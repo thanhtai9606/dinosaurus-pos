@@ -1,0 +1,67 @@
+---
+globs: Makefile,*.mk,scripts/**/*.sh
+description: Makefile and shell scripting patterns for POS Kasir development workflow
+---
+
+# Makefile & Shell Scripting Guidelines
+
+## Makefile Structure
+
+Follow [Makefile](mdc:Makefile) (pattern dari go-pos, disesuaikan infra compose + dev lokal).
+
+### Headers & defaults
+
+```makefile
+.DEFAULT_GOAL := help
+COMPOSE_INFRA := docker-compose.infra.yml
+COMPOSE_PROD := docker-compose.yml
+-include .env
+```
+
+### Command categories
+
+1. **Development** — `dev`, `up`, `down`, `prod`, `restart`, `build`
+2. **Database** — migrations, `seed`, `backup`, `restore`, `db-reset`, `create-admin`
+3. **Codegen** — `sqlc-generate`, `swag`
+4. **Utilities** — `logs`, `status`, `clean`, `test`, `lint`, `format`, `deps`
+5. **Shortcuts** — `start` → `up`, `stop` → `down`, `install` → `deps`
+
+Dev lokal: `make up` hanya menjalankan infra; app = `go run ./cmd/app` dan `cd web && bun run dev`.
+
+## Docker
+
+- **Infra dev:** `docker compose -f docker-compose.infra.yml`
+- **Production full stack:** `docker compose -f docker-compose.yml`
+- Container DB: `pos-postgres` (user/db dari `.env`, default `pos_user` / `pos_kasir`)
+
+Sebelum operasi DB, cek container:
+
+```bash
+docker ps -q -f name=pos-postgres
+```
+
+## Shell scripts (`scripts/`)
+
+- Gunakan `scripts/common.sh` untuk load `.env` dan `require_postgres`.
+- `set -e` di semua script.
+- Operasi destruktif: konfirmasi eksplisit (`YES` atau `DELETE ALL DATA`).
+- Hash password admin: `go run ./scripts/hashpw/main.go`, jangan simpan plain text di repo.
+
+### Script map
+
+| Script | Make target |
+|--------|-------------|
+| `backup.sh` | `make backup` |
+| `restore.sh` | `make restore` |
+| `db-reset.sh` | `make db-reset` |
+| `remove-data.sh` | `make remove-data` |
+| `create-admin.sh` | `make create-admin` |
+| `create-demo-users.sh` | `make create-demo-users` |
+
+Backup disimpan di `backups/` dengan prefix `pos_kasir_backup_*`.
+
+## Migrations
+
+`DB_URL` dibangun dari variabel `.env` (`DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_SSLMODE`).
+
+Untuk dev lokal set `DB_HOST=localhost` setelah `make up`.

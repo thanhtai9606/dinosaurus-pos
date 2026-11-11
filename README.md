@@ -144,11 +144,11 @@ Env lainnya sudah memiliki default yang aman. Lihat [`.env.example`](.env.exampl
 ### 1. Setup Infrastructure
 
 ```bash
-# Jalankan PostgreSQL + MinIO + Redis via Docker
-docker compose -f docker-compose.infra.yml up -d
+# Infra saja (Postgres + MinIO + Redis)
+make up          # alias: make dev, make dev-infra, make start
 
-# Atau menggunakan Makefile
-make dev-infra
+# Atau langsung via Docker Compose
+docker compose -f docker-compose.infra.yml up -d
 ```
 
 ### 2. Setup Environment
@@ -198,20 +198,37 @@ Setelah build, akses `http://localhost:8080` — Go backend serve SPA langsung.
 
 ## Useful Commands
 
+Daftar lengkap: `make` atau `make help`.
+
 ```bash
+# Development & Docker
+make dev                 # Infra up + petunjuk jalankan backend/frontend lokal
+make up                  # Infra di background (Postgres, Redis, MinIO)
+make down                # Stop semua stack
+make prod                # Full stack (image app + infra) via docker-compose.yml
+make status              # Cek container pos-*
+make logs                # Log infra compose
+
 # Database
 make migrate-up          # Jalankan migrations
 make migrate-down-one    # Rollback 1 migration
-make migrate-create name=add_xxx_table   # Buat migration baru
+make migrate-down-all    # Rollback semua migration
+make migrate-create name=add_xxx_table
 make seed                # Seed sample data
+make create-demo-users   # Seed + tampilkan akun demo
+make db-reset            # down all migrations, up, seed (konfirmasi)
+make backup              # Backup SQL ke backups/
+make restore             # Restore dari backups/
+make db-shell            # psql ke pos-postgres
 
-# Code Generation
-make sqlc-generate       # Generate Go code dari SQL
-make swag                # Generate Swagger docs + API client
+# Code generation
+make sqlc-generate
+make swag                # Swagger + OpenAPI client di web/
 
-# Docker
-docker compose up -d              # Full stack (app + DB + MinIO)
-docker compose -f docker-compose-infra.yaml up -d   # Infra saja
+# Tooling
+make test                # go test ./... + vitest di web
+make lint                # go vet
+make deps                # go mod tidy + bun install di web
 ```
 
 ## CI/CD

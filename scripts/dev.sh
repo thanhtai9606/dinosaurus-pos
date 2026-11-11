@@ -139,6 +139,14 @@ until curl -sf "http://127.0.0.1:${APP_PORT}/healthz" >/dev/null 2>&1; do
 done
 echo -e "${GREEN}✅ Backend is up (/healthz).${NC}"
 
+user_count=$(docker exec "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -tAc "SELECT count(*) FROM users;" 2>/dev/null | tr -d '[:space:]')
+if [[ "${user_count:-0}" == "0" ]]; then
+	echo -e "${YELLOW}📦 Database empty — running seeder (first run may take ~30s)...${NC}"
+	( cd "$REPO_ROOT" && go run ./cmd/seeder/main.go ) 2>&1 | sed -u 's/^/[seed] /' || {
+		echo -e "${RED}❌ Seeder failed. Try: DB_HOST=localhost DB_PORT=${DB_PUBLISH_PORT} make seed${NC}"
+	}
+fi
+
 ( cd web && exec pnpm dev 2>&1 | sed -u 's/^/[frontend] /' ) &
 FRONTEND_PID=$!
 

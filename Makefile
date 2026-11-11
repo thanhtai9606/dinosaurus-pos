@@ -157,7 +157,10 @@ sqlc-generate:
 	sqlc generate -f sqlc/sqlc.yaml
 
 seed:
-	go run ./cmd/seeder/main.go
+	@DB_HOST=localhost DB_PORT=$(DB_PUBLISH_PORT) REDIS_HOST=localhost \
+		R2_ENDPOINT=$${R2_ENDPOINT:-http://localhost:9000} R2_USE_SSL=false \
+		R2_ACCESS_KEY=$${R2_ACCESS_KEY:-minioadmin} R2_SECRET_KEY=$${R2_SECRET_KEY:-minioadmin} \
+		APP_ENV=development go run ./cmd/seeder/main.go
 
 swag:
 	@echo "$(GREEN)Generating Swagger and web API client...$(NC)"

@@ -27,6 +27,9 @@ MIGRATIONS_PATH := ./sqlc/migrations
 
 -include .env
 
+DB_PUBLISH_PORT ?= 5433
+# Migrations/cli từ máy host → Docker Postgres (published port)
+LOCAL_DB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PUBLISH_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 DB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 
 ## Help
@@ -125,7 +128,11 @@ migrate-version:
 	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) version
 
 migrate-up:
-	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) up
+	@if [ "$(DB_HOST)" = "localhost" ] || [ "$(DB_HOST)" = "127.0.0.1" ]; then \
+		$(MIGRATE) -path $(MIGRATIONS_PATH) -database "$(LOCAL_DB_URL)" up; \
+	else \
+		$(MIGRATE) -path $(MIGRATIONS_PATH) -database "$(DB_URL)" up; \
+	fi
 
 migrate-down:
 	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) down

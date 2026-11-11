@@ -107,9 +107,10 @@ type AppContainer struct {
 }
 
 func InitApp() *App {
-	if err := godotenv.Overload(); err != nil {
+	// Load fills unset vars only so make dev / Docker env overrides .env (e.g. DB_HOST).
+	if err := godotenv.Load(); err != nil {
 		if os.Getenv("APP_ENV") != "production" {
-			log.Println("Warning: .env file not found or could not be overloaded")
+			log.Println("Warning: .env file not found or could not be loaded")
 		}
 	}
 

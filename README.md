@@ -189,6 +189,11 @@ pnpm dev
 
 Frontend dev server di `http://localhost:5173` (dengan proxy ke backend 8080)
 
+**UI gọi API lỗi?**
+- Chạy **`make dev`** (cần cả backend lẫn Vite), không chỉ `pnpm dev`.
+- Postgres Docker map cổng **`DB_PUBLISH_PORT` (mặc định 5433)** để tránh trùng PostgreSQL cổng 5432 trên máy.
+- `DB_PASSWORD` trong `.env` phải khớp lúc tạo volume (mặc định `pos_password`), hoặc `make down` + xóa volume rồi `make up` lại.
+
 ### 5. Build Frontend (SPA)
 
 ```bash

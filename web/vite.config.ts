@@ -37,6 +37,9 @@ const config = defineConfig({
     },
   },
   server: {
+    host: true,
+    port: 5173,
+    strictPort: true,
     proxy: {
       '/api': 'http://localhost:8080',
       '/swagger': 'http://localhost:8080',

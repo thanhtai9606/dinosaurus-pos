@@ -26,7 +26,7 @@ COMPOSE_PROD := docker-compose.yml
 4. **Utilities** — `logs`, `status`, `clean`, `test`, `lint`, `format`, `deps`
 5. **Shortcuts** — `start` → `up`, `stop` → `down`, `install` → `deps`
 
-Dev lokal: `make up` hanya menjalankan infra; app = `go run ./cmd/app` dan `cd web && pnpm dev`.
+Dev lokal: `make dev` menjalankan infra + backend (`air`) + frontend (`pnpm dev`). `make up` hanya infra.
 
 ## Docker
 
@@ -57,6 +57,7 @@ docker ps -q -f name=pos-postgres
 | `remove-data.sh` | `make remove-data` |
 | `create-admin.sh` | `make create-admin` |
 | `create-demo-users.sh` | `make create-demo-users` |
+| `dev.sh` | `make dev` |
 
 Backup disimpan di `backups/` dengan prefix `pos_kasir_backup_*`.
 

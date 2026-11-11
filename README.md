@@ -144,8 +144,11 @@ Env lainnya sudah memiliki default yang aman. Lihat [`.env.example`](.env.exampl
 ### 1. Setup Infrastructure
 
 ```bash
+# Full stack dev (infra + backend hot-reload + Vite)
+make dev
+
 # Infra saja (Postgres + MinIO + Redis)
-make up          # alias: make dev, make dev-infra, make start
+make up          # alias: make dev-infra, make start
 
 # Atau langsung via Docker Compose
 docker compose -f docker-compose.infra.yml up -d
@@ -202,7 +205,7 @@ Daftar lengkap: `make` atau `make help`.
 
 ```bash
 # Development & Docker
-make dev                 # Infra up + petunjuk jalankan backend/frontend lokal
+make dev                 # Infra + backend (air) + frontend (pnpm dev)
 make up                  # Infra di background (Postgres, Redis, MinIO)
 make down                # Stop semua stack
 make prod                # Full stack (image app + infra) via docker-compose.yml

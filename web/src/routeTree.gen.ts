@@ -9,39 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LocaleLoginRouteImport } from './routes/$locale/login'
+import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as LocaleDashboardRouteImport } from './routes/$locale/_dashboard'
+import { Route as LocaleLoginRouteImport } from './routes/$locale/login'
 import { Route as LocaleDashboardIndexRouteImport } from './routes/$locale/_dashboard.index'
-import { Route as LocaleDashboardUsersRouteImport } from './routes/$locale/_dashboard.users'
-import { Route as LocaleDashboardTransactionsRouteImport } from './routes/$locale/_dashboard.transactions'
-import { Route as LocaleDashboardSettingsRouteImport } from './routes/$locale/_dashboard.settings'
-import { Route as LocaleDashboardReportsRouteImport } from './routes/$locale/_dashboard.reports'
-import { Route as LocaleDashboardPromotionsRouteImport } from './routes/$locale/_dashboard.promotions'
-import { Route as LocaleDashboardProductRouteImport } from './routes/$locale/_dashboard.product'
-import { Route as LocaleDashboardOrderRouteImport } from './routes/$locale/_dashboard.order'
-import { Route as LocaleDashboardCustomersRouteImport } from './routes/$locale/_dashboard.customers'
-import { Route as LocaleDashboardActivityLogsRouteImport } from './routes/$locale/_dashboard.activity-logs'
 import { Route as LocaleDashboardAccountRouteImport } from './routes/$locale/_dashboard.account'
+import { Route as LocaleDashboardActivityLogsRouteImport } from './routes/$locale/_dashboard.activity-logs'
+import { Route as LocaleDashboardCustomersRouteImport } from './routes/$locale/_dashboard.customers'
+import { Route as LocaleDashboardOrderRouteImport } from './routes/$locale/_dashboard.order'
+import { Route as LocaleDashboardProductRouteImport } from './routes/$locale/_dashboard.product'
+import { Route as LocaleDashboardPromotionsRouteImport } from './routes/$locale/_dashboard.promotions'
+import { Route as LocaleDashboardReportsRouteImport } from './routes/$locale/_dashboard.reports'
+import { Route as LocaleDashboardSettingsRouteImport } from './routes/$locale/_dashboard.settings'
+import { Route as LocaleDashboardTransactionsRouteImport } from './routes/$locale/_dashboard.transactions'
+import { Route as LocaleDashboardUsersRouteImport } from './routes/$locale/_dashboard.users'
 
-const LocaleRoute = LocaleRouteImport.update({
-  id: '/$locale',
-  path: '/$locale',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LocaleLoginRoute = LocaleLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => LocaleRoute,
+const LocaleRoute = LocaleRouteImport.update({
+  id: '/$locale',
+  path: '/$locale',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleDashboardRoute = LocaleDashboardRouteImport.update({
   id: '/_dashboard',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleLoginRoute = LocaleLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => LocaleRoute,
 } as any)
 const LocaleDashboardIndexRoute = LocaleDashboardIndexRouteImport.update({
@@ -49,25 +49,31 @@ const LocaleDashboardIndexRoute = LocaleDashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
-const LocaleDashboardUsersRoute = LocaleDashboardUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const LocaleDashboardAccountRoute = LocaleDashboardAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
-const LocaleDashboardTransactionsRoute =
-  LocaleDashboardTransactionsRouteImport.update({
-    id: '/transactions',
-    path: '/transactions',
+const LocaleDashboardActivityLogsRoute =
+  LocaleDashboardActivityLogsRouteImport.update({
+    id: '/activity-logs',
+    path: '/activity-logs',
     getParentRoute: () => LocaleDashboardRoute,
   } as any)
-const LocaleDashboardSettingsRoute = LocaleDashboardSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const LocaleDashboardCustomersRoute =
+  LocaleDashboardCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => LocaleDashboardRoute,
+  } as any)
+const LocaleDashboardOrderRoute = LocaleDashboardOrderRouteImport.update({
+  id: '/order',
+  path: '/order',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
-const LocaleDashboardReportsRoute = LocaleDashboardReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
+const LocaleDashboardProductRoute = LocaleDashboardProductRouteImport.update({
+  id: '/product',
+  path: '/product',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
 const LocaleDashboardPromotionsRoute =
@@ -76,37 +82,31 @@ const LocaleDashboardPromotionsRoute =
     path: '/promotions',
     getParentRoute: () => LocaleDashboardRoute,
   } as any)
-const LocaleDashboardProductRoute = LocaleDashboardProductRouteImport.update({
-  id: '/product',
-  path: '/product',
+const LocaleDashboardReportsRoute = LocaleDashboardReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
-const LocaleDashboardOrderRoute = LocaleDashboardOrderRouteImport.update({
-  id: '/order',
-  path: '/order',
+const LocaleDashboardSettingsRoute = LocaleDashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
-const LocaleDashboardCustomersRoute =
-  LocaleDashboardCustomersRouteImport.update({
-    id: '/customers',
-    path: '/customers',
+const LocaleDashboardTransactionsRoute =
+  LocaleDashboardTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
     getParentRoute: () => LocaleDashboardRoute,
   } as any)
-const LocaleDashboardActivityLogsRoute =
-  LocaleDashboardActivityLogsRouteImport.update({
-    id: '/activity-logs',
-    path: '/activity-logs',
-    getParentRoute: () => LocaleDashboardRoute,
-  } as any)
-const LocaleDashboardAccountRoute = LocaleDashboardAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const LocaleDashboardUsersRoute = LocaleDashboardUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$locale': typeof LocaleDashboardRouteWithChildren
+  '/$locale': typeof LocaleRouteWithChildren
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/account': typeof LocaleDashboardAccountRoute
   '/$locale/activity-logs': typeof LocaleDashboardActivityLogsRoute
@@ -211,13 +211,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/$locale': {
-      id: '/$locale'
-      path: '/$locale'
-      fullPath: '/$locale'
-      preLoaderRoute: typeof LocaleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -225,18 +218,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$locale/login': {
-      id: '/$locale/login'
-      path: '/login'
-      fullPath: '/$locale/login'
-      preLoaderRoute: typeof LocaleLoginRouteImport
-      parentRoute: typeof LocaleRoute
+    '/$locale': {
+      id: '/$locale'
+      path: '/$locale'
+      fullPath: '/$locale'
+      preLoaderRoute: typeof LocaleRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$locale/_dashboard': {
       id: '/$locale/_dashboard'
       path: ''
       fullPath: '/$locale'
       preLoaderRoute: typeof LocaleDashboardRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/login': {
+      id: '/$locale/login'
+      path: '/login'
+      fullPath: '/$locale/login'
+      preLoaderRoute: typeof LocaleLoginRouteImport
       parentRoute: typeof LocaleRoute
     }
     '/$locale/_dashboard/': {
@@ -246,60 +246,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleDashboardIndexRouteImport
       parentRoute: typeof LocaleDashboardRoute
     }
-    '/$locale/_dashboard/users': {
-      id: '/$locale/_dashboard/users'
-      path: '/users'
-      fullPath: '/$locale/users'
-      preLoaderRoute: typeof LocaleDashboardUsersRouteImport
-      parentRoute: typeof LocaleDashboardRoute
-    }
-    '/$locale/_dashboard/transactions': {
-      id: '/$locale/_dashboard/transactions'
-      path: '/transactions'
-      fullPath: '/$locale/transactions'
-      preLoaderRoute: typeof LocaleDashboardTransactionsRouteImport
-      parentRoute: typeof LocaleDashboardRoute
-    }
-    '/$locale/_dashboard/settings': {
-      id: '/$locale/_dashboard/settings'
-      path: '/settings'
-      fullPath: '/$locale/settings'
-      preLoaderRoute: typeof LocaleDashboardSettingsRouteImport
-      parentRoute: typeof LocaleDashboardRoute
-    }
-    '/$locale/_dashboard/reports': {
-      id: '/$locale/_dashboard/reports'
-      path: '/reports'
-      fullPath: '/$locale/reports'
-      preLoaderRoute: typeof LocaleDashboardReportsRouteImport
-      parentRoute: typeof LocaleDashboardRoute
-    }
-    '/$locale/_dashboard/promotions': {
-      id: '/$locale/_dashboard/promotions'
-      path: '/promotions'
-      fullPath: '/$locale/promotions'
-      preLoaderRoute: typeof LocaleDashboardPromotionsRouteImport
-      parentRoute: typeof LocaleDashboardRoute
-    }
-    '/$locale/_dashboard/product': {
-      id: '/$locale/_dashboard/product'
-      path: '/product'
-      fullPath: '/$locale/product'
-      preLoaderRoute: typeof LocaleDashboardProductRouteImport
-      parentRoute: typeof LocaleDashboardRoute
-    }
-    '/$locale/_dashboard/order': {
-      id: '/$locale/_dashboard/order'
-      path: '/order'
-      fullPath: '/$locale/order'
-      preLoaderRoute: typeof LocaleDashboardOrderRouteImport
-      parentRoute: typeof LocaleDashboardRoute
-    }
-    '/$locale/_dashboard/customers': {
-      id: '/$locale/_dashboard/customers'
-      path: '/customers'
-      fullPath: '/$locale/customers'
-      preLoaderRoute: typeof LocaleDashboardCustomersRouteImport
+    '/$locale/_dashboard/account': {
+      id: '/$locale/_dashboard/account'
+      path: '/account'
+      fullPath: '/$locale/account'
+      preLoaderRoute: typeof LocaleDashboardAccountRouteImport
       parentRoute: typeof LocaleDashboardRoute
     }
     '/$locale/_dashboard/activity-logs': {
@@ -309,11 +260,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleDashboardActivityLogsRouteImport
       parentRoute: typeof LocaleDashboardRoute
     }
-    '/$locale/_dashboard/account': {
-      id: '/$locale/_dashboard/account'
-      path: '/account'
-      fullPath: '/$locale/account'
-      preLoaderRoute: typeof LocaleDashboardAccountRouteImport
+    '/$locale/_dashboard/customers': {
+      id: '/$locale/_dashboard/customers'
+      path: '/customers'
+      fullPath: '/$locale/customers'
+      preLoaderRoute: typeof LocaleDashboardCustomersRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/order': {
+      id: '/$locale/_dashboard/order'
+      path: '/order'
+      fullPath: '/$locale/order'
+      preLoaderRoute: typeof LocaleDashboardOrderRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/product': {
+      id: '/$locale/_dashboard/product'
+      path: '/product'
+      fullPath: '/$locale/product'
+      preLoaderRoute: typeof LocaleDashboardProductRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/promotions': {
+      id: '/$locale/_dashboard/promotions'
+      path: '/promotions'
+      fullPath: '/$locale/promotions'
+      preLoaderRoute: typeof LocaleDashboardPromotionsRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/reports': {
+      id: '/$locale/_dashboard/reports'
+      path: '/reports'
+      fullPath: '/$locale/reports'
+      preLoaderRoute: typeof LocaleDashboardReportsRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/settings': {
+      id: '/$locale/_dashboard/settings'
+      path: '/settings'
+      fullPath: '/$locale/settings'
+      preLoaderRoute: typeof LocaleDashboardSettingsRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/transactions': {
+      id: '/$locale/_dashboard/transactions'
+      path: '/transactions'
+      fullPath: '/$locale/transactions'
+      preLoaderRoute: typeof LocaleDashboardTransactionsRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/users': {
+      id: '/$locale/_dashboard/users'
+      path: '/users'
+      fullPath: '/$locale/users'
+      preLoaderRoute: typeof LocaleDashboardUsersRouteImport
       parentRoute: typeof LocaleDashboardRoute
     }
   }

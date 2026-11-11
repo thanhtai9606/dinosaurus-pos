@@ -34,7 +34,7 @@ help:
 	@echo "$(BLUE)POS Kasir — Available Make Commands$(NC)"
 	@echo ""
 	@echo "$(GREEN)Development:$(NC)"
-	@echo "  make dev            - Start infra (Postgres, Redis, MinIO) + setup hints"
+	@echo "  make dev            - Infra + backend (air) + frontend (pnpm dev)"
 	@echo "  make up             - Start infra in background (alias: dev-infra, start)"
 	@echo "  make down           - Stop infra and production stacks"
 	@echo "  make prod           - Full stack via docker-compose.yml"
@@ -70,17 +70,12 @@ help:
 	@echo "  make format         - gofmt on Go sources"
 	@echo "  make deps           - go mod tidy + web install"
 	@echo ""
-	@echo "$(YELLOW)Local app: go run ./cmd/app (or air) and cd web && pnpm dev$(NC)"
+	@echo "$(YELLOW)Quick start: make dev (infra + backend + frontend)$(NC)"
 
 ## Development
 
-dev: up
-	@echo ""
-	@echo "$(GREEN)✅ Infrastructure is up.$(NC)"
-	@echo "$(BLUE)Backend:$(NC)  go run ./cmd/app   (or: air)"
-	@echo "$(BLUE)Frontend:$(NC) cd web && pnpm dev  → http://localhost:5173"
-	@echo "$(BLUE)Full SPA:$(NC)   cd web && pnpm build, then http://localhost:8080"
-	@echo "$(BLUE)MinIO:$(NC)      http://localhost:9001"
+dev:
+	@./scripts/dev.sh
 
 prod:
 	@echo "$(GREEN)🚀 Starting production stack...$(NC)"

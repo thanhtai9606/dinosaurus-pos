@@ -1,6 +1,6 @@
 import * as React from "react"
 import { format, subDays, startOfDay, endOfDay } from "date-fns"
-import { id as localeId, enUS as localeEn } from "date-fns/locale"
+import { id as localeId, enUS as localeEn, vi as localeVi } from "date-fns/locale"
 import { Calendar as CalendarIcon, Check } from "lucide-react"
 import { DateRange } from "react-day-picker"
 
@@ -25,7 +25,8 @@ export function DateRangePicker({
   onDateChange,
 }: DateRangePickerProps) {
   const { t, i18n } = useTranslation()
-  const currentLocale = i18n.language === 'id' ? localeId : localeEn
+  const currentLocale =
+    i18n.language === 'id' ? localeId : i18n.language === 'vi' ? localeVi : localeEn
 
   const [isOpen, setIsOpen] = React.useState(false)
 

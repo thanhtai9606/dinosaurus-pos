@@ -148,18 +148,21 @@ function flattenObject(ob: any): Record<string, string> {
     return toReturn;
 }
 
-function loadLocales(): { id: Record<string, string>, en: Record<string, string> } {
+function loadLocales(): { id: Record<string, string>, en: Record<string, string>, vi: Record<string, string> } {
     let id: Record<string, string> = {};
     let en: Record<string, string> = {};
+    let vi: Record<string, string> = {};
     try {
         const idPath = path.join(LOCALES_DIR, 'id.json');
         const enPath = path.join(LOCALES_DIR, 'en.json');
+        const viPath = path.join(LOCALES_DIR, 'vi.json');
         if (fs.existsSync(idPath)) id = flattenObject(JSON.parse(fs.readFileSync(idPath, 'utf8')));
         if (fs.existsSync(enPath)) en = flattenObject(JSON.parse(fs.readFileSync(enPath, 'utf8')));
+        if (fs.existsSync(viPath)) vi = flattenObject(JSON.parse(fs.readFileSync(viPath, 'utf8')));
     } catch (e) {
         console.warn("Failed to load locales", e);
     }
-    return { id, en };
+    return { id, en, vi };
 }
 
 function run() {
@@ -213,6 +216,9 @@ function run() {
             }
             if (!locales.en[key]) {
                 errors.push(`Missing translation key '${key}' in en.json`);
+            }
+            if (!locales.vi[key]) {
+                errors.push(`Missing translation key '${key}' in vi.json`);
             }
         }
 

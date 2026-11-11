@@ -1,0 +1,937 @@
+{
+    "common": {
+        "loading": "Đang tải...",
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "delete": "Delete (Xóa)",
+        "edit": "Chỉnh sửa",
+        "actions": "Hành động",
+        "logout": "Thoát",
+        "confirm": "Xác nhận",
+        "yes": "Có",
+        "no": "Không",
+        "no_data": "Không có dữ liệu",
+        "save_changes": "Lưu Thay Đổi",
+        "start_date": "Ngày Bắt đầu",
+        "end_date": "Ngày kết thúc",
+        "sold": "đã bán",
+        "rev": "lợi tức",
+        "no_results": "Không tìm thấy kết quả.",
+        "clear_filters": "Xóa bộ lọc",
+        "previous": "Trước",
+        "next": "Tiếp theo",
+        "page_info": "Trang {{current}}/{{total}}",
+        "restore": "Khôi phục",
+        "print": "In",
+        "open_menu": "Mở menu",
+        "language_placeholder": "Ngôn ngữ",
+        "language_id": "Bahasa Indonesia (ID)",
+        "language_en": "Tiếng Anh (EN)",
+        "error": {
+            "title": "Rất tiếc!",
+            "subtitle": "Đã xảy ra sự cố",
+            "default_message": "Có lỗi xảy ra, xin vui lòng thử lại",
+            "try_again": "Thử lại",
+            "go_home": "Trở về",
+            "load_failed": "Không thể tải dữ liệu: {{message}}"
+        },
+        "crop": {
+            "title": "Cắt Xén Hình Ảnh",
+            "description": "Điều chỉnh hình ảnh để phù hợp với tỷ lệ khung hình cần thiết.",
+            "zoom": "Zoom",
+            "save": "Cắt & lưu"
+        },
+        "theme": {
+            "toggle": "Chuyển đổi chủ đề",
+            "light": "Hạng nhẹ",
+            "dark": "Tối",
+            "system": "Hệ thống"
+        },
+        "not_found": {
+            "title": "Không tìm thấy trang",
+            "description": "Rất tiếc, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.",
+            "go_home": "Quy mo du an"
+        },
+        "language_vi": "Tiếng Việt (VI)",
+        "email_placeholder": "m.scott@dundermifflin.com",
+        "password_placeholder": "••••••••"
+    },
+    "auth": {
+        "welcome_back": "Chào mừng bạn đã trở lại",
+        "sign_in_subtitle": "Đăng nhập vào tài khoản của bạn để tiếp tục.",
+        "email": "Email",
+        "password": "Mật khẩu",
+        "sign_in": "Đăng nhập",
+        "signing_in": "Đăng nhập",
+        "dont_have_account": "Bạn không có tài khoản? ",
+        "register": "Đăng ký",
+        "forgot_password": "Quên mật khẩu?",
+        "login_failed": "Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn.",
+        "email_placeholder": "m.scott@dundermifflin.com",
+        "password_placeholder": "••••••••",
+        "demo_account": "Sử dụng tài khoản demo:",
+        "logout_failed": "Đăng xuất không thành công: {{message}}",
+        "update_avatar_failed": "Không thể cập nhật hình đại diện: {{message}}",
+        "update_password_success": "Cập nhật mật khẩu thành công",
+        "update_password_failed": "Không thể cập nhật mật khẩu: {{message}}"
+    },
+    "sidebar": {
+        "summary": "Bản chất kỹ thuật của sáng chế",
+        "pos": "Máy POS",
+        "date": "Ngày",
+        "transactions": "Giao dịch",
+        "product": "Sản phẩm",
+        "promotions": "Mã giảm giá",
+        "reports": "Báo cáo",
+        "users": "Người dùng",
+        "settings": "Cài đặt",
+        "account": "Tài khoản",
+        "activity_logs": "Nhật ký hoạt động",
+        "customers": "Khách hàng"
+    },
+    "user_menu": {
+        "profile": "Hồ sơ",
+        "settings": "Cài đặt",
+        "activity_logs": "Nhật ký hoạt động"
+    },
+    "transactions": {
+        "title": "Giao dịch",
+        "subtitle": "Theo dõi đơn hàng và quản lý thanh toán.",
+        "filter_user": "Tất cả nhân viên thu ngân",
+        "search_placeholder": "Tìm kiếm hàng đợi, vật phẩm, thu ngân…",
+        "tabs": {
+            "active": "Hoạt động",
+            "history": "Lịch sử",
+            "cancelled": "Cancelled"
+        },
+        "status": {
+            "open": "Mở",
+            "in_progress": "Process (Xử lý)",
+            "served": "Chúng tôi phục vụ",
+            "paid": "Đã thanh toán",
+            "cancelled": "Hủy",
+            "all": "Tất cả"
+        },
+        "status_badge": {
+            "paid": "ĐÃ THANH TOÁN]",
+            "unpaid": "CHƯA THANH TOÁN"
+        },
+        "table": {
+            "queue": "Hàng Đợi",
+            "type": "Loại",
+            "cashier": "Kế toán",
+            "items": "Hạng mục",
+            "total": "Tổng cộng",
+            "status": "Trạng thái",
+            "action": "Hành động",
+            "no_data": "Không tìm thấy giao dịch nào cho bộ lọc này."
+        },
+        "actions_button": {
+            "pay": "Mức lương",
+            "complete": "Hoàn thành",
+            "cancel": "Hủy",
+            "refund": "Hoàn tiền"
+        },
+        "cancellation_dialog": {
+            "title": "Hủy Đơn hàng",
+            "description": "Vui lòng chọn lý do hủy đơn hàng",
+            "reason_label": "Lý do",
+            "reason_placeholder": "Chọn một lý do",
+            "notes_label": "Ghi chú bổ sung",
+            "notes_placeholder": "Chi tiết tùy chọn...",
+            "confirm": "Hủy Đơn hàng",
+            "cancel": "Quay lại"
+        },
+        "refund_dialog": {
+            "title": "Lệnh hoàn tiền",
+            "description": "Bạn có chắc chắn muốn hoàn tiền cho đơn hàng này không?",
+            "warning": "Thao tác này sẽ hủy các mặt hàng và đưa chúng trở lại kho.",
+            "reason_label": "Lý do",
+            "reason_placeholder": "Chọn lý do"
+        },
+        "payment_dialog": {
+            "title": "Hoàn tất thanh toán",
+            "description": "Xử lý thanh toán cho hàng đợi",
+            "total_amount": "TỔNG THANH TOÁN",
+            "select_method": "Phương thức thanh toán",
+            "cash_received": "Tiền mặt thu ",
+            "change_due": "Thay đổi ngày đáo hạn",
+            "confirm": "Xác nhận thanh toán",
+            "money_insufficient": "Tiền mặt không đủ!",
+            "success": "Thanh toán thành công! Thay đổi:"
+        },
+        "messages": {
+            "fetch_error": "Không thể tìm nạp giao dịch",
+            "cancel_notes_required": "Ghi chú hủy là bắt buộc",
+            "order_finished": "Đơn hàng đã hoàn tất",
+            "use_action_button": "Vui lòng sử dụng các nút hành động"
+        },
+        "loading": "Memuat status shift...",
+        "register_open": "Mesin Kasir Terbuka",
+        "open_register": "Buka Mesin Kasir",
+        "open_shift_title": "Buka Shift"
+    },
+    "dashboard": {
+        "title": "Tóm tắt trang tổng quan",
+        "welcome_subtitle": "Dưới đây là những gì đang xảy ra với cửa hàng của bạn ngày hôm nay.",
+        "toggle_nav": "Chuyển đổi điều hướng thành",
+        "widgets": {
+            "quick_actions": "Tiện ích nhanh",
+            "quick_actions_desc": "Quản lý cửa hàng của bạn hiệu quả",
+            "manage_products": "Quản lý sản phẩm",
+            "view_reports": "Xem báo cáo đầy đủ",
+            "sales_trend": "Xu hướng bán hàng (30 ngày qua)",
+            "top_products": "Top sản phẩm",
+            "quantity": "Đơn vị",
+            "revenue": "Doanh thu",
+            "payment_distribution": "Phương thức Thanh toán",
+            "cashier_performance": "Hiệu suất thu ngân"
+        },
+        "stats": {
+            "from_last_month": "Tháng trước",
+            "since_last_hour": "kể từ giờ trước",
+            "today_sales": "Doanh số hôm nay",
+            "today_orders": "Đơn hàng hôm nay",
+            "active_today": "Hoạt động hôm nay",
+            "all_time": "Tất cả thời điểm"
+        },
+        "total_revenue": "Doanh thu tổng",
+        "total_orders": "Tổng số đơn đặt hàng",
+        "active_cashiers": "Nhân viên thu ngân đang hoạt động",
+        "total_products": "Tổng số sản phẩm",
+        "active_users": "Người dùng hoạt động",
+        "sales": "Bán hàng",
+        "active_now": "Kích hoạt Ngay",
+        "brand_name": "POS Kasir",
+        "secret_reports": "Trang Báo cáo Bí mật (Chỉ dành cho Quản trị viên)",
+        "placeholder_content": "Nội dung khác có thể được đặt ở đây..."
+    },
+    "reports": {
+        "title": "Phân tích báo cáo",
+        "subtitle": "Hiểu biết toàn diện về hiệu quả kinh doanh của bạn.",
+        "export_csv": "Xuất CSV",
+        "tabs": {
+            "sales": "Bán hàng",
+            "products": "Sản phẩm",
+            "profit": "Lợi nhuận",
+            "performance": "Sự trình diễn (Performance)",
+            "cancellations": "Hủy dịch vụ",
+            "low_stock": "Còn ít hàng",
+            "promotions": "Mã giảm giá",
+            "shifts": "Ca"
+        },
+        "sales": {
+            "title": "Tổng quan bán hàng",
+            "description": "Doanh thu bán hàng hàng ngày và đơn hàng được tính theo thời gian.",
+            "revenue": "Doanh thu tổng",
+            "orders": "Đơn hàng - Số lượng mặt hàng"
+        },
+        "products": {
+            "title": "Hiệu suất Sản phẩm",
+            "description": "Sản phẩm bán chạy nhất theo số lượng và doanh thu.",
+            "product": "Sản phẩm",
+            "quantity": "Số lượng bán Đon vị",
+            "revenue": "Doanh thu tổng",
+            "stock": "Tồn kho"
+        },
+        "performance": {
+            "payment_methods": "Phân phối phương thức thanh toán",
+            "cashier": "Bảng xếp hạng thu ngân",
+            "staff": "Đội ngũ Trainer",
+            "orders": "Tổng số đơn đặt hàng",
+            "sales": "Tổng doanh số"
+        },
+        "cancellations": {
+            "title": "Báo cáo hủy",
+            "description": "Phân tích các lệnh và lý do bị hủy.",
+            "reason": "Lý do",
+            "date": "Ngày",
+            "count": "Tổng sản phẩm"
+        },
+        "profit": {
+            "title": "Phân tích lợi nhuận",
+            "description": "Phân tích doanh thu, giá VỐN và lợi nhuận gộp của bạn.",
+            "revenue": "Doanh thu",
+            "cogs": "COGS",
+            "gross_profit": "Tổng lợi nhuận trước thuế",
+            "products": "Khả năng sinh lời của sản phẩm",
+            "products_desc": "Phân tích tỷ suất lợi nhuận trên mỗi sản phẩm.",
+            "profit": "Lợi nhuận"
+        },
+        "start_date": "Ngày Bắt đầu",
+        "end_date": "Ngày kết thúc",
+        "low_stock": {
+            "title": "Sản phẩm có lượng tồn kho thấp",
+            "description": "Các sản phẩm có trữ lượng dưới ngưỡng tối thiểu."
+        },
+        "promotions": {
+            "title": "Chương trình khuyến mãi",
+            "description": "Kiểm tra hiệu quả của các chương trình khuyến mãi",
+            "name": "Tên chương trình khuyến mãi",
+            "discount": "Giảm giá",
+            "type": "Loại"
+        },
+        "shifts": {
+            "title": "Ca làm việc",
+            "description": "Theo dõi chính xác việc đối chiếu tiền mặt.",
+            "status": "Trạng thái",
+            "expected": "Kỳ vọng",
+            "actual": "Thực tế",
+            "diff": "Sự khác biệt"
+        }
+    },
+    "account": {
+        "title": "Tài khoản",
+        "subtitle": "Quản lý cài đặt và tùy chọn tài khoản của bạn.",
+        "tabs": {
+            "profile": "Hồ sơ",
+            "security": "Tính bảo mật"
+        },
+        "avatar": {
+            "title": "Ảnh hồ sơ",
+            "description": "Cập nhật hình ảnh cho hồ sơ",
+            "success": "Hô sơ được cập nhật thành công!",
+            "error": "Không thể cập nhật hình đại diện.",
+            "upload_button": "Tải ảnh mới"
+        },
+        "password": {
+            "title": "Bảo mật bằng mật khẩu",
+            "description": "Thay đổi mật khẩu để giữ an toàn cho tài khoản của bạn.",
+            "current_password": "Mật khẩu Hiện tại",
+            "new_password": "Mật khẩu Mới",
+            "confirm_password": "Xác nhận mật khẩu mới",
+            "button": "Thay đổi mật khẩu",
+            "error_match": "Mật khẩu mới không trùng khớp.",
+            "success": "Mật khẩu được cập nhật thành công!",
+            "error_fail": "Không thể cập nhật mật khẩu."
+        }
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "description": "Quản lý cài đặt và cấu hình ứng dụng.",
+        "tabs": {
+            "cancellation": "Lý do hủy",
+            "category": "Loại tài sản",
+            "payment_methods": "Phương thức Thanh toán",
+            "branding": "Branding",
+            "printer": "Máy in"
+        },
+        "cancellation": {
+            "title": "Lý do hủy",
+            "add_button": "Thêm lý do…",
+            "description": "Quản lý các lý do tiêu chuẩn cho việc hủy giao dịch.",
+            "table": {
+                "reason": "Lý do",
+                "description": "Mô tả",
+                "status": "Trạng thái",
+                "empty": "Không tìm thấy lý do hủy."
+            },
+            "status": {
+                "active": "Hoạt động",
+                "inactive": "Không hoạt động"
+            }
+        },
+        "category": {
+            "title": "Các danh mục sản phẩm",
+            "description": "Sắp xếp sản phẩm của bạn thành các danh mục.",
+            "add_button": "Thêm danh mục",
+            "table": {
+                "name": "Tên",
+                "created_at": "Tạo Lúc",
+                "actions": "Hành động",
+                "empty": "Không tìm thấy danh mục nào. Hãy tạo một danh mục để bắt đầu."
+            },
+            "actions": {
+                "edit": "Chỉnh sửa chi tiết",
+                "delete": "Xóa Danh mục",
+                "delete_title": "Xóa Danh mục",
+                "delete_confirm": "Bạn có chắc chắn muốn xóa ",
+                "delete_warning": "Hành động này không thể hoàn tác.",
+                "cancel": "Hủy",
+                "delete_button": "Delete (Xóa)",
+                "deleting": "Đang xóa..."
+            },
+            "form": {
+                "title_add": "Danh mục Mới",
+                "title_edit": "Chỉnh sửa Danh mục",
+                "desc_add": "Tạo danh mục sản phẩm mới",
+                "desc_edit": "Cập nhật danh mục",
+                "name_label": "Tên",
+                "name_placeholder": "ví dụ: Đồ uống, Đồ ăn nhẹ",
+                "save": "Lưu Thay Đổi",
+                "saving": "Đang lưu..."
+            }
+        },
+        "payment_methods": {
+            "title": "Phương thức Thanh toán",
+            "description": "Phương thức thanh toán khả dụng cho các giao dịch POS.",
+            "empty": "Không tìm thấy phương thức thanh toán."
+        },
+        "branding": {
+            "title": "Xây dựng thương hiệu ứng dụng",
+            "description": "Tùy chỉnh tên ứng dụng, logo và chân trang của bạn.",
+            "app_name": "Tên Ứng dụng",
+            "logo": "Logo ứng dụng",
+            "footer_text": "Văn bản chân trang",
+            "theme_color": "Màu chủ đề sáng",
+            "theme_color_dark": "Màu chủ đề (Chế độ tối)",
+            "save_success": "Cài đặt đã lưu thành công.",
+            "save_error": "Lưu cài đặt không thành công",
+            "update_success": "Cài đặt đã được cập nhật thành công!",
+            "update_error": "Không thể cập nhật thương hiệu",
+            "uploading": "Đang tải logo lên...",
+            "upload_success": "tải lên thành công",
+            "upload_error": "Không thể tải lên.",
+            "no_logo": "Không có logo",
+            "upload_button": "Tải lên Logo mới",
+            "remove_button": "Xóa/Xóa",
+            "logo_help": "Kích thước đề xuất: 512x512px. Tối đa 5MB. Các giá trị được cập nhật ngay sau khi tải lên.",
+            "app_name_placeholder": "POS Kasir",
+            "footer_placeholder": "© 2024 POS Kasir",
+            "logo_alt": "Logo ứng dụng",
+            "color_placeholder": "000000 ",
+            "color_dark_placeholder": "#FFFFFF"
+        },
+        "printer": {
+            "title": "Thiết lập máy in",
+            "description": "Định cấu hình kết nối máy in biên lai của bạn.",
+            "connection": "URI kết nối máy in",
+            "connection_placeholder": "ổ cắm://127.0.0.1:9100",
+            "paper_width": "Khổ giấy",
+            "auto_print": "Tự động in khi thanh toán",
+            "test_print": "In thử",
+            "update_success": "Cài đặt đã được cập nhật thành công!",
+            "update_error": "Không thể cập nhật cài đặt. ",
+            "save_failed": "Lưu cài đặt không thành công",
+            "print_success": "Đã in biên lai thành công",
+            "print_failed": "Không thể in biên lai",
+            "ip_help": "Sẽ bị bỏ qua nếu không phải là máy in mạng",
+            "connected": "Đã kết nối",
+            "connection_failed": "Kết nối không thành công",
+            "test_print_success": "In thử thành công",
+            "test_print_error": "“In không thành công.",
+            "interface_type": "Loại Giao diện",
+            "connected_to": "Kết nối đến",
+            "not_connected": "Không kết nối",
+            "reconnect": "Kết nối lại",
+            "connect": "Kết nối",
+            "fe_help": "Trình duyệt xử lý kết nối trực tiếp với máy in",
+            "printer_ip": "IP / URL máy in",
+            "fe_lan_help": "Nhập IP máy in Lan. Ví dụ: 192.168.1.200",
+            "print_method": "Chế độ kết nối máy in",
+            "method_be": "Kết nối mạng (Lan / Wi-Fi)",
+            "method_fe": "<g id=\"1\">+ </g>Kết nối Bluetooth",
+            "method_be_desc": "Máy in được kết nối với cùng một mạng với máy chủ (Được đề xuất cho máy in cố định)",
+            "method_fe_desc": "Máy in được kết nối trực tiếp với thiết bị này (Được đề xuất cho máy in di động)",
+            "discovery_title": "Khám phá Máy in mạng",
+            "discovery_desc": "Tìm kiếm các máy in nhiệt có sẵn trong mạng cục bộ của bạn (Cổng 9100).",
+            "scan_now": "LAN",
+            "discovered_count": "Đã tìm thấy máy in",
+            "discovery_completed": "Phát hiện máy in đã hoàn tất",
+            "discovery_failed": "Không thể phát hiện máy in",
+            "help_text": "Sử dụng CỔNG socket://IP: cho máy in mạng (ví dụ: 192.168.1.100:9100).",
+            "bluetooth": "Bluetooth",
+            "lan": "Mạng LAN / Mạng",
+            "lan_placeholder": "ví dụ: 192.168.1.200 hoặc http://192.168.1.200:80/bản in",
+            "paper_58": "58mm",
+            "paper_80": "80mm"
+        }
+    },
+    "users": {
+        "loading": "Đang tải trạng thái ca làm việc...",
+        "register_open": "Đăng ký mở",
+        "open_register": "Mở chi nhánh",
+        "open_shift_title": "Mở ca làm việc",
+        "title": "Người dùng",
+        "description": "Quản lý quyền truy cập và vai trò của người dùng.",
+        "add_button": "Thêm Người dùng",
+        "search_placeholder": "Tìm Kiếm Người Dùng",
+        "view_list": "Dạng xem danh sách",
+        "view_grid": "Cáº¥u hÃ¬nh cÃ¡c thiáº¿t láº­p cache á» ÄÃ¢y. Name",
+        "role_filter": "Vai trò",
+        "role_all": "Tất cả các Vai trò",
+        "status_filter": "Trạng thái",
+        "status_all": "Tất cả trạng thái",
+        "roles": {
+            "admin": "Quản trị viên",
+            "manager": "Người quản lý",
+            "cashier": "Kế toán"
+        },
+        "table": {
+            "avatar": "Avatar",
+            "user": "Người dùng",
+            "role": "Vai trò",
+            "status": "Trạng thái",
+            "actions": "Hành động",
+            "empty": "Không tìm thấy người dùng. "
+        },
+        "status": {
+            "active": "Hoạt động",
+            "inactive": "Không hoạt động"
+        },
+        "actions": {
+            "open_menu": "Mở menu",
+            "edit": "Chỉnh sửa chi tiết",
+            "activate": "Kích hoạt tài khoản",
+            "deactivate": "Tắt kích hoạt tài khoản",
+            "delete": "Xóa người dùng",
+            "delete_title": "Chắc chứ?",
+            "delete_desc": "Hành động này không thể hoàn tác. Thao tác này sẽ xóa vĩnh viễn tài khoản người dùng",
+            "delete_desc_2": "và xóa dữ liệu của họ khỏi máy chủ của chúng tôi.",
+            "cancel": "Hủy",
+            "delete_confirm": "Delete (Xóa)",
+            "deleting": "Đang xóa..."
+        },
+        "form": {
+            "title_create": "Tạo người dùng mới",
+            "title_edit": "Chỉnh sửa người dùng",
+            "desc_create": "Thêm người dùng mới vào hệ thống.",
+            "desc_edit": "Cập nhật chi tiết người dùng. Không thể thay đổi mật khẩu tại đây.",
+            "username": "Tên người dùng",
+            "email": "Email",
+            "role": "Vai trò",
+            "select_role": "Chọn vai trò",
+            "password": "Mật khẩu",
+            "password_placeholder": "Sử dụng mật khẩu mạnh. ",
+            "save_changes": "Lưu Thay Đổi",
+            "create_user": "Tạo người dùng",
+            "success_create": "Đã tạo người dùng thành công!",
+            "success_update": "\"Cập nhật người dùng thành công\"",
+            "error_save": "Không thể lưu người dùng: "
+        },
+        "messages": {
+            "create_success": "Đã tạo người dùng thành công!",
+            "create_failed": "Không thể tạo người dùng: {{message}}",
+            "update_success": "\"Cập nhật người dùng thành công\"",
+            "update_failed": "Không thể cập nhật người dùng: {{message}}",
+            "delete_success": "Đã xóa thành công người dùng",
+            "delete_failed": "Không thể xóa người dùng: {{message}}",
+            "update_status_success": "Tình trạng mục cập nhật thành công.",
+            "update_status_failed": "Không thể cập nhật trạng thái: {{message}}"
+        }
+    },
+    "pagination": {
+        "page_info": "Trang {{current}}/{{total}}",
+        "previous": "Trước",
+        "next": "Tiếp theo",
+        "first": "Trang đầu tiên",
+        "last": "Trang cuối",
+        "showing_range": "Hiển thị {{start}} đến {{end}} trong số {{total}} kết quả",
+        "show": "Hiện",
+        "per_page": "xuất hiện trên trang",
+        "updating": "Đang cập nhật…"
+    },
+    "products": {
+        "title": "Sản phẩm",
+        "description": "Quản lý kho sản phẩm của bạn.",
+        "add_button": "Thêm sản phẩm",
+        "tabs": {
+            "active": "Sản phẩm đang hoạt động",
+            "trash": "Thùng rác ({{count}})",
+            "list": "Xem danh sách",
+            "grid": "Chế độ hiển thị theo ô"
+        },
+        "filters": {
+            "search_placeholder": "Tìm kiếm sản phẩm...",
+            "category": "Loại tài sản",
+            "category_all": "Tất cả danh mục"
+        },
+        "table": {
+            "image": "Hình ảnh",
+            "name": "Tên",
+            "category": "Loại tài sản",
+            "price": "Giá",
+            "stock": "Tồn kho",
+            "actions": "Hành động",
+            "empty": "Không có dự án nào.",
+            "empty_trash": "Không có sản phẩm rác."
+        },
+        "card": {
+            "out_of_stock": "Hết hàng",
+            "stock_left": "Còn {{count}}",
+            "uncategorized": "Chưa phân loại"
+        },
+        "actions": {
+            "edit": "Sửa sản phẩm",
+            "delete": "Xóa sản phẩm",
+            "restore": "Khôi phục",
+            "delete_title": "Xóa sản phẩm",
+            "delete_desc": "Bạn có chắc chắn muốn xóa ",
+            "delete_desc_2": "Hành động này không thể hoàn tác.",
+            "deleting": "Đang xóa...",
+            "cancel": "products.actions.cancel",
+            "delete_confirm": "products.actions.delete_confirm"
+        },
+        "form": {
+            "title_create": "Tạo sản phẩm mới",
+            "title_edit": "Sửa sản phẩm",
+            "desc": "Điền thông tin chi tiết bên dưới. Nhấp vào lưu khi bạn hoàn tất.",
+            "upload_image": "Tải lên hình ảnh",
+            "change_image": "Thay đổi hình ảnh",
+            "name": "Tên",
+            "category": "Loại tài sản",
+            "select_category": "Chọn danh mục",
+            "price": "Giá",
+            "stock": "Tồn kho",
+            "variants": "Biến thể của sản phẩm",
+            "add_variant": "Thêm Biến Thể",
+            "variant_name": "Tên biến thể (ví dụ: Kích thước XL)",
+            "additional_price": "Chi tiết giá",
+            "no_variants": "Không có biến thể nào được thêm vào.",
+            "save": "Lưu sản phẩm",
+            "saving": "Đang lưu...",
+            "success_create": "Đã tạo dự án",
+            "success_update": "Sản phẩm được cập nhật",
+            "error_category": "Vui lòng chọn danh mục",
+            "error_name_required": "Bắt buộc phải có tên sản phẩm",
+            "error_delete_variant": "Không thể xóa các biến thể hiện có (giới hạn API)",
+            "tab_details": "Chi tiết",
+            "tab_history": "Lịch sử",
+            "cost_price": "Chi phí"
+        },
+        "messages": {
+            "create_success": "Đã tạo sản phẩm thành công",
+            "create_error": "Không thể tạo sản phẩm",
+            "update_success": "Sản phẩm được cập nhật thành công",
+            "update_error": "Không thể cập nhật sản phẩm",
+            "load_detail_error": "Không thể tải chi tiết sản phẩm. Đóng và thử lại.",
+            "delete_success": "Đã xóa sản phẩm thành công",
+            "delete_error": "Không thể xóa sản phẩm",
+            "upload_image_success": "Hình ảnh sản phẩm được tải lên thành công",
+            "upload_image_error": "Không thể tải lên hình ảnh hồ sơ",
+            "create_variant_success": "Đã tạo biến thể sản phẩm thành công",
+            "create_variant_error": "Không thể tạo biến thể",
+            "update_variant_success": "Đã cập nhật biến thể thành công",
+            "update_variant_error": "Không thể cập nhật biến thể",
+            "upload_variant_image_success": "Đã tải lên hình ảnh biến thể thành công",
+            "upload_variant_image_error": "Không thể tải lên hình ảnh biến thể",
+            "restore_success": "Sản phẩm được khôi phục thành công",
+            "restore_error": "Không thể khôi phục sản phẩm"
+        },
+        "stock_history": {
+            "no_history": "Không tìm thấy lịch sử cổ phiếu.",
+            "type_sale": "Khuyến mại",
+            "type_restock": "Bổ sung",
+            "type_correction": "Nắn chỉnh",
+            "type_return": "Trở lại",
+            "type_damage": "Hư hại",
+            "date": "Ngày",
+            "type": "Loại",
+            "amount": "Số tiền",
+            "initial_stock": "hàng trữ đầu kỳ",
+            "final_stock": "Cổ phần cuối cùng",
+            "note": "Thuyết minh"
+        }
+    },
+    "promotions": {
+        "title": "Mã giảm giá",
+        "description": "Khuyến mại, chiết khấu cho khách hàng",
+        "add_button": "Thêm quảng cáo",
+        "search_placeholder": "Tìm kiếm chương trình khuyến mãi…",
+        "table": {
+            "name": "Promotion Name:",
+            "scope": "Phạm vi",
+            "discount": "Giảm giá",
+            "period": "Thời kỳ\nCác thời kỳ",
+            "status": "Trạng thái",
+            "actions": "Hành động",
+            "empty": "Chưa có chương trình khuyến mãi nào.",
+            "max": "Tối đa:"
+        },
+        "tabs": {
+            "active": "Hoạt động",
+            "trash": "Rác"
+        },
+        "status": {
+            "active": "Hoạt động",
+            "inactive": "Không hoạt động"
+        },
+        "actions": {
+            "open_menu": "Mở menu"
+        },
+        "delete_toast_success": "Đã xóa khuyến mãi",
+        "delete_toast_error": "Không thể xóa quảng cáo",
+        "delete_title": "Xóa khuyến mãi",
+        "delete_confirm": "Bạn có chắc chắn muốn xóa khuyến mãi này không? Nó sẽ được chuyển vào thùng rác.",
+        "restore_title": "Khôi phục chương trình khuyến mãi",
+        "restore_confirm": "Bạn có chắc chắn muốn khôi phục chương trình khuyến mãi này không?",
+        "form": {
+            "title_create": "Tạo khuyến mãi mới",
+            "title_edit": "Chỉnh sửa chương trình khuyến mãi",
+            "desc": "Điền thông tin khuyến mãi bên dưới.",
+            "name": "Promotion Name:",
+            "name_placeholder": "ví dụ: Giảm giá cuối năm",
+            "description": "Mô tả",
+            "scope": "Phạm vi",
+            "discount_type": "Loại ưu đãi",
+            "discount_value": "Giá trị chiết khấu",
+            "max_discount": "Số lượng chiết khấu",
+            "start_date": "Ngày Bắt đầu",
+            "end_date": "Ngày kết thúc",
+            "is_active": "Kích hoạt khuyến mãi",
+            "rules": "Quy định khuyến mãi",
+            "add_rule": "Thêm Quy tắc",
+            "rule_type": "Loại Quy tắc",
+            "rule_value": "Giá trị Quy tắc",
+            "rule_desc": "Rule Description: .",
+            "targets": "Mục tiêu khuyến mãi",
+            "add_target": "Thêm Mục Tiêu",
+            "target_type": "Loại Tiêu Chí",
+            "target_id": "ID đích",
+            "save": "Lưu khuyến mãi",
+            "saving": "Đang lưu...",
+            "success_create": "Đã tạo khuyến mãi thành công!",
+            "success_update": "Đã cập nhật khuyến mãi thành công!",
+            "pick_date": "Chọn một ngày",
+            "select_scope": "Chọn phạm vi",
+            "select_product": "Chọn sản phẩm",
+            "select_category": "Chọn danh mục",
+            "rule_min_order_amount": "Tổng tiền Đơn hàng",
+            "rule_required_product": "Sản phẩm bắt buộc",
+            "rule_required_category": "Danh mục bắt buộc"
+        },
+        "types": {
+            "percentage": "Tỷ lệ phần trăm",
+            "fixed_amount": "Số tiền cố định",
+            "product": "Sản phẩm",
+            "category": "Loại tài sản"
+        },
+        "scope": {
+            "ORDER": "Lệnh",
+            "ITEM": "Hạng mục"
+        },
+        "messages": {
+            "restore_success": "Đã khôi phục thành công khuyến mãi",
+            "create_success": "Đã tạo khuyến mãi thành công",
+            "update_success": "Đã cập nhật khuyến mãi thành công",
+            "delete_success": "khuyễn mãi đã được xóa thành công"
+        }
+    },
+    "order": {
+        "categories_title": "Thể loại",
+        "items_available": "{{count}} sản phẩm khả dụng",
+        "add_to_cart": "Thêm vào giỏ hàng",
+        "search_placeholder": "Tìm kiếm sản phẩm...",
+        "all_categories": "Tất cả",
+        "out_of_stock": "Hết hàng",
+        "no_products": "Không có dự án nào.",
+        "current_order": "Đơn hàng hiện tại",
+        "items": "sản phẩm",
+        "empty_cart": "Giỏ hàng trống",
+        "subtotal": "Tổng phụ",
+        "total": "Tổng cộng",
+        "charge": "Sạc",
+        "order_type": {
+            "dine_in": "Dine In",
+            "take_away": "Mang đi"
+        },
+        "refund_success": "Đã hoàn tiền đơn hàng thành công",
+        "select_customer": "Chọn khách hàng",
+        "walk_in": "Trải nghiệm",
+        "tax": "Thuế",
+        "static_qris": "QRIS tĩnh",
+        "errors": {
+            "invalid_cart": "Trạng thái giỏ hàng không hợp lệ",
+            "stock_empty": "<strong>%s sản phẩm</strong> hết hàng",
+            "load_failed": "Không thể tải thông tin sản phẩm",
+            "insufficient_stock": "Kho không đủ",
+            "create_failed": "Không thể tạo lệnh",
+            "cash_insufficient": "Tiền mặt không đủ!",
+            "payment_failed": "Thanh toán không thành công",
+            "select_payment": "Vui lòng chọn một phương thức thanh toán"
+        },
+        "success": {
+            "created": "Đã tạo đơn hàng! Tiếp tục thanh toán.",
+            "creating": "Tạo đơn hàng",
+            "payment_complete": "Hoàn tất thanh toán thành công!",
+            "payment_success": "Thanh toán thành công! Thay đổi:",
+            "received": "Đã nhận",
+            "saved": "Đã lưu đơn hàng! Bạn có thể thanh toán sau trong Giao dịch."
+        },
+        "payment_dialog": {
+            "title": "Phương thức Thanh toán",
+            "desc": "Chọn cách khách hàng thanh toán. Tổng cộng:",
+            "process_via": "Tiến hành thanh toán",
+            "pay": "Thanh toán cho đơn hàng",
+            "cash_received": "Tiền mặt thu ",
+            "enter_amount": "Nhập số lượng",
+            "change": "Thay đổi",
+            "cancel": "Hủy",
+            "pay_later": "Thanh toán sau",
+            "payment_complete": "Thanh Toán Hoàn Tất",
+            "complete": "Hoàn tất thanh toán",
+            "midtrans_auto_confirm": "Thanh toán tự động được xác nhận bởi Midtrans/Máy chủ",
+            "cancelled_by_user": "Người dùng đã hủy từ màn hình thanh toán",
+            "scan_qr_static": "Quét QRIS tĩnh (Placeholder)",
+            "confirm_payment": "Xác nhận thanh toán",
+            "scan_qr_dynamic": "Quét QRIS để thanh toán",
+            "generate_qris_failed": "Không thể tạo mã QRIS từ Midtrans",
+            "qris_generated": "Đã tạo QRIS",
+            "click_to_generate": "Nhấp vào nút ở trên để tạo mã QR",
+            "generate_qris": "Tạo QRIS",
+            "discount": "Giảm giá",
+            "select_promo": "Chọn khuyến mãi",
+            "no_promo": "Không có khuyến mãi",
+            "cancel_order_btn": "Hủy Đơn hàng",
+            "close": "Đóng"
+        },
+        "variant_dialog": {
+            "title": "Chọn biến thể:",
+            "desc": "Chọn một tùy chọn",
+            "original": "Original",
+            "no_image": "Không có hình ảnh"
+        },
+        "cancel_confirm": {
+            "title": "Hủy Đơn hàng",
+            "desc": "Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.",
+            "yes": "Hủy Đơn hàng"
+        },
+        "qr_code_alt": "Mã QR",
+        "promo_applied": "Đã áp dụng khuyến mãi thành công",
+        "cancel_success": "Đã hủy đơn hàng thành công",
+        "manual_payment_success": "Đã xác nhận thanh toán thủ công thành công",
+        "payment_processed": "Đã xử lý thanh toán",
+        "status_updated": "Đã cập nhật Trạng thái Đơn hàng.",
+        "create_success": "Tạo Đơn hàng thành công!",
+        "item_updated": "Đã cập nhật Đơn hàng thành công!",
+        "printing_invoice": "Đang in hóa đơn..."
+    },
+    "errors": {
+        "unexpected_error": {
+            "title": "Rất tiếc...",
+            "desc": "Đã xảy ra lỗi không mong muốn khi tải trang này."
+        },
+        "not_found": {
+            "title": "404",
+            "desc": "Trang không được tìm thấy"
+        },
+        "go_home": "Về Trang Chủ",
+        "default_message": "Đã xảy ra sự cố"
+    },
+    "activity_logs": {
+        "title": "Nhật ký hoạt động",
+        "description": "Xem và lọc nhật ký hoạt động của hệ thống.",
+        "list_title": "Hoạt động hệ thống",
+        "search_placeholder": "Chi tiết tìm kiếm hoặc ID thực thể...",
+        "filters": {
+            "all_actions": "Tất cả hình thức",
+            "all_entities": "Tất cả các đơn vị",
+            "action_type": "Thể Loại Hành Động",
+            "entity_type": "Loại đối tượng",
+            "user_id": "ID Người dùng",
+            "date_range": "Chọn phạm vi ngày"
+        },
+        "table": {
+            "details": "Chi tiết",
+            "id_prefix": "Số CCCD:",
+            "toggle": "Bật/tắt",
+            "empty": "Tidak ada log aktivitas ditemukan."
+        },
+        "columns": {
+            "date": "Ngày",
+            "user": "Người dùng",
+            "action": "Hành động",
+            "entity": "Thực thể",
+            "details": "Chi tiết"
+        }
+    },
+    "category": {
+        "create_success": "Danh mục mới được tạo thành công",
+        "update_success": "Danh mục được cập nhật thành công",
+        "delete_success": "Danh mục đã xóa thành công."
+    },
+    "customers": {
+        "title": "Khách hàng",
+        "description": "Quản lý thông tin và lịch sử khách hàng.",
+        "add_button": "Thêm khách hàng mới",
+        "search_placeholder": "MUỐN TÌM KIẾM KHÁCH HÀNG",
+        "table": {
+            "name": "Tên",
+            "phone": "Điện thoại",
+            "email": "Email",
+            "address": "Địa chỉ",
+            "actions": "Hành động",
+            "empty": "Không tìm thấy khách hàng."
+        },
+        "form": {
+            "title_create": "Thêm khách hàng mới",
+            "title_edit": "Sửa khách hàng",
+            "desc_create": "Điền thông tin chi tiết để tạo khách hàng.",
+            "desc_edit": "Cập nhật thông tin khách hàng.",
+            "name": "Tên",
+            "email": "Email",
+            "phone": "Điện thoại",
+            "address": "Địa chỉ",
+            "save_changes": "Lưu Thay Đổi",
+            "create_customer": "Tạo khách hàng"
+        },
+        "messages": {
+            "create_success": "Khách hàng đã tạo thành công",
+            "create_failed": "Không thể tạo khách hàng: {{message}}",
+            "update_success": "Đã cập nhật khách hàng thành công",
+            "update_failed": "Không thể cập nhật khách hàng: {{message}}",
+            "delete_success": "Khách hàng đã xóa thành công",
+            "delete_failed": "Không thể xóa khách hàng: {{message}}",
+            "save_failed": "Không thể lưu khách hàng: {{message}}"
+        },
+        "actions": {
+            "open_menu": "Mở menu",
+            "edit": "Chỉnh sửa",
+            "delete": "Delete (Xóa)",
+            "delete_title": "Xóa khách hàng",
+            "delete_desc": "Hãy chắc chắn rằng bạn muốn xóa điều này?",
+            "delete_desc_2": "Hành động này không thể hoàn tác.",
+            "cancel": "Hủy",
+            "deleting": "Đang xóa...",
+            "delete_confirm": "Delete (Xóa)"
+        }
+    },
+    "shift": {
+        "loading": "Đang tải...",
+        "register_open": "Đăng ký mở",
+        "open_register": "Mở chi nhánh",
+        "messages": {
+            "start_success": "Bắt đầu ca làm việc thành công",
+            "end_success": "Ca làm việc đã kết thúc thành công",
+            "transaction_recorded": "Giao dịch được ghi lại"
+        },
+        "close_modal": {
+            "title": "Đóng chi nhánh",
+            "title_summary": "Đã đóng ca làm việc",
+            "desc": "Đếm tiền mặt trong ngăn kéo và nhập số tiền để đóng ca.",
+            "desc_summary": "Tóm tắt ca làm việc và đối chiếu.",
+            "start_cash": "Bắt đầu bằng tiền mặt",
+            "expected_cash": "Tiền mặt dự kiến",
+            "actual_cash": "Tiền mặt thực tế",
+            "difference": "Sự khác biệt",
+            "close": "Đóng",
+            "password": "Mật khẩu",
+            "closing": "Kết thúc",
+            "submit": "Đóng chi nhánh"
+        },
+        "open_modal": {
+            "title": "Mở chi nhánh",
+            "desc": "Nhập số tiền mặt bắt đầu và mật khẩu của bạn để bắt đầu.",
+            "start_cash": "Bắt đầu bằng tiền mặt",
+            "password": "Mật khẩu",
+            "opening": "Khai mạc",
+            "submit": "Mở chi nhánh"
+        }
+    },
+    "/": "/",
+    "main": "main",
+    "link": "link",
+    "@/components/dashboard/DashboardCharts": "@/components/dashboard/DashboardCharts",
+    "/auth/refresh": "/auth/refresh",
+    "Printing failed": {
+        " Please check printer connection": {
+            "": "Không thể in. Vui lòng kiểm tra kết nối máy in."
+        }
+    },
+    "canvas": "canvas",
+    "2d": "2d",
+    "T": "T",
+    "a": "a",
+    "cancellation": "cancellation",
+    "@/components/DevToolsPanel": "@/components/DevToolsPanel"
+}

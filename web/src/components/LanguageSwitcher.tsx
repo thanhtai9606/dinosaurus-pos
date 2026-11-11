@@ -40,6 +40,7 @@ export function LanguageSwitcher() {
             <SelectContent>
                 <SelectItem value="id">{t('common.language_id')}</SelectItem>
                 <SelectItem value="en">{t('common.language_en')}</SelectItem>
+                <SelectItem value="vi">{t('common.language_vi')}</SelectItem>
             </SelectContent>
         </Select>
     );

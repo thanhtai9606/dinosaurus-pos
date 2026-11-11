@@ -27,6 +27,7 @@
         "language_placeholder": "Language",
         "language_id": "Bahasa (ID)",
         "language_en": "English (EN)",
+        "language_vi": "Tiếng Việt (VI)",
         "error": {
             "title": "Oops!",
             "subtitle": "Something went wrong",

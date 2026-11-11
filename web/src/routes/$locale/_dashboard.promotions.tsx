@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { useDebounce } from '@/hooks/use-debounce'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -13,9 +14,10 @@ import {
     Promotion
 } from '@/lib/api/query/promotions'
 import { PromotionFormDialog } from '@/components/promotions/PromotionFormDialog'
-import { NewPagination } from "@/components/pagination"
+import { ListPagination } from '@/components/pagination'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PromotionsHeader } from '@/components/promotions/PromotionsHeader'
+import { PromotionsFilters } from '@/components/promotions/PromotionsFilters'
 import { PromotionsTable } from '@/components/promotions/PromotionsTable'
 import { PromotionsActionDialogs } from '@/components/promotions/PromotionsActionDialogs'
 
@@ -55,6 +57,19 @@ function PromotionsPage() {
     const promotions = promotionsQuery.data?.promotions || []
     const pagination = promotionsQuery.data?.pagination || {}
 
+    const [searchTerm, setSearchTerm] = useState('')
+    const debouncedSearch = useDebounce(searchTerm, 400)
+    const filteredPromotions = useMemo(() => {
+        const q = debouncedSearch.trim().toLowerCase()
+        if (!q) return promotions
+        return promotions.filter((p) => {
+            const name = p.name?.toLowerCase() ?? ''
+            const code = (p as any).code?.toLowerCase() ?? ''
+            return name.includes(q) || code.includes(q)
+        })
+    }, [promotions, debouncedSearch])
+
+
     const deleteMutation = useDeletePromotionMutation()
     const restoreMutation = useRestorePromotionMutation()
     const createMutation = useCreatePromotionMutation()
@@ -67,6 +82,10 @@ function PromotionsPage() {
 
     const handlePageChange = (newPage: number) => {
         navigate({ search: (prev) => ({ ...prev, page: newPage }) })
+    }
+
+    const handleLimitChange = (limit: number) => {
+        navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
     }
 
     const openCreateModal = () => {
@@ -111,6 +130,13 @@ function PromotionsPage() {
                 canCreate={createMutation.isAllowed}
             />
 
+            <PromotionsFilters
+                t={t}
+                search={searchTerm}
+                onSearchChange={setSearchTerm}
+                isSearching={searchTerm !== debouncedSearch}
+            />
+
             <Tabs defaultValue="active" onValueChange={setActiveTab} className="w-full">
                 <TabsList>
                     <TabsTrigger value="active">{t('promotions.tabs.active')}</TabsTrigger>
@@ -119,7 +145,7 @@ function PromotionsPage() {
 
                 <TabsContent value="active" className="mt-4">
                     <PromotionsTable
-                        promotions={promotions}
+                        promotions={filteredPromotions}
                         t={t}
                         onEdit={openEditModal}
                         onDelete={handleDelete}
@@ -131,7 +157,7 @@ function PromotionsPage() {
 
                 <TabsContent value="trash" className="mt-4">
                     <PromotionsTable
-                        promotions={promotions}
+                        promotions={filteredPromotions}
                         t={t}
                         onEdit={openEditModal}
                         onDelete={handleDelete}
@@ -142,13 +168,12 @@ function PromotionsPage() {
                 </TabsContent>
             </Tabs>
 
-            {promotions.length > 0 && pagination && (
-                <NewPagination
-                    pagination={pagination}
-                    onClickPrev={() => handlePageChange(((pagination as any).current_page || 1) - 1)}
-                    onClickNext={() => handlePageChange(((pagination as any).current_page || 1) + 1)}
-                />
-            )}
+            <ListPagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
+                isFetching={promotionsQuery.isFetching}
+            />
 
             <PromotionFormDialog
                 open={isDialogOpen}

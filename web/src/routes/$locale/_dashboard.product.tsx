@@ -6,7 +6,7 @@ import { useDebounce } from '@/hooks/use-debounce'
 import { type Product, productsListQueryOptions, useTrashProductsListQuery, useRestoreProductMutation, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '@/lib/api/query/products'
 import { categoriesListQueryOptions } from '@/lib/api/query/categories'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { NewPagination } from "@/components/pagination.tsx";
+import { ListPagination } from '@/components/pagination'
 import { useTranslation } from 'react-i18next';
 import { ProductHeader } from '@/components/products/ProductHeader'
 import { ProductFilters } from '@/components/products/ProductFilters'
@@ -85,6 +85,7 @@ function ProductsPage() {
 
     const [searchTerm, setSearchTerm] = useState(searchParams.search || '')
     const debouncedSearch = useDebounce(searchTerm, 500)
+    const isSearchPending = searchTerm !== debouncedSearch
 
     useEffect(() => {
         if (debouncedSearch !== (searchParams.search || '')) {
@@ -110,6 +111,10 @@ function ProductsPage() {
 
     const handlePageChange = (newPage: number) => {
         navigate({ to: '.', search: (prev) => ({ ...prev, page: newPage }) })
+    }
+
+    const handleLimitChange = (limit: number) => {
+        navigate({ to: '.', search: (prev) => ({ ...prev, limit, page: 1 }) })
     }
 
     const openCreateModal = () => {
@@ -153,6 +158,7 @@ function ProductsPage() {
                 onCategoryChange={handleFilterCategory}
                 t={t}
                 canReadTrash={canReadTrash}
+                isSearching={isSearchPending || productsQuery.isFetching}
             />
 
             <TabsContent value="active" className="space-y-4">
@@ -174,10 +180,12 @@ function ProductsPage() {
                     />
                 )}
 
-                {products.length > 0 && (
-                    <NewPagination pagination={pagination} onClickPrev={() => handlePageChange((pagination.current_page || 1) - 1)}
-                        onClickNext={() => handlePageChange((pagination.current_page || 1) + 1)} />
-                )}
+                <ListPagination
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                    isFetching={productsQuery.isFetching}
+                />
             </TabsContent>
 
             {canReadTrash && (
@@ -200,10 +208,12 @@ function ProductsPage() {
                     />
                 )}
 
-                    {trashProducts.length > 0 && (
-                        <NewPagination pagination={trashPagination} onClickPrev={() => handlePageChange((trashPagination.current_page || 1) - 1)}
-                            onClickNext={() => handlePageChange((trashPagination.current_page || 1) + 1)} />
-                    )}
+                    <ListPagination
+                        pagination={trashPagination}
+                        onPageChange={handlePageChange}
+                        onLimitChange={handleLimitChange}
+                        isFetching={trashProductsQuery.isFetching}
+                    />
                 </TabsContent>
             )}
             </Tabs>

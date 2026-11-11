@@ -1,4 +1,6 @@
-import { Loader2, Utensils, ShoppingBag, CheckCircle, XCircle, Banknote } from 'lucide-react'
+import { Loader2, Utensils, ShoppingBag, CheckCircle, XCircle, Banknote, Hash, User, List, CircleDot, Settings2 } from 'lucide-react'
+import { DataTableSkeleton } from '@/components/ui/list-skeletons'
+import { TableColumnHeader } from '@/components/data-table/TableColumnHeader'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -41,24 +43,34 @@ export function TransactionTable({
     canUpdateStatus, canCancel, canRefund, canPay, t
 }: TransactionTableProps) {
     if (isLoading) {
-        return (
-            <div className="h-48 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
-            </div>
-        )
+        return <DataTableSkeleton rows={8} columns={7} />
     }
 
     return (
         <Table>
             <TableHeader>
                 <TableRow className="bg-muted/50">
-                    <TableHead className="w-[100px]">{t('transactions.table.queue')}</TableHead>
-                    <TableHead>{t('transactions.table.type')}</TableHead>
-                    <TableHead>{t('transactions.table.cashier')}</TableHead>
-                    <TableHead className="w-[300px]">{t('transactions.table.items')}</TableHead>
-                    <TableHead>{t('transactions.table.total')}</TableHead>
-                    <TableHead>{t('transactions.table.status')}</TableHead>
-                    <TableHead className="text-right">{t('transactions.table.action')}</TableHead>
+                    <TableHead className="w-[100px]">
+                        <TableColumnHeader title={t('transactions.table.queue')} icon={Hash} />
+                    </TableHead>
+                    <TableHead>
+                        <TableColumnHeader title={t('transactions.table.type')} icon={Utensils} />
+                    </TableHead>
+                    <TableHead>
+                        <TableColumnHeader title={t('transactions.table.cashier')} icon={User} />
+                    </TableHead>
+                    <TableHead className="w-[300px]">
+                        <TableColumnHeader title={t('transactions.table.items')} icon={List} />
+                    </TableHead>
+                    <TableHead>
+                        <TableColumnHeader title={t('transactions.table.total')} icon={Banknote} />
+                    </TableHead>
+                    <TableHead>
+                        <TableColumnHeader title={t('transactions.table.status')} icon={CircleDot} />
+                    </TableHead>
+                    <TableHead className="text-right">
+                        <TableColumnHeader title={t('transactions.table.action')} icon={Settings2} align="right" />
+                    </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

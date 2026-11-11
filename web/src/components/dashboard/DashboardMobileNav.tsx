@@ -13,6 +13,7 @@ interface DashboardMobileNavProps {
     branding: any
     filteredMenu: any[]
     user: any
+    userRole?: string
     handleLogout: () => void
 }
 
@@ -22,6 +23,7 @@ export function DashboardMobileNav({
     branding,
     filteredMenu,
     user,
+    userRole,
     handleLogout
 }: DashboardMobileNavProps) {
     return (
@@ -88,7 +90,9 @@ export function DashboardMobileNav({
                 <div className="mt-auto p-3 border-t border-border/50">
                     <DashboardUserMenu
                         t={t}
+                        locale={locale}
                         user={user}
+                        userRole={userRole as any}
                         handleLogout={handleLogout}
                         isMobile={true}
                     />

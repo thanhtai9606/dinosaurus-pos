@@ -5,10 +5,11 @@ import { ordersListQueryOptions, useUpdateOrderStatusMutation, useCancelOrderMut
 import { usersListQueryOptions } from '@/lib/api/query/user'
 import { useCancellationReasonsListQuery } from '@/lib/api/query/cancel-reason'
 import { useState, useMemo } from 'react'
+import { useDebounce } from '@/hooks/use-debounce'
 import { toast } from 'sonner'
 import { InternalOrdersOrderListResponse, POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 import { useTranslation } from 'react-i18next'
-import { NewPagination } from "@/components/pagination.tsx";
+import { ListPagination } from '@/components/pagination'
 import { PaymentDialog } from "@/components/payment/PaymentDialog"
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TransactionFilters } from '@/components/transactions/TransactionFilters'
@@ -79,7 +80,7 @@ function TransactionsPage() {
     }, [selectedTab])
 
     // Fetch Orders
-    const { data, isLoading } = useQuery(ordersListQueryOptions({
+    const { data, isLoading, isFetching } = useQuery(ordersListQueryOptions({
         page,
         limit,
         statuses: statusesFilter,
@@ -88,6 +89,27 @@ function TransactionsPage() {
 
     const orders = (data?.orders || []) as OrderWithItems[]
     const pagination = data?.pagination || { total_pages: 1, current_page: 1 }
+
+    const [searchTerm, setSearchTerm] = useState('')
+    const debouncedSearch = useDebounce(searchTerm, 400)
+
+    const displayedOrders = useMemo(() => {
+        const q = debouncedSearch.trim().toLowerCase()
+        if (!q) return orders
+        return orders.filter((order) => {
+            const queue = String(order.queue_number ?? '')
+            const id = String(order.id ?? '')
+            const cashier = userMap.get(order.user_id || '')?.toLowerCase() ?? ''
+            const itemsText =
+                order.items?.map((i) => i.product_name?.toLowerCase() ?? '').join(' ') ?? ''
+            return (
+                queue.toLowerCase().includes(q) ||
+                id.toLowerCase().includes(q) ||
+                cashier.includes(q) ||
+                itemsText.includes(q)
+            )
+        })
+    }, [orders, debouncedSearch, userMap])
 
     // Payment Dialog State
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
@@ -218,12 +240,19 @@ function TransactionsPage() {
         })
     }
 
+    const handleLimitChange = (limit: number) => {
+        navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
+    }
+
     return (
         <div className="flex flex-col gap-6  mx-auto w-full">
-            <TransactionFilters 
+            <TransactionFilters
                 users={users}
                 selectedUserId={selectedUserId}
                 onUserChange={handleUserChange}
+                search={searchTerm}
+                onSearchChange={setSearchTerm}
+                isSearching={searchTerm !== debouncedSearch}
                 t={t}
             />
 
@@ -239,7 +268,7 @@ function TransactionsPage() {
 
                 <div className="rounded-2xl border-0 shadow-sm bg-card overflow-hidden">
                     <TransactionTable 
-                        orders={orders}
+                        orders={displayedOrders}
                         isLoading={isLoading}
                         userMap={userMap}
                         mutatingOrderId={mutatingOrderId}
@@ -256,13 +285,12 @@ function TransactionsPage() {
                     />
                 </div>
 
-                {pagination && (
-                    <NewPagination
-                        pagination={pagination}
-                        onClickPrev={() => handlePageChange((pagination.current_page || 1) - 1)}
-                        onClickNext={() => handlePageChange((pagination.current_page || 1) + 1)}
-                    />
-                )}
+                <ListPagination
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                    isFetching={isFetching && !isLoading}
+                />
             </div>
 
             {/* Payment Dialog Component */}

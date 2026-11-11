@@ -76,7 +76,7 @@ export const useProductDetailQuery = (id: string) => {
     const defaultOptions = productDetailQueryOptions(id);
     const query = useQuery({
         ...defaultOptions,
-        enabled: defaultOptions.enabled !== false ? isAllowed : false
+        enabled: !!id && isAllowed,
     });
     return { ...query, isAllowed };
 }

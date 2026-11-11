@@ -1,13 +1,14 @@
-import { Search } from 'lucide-react'
+import { Loader2, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 interface CustomersFiltersProps {
     t: any
-    search: string | undefined
-    onSearch: (term: string) => void
+    search: string
+    onSearchChange: (term: string) => void
+    isSearching?: boolean
 }
 
-export function CustomersFilters({ t, search, onSearch }: CustomersFiltersProps) {
+export function CustomersFilters({ t, search, onSearchChange, isSearching }: CustomersFiltersProps) {
     return (
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-1 items-center gap-2">
@@ -17,9 +18,12 @@ export function CustomersFilters({ t, search, onSearch }: CustomersFiltersProps)
                         type="search"
                         placeholder={t('customers.search_placeholder', 'Search customers...')}
                         className="pl-8"
-                        defaultValue={search}
-                        onChange={(e) => onSearch(e.target.value)}
+                        value={search}
+                        onChange={(e) => onSearchChange(e.target.value)}
                     />
+                    {isSearching && (
+                        <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
                 </div>
             </div>
         </div>

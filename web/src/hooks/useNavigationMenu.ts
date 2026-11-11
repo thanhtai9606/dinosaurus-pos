@@ -112,16 +112,6 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
             ]
         },
         {
-            label: t('sidebar.account'),
-            icon: UserIcon,
-            to: '/$locale/account',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
-        },
-        {
             label: t('sidebar.activity_logs'),
             icon: ActivityIcon,
             to: '/$locale/activity-logs',

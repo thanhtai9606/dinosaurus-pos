@@ -15,6 +15,7 @@ interface DashboardSidebarProps {
     setIsSidebarCollapsed: (collapsed: boolean) => void
     filteredMenu: any[]
     user: any
+    userRole?: string
     handleLogout: () => void
 }
 
@@ -26,6 +27,7 @@ export function DashboardSidebar({
     setIsSidebarCollapsed,
     filteredMenu,
     user,
+    userRole,
     handleLogout
 }: DashboardSidebarProps) {
     return (
@@ -106,7 +108,9 @@ export function DashboardSidebar({
 
                     <DashboardUserMenu
                         t={t}
+                        locale={locale}
                         user={user}
+                        userRole={userRole as any}
                         isSidebarCollapsed={isSidebarCollapsed}
                         handleLogout={handleLogout}
                     />

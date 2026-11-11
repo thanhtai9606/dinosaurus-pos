@@ -87,6 +87,7 @@ function DashboardLayout() {
                 setIsSidebarCollapsed={setIsSidebarCollapsed}
                 filteredMenu={filteredMenu}
                 user={auth.user}
+                userRole={auth.user?.role}
                 handleLogout={handleLogout}
             />
 
@@ -99,6 +100,7 @@ function DashboardLayout() {
                             branding={branding}
                             filteredMenu={filteredMenu}
                             user={auth.user}
+                            userRole={auth.user?.role}
                             handleLogout={handleLogout}
                         />
 

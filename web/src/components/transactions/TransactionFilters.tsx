@@ -1,21 +1,25 @@
-import { User as UserIcon, Receipt } from 'lucide-react'
+import { Loader2, Search, User as UserIcon, Receipt } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select'
 
 interface TransactionFiltersProps {
     users: any[]
     selectedUserId: string
     onUserChange: (value: string) => void
+    search: string
+    onSearchChange: (value: string) => void
+    isSearching?: boolean
     t: any
 }
 
 export function TransactionFilters({
-    users, selectedUserId, onUserChange, t
+    users, selectedUserId, onUserChange, search, onSearchChange, isSearching, t
 }: TransactionFiltersProps) {
     return (
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -29,8 +33,21 @@ export function TransactionFilters({
                 </div>
             </div>
 
-            {/* User Filter */}
-            <div className="flex items-center gap-2">
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                <div className="relative w-full sm:w-[240px]">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="search"
+                        placeholder={t('transactions.search_placeholder')}
+                        className="pl-8 pr-8 rounded-xl"
+                        value={search}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                    />
+                    {isSearching && (
+                        <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
+                </div>
+                <div className="flex items-center gap-2">
                 <UserIcon className="h-4 w-4 text-muted-foreground" />
                 <Select value={selectedUserId} onValueChange={onUserChange}>
                     <SelectTrigger className="w-[180px] rounded-xl">
@@ -43,6 +60,7 @@ export function TransactionFilters({
                         ))}
                     </SelectContent>
                 </Select>
+                </div>
             </div>
         </div>
     )

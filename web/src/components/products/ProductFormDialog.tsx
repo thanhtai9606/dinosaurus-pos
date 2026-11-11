@@ -44,6 +44,12 @@ interface VariantItem {
     isNew?: boolean
 }
 
+function normalizeCategoryIds(source?: { categories?: Array<{ id?: number | string | null }> } | null): number[] {
+    return (source?.categories ?? [])
+        .map((c) => Number(c.id))
+        .filter((id) => Number.isFinite(id) && id > 0)
+}
+
 export function ProductFormDialog({ open, onOpenChange, productToEdit, categories }: {
     open: boolean,
     onOpenChange: (open: boolean) => void,
@@ -64,7 +70,8 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
         return errors.map(err => typeof err === 'object' ? ((err as any).message ?? JSON.stringify(err)) : String(err)).join(', ');
     }
 
-    const { data: detailProduct, isLoading: isLoadingDetail } = useProductDetailQuery(productToEdit?.id || '')
+    const productId = productToEdit?.id ?? ''
+    const { data: detailProduct, isLoading: isLoadingDetail, isError: isDetailError } = useProductDetailQuery(productId)
 
     const cropper = useImageCropper()
 
@@ -156,6 +163,9 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
 
             } catch (error) {
                 console.error(error)
+                toast.error(
+                    productToEdit ? t('products.messages.update_error') : t('products.messages.create_error')
+                )
             }
         }
     })
@@ -173,7 +183,9 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                 if (productToEdit) {
                     form.setFieldValue('name', detailProduct?.name ?? productToEdit.name ?? '')
 
-                    const initialCategoryIds = (detailProduct?.categories?.map(c => Number(c.id)) ?? (productToEdit as any).categories?.map((c: any) => Number(c.id)) ?? []) as number[]
+                    const initialCategoryIds = detailProduct
+                        ? normalizeCategoryIds(detailProduct)
+                        : normalizeCategoryIds(productToEdit)
                     form.setFieldValue('category_ids', initialCategoryIds)
 
                     form.setFieldValue('price', detailProduct?.price ?? productToEdit.price ?? 0)
@@ -276,6 +288,10 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                             <div className="h-full flex items-center justify-center">
                                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                             </div>
+                        ) : productToEdit && isDetailError ? (
+                            <div className="py-8 text-center text-sm text-destructive">
+                                {t('products.messages.load_detail_error')}
+                            </div>
                         ) : (
                             <Tabs defaultValue="details" className="w-full">
                                 <TabsList className="grid w-full grid-cols-2">
@@ -353,13 +369,15 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                                     <div key={cat.id} className="flex items-center space-x-2">
                                                                         <Checkbox
                                                                             id={`cat-${cat.id}`}
-                                                                            checked={field.state.value?.includes(cat.id)}
+                                                                            checked={(field.state.value ?? []).includes(Number(cat.id))}
                                                                             onCheckedChange={(checked) => {
-                                                                                const current = (field.state.value || []) as number[]
+                                                                                const catId = Number(cat.id)
+                                                                                const current = (field.state.value ?? []) as number[]
                                                                                 if (checked) {
-                                                                                    field.handleChange([...current, Number(cat.id)])
+                                                                                    if (current.includes(catId)) return
+                                                                                    field.handleChange([...current, catId])
                                                                                 } else {
-                                                                                    field.handleChange(current.filter((id: number) => id !== Number(cat.id)))
+                                                                                    field.handleChange(current.filter((id) => id !== catId))
                                                                                 }
                                                                             }}
                                                                         />

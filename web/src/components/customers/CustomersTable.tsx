@@ -1,5 +1,9 @@
+import { useMemo } from 'react'
+import { Users, Phone, Mail, MapPin, Settings2 } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { InternalCustomersCustomerResponse } from '@/lib/api/generated'
+import { TableColumnHeader } from '@/components/data-table/TableColumnHeader'
+import { useClientSort } from '@/hooks/use-client-sort'
 
 interface CustomersTableProps {
     customers: InternalCustomersCustomerResponse[]
@@ -8,33 +12,63 @@ interface CustomersTableProps {
 }
 
 export function CustomersTable({ customers, t, renderActions }: CustomersTableProps) {
+    const getters = useMemo(
+        () => ({
+            name: (c: InternalCustomersCustomerResponse) => c.name ?? '',
+        }),
+        []
+    )
+    const { sorted, toggleSort, getSortDirection } = useClientSort(customers, getters)
+
     return (
         <div className="rounded-md border bg-card">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>{t('customers.table.name', 'Name')}</TableHead>
-                        <TableHead>{t('customers.table.phone', 'Phone')}</TableHead>
-                        <TableHead>{t('customers.table.email', 'Email')}</TableHead>
-                        <TableHead>{t('customers.table.address', 'Address')}</TableHead>
-                        <TableHead className="text-right">{t('customers.table.actions', 'Actions')}</TableHead>
+                        <TableHead>
+                            <TableColumnHeader
+                                title={t('customers.table.name', 'Name')}
+                                icon={Users}
+                                sort={getSortDirection('name')}
+                                onSort={() => toggleSort('name')}
+                            />
+                        </TableHead>
+                        <TableHead>
+                            <TableColumnHeader title={t('customers.table.phone', 'Phone')} icon={Phone} />
+                        </TableHead>
+                        <TableHead>
+                            <TableColumnHeader title={t('customers.table.email', 'Email')} icon={Mail} />
+                        </TableHead>
+                        <TableHead>
+                            <TableColumnHeader title={t('customers.table.address', 'Address')} icon={MapPin} />
+                        </TableHead>
+                        <TableHead className="text-right">
+                            <TableColumnHeader
+                                title={t('customers.table.actions', 'Actions')}
+                                icon={Settings2}
+                                align="right"
+                            />
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {customers.length === 0 ? (
+                    {sorted.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="h-24 text-center">{t('customers.table.empty', 'No customers found.')}</TableCell>
+                            <TableCell colSpan={5} className="h-32 text-center">
+                                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                    <Users className="h-8 w-8 opacity-40" />
+                                    {t('customers.table.empty', 'No customers found.')}
+                                </div>
+                            </TableCell>
                         </TableRow>
                     ) : (
-                        customers.map((customer) => (
+                        sorted.map((customer) => (
                             <TableRow key={customer.id}>
                                 <TableCell className="font-medium">{customer.name}</TableCell>
                                 <TableCell>{customer.phone || '-'}</TableCell>
                                 <TableCell>{customer.email || '-'}</TableCell>
                                 <TableCell>{customer.address || '-'}</TableCell>
-                                <TableCell className="text-right">
-                                    {renderActions(customer)}
-                                </TableCell>
+                                <TableCell className="text-right">{renderActions(customer)}</TableCell>
                             </TableRow>
                         ))
                     )}

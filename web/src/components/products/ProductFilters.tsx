@@ -1,4 +1,4 @@
-import { Filter, Search, LayoutGrid, LayoutList } from 'lucide-react'
+import { Filter, Loader2, Search, LayoutGrid, LayoutList } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
     Select,
@@ -20,11 +20,12 @@ interface ProductFiltersProps {
     onCategoryChange: (value: string) => void
     t: any
     canReadTrash?: boolean
+    isSearching?: boolean
 }
 
 export function ProductFilters({
     trashCount, viewMode, onViewModeChange,
-    searchTerm, onSearchChange, category, categories, onCategoryChange, t, canReadTrash = true
+    searchTerm, onSearchChange, category, categories, onCategoryChange, t, canReadTrash = true, isSearching
 }: ProductFiltersProps) {
     return (
         <div className="w-full">
@@ -51,10 +52,13 @@ export function ProductFilters({
                     <Input
                         type="search"
                         placeholder={t('products.filters.search_placeholder')}
-                        className="pl-8"
+                        className="pl-8 pr-8"
                         value={searchTerm}
                         onChange={(e) => onSearchChange(e.target.value)}
                     />
+                    {isSearching && (
+                        <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
                 </div>
 
                 <Select

@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { z } from 'zod'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useDebounce } from '@/hooks/use-debounce'
 import { customersListQueryOptions, CustomersListParams, useCreateCustomerMutation, useUpdateCustomerMutation, useDeleteCustomerMutation } from '@/lib/api/query/customers'
 import { InternalCustomersCustomerResponse } from '@/lib/api/generated'
-import { NewPagination } from "@/components/pagination.tsx";
+import { ListPagination } from '@/components/pagination'
 import { useTranslation } from 'react-i18next'
 import { CustomersHeader } from "@/components/customers/CustomersHeader"
 import { CustomersFilters } from "@/components/customers/CustomersFilters"
@@ -56,15 +57,25 @@ function CustomersPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedCustomer, setSelectedCustomer] = useState<InternalCustomersCustomerResponse | null>(null)
 
-    const handleSearch = (term: string) => {
-        navigate({
-            search: (prev) => ({ ...prev, search: term || undefined, page: 1 }),
-            replace: true
-        })
-    }
+    const [searchTerm, setSearchTerm] = useState(searchParams.search || '')
+    const debouncedSearch = useDebounce(searchTerm, 500)
+    const isSearchPending = searchTerm !== debouncedSearch
+
+    useEffect(() => {
+        if (debouncedSearch !== (searchParams.search || '')) {
+            navigate({
+                search: (prev) => ({ ...prev, search: debouncedSearch || undefined, page: 1 }),
+                replace: true,
+            })
+        }
+    }, [debouncedSearch, navigate, searchParams.search])
 
     const handlePageChange = (newPage: number) => {
         navigate({ search: (prev) => ({ ...prev, page: newPage }) })
+    }
+
+    const handleLimitChange = (limit: number) => {
+        navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
     }
 
     const openCreateModal = () => {
@@ -85,10 +96,11 @@ function CustomersPage() {
                 canCreate={canCreate}
             />
 
-            <CustomersFilters 
+            <CustomersFilters
                 t={t}
-                search={searchParams.search}
-                onSearch={handleSearch}
+                search={searchTerm}
+                onSearchChange={setSearchTerm}
+                isSearching={isSearchPending || customersQuery.isFetching}
             />
 
             <CustomersTable 
@@ -100,10 +112,11 @@ function CustomersPage() {
             />
 
             {pagination && (
-                <NewPagination
+                <ListPagination
                     pagination={pagination}
-                    onClickPrev={() => handlePageChange((pagination.current_page || 1) - 1)}
-                    onClickNext={() => handlePageChange((pagination.current_page || 1) + 1)}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                    isFetching={customersQuery.isFetching}
                 />
             )}
 

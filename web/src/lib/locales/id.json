@@ -88,10 +88,16 @@
         "activity_logs": "Log Aktivitas",
         "customers": "Pelanggan"
     },
+    "user_menu": {
+        "profile": "Profil",
+        "settings": "Pengaturan",
+        "activity_logs": "Log Aktivitas"
+    },
     "transactions": {
         "title": "Transaksi",
         "subtitle": "Pantau pesanan dan kelola pembayaran.",
         "filter_user": "Semua Kasir",
+        "search_placeholder": "Cari antrian, item, kasir…",
         "loading": "Memuat status shift...",
         "register_open": "Mesin Kasir Terbuka",
         "open_register": "Buka Mesin Kasir",
@@ -433,8 +439,12 @@
         "description": "Kelola akses dan peran pengguna.",
         "add_button": "Tambah Pengguna",
         "search_placeholder": "Cari pengguna...",
+        "view_list": "Tampilan daftar",
+        "view_grid": "Tampilan kartu",
         "role_filter": "Peran",
         "role_all": "Semua Peran",
+        "status_filter": "Status",
+        "status_all": "Semua Status",
         "roles": {
             "admin": "Admin",
             "manager": "Manajer",
@@ -566,6 +576,7 @@
             "create_error": "Gagal membuat produk",
             "update_success": "Produk berhasil diperbarui",
             "update_error": "Gagal memperbarui produk",
+            "load_detail_error": "Gagal memuat detail produk. Tutup dan coba lagi.",
             "delete_success": "Produk berhasil dihapus",
             "delete_error": "Gagal menghapus produk",
             "upload_image_success": "Gambar produk berhasil diupload",
@@ -598,6 +609,7 @@
         "title": "Promosi",
         "description": "Kelola promosi dan diskon untuk pelanggan.",
         "add_button": "Tambah Promosi",
+        "search_placeholder": "Cari promosi…",
         "table": {
             "name": "Nama Promosi",
             "scope": "Cakupan",
@@ -893,7 +905,13 @@
     "pagination": {
         "previous": "Sebelumnya",
         "next": "Selanjutnya",
-        "page_info": "Halaman {{current}} dari {{total}}"
+        "page_info": "Halaman {{current}} dari {{total}}",
+        "first": "Halaman pertama",
+        "last": "Halaman terakhir",
+        "showing_range": "Menampilkan {{start}}–{{end}} dari {{total}} hasil",
+        "show": "Tampilkan",
+        "per_page": "per halaman",
+        "updating": "Memperbarui…"
     },
     "/auth/refresh": "/auth/refresh",
     "Printing failed": {

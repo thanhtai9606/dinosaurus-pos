@@ -86,10 +86,16 @@
         "activity_logs": "Activity Logs",
         "customers": "Customers"
     },
+    "user_menu": {
+        "profile": "Profile",
+        "settings": "Settings",
+        "activity_logs": "Activity Logs"
+    },
     "transactions": {
         "title": "Transactions",
         "subtitle": "Monitor orders and manage payments.",
         "filter_user": "All Cashiers",
+        "search_placeholder": "Search queue, items, cashier…",
         "tabs": {
             "active": "Active",
             "history": "History",
@@ -433,8 +439,12 @@
         "description": "Manage user access and roles.",
         "add_button": "Add User",
         "search_placeholder": "Search user...",
+        "view_list": "List view",
+        "view_grid": "Card view",
         "role_filter": "Role",
         "role_all": "All Roles",
+        "status_filter": "Status",
+        "status_all": "All Status",
         "roles": {
             "admin": "Admin",
             "manager": "Manager",
@@ -496,7 +506,13 @@
     "pagination": {
         "page_info": "Page {{current}} of {{total}}",
         "previous": "Previous",
-        "next": "Next"
+        "next": "Next",
+        "first": "First page",
+        "last": "Last page",
+        "showing_range": "Showing {{start}} to {{end}} of {{total}} results",
+        "show": "Show",
+        "per_page": "per page",
+        "updating": "Updating…"
     },
     "products": {
         "title": "Products",
@@ -571,6 +587,7 @@
             "create_error": "Failed to create product",
             "update_success": "Product updated successfully",
             "update_error": "Failed to update product",
+            "load_detail_error": "Failed to load product details. Close and try again.",
             "delete_success": "Product deleted successfully",
             "delete_error": "Failed to delete product",
             "upload_image_success": "Product image uploaded successfully",
@@ -603,6 +620,7 @@
         "title": "Promotions",
         "description": "Manage promotions and discounts for customers.",
         "add_button": "Add Promotion",
+        "search_placeholder": "Search promotions…",
         "table": {
             "name": "Promotion Name",
             "scope": "Scope",

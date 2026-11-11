@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
+import { useDebounce } from '@/hooks/use-debounce'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
@@ -34,9 +36,32 @@ function OrderPage() {
     const queryClient = useQueryClient()
     const navigate = useNavigate({ from: Route.fullPath })
     const searchParams = Route.useSearch()
+    const selectedCategory = searchParams.category || 'all'
 
+    const searchInputRef = useRef<HTMLInputElement>(null)
     const [searchTerm, setSearchTerm] = useState('')
-    const { data: productsData, isLoading: productsLoading } = useProductsListQuery({ limit: 200, search: searchTerm })
+
+    useKeyboardShortcuts(
+        [
+            {
+                key: 'f',
+                ctrlKey: true,
+                action: () => searchInputRef.current?.focus(),
+            },
+        ],
+        true
+    )
+    const debouncedSearch = useDebounce(searchTerm, 500)
+    const isSearchPending = searchTerm !== debouncedSearch
+    const categoryFilter = selectedCategory === 'all' ? undefined : Number(selectedCategory)
+
+    const { data: productsData, isLoading: productsLoading, isFetching: productsFetching } =
+        useProductsListQuery({
+            limit: 120,
+            page: 1,
+            search: debouncedSearch || undefined,
+            category: Number.isFinite(categoryFilter) ? categoryFilter : undefined,
+        })
     const products = productsData?.products || []
     const { data: categoriesFromApi, isLoading: categoriesLoading } = useCategoriesListQuery({ limit: 100 })
 
@@ -44,52 +69,22 @@ function OrderPage() {
     const customers = customersData?.customers || []
 
     const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
-
-    const selectedCategory = searchParams.category || "all"
     const [selectedOrderType, setSelectedOrderType] = useState<POSKasirInternalOrdersRepositoryOrderType>(POSKasirInternalOrdersRepositoryOrderType.OrderTypeDineIn)
 
     const categories = useMemo(() => {
-        const counts = new Map<string, number>()
-        products.forEach((p) => {
-            p.categories?.forEach((cat) => {
-                if (cat.id != null) {
-                    const id = String(cat.id)
-                    counts.set(id, (counts.get(id) ?? 0) + 1)
-                }
-            })
-        })
-
-        const fromApi = categoriesFromApi ?? []
-        const byId = new Map<string, { id: string; name: string; count?: number }>()
-        fromApi.forEach((cat) => {
-            if (cat.id != null && cat.name) {
-                const id = String(cat.id)
-                byId.set(id, { id, name: cat.name, count: counts.get(id) ?? 0 })
-            }
-        })
-        counts.forEach((count, id) => {
-            if (!byId.has(id)) {
-                const name = products
-                    .flatMap((p) => p.categories ?? [])
-                    .find((c) => String(c.id) === id)?.name
-                if (name) byId.set(id, { id, name, count })
-            }
-        })
-        return Array.from(byId.values()).sort((a, b) => a.name.localeCompare(b.name))
-    }, [products, categoriesFromApi])
+        return (categoriesFromApi ?? [])
+            .filter((cat) => cat.id != null && cat.name)
+            .map((cat) => ({ id: String(cat.id), name: cat.name! }))
+            .sort((a, b) => a.name.localeCompare(b.name))
+    }, [categoriesFromApi])
 
     const categoryTitle = useMemo(() => {
         if (selectedCategory === 'all') return t('order.all_categories')
         return categories.find((c) => c.id === selectedCategory)?.name ?? t('order.all_categories')
     }, [selectedCategory, categories, t])
 
-    const filteredProducts = useMemo(() => {
-        if (selectedCategory === "all") return products
-        return products.filter(p => p.categories?.some(cat => String(cat.id) === selectedCategory))
-    }, [selectedCategory, products])
-
-    const inStockProducts = filteredProducts.filter(p => (p.stock || 0) > 0)
-    const outOfStockProducts = filteredProducts.filter(p => (p.stock || 0) <= 0)
+    const inStockProducts = products.filter((p) => (p.stock || 0) > 0)
+    const outOfStockProducts = products.filter((p) => (p.stock || 0) <= 0)
 
     const [cart, setCart] = useState<CartItem[]>([])
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
@@ -217,6 +212,8 @@ function OrderPage() {
                 <ProductSearch
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
+                    inputRef={searchInputRef}
+                    isSearching={isSearchPending || (productsFetching && !productsLoading)}
                     t={t}
                     categoryLabel={categoryTitle}
                     itemsAvailable={inStockProducts.length}

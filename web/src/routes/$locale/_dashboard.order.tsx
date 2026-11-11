@@ -16,6 +16,8 @@ import { CartContent, CartItem } from '@/components/orders/CartContent'
 import { VariantSelectionDialog } from '@/components/orders/VariantSelectionDialog'
 import { ProductSearch } from '@/components/orders/ProductSearch'
 import { ProductGrid } from '@/components/orders/ProductGrid'
+import { CategorySidebar } from '@/components/orders/CategorySidebar'
+import { useCategoriesListQuery } from '@/lib/api/query/categories'
 
 const orderSearchSchema = z.object({
     category: z.string().optional().catch('all'),
@@ -34,8 +36,9 @@ function OrderPage() {
     const searchParams = Route.useSearch()
 
     const [searchTerm, setSearchTerm] = useState('')
-    const { data: productsData } = useProductsListQuery({ limit: 100, search: searchTerm })
+    const { data: productsData, isLoading: productsLoading } = useProductsListQuery({ limit: 200, search: searchTerm })
     const products = productsData?.products || []
+    const { data: categoriesFromApi, isLoading: categoriesLoading } = useCategoriesListQuery({ limit: 100 })
 
     const { data: customersData } = useCustomersListQuery({ limit: 100 })
     const customers = customersData?.customers || []
@@ -46,18 +49,39 @@ function OrderPage() {
     const [selectedOrderType, setSelectedOrderType] = useState<POSKasirInternalOrdersRepositoryOrderType>(POSKasirInternalOrdersRepositoryOrderType.OrderTypeDineIn)
 
     const categories = useMemo(() => {
-        const unique = new Map<string, string>()
-        products.forEach(p => {
-            p.categories?.forEach(cat => {
-                if (cat.id && cat.name) {
-                    unique.set(String(cat.id), cat.name)
+        const counts = new Map<string, number>()
+        products.forEach((p) => {
+            p.categories?.forEach((cat) => {
+                if (cat.id != null) {
+                    const id = String(cat.id)
+                    counts.set(id, (counts.get(id) ?? 0) + 1)
                 }
             })
         })
-        return Array.from(unique.entries())
-            .map(([id, name]) => ({ id, name }))
-            .sort((a, b) => a.name.localeCompare(b.name))
-    }, [products])
+
+        const fromApi = categoriesFromApi ?? []
+        const byId = new Map<string, { id: string; name: string; count?: number }>()
+        fromApi.forEach((cat) => {
+            if (cat.id != null && cat.name) {
+                const id = String(cat.id)
+                byId.set(id, { id, name: cat.name, count: counts.get(id) ?? 0 })
+            }
+        })
+        counts.forEach((count, id) => {
+            if (!byId.has(id)) {
+                const name = products
+                    .flatMap((p) => p.categories ?? [])
+                    .find((c) => String(c.id) === id)?.name
+                if (name) byId.set(id, { id, name, count })
+            }
+        })
+        return Array.from(byId.values()).sort((a, b) => a.name.localeCompare(b.name))
+    }, [products, categoriesFromApi])
+
+    const categoryTitle = useMemo(() => {
+        if (selectedCategory === 'all') return t('order.all_categories')
+        return categories.find((c) => c.id === selectedCategory)?.name ?? t('order.all_categories')
+    }, [selectedCategory, categories, t])
 
     const filteredProducts = useMemo(() => {
         if (selectedCategory === "all") return products
@@ -177,22 +201,35 @@ function OrderPage() {
     }
 
     return (
-        <div className="flex h-[calc(100vh-4rem)] gap-2 relative">
-            {/* Left: Product Grid */}
-            <div className="flex-1 flex flex-col gap-4 overflow-hidden bg-background min-h-0">
-                <ProductSearch 
+        <div className="relative flex h-[calc(100vh-4rem)] overflow-hidden rounded-xl border bg-muted/20">
+            <aside className="hidden w-56 shrink-0 lg:block xl:w-64">
+                <CategorySidebar
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={(v) => navigate({ search: (prev) => ({ ...prev, category: v }) })}
+                    isLoading={categoriesLoading}
+                    allLabel={t('order.all_categories')}
+                    title={t('order.categories_title')}
+                />
+            </aside>
+
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
+                <ProductSearch
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
+                    t={t}
+                    categoryLabel={categoryTitle}
+                    itemsAvailable={inStockProducts.length}
                     selectedCategory={selectedCategory}
                     onCategoryChange={(v) => navigate({ search: (prev) => ({ ...prev, category: v }) })}
                     categories={categories}
-                    t={t}
                 />
 
-                <div className="flex-1 min-h-0">
-                    <ProductGrid 
+                <div className="min-h-0 flex-1">
+                    <ProductGrid
                         inStockProducts={inStockProducts}
                         outOfStockProducts={outOfStockProducts}
+                        isLoading={productsLoading}
                         isLoadingDetailsId={isLoadingDetailsId}
                         onAddToCart={addToCart}
                         t={t}
@@ -233,7 +270,7 @@ function OrderPage() {
             </div>
 
             {/* Right: Cart Sidebar (Desktop) */}
-            <div className="hidden md:flex w-[350px] flex-col rounded-xl border bg-card overflow-hidden min-h-0">
+            <div className="hidden min-h-0 w-[min(100%,24rem)] shrink-0 flex-col overflow-hidden border-l bg-card md:flex xl:w-96">
                 <CartContent 
                     cart={cart} 
                     t={t} 

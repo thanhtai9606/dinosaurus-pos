@@ -683,6 +683,9 @@
         }
     },
     "order": {
+        "categories_title": "Categories",
+        "items_available": "{{count}} items available",
+        "add_to_cart": "Add to cart",
         "search_placeholder": "Search products...",
         "all_categories": "All",
         "out_of_stock": "Out of Stock",

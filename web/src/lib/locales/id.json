@@ -678,6 +678,9 @@
         }
     },
     "order": {
+        "categories_title": "Kategori",
+        "items_available": "{{count}} produk tersedia",
+        "add_to_cart": "Tambah",
         "search_placeholder": "Cari produk...",
         "all_categories": "Semua",
         "out_of_stock": "Stok Habis",

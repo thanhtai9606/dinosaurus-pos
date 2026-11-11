@@ -1,0 +1,140 @@
+package cloudflarer2
+
+import (
+	"POS-kasir/config"
+	"POS-kasir/pkg/logger"
+	"bytes"
+	"context"
+	"fmt"
+	"io"
+	"net/url"
+	"strings"
+	"time"
+
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
+)
+
+type StorageClient interface {
+	BucketExists(ctx context.Context, bucketName string) (bool, error)
+	PresignedGetObject(ctx context.Context, bucketName string, objectName string, expiry time.Duration, reqParams url.Values) (*url.URL, error)
+	PutObject(ctx context.Context, bucketName, objectName string, reader io.Reader, objectSize int64, opts minio.PutObjectOptions) (minio.UploadInfo, error)
+	SetBucketPolicy(ctx context.Context, bucketName, policy string) error
+}
+
+type CloudflareR2 struct {
+	Cfg    *config.AppConfig
+	Log    logger.ILogger
+	Client StorageClient
+}
+
+type IR2 interface {
+	UploadFile(ctx context.Context, objectName string, data []byte, contentType string) (string, error)
+	GetFileShareLink(ctx context.Context, objectName string) (string, error)
+	BucketExists(ctx context.Context) (bool, error)
+}
+
+var NewMinioClient = func(endpoint string, opts *minio.Options) (StorageClient, error) {
+	return minio.New(endpoint, opts)
+}
+
+func NewCloudflareR2(cfg *config.AppConfig, log logger.ILogger) (IR2, error) {
+	endpoint := cfg.CloudflareR2.Endpoint
+	if endpoint == "" {
+		endpoint = fmt.Sprintf("%s.r2.cloudflarestorage.com", cfg.CloudflareR2.AccountID)
+	}
+
+	// Clean endpoint: strip http:// or https:// if present
+	endpoint = strings.TrimPrefix(endpoint, "http://")
+	endpoint = strings.TrimPrefix(endpoint, "https://")
+
+	log.Infof("NewCloudflareR2 | Using endpoint: %s, Bucket: %s, UseSSL: %v", endpoint, cfg.CloudflareR2.Bucket, cfg.CloudflareR2.UseSSL)
+
+	client, err := NewMinioClient(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(cfg.CloudflareR2.AccessKey, cfg.CloudflareR2.SecretKey, ""),
+		Secure: cfg.CloudflareR2.UseSSL,
+	})
+
+	if err != nil {
+		log.Errorf("Failed to create R2 client: %v", err)
+		return nil, err
+	}
+
+	exists, err := client.BucketExists(context.Background(), cfg.CloudflareR2.Bucket)
+	if err != nil {
+		log.Warnf("Failed to check if R2 bucket exists during initialization: %v. Client will be initialized anyway.", err)
+	} else if !exists {
+		log.Warnf("R2 Bucket %s does not exist. (Note: Automatic creation might not be supported or permitted)", cfg.CloudflareR2.Bucket)
+	}
+
+	// In development mode with custom endpoint (MinIO), automatically set bucket policy to public read if BucketExists succeeded
+	if cfg.Server.Env == "development" && cfg.CloudflareR2.Endpoint != "" && exists {
+		policy := fmt.Sprintf(`{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource":["arn:aws:s3:::%s"]},{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject"],"Resource":["arn:aws:s3:::%s/*"]}]}`, cfg.CloudflareR2.Bucket, cfg.CloudflareR2.Bucket)
+		err = client.SetBucketPolicy(context.Background(), cfg.CloudflareR2.Bucket, policy)
+		if err != nil {
+			log.Warnf("Failed to set R2 bucket policy to public read: %v", err)
+		} else {
+			log.Infof("Successfully set R2 bucket %s policy to public read", cfg.CloudflareR2.Bucket)
+		}
+	}
+
+	log.Println("Created Cloudflare R2 client")
+
+	return &CloudflareR2{
+		Cfg:    cfg,
+		Log:    log,
+		Client: client,
+	}, nil
+}
+
+func (r *CloudflareR2) BucketExists(ctx context.Context) (bool, error) {
+	if r == nil || r.Client == nil || r.Cfg == nil {
+		return false, fmt.Errorf("r2 client or dependencies are nil")
+	}
+
+	exists, err := r.Client.BucketExists(ctx, r.Cfg.CloudflareR2.Bucket)
+	if err != nil {
+		r.Log.Errorf("Failed to check if R2 bucket exists: %v", err)
+		return false, err
+	}
+
+	return exists, nil
+}
+
+func (r *CloudflareR2) GetFileShareLink(ctx context.Context, objectName string) (string, error) {
+
+	if r.Cfg.CloudflareR2.PublicDomain != "" {
+		return fmt.Sprintf("%s/%s", r.Cfg.CloudflareR2.PublicDomain, objectName), nil
+	}
+
+	presignedURL, err := r.Client.PresignedGetObject(
+		ctx,
+		r.Cfg.CloudflareR2.Bucket,
+		objectName,
+		time.Duration(r.Cfg.CloudflareR2.ExpirySec)*time.Second,
+		nil,
+	)
+	if err != nil {
+		r.Log.Errorf("Failed to generate R2 presigned URL: %v, objectName=%s", err, objectName)
+		return "", err
+	}
+	return presignedURL.String(), nil
+}
+
+func (r *CloudflareR2) UploadFile(ctx context.Context, objectName string, data []byte, contentType string) (string, error) {
+	if r == nil || r.Client == nil || r.Cfg == nil {
+		return "", fmt.Errorf("r2 client or dependencies are nil")
+	}
+
+	reader := bytes.NewReader(data)
+	_, err := r.Client.PutObject(ctx, r.Cfg.CloudflareR2.Bucket, objectName, reader, int64(len(data)), minio.PutObjectOptions{
+		ContentType: contentType,
+	})
+
+	if err != nil {
+		r.Log.Errorf("Failed to upload file to R2: %v, objectName=%s", err, objectName)
+		return "", err
+	}
+
+	return r.GetFileShareLink(ctx, objectName)
+}

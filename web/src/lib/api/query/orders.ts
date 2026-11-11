@@ -1,0 +1,347 @@
+import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ordersApi, printerApi } from "../../api/client"
+import {
+    POSKasirInternalCommonErrorResponse,
+    InternalOrdersApplyPromotionRequest,
+    InternalOrdersCancelOrderRequest,
+    InternalOrdersConfirmManualPaymentRequest,
+    InternalOrdersCreateOrderRequest,
+    InternalOrdersUpdateOrderStatusRequest,
+    InternalOrdersUpdateOrderItemRequest,
+    InternalOrdersOrderDetailResponse,
+    InternalOrdersMidtransPaymentResponse,
+    InternalOrdersRefundOrderRequest,
+} from "../generated"
+import { toast } from "sonner"
+import { AxiosError } from "axios"
+import { useRBAC } from "@/lib/auth/rbac"
+import i18n from '@/lib/i18n'
+
+export type OrdersListParams = {
+    limit?: number
+    page?: number
+    statuses?: string[]
+    userId?: string
+}
+
+export const ordersListQueryOptions = (params?: OrdersListParams) =>
+    queryOptions<
+        any,
+        AxiosError<POSKasirInternalCommonErrorResponse>
+    >({
+        queryKey: ['orders', 'list', params],
+        queryFn: async () => {
+            const res = await ordersApi.ordersGet(
+                params?.page ? params.page : undefined,
+                params?.limit ? params.limit : undefined,
+                params?.statuses ? (params.statuses as any) : undefined,
+                params?.userId ? params.userId : undefined,
+            )
+
+            return (res.data as any).data;
+        },
+        placeholderData: keepPreviousData,
+    })
+
+export const useOrdersListQuery = (params?: OrdersListParams) => {
+    const { canAccessApi } = useRBAC();
+    const isAllowed = canAccessApi('GET', '/orders');
+    const query = useQuery({
+        ...ordersListQueryOptions(params),
+        enabled: isAllowed
+    });
+    return { ...query, isAllowed };
+}
+
+export const orderDetailQueryOptions = (id: string) =>
+    queryOptions<
+        any,
+        AxiosError<POSKasirInternalCommonErrorResponse>
+    >({
+        queryKey: ['orders', 'detail', id],
+        queryFn: async () => {
+            const res = await ordersApi.ordersIdGet(id)
+            return (res.data as any).data;
+        },
+        enabled: !!id,
+    })
+
+import { UseQueryOptions } from '@tanstack/react-query'
+
+export const useOrderDetailQuery = (id: string, options?: Omit<UseQueryOptions<any, AxiosError<POSKasirInternalCommonErrorResponse>>, 'queryKey' | 'queryFn'>) => {
+    const { canAccessApi } = useRBAC();
+    const isAllowed = canAccessApi('GET', '/orders/{id}');
+    const defaultOptions = orderDetailQueryOptions(id);
+    const query = useQuery({
+        ...defaultOptions,
+        ...options,
+        enabled: (defaultOptions.enabled !== false && (options?.enabled ?? true)) ? isAllowed : false
+    });
+    return { ...query, isAllowed };
+}
+
+export const useApplyPromotionMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders/{id}/apply-promotion')
+
+    const mutation = useMutation<
+        InternalOrdersOrderDetailResponse,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string; body: InternalOrdersApplyPromotionRequest }
+    >({
+        mutationKey: ['orders', 'apply-promotion'],
+        mutationFn: async ({ id, body }) => {
+            const res = await ordersApi.ordersIdApplyPromotionPost(id, body)
+            return (res.data as any).data;
+        },
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            qc.invalidateQueries({ queryKey: ['orders', 'detail', variables.id] })
+            toast.success(i18n.t('order.promo_applied'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal menerapkan promo"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+export const useCancelOrderMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders/{id}/cancel')
+
+    const mutation = useMutation<
+        any,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string; body: InternalOrdersCancelOrderRequest }
+    >({
+        mutationKey: ['orders', 'cancel'],
+        mutationFn: async ({ id, body }) => {
+            const res = await ordersApi.ordersIdCancelPost(id, body)
+            return (res.data as any).data;
+        },
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            qc.invalidateQueries({ queryKey: ['orders', 'detail', variables.id] })
+            toast.success(i18n.t('order.cancel_success'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal membatalkan order"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+export const useConfirmManualPaymentMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders/{id}/pay-manual')
+
+    const mutation = useMutation<
+        InternalOrdersOrderDetailResponse,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string; body: InternalOrdersConfirmManualPaymentRequest }
+    >({
+        mutationKey: ['orders', 'complete-manual-payment'],
+        mutationFn: async ({ id, body }) => {
+            const res = await ordersApi.ordersIdPayManualPost(id, body, {
+                headers: {
+                    'X-Idempotency-Key': crypto.randomUUID()
+                }
+            })
+            return (res.data as any).data;
+        },
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            qc.invalidateQueries({ queryKey: ['orders', 'detail', variables.id] })
+            toast.success(i18n.t('order.manual_payment_success'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal konfirmasi pembayaran manual"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+export const useInitiateMidtransPaymentMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders/{id}/pay-midtrans')
+
+    const mutation = useMutation<
+        InternalOrdersMidtransPaymentResponse,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string }
+    >({
+        mutationKey: ['orders', 'process-payment'],
+        mutationFn: async ({ id }) => {
+            const res = await ordersApi.ordersIdPayMidtransPost(id)
+            return (res.data as any).data;
+        },
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            qc.invalidateQueries({ queryKey: ['orders', 'detail', variables.id] })
+            toast.success(i18n.t('order.payment_processed'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal memproses pembayaran"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+export const useUpdateOrderStatusMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders/{id}/update-status')
+
+    const mutation = useMutation<
+        InternalOrdersOrderDetailResponse,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string; body: InternalOrdersUpdateOrderStatusRequest }
+    >({
+        mutationKey: ['orders', 'update-status'],
+        mutationFn: async ({ id, body }) => {
+            const res = await ordersApi.ordersIdUpdateStatusPost(id, body)
+            return (res.data as any).data;
+        },
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            qc.invalidateQueries({ queryKey: ['orders', 'detail', variables.id] })
+            toast.success(i18n.t('order.status_updated'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal memperbarui status order"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+export const useCreateOrderMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders')
+
+    const mutation = useMutation<
+        InternalOrdersOrderDetailResponse,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        InternalOrdersCreateOrderRequest
+    >({
+        mutationKey: ['orders', 'create'],
+        mutationFn: async (body) => {
+            const res = await ordersApi.ordersPost(body, {
+                headers: {
+                    'X-Idempotency-Key': crypto.randomUUID()
+                }
+            })
+            return (res.data as any).data
+        },
+        onSuccess: () => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            toast.success(i18n.t('order.create_success'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal membuat order"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+export const useUpdateOrderItemsMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('PUT', '/orders/{id}/items')
+
+    const mutation = useMutation<
+        InternalOrdersOrderDetailResponse,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string; body: InternalOrdersUpdateOrderItemRequest[] }
+    >({
+        mutationKey: ['orders', 'update-items'],
+        mutationFn: async ({ id, body }) => {
+            const res = await ordersApi.ordersIdItemsPatch(id, body as any)
+            return (res.data as any).data
+        },
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            qc.invalidateQueries({ queryKey: ['orders', 'detail', variables.id] })
+            toast.success(i18n.t('order.item_updated'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal memperbarui item order"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+
+export const usePrintInvoiceMutation = () => {
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders/{id}/print')
+
+    const mutation = useMutation<
+        any,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string }
+    >({
+        mutationKey: ['orders', 'print'],
+        mutationFn: async ({ id }) => {
+            const res = await printerApi.ordersIdPrintPost(id)
+            return (res.data as any).data
+        },
+        onSuccess: () => {
+            toast.success(i18n.t('order.printing_invoice'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Failed to print invoice"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}
+
+export const useRefundOrderMutation = () => {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('POST', '/orders/{id}/refund')
+
+    const mutation = useMutation<
+        any,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string; body: InternalOrdersRefundOrderRequest }
+    >({
+        mutationKey: ['orders', 'refund'],
+        mutationFn: async ({ id, body }) => {
+            const res = await ordersApi.ordersIdRefundPost(id, body)
+            return (res.data as any).data
+        },
+        onSuccess: (_, variables) => {
+            qc.invalidateQueries({ queryKey: ['orders', 'list'] })
+            qc.invalidateQueries({ queryKey: ['orders', 'detail', variables.id] })
+            toast.success(i18n.t('order.refund_success', 'Order refunded successfully'))
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || "Gagal melakukan refund order"
+            toast.error(msg)
+        }
+    })
+
+    return { ...mutation, isAllowed }
+}

@@ -1,0 +1,532 @@
+package report
+
+import (
+	"POS-kasir/internal/activitylog"
+	"POS-kasir/internal/common/pagination"
+	"POS-kasir/internal/common/store"
+	"POS-kasir/internal/report/repository"
+	"POS-kasir/pkg/logger"
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
+
+	"POS-kasir/pkg/cache"
+)
+
+type IRptService interface {
+	GetDashboardSummary(ctx context.Context, req *SalesReportServiceRequest) (*DashboardSummaryResponse, error)
+	GetSalesReports(ctx context.Context, req *SalesReportServiceRequest) (*[]SalesReport, error)
+	GetProductPerformance(ctx context.Context, req *SalesReportServiceRequest) (*ProductPerformanceResponse, error)
+	GetPaymentMethodPerformance(ctx context.Context, req *SalesReportServiceRequest) (*[]PaymentMethodPerformanceResponse, error)
+	GetCashierPerformance(ctx context.Context, req *SalesReportServiceRequest) (*[]CashierPerformanceResponse, error)
+	GetCancellationReports(ctx context.Context, req *SalesReportServiceRequest) (*[]CancellationReportResponse, error)
+	GetProfitSummary(ctx context.Context, req *SalesReportServiceRequest) (*[]ProfitSummaryResponse, error)
+	GetProductProfitReports(ctx context.Context, req *SalesReportServiceRequest) (*ProductProfitResponse, error)
+
+	GetLowStockProducts(ctx context.Context, req *LowStockRequest) (*[]LowStockProductResponse, error)
+	GetPromotionPerformanceReport(ctx context.Context, req *SalesReportServiceRequest) (*[]PromotionPerformanceResponse, error)
+	GetShiftSummaryReport(ctx context.Context, req *SalesReportServiceRequest) (*[]ShiftSummaryResponse, error)
+}
+
+func NewRptService(store store.Store, repo repository.Querier, activityLogService activitylog.IActivityService, log logger.ILogger, redisCache cache.Cache) IRptService {
+	return &RptService{
+		repo:               repo,
+		Store:              store,
+		ActivityLogService: activityLogService,
+		Log:                log,
+		Cache:              redisCache,
+	}
+}
+
+type RptService struct {
+	repo               repository.Querier
+	Store              store.Store
+	ActivityLogService activitylog.IActivityService
+	Log                logger.ILogger
+	Cache              cache.Cache
+}
+
+func (r *RptService) GetSalesReports(ctx context.Context, req *SalesReportServiceRequest) (*[]SalesReport, error) {
+	cacheKey := fmt.Sprintf("report:sales:sd:%d:ed:%d", req.StartDate.Unix(), req.EndDate.Unix())
+	if cachedData, err := r.Cache.GetWithContext(ctx, cacheKey); err == nil && cachedData != nil {
+		var response []SalesReport
+		if err := json.Unmarshal(cachedData, &response); err == nil {
+			r.Log.Info("Sales report cache hit!")
+			return &response, nil
+		}
+	}
+
+	params := repository.GetSalesSummaryParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+	}
+
+	reports, err := r.repo.GetSalesSummary(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get sales reports", "error", err)
+		return nil, err
+	}
+
+	salesReports := make([]SalesReport, len(reports))
+	for i, report := range reports {
+		salesReports[i] = SalesReport{
+			Date:       report.Date.Time,
+			OrderCount: report.OrderCount,
+			TotalSales: 0, 
+		}
+		if n, ok := report.TotalSales.(pgtype.Numeric); ok && n.Valid {
+			f8, _ := n.Float64Value()
+			salesReports[i].TotalSales = f8.Float64
+		}
+	}
+	if b, err := json.Marshal(salesReports); err == nil {
+		ttl := 5 * time.Minute
+		if req.EndDate.Before(time.Now().Truncate(24 * time.Hour)) {
+			ttl = 12 * time.Hour
+		}
+		_ = r.Cache.SetWithContext(ctx, cacheKey, b, ttl)
+	}
+
+	return &salesReports, nil
+}
+
+func (r *RptService) GetDashboardSummary(ctx context.Context, req *SalesReportServiceRequest) (*DashboardSummaryResponse, error) {
+	cacheKey := fmt.Sprintf("report:dashboard:sd:%d:ed:%d", req.StartDate.Unix(), req.EndDate.Unix())
+	if cachedData, err := r.Cache.GetWithContext(ctx, cacheKey); err == nil && cachedData != nil {
+		var response DashboardSummaryResponse
+		if err := json.Unmarshal(cachedData, &response); err == nil {
+			r.Log.Info("Dashboard cache hit!")
+			return &response, nil
+		}
+	}
+
+	params := repository.GetDashboardSummaryParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+	}
+
+	summary, err := r.repo.GetDashboardSummary(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get dashboard summary", "error", err)
+		return nil, err
+	}
+
+	var totalSales float64
+	if n, ok := summary.TotalSales.(pgtype.Numeric); ok && n.Valid {
+		f8, _ := n.Float64Value()
+		totalSales = f8.Float64
+	}
+
+	response := &DashboardSummaryResponse{
+		TotalSales:    totalSales,
+		TotalOrders:   summary.TotalOrders,
+		UniqueCashier: summary.UniqueCashiers,
+		TotalProducts: summary.TotalProducts,
+	}
+
+	if b, err := json.Marshal(response); err == nil {
+		ttl := 5 * time.Minute
+		if req.EndDate.Before(time.Now().Truncate(24 * time.Hour)) {
+			ttl = 12 * time.Hour
+		}
+		_ = r.Cache.SetWithContext(ctx, cacheKey, b, ttl)
+	}
+
+	return response, nil
+}
+
+func (r *RptService) GetProductPerformance(ctx context.Context, req *SalesReportServiceRequest) (*ProductPerformanceResponse, error) {
+	req.SetDefaults()
+
+	cacheKey := fmt.Sprintf("report:products:sd:%d:ed:%d:p:%d:l:%d", req.StartDate.Unix(), req.EndDate.Unix(), req.Page, req.Limit)
+	if cachedData, err := r.Cache.GetWithContext(ctx, cacheKey); err == nil && cachedData != nil {
+		var response ProductPerformanceResponse
+		if err := json.Unmarshal(cachedData, &response); err == nil {
+			r.Log.Info("Product performance cache hit!")
+			return &response, nil
+		}
+	}
+
+	params := repository.GetProductSalesPerformanceParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+		Limit:  int32(req.Limit),
+		Offset: int32((req.Page - 1) * req.Limit),
+	}
+
+	results, err := r.repo.GetProductSalesPerformance(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get product performance", "error", err)
+		return nil, err
+	}
+
+	countParams := repository.CountProductSalesPerformanceParams{
+		CreatedAt:   params.CreatedAt,
+		CreatedAt_2: params.CreatedAt_2,
+	}
+	totalData, err := r.repo.CountProductSalesPerformance(ctx, countParams)
+	if err != nil {
+		r.Log.Error("Failed to count product performance", "error", err)
+		return nil, err
+	}
+
+	productRows := make([]ProductPerformanceRow, len(results))
+	for i, row := range results {
+		productRows[i] = ProductPerformanceRow{
+			ProductID:     row.ProductID.String(),
+			ProductName:   row.ProductName,
+			TotalQuantity: row.TotalQuantity,
+			TotalRevenue:  float64(row.TotalRevenue),
+		}
+	}
+
+	response := &ProductPerformanceResponse{
+		Products: productRows,
+		Pagination: pagination.BuildPagination(
+			req.Page,
+			int(totalData),
+			req.Limit,
+		),
+	}
+
+	if b, err := json.Marshal(response); err == nil {
+		ttl := 5 * time.Minute
+		if req.EndDate.Before(time.Now().Truncate(24 * time.Hour)) {
+			ttl = 12 * time.Hour
+		}
+		_ = r.Cache.SetWithContext(ctx, cacheKey, b, ttl)
+	}
+
+	return response, nil
+}
+
+func (r *RptService) GetPaymentMethodPerformance(ctx context.Context, req *SalesReportServiceRequest) (*[]PaymentMethodPerformanceResponse, error) {
+	params := repository.GetPaymentMethodSalesParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+	}
+
+	results, err := r.repo.GetPaymentMethodSales(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get payment method performance", "error", err)
+		return nil, err
+	}
+
+	responses := make([]PaymentMethodPerformanceResponse, len(results))
+	for i, row := range results {
+		var totalSales float64
+		if n, ok := row.TotalSales.(pgtype.Numeric); ok && n.Valid {
+			f8, _ := n.Float64Value()
+			totalSales = f8.Float64
+		} else if v, ok := row.TotalSales.(int64); ok {
+			totalSales = float64(v)
+		}
+
+		responses[i] = PaymentMethodPerformanceResponse{
+			PaymentMethodID:   row.PaymentMethodID,
+			PaymentMethodName: row.PaymentMethodName,
+			OrderCount:        row.OrderCount,
+			TotalSales:        totalSales,
+		}
+	}
+
+	return &responses, nil
+}
+
+func (r *RptService) GetCashierPerformance(ctx context.Context, req *SalesReportServiceRequest) (*[]CashierPerformanceResponse, error) {
+	params := repository.GetCashierPerformanceParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+	}
+
+	results, err := r.repo.GetCashierPerformance(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get cashier performance", "error", err)
+		return nil, err
+	}
+
+	responses := make([]CashierPerformanceResponse, len(results))
+	for i, row := range results {
+		var totalSales float64
+		if n, ok := row.TotalSales.(pgtype.Numeric); ok && n.Valid {
+			f8, _ := n.Float64Value()
+			totalSales = f8.Float64
+		} else if v, ok := row.TotalSales.(int64); ok {
+			totalSales = float64(v)
+		}
+
+		responses[i] = CashierPerformanceResponse{
+			UserID:     row.UserID.String(),
+			Username:   row.Username,
+			OrderCount: row.OrderCount,
+			TotalSales: totalSales,
+		}
+	}
+
+	return &responses, nil
+}
+
+func (r *RptService) GetCancellationReports(ctx context.Context, req *SalesReportServiceRequest) (*[]CancellationReportResponse, error) {
+	params := repository.GetCancellationReasonsParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+	}
+
+	results, err := r.repo.GetCancellationReasons(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get cancellation reports", "error", err)
+		return nil, err
+	}
+
+	responses := make([]CancellationReportResponse, len(results))
+	for i, row := range results {
+		responses[i] = CancellationReportResponse{
+			ReasonID:        row.ReasonID,
+			Reason:          row.Reason,
+			CancelledOrders: row.CancelledOrders,
+		}
+	}
+
+	return &responses, nil
+}
+
+func (r *RptService) GetProfitSummary(ctx context.Context, req *SalesReportServiceRequest) (*[]ProfitSummaryResponse, error) {
+	params := repository.GetProfitSummaryParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+	}
+
+	results, err := r.repo.GetProfitSummary(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get profit summary", "error", err)
+		return nil, err
+	}
+
+	responses := make([]ProfitSummaryResponse, len(results))
+	for i, row := range results {
+		var totalRevenue, totalCOGS, grossProfit float64
+
+		// TotalRevenue (interface{})
+		if n, ok := row.TotalRevenue.(pgtype.Numeric); ok && n.Valid {
+			f, _ := n.Float64Value()
+			totalRevenue = f.Float64
+		} else if v, ok := row.TotalRevenue.(int64); ok {
+			totalRevenue = float64(v)
+		} else if v, ok := row.TotalRevenue.(float64); ok {
+			totalRevenue = v
+		}
+
+		// TotalCogs (interface{})
+		if n, ok := row.TotalCogs.(pgtype.Numeric); ok && n.Valid {
+			f, _ := n.Float64Value()
+			totalCOGS = f.Float64
+		} else if v, ok := row.TotalCogs.(int64); ok {
+			totalCOGS = float64(v)
+		} else if v, ok := row.TotalCogs.(float64); ok {
+			totalCOGS = v
+		}
+
+		// GrossProfit (int32)
+		grossProfit = float64(row.GrossProfit)
+
+		var date time.Time
+		if row.Date.Valid {
+			date = row.Date.Time
+		}
+
+		responses[i] = ProfitSummaryResponse{
+			Date:         date,
+			TotalRevenue: totalRevenue,
+			TotalCOGS:    totalCOGS,
+			GrossProfit:  grossProfit,
+		}
+	}
+
+	return &responses, nil
+}
+
+func (r *RptService) GetProductProfitReports(ctx context.Context, req *SalesReportServiceRequest) (*ProductProfitResponse, error) {
+	req.SetDefaults()
+
+	params := repository.GetProductProfitReportsParams{
+		CreatedAt: pgtype.Timestamptz{
+			Time:  req.StartDate,
+			Valid: true,
+		},
+		CreatedAt_2: pgtype.Timestamptz{
+			Time:  req.EndDate,
+			Valid: true,
+		},
+		Limit:  int32(req.Limit),
+		Offset: int32((req.Page - 1) * req.Limit),
+	}
+
+	results, err := r.repo.GetProductProfitReports(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get product profit reports", "error", err)
+		return nil, err
+	}
+
+	countParams := repository.CountProductProfitReportsParams{
+		CreatedAt:   params.CreatedAt,
+		CreatedAt_2: params.CreatedAt_2,
+	}
+	totalData, err := r.repo.CountProductProfitReports(ctx, countParams)
+	if err != nil {
+		r.Log.Error("Failed to count product profit reports", "error", err)
+		return nil, err
+	}
+
+	productRows := make([]ProductProfitRow, len(results))
+	for i, row := range results {
+		productRows[i] = ProductProfitRow{
+			ProductID:    row.ProductID.String(),
+			ProductName:  row.ProductName,
+			TotalSold:    row.TotalSold,
+			TotalRevenue: float64(row.TotalRevenue),
+			TotalCOGS:    float64(row.TotalCogs),
+			GrossProfit:  float64(row.GrossProfit),
+		}
+	}
+
+	response := &ProductProfitResponse{
+		Products: productRows,
+		Pagination: pagination.BuildPagination(
+			req.Page,
+			int(totalData),
+			req.Limit,
+		),
+	}
+
+	return response, nil
+}
+
+func (r *RptService) GetLowStockProducts(ctx context.Context, req *LowStockRequest) (*[]LowStockProductResponse, error) {
+	products, err := r.repo.GetLowStockProducts(ctx, req.Threshold)
+	if err != nil {
+		r.Log.Error("Failed to get low stock products", "error", err)
+		return nil, err
+	}
+
+	var response []LowStockProductResponse
+	for _, p := range products {
+		response = append(response, LowStockProductResponse{
+			ProductID:   p.ID.String(),
+			ProductName: p.Name,
+			Stock:       p.Stock,
+		})
+	}
+
+	return &response, nil
+}
+
+func (r *RptService) GetPromotionPerformanceReport(ctx context.Context, req *SalesReportServiceRequest) (*[]PromotionPerformanceResponse, error) {
+	params := repository.GetPromotionPerformanceParams{
+		CreatedAt:   pgtype.Timestamptz{Time: req.StartDate, Valid: true},
+		CreatedAt_2: pgtype.Timestamptz{Time: req.EndDate, Valid: true},
+	}
+
+	promotions, err := r.repo.GetPromotionPerformance(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get promotion performance", "error", err)
+		return nil, err
+	}
+
+	var response []PromotionPerformanceResponse
+	for _, p := range promotions {
+		var totalDiscount, totalSales float64
+		if n, ok := p.TotalDiscountGiven.(pgtype.Numeric); ok && n.Valid {
+			f8, _ := n.Float64Value()
+			totalDiscount = f8.Float64
+		}
+		if n, ok := p.TotalSalesWithPromotion.(pgtype.Numeric); ok && n.Valid {
+			f8, _ := n.Float64Value()
+			totalSales = f8.Float64
+		}
+
+		response = append(response, PromotionPerformanceResponse{
+			PromotionID:             p.PromotionID.String(),
+			PromotionName:           p.PromotionName,
+			UsageCount:              p.UsageCount,
+			TotalDiscountGiven:      totalDiscount,
+			TotalSalesWithPromotion: totalSales,
+		})
+	}
+
+	return &response, nil
+}
+
+func (r *RptService) GetShiftSummaryReport(ctx context.Context, req *SalesReportServiceRequest) (*[]ShiftSummaryResponse, error) {
+	params := repository.GetShiftSummaryParams{
+		StartTime:   pgtype.Timestamptz{Time: req.StartDate, Valid: true},
+		StartTime_2: pgtype.Timestamptz{Time: req.EndDate, Valid: true},
+	}
+
+	shifts, err := r.repo.GetShiftSummary(ctx, params)
+	if err != nil {
+		r.Log.Error("Failed to get shift summary", "error", err)
+		return nil, err
+	}
+
+	var response []ShiftSummaryResponse
+	for _, s := range shifts {
+		response = append(response, ShiftSummaryResponse{
+			ShiftID:         s.ShiftID.String(),
+			CashierName:     s.CashierName,
+			StartTime:       s.StartTime.Time,
+			EndTime:         s.EndTime.Time,
+			Status:          string(s.Status),
+			StartCash:       s.StartCash,
+			ActualCashEnd:   s.ActualCashEnd,
+			ExpectedCashEnd: s.ExpectedCashEnd,
+			CashDifference:  s.CashDifference,
+		})
+	}
+
+	return &response, nil
+}

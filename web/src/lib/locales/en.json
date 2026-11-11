@@ -1,0 +1,908 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "actions": "Actions",
+        "logout": "Logout",
+        "confirm": "Confirm",
+        "yes": "Yes",
+        "no": "No",
+        "no_data": "No data available",
+        "save_changes": "Save Changes",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "sold": "sold",
+        "rev": "rev",
+        "no_results": "No results found.",
+        "clear_filters": "Clear Filters",
+        "previous": "Previous",
+        "next": "Next",
+        "page_info": "Page {{current}} of {{total}}",
+        "restore": "Restore",
+        "print": "Print",
+        "open_menu": "Open menu",
+        "language_placeholder": "Language",
+        "language_id": "Bahasa (ID)",
+        "language_en": "English (EN)",
+        "error": {
+            "title": "Oops!",
+            "subtitle": "Something went wrong",
+            "default_message": "An unexpected error occurred. Please try again later.",
+            "try_again": "Try Again",
+            "go_home": "Go Home",
+            "load_failed": "Failed to load data: {{message}}"
+        },
+        "crop": {
+            "title": "Crop Image",
+            "description": "Adjust the image to fit the required aspect ratio.",
+            "zoom": "Zoom",
+            "save": "Crop & Save"
+        },
+        "theme": {
+            "toggle": "Toggle theme",
+            "light": "Light",
+            "dark": "Dark",
+            "system": "System"
+        },
+        "not_found": {
+            "title": "Page Not Found",
+            "description": "Sorry, the page you are looking for does not exist or has been moved.",
+            "go_home": "Go Back Home"
+        }
+    },
+    "auth": {
+        "welcome_back": "Welcome back",
+        "sign_in_subtitle": "Sign in to your account to continue.",
+        "email": "Email",
+        "password": "Password",
+        "sign_in": "Sign in",
+        "signing_in": "Signing in...",
+        "dont_have_account": "Don't have an account?",
+        "register": "Register",
+        "forgot_password": "Forgot password?",
+        "login_failed": "Login failed. Please check your credentials.",
+        "email_placeholder": "m.scott@dundermifflin.com",
+        "password_placeholder": "••••••••",
+        "demo_account": "Use demo account:",
+        "logout_failed": "Logout failed: {{message}}",
+        "update_avatar_failed": "Failed to update avatar: {{message}}",
+        "update_password_success": "Password updated successfully",
+        "update_password_failed": "Failed to update password: {{message}}"
+    },
+    "sidebar": {
+        "summary": "Summary",
+        "pos": "POS",
+        "date": "Date",
+        "transactions": "Transactions",
+        "product": "Product",
+        "promotions": "Promotions",
+        "reports": "Reports",
+        "users": "Users",
+        "settings": "Settings",
+        "account": "Account",
+        "activity_logs": "Activity Logs",
+        "customers": "Customers"
+    },
+    "transactions": {
+        "title": "Transactions",
+        "subtitle": "Monitor orders and manage payments.",
+        "filter_user": "All Cashiers",
+        "tabs": {
+            "active": "Active",
+            "history": "History",
+            "cancelled": "Cancelled"
+        },
+        "status": {
+            "open": "Open",
+            "in_progress": "Process",
+            "served": "Served",
+            "paid": "Paid",
+            "cancelled": "Cancel",
+            "all": "All"
+        },
+        "status_badge": {
+            "paid": "PAID",
+            "unpaid": "UNPAID"
+        },
+        "table": {
+            "queue": "Queue",
+            "type": "Type",
+            "cashier": "Cashier",
+            "items": "Items",
+            "total": "Total",
+            "status": "Status",
+            "action": "Action",
+            "no_data": "No transactions found for this filter."
+        },
+        "actions_button": {
+            "pay": "Pay",
+            "complete": "Complete",
+            "cancel": "Cancel",
+            "refund": "Refund"
+        },
+        "cancellation_dialog": {
+            "title": "Cancel Order",
+            "description": "Please select a reason for cancelling order",
+            "reason_label": "Reason",
+            "reason_placeholder": "Select a reason",
+            "notes_label": "Additional Notes",
+            "notes_placeholder": "Optional details...",
+            "confirm": "Cancel Order",
+            "cancel": "Back"
+        },
+        "refund_dialog": {
+            "title": "Refund Order",
+            "description": "Are you sure you want to refund this order?",
+            "warning": "This action will cancel the items and return them to stock.",
+            "reason_label": "Reason",
+            "reason_placeholder": "Select reason"
+        },
+        "payment_dialog": {
+            "title": "Complete Payment",
+            "description": "Process payment for Queue",
+            "total_amount": "Total Amount",
+            "select_method": "Select Payment Method",
+            "cash_received": "Cash Received",
+            "change_due": "Change Due",
+            "confirm": "Confirm Payment",
+            "money_insufficient": "Cash insufficient!",
+            "success": "Payment Successful! Change:"
+        },
+        "messages": {
+            "fetch_error": "Failed to fetch transactions",
+            "cancel_notes_required": "Cancel notes are required",
+            "order_finished": "Order finished",
+            "use_action_button": "Please use action buttons"
+        }
+    },
+    "dashboard": {
+        "title": "Dashboard Summary",
+        "welcome_subtitle": "Here's what's happening with your store today.",
+        "toggle_nav": "Toggle navigation menu",
+        "widgets": {
+            "quick_actions": "Quick Actions",
+            "quick_actions_desc": "Manage your store efficiently",
+            "manage_products": "Manage Products",
+            "view_reports": "View Full Reports",
+            "sales_trend": "Sales Trend (Last 30 Days)",
+            "top_products": "Top Products",
+            "quantity": "Quantity",
+            "revenue": "Revenue",
+            "payment_distribution": "Payment Methods",
+            "cashier_performance": "Cashier Performance"
+        },
+        "stats": {
+            "from_last_month": "from last month",
+            "since_last_hour": "since last hour",
+            "today_sales": "Today's Sales",
+            "today_orders": "Today's Orders",
+            "active_today": "Active Today",
+            "all_time": "All Time"
+        },
+        "total_revenue": "Total Revenue",
+        "total_orders": "Total Orders",
+        "active_cashiers": "Active Cashiers",
+        "total_products": "Total Products",
+        "active_users": "Active Users",
+        "sales": "Sales",
+        "active_now": "Active Now",
+        "brand_name": "POS Kasir",
+        "secret_reports": "Secret Reports Page (Admin Only)",
+        "placeholder_content": "Other content can be placed here..."
+    },
+    "reports": {
+        "title": "Reports Analytics",
+        "subtitle": "Comprehensive insights into your business performance.",
+        "export_csv": "Export CSV",
+        "tabs": {
+            "sales": "Sales",
+            "products": "Products",
+            "profit": "Profit",
+            "performance": "Performance",
+            "cancellations": "Cancellations",
+            "low_stock": "Low Stock",
+            "promotions": "Promotions",
+            "shifts": "Shifts"
+        },
+        "sales": {
+            "title": "Sales Overview",
+            "description": "Daily sales revenue and order counts over time.",
+            "revenue": "Total Revenue",
+            "orders": "Order Count"
+        },
+        "products": {
+            "title": "Product Performance",
+            "description": "Top selling products by quantity and revenue.",
+            "product": "Product",
+            "quantity": "Quantity Sold",
+            "revenue": "Total Revenue",
+            "stock": "Stock"
+        },
+        "performance": {
+            "payment_methods": "Payment Method Distribution",
+            "cashier": "Cashier Leaderboard",
+            "staff": "Staff Member",
+            "orders": "Total Orders",
+            "sales": "Total Sales"
+        },
+        "cancellations": {
+            "title": "Cancellation Report",
+            "description": "Analysis of cancelled orders and reasons.",
+            "reason": "Reason",
+            "date": "Date",
+            "count": "Total Count"
+        },
+        "profit": {
+            "title": "Profit Analysis",
+            "description": "Analyze your revenue, COGS, and gross profit.",
+            "revenue": "Revenue",
+            "cogs": "COGS",
+            "gross_profit": "Gross Profit",
+            "products": "Product Profitability",
+            "products_desc": "Profit margin analysis per product.",
+            "profit": "Profit"
+        },
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "low_stock": {
+            "title": "Low Stock Products",
+            "description": "Products with stock below minimum threshold."
+        },
+        "promotions": {
+            "title": "Active Promotions",
+            "description": "Check promotions efficacy.",
+            "name": "Promo Name",
+            "discount": "Discount",
+            "type": "Type"
+        },
+        "shifts": {
+            "title": "Work Shifts",
+            "description": "Monitor cash reconcile accurately.",
+            "status": "Status",
+            "expected": "Expected",
+            "actual": "Actual",
+            "diff": "Difference"
+        }
+    },
+    "account": {
+        "title": "Account",
+        "subtitle": "Manage your account settings and preferences.",
+        "tabs": {
+            "profile": "Profile",
+            "security": "Security"
+        },
+        "avatar": {
+            "title": "Profile Picture",
+            "description": "Update your profile picture.",
+            "success": "Profile picture updated successfully!",
+            "error": "Failed to update avatar.",
+            "upload_button": "Upload New Picture"
+        },
+        "password": {
+            "title": "Password & Security",
+            "description": "Change your password to keep your account secure.",
+            "current_password": "Current Password",
+            "new_password": "New Password",
+            "confirm_password": "Confirm New Password",
+            "button": "Change Password",
+            "error_match": "New passwords do not match.",
+            "success": "Password updated successfully!",
+            "error_fail": "Failed to update password."
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "description": "Manage application settings and configurations.",
+        "tabs": {
+            "cancellation": "Cancellation Reasons",
+            "category": "Category",
+            "payment_methods": "Payment Methods",
+            "branding": "Branding",
+            "printer": "Printer"
+        },
+        "cancellation": {
+            "title": "Cancellation Reasons",
+            "add_button": "Add Reason",
+            "description": "Manage standard reasons for transaction cancellations.",
+            "table": {
+                "reason": "Reason",
+                "description": "Description",
+                "status": "Status",
+                "empty": "No cancellation reasons found."
+            },
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            }
+        },
+        "category": {
+            "title": "Product Categories",
+            "description": "Organize your products into categories.",
+            "add_button": "Add Category",
+            "table": {
+                "name": "Name",
+                "created_at": "Created At",
+                "actions": "Actions",
+                "empty": "No categories found. Create one to get started."
+            },
+            "actions": {
+                "edit": "Edit Details",
+                "delete": "Delete Category",
+                "delete_title": "Delete Category?",
+                "delete_confirm": "Are you sure you want to delete",
+                "delete_warning": "This action cannot be undone.",
+                "cancel": "Cancel",
+                "delete_button": "Delete",
+                "deleting": "Deleting..."
+            },
+            "form": {
+                "title_add": "New Category",
+                "title_edit": "Edit Category",
+                "desc_add": "Create a new product category.",
+                "desc_edit": "Update category name.",
+                "name_label": "Name",
+                "name_placeholder": "e.g., Beverages, Snacks",
+                "save": "Save Changes",
+                "saving": "Saving..."
+            }
+        },
+        "payment_methods": {
+            "title": "Payment Methods",
+            "description": "Available payment methods for POS transactions.",
+            "empty": "No payment methods found."
+        },
+        "branding": {
+            "title": "App Branding",
+            "description": "Customize your application name, logo, and footer.",
+            "app_name": "Application Name",
+            "logo": "Application Logo",
+            "footer_text": "Footer Text",
+            "theme_color": "Theme Color (Light Mode)",
+            "theme_color_dark": "Theme Color (Dark Mode)",
+            "save_success": "Settings saved successfully",
+            "save_error": "Failed to save settings",
+            "update_success": "Branding settings updated successfully!",
+            "update_error": "Failed to update branding",
+            "uploading": "Uploading logo...",
+            "upload_success": "Logo uploaded successfully",
+            "upload_error": "Failed to upload logo",
+            "no_logo": "No Logo",
+            "upload_button": "Upload New Logo",
+            "remove_button": "Remove/Clear",
+            "logo_help": "Recommended size: 512x512px. Max 5MB. Values are updated immediately upon upload.",
+            "app_name_placeholder": "POS Kasir",
+            "footer_placeholder": "© 2024 POS Kasir",
+            "logo_alt": "App Logo",
+            "color_placeholder": "#000000",
+            "color_dark_placeholder": "#ffffff"
+        },
+        "printer": {
+            "title": "Printer Settings",
+            "description": "Configure your receipt printer connection.",
+            "connection": "Printer Connection URI",
+            "connection_placeholder": "socket://127.0.0.1:9100",
+            "paper_width": "Paper Width",
+            "auto_print": "Auto Print on Payment",
+            "test_print": "Test Print",
+            "update_success": "Printer settings updated successfully!",
+            "update_error": "Failed to update printer settings",
+            "save_failed": "Failed to save settings",
+            "print_success": "Receipt printed successfully",
+            "print_failed": "Failed to print receipt",
+            "ip_help": "Will be ignored if not network printer",
+            "connected": "Connected",
+            "connection_failed": "Connection failed",
+            "test_print_success": "Test print successful",
+            "test_print_error": "Test print failed",
+            "interface_type": "Interface Type",
+            "connected_to": "Connected to",
+            "not_connected": "Not Connected",
+            "reconnect": "Reconnect",
+            "connect": "Connect",
+            "fe_help": "Browser handles connection to the printer directly",
+            "printer_ip": "Printer IP / URL",
+            "fe_lan_help": "Input the LAN Printer IP. E.g: 192.168.1.200",
+            "print_method": "Printer Connection Mode",
+            "method_be": "Network Connection (LAN / Wi-Fi)",
+            "method_fe": "Bluetooth Connection",
+            "method_be_desc": "Printer is connected to the same network as the server (Recommended for fixed printers)",
+            "method_fe_desc": "Printer is connected directly to this device (Recommended for portable printers)",
+            "discovery_title": "Discover Network Printers",
+            "discovery_desc": "Search for available thermal printers in your local network (Port 9100).",
+            "scan_now": "Scan Local Network",
+            "discovered_count": "Printers Found",
+            "discovery_completed": "Printer discovery completed",
+            "discovery_failed": "Failed to discover printers",
+            "help_text": "Use socket://IP:PORT for network printers (e.g. 192.168.1.100:9100).",
+            "bluetooth": "Bluetooth",
+            "lan": "LAN / Network",
+            "lan_placeholder": "e.g. 192.168.1.200 or http://192.168.1.200:80/print",
+            "paper_58": "58mm",
+            "paper_80": "80mm"
+        }
+    },
+    "users": {
+        "loading": "Loading shift status...",
+        "register_open": "Register Open",
+        "open_register": "Open Register",
+        "open_shift_title": "Open Shift",
+        "title": "Users",
+        "description": "Manage user access and roles.",
+        "add_button": "Add User",
+        "search_placeholder": "Search user...",
+        "role_filter": "Role",
+        "role_all": "All Roles",
+        "roles": {
+            "admin": "Admin",
+            "manager": "Manager",
+            "cashier": "Cashier"
+        },
+        "table": {
+            "avatar": "Avatar",
+            "user": "User",
+            "role": "Role",
+            "status": "Status",
+            "actions": "Actions",
+            "empty": "No users found."
+        },
+        "status": {
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "actions": {
+            "open_menu": "Open menu",
+            "edit": "Edit Details",
+            "activate": "Activate Account",
+            "deactivate": "Deactivate Account",
+            "delete": "Delete User",
+            "delete_title": "Are you absolutely sure?",
+            "delete_desc": "This action cannot be undone. This will permanently delete the user account",
+            "delete_desc_2": "and remove their data from our servers.",
+            "cancel": "Cancel",
+            "delete_confirm": "Delete",
+            "deleting": "Deleting..."
+        },
+        "form": {
+            "title_create": "Create New User",
+            "title_edit": "Edit User",
+            "desc_create": "Add a new user to the system.",
+            "desc_edit": "Update user details. Password cannot be changed here.",
+            "username": "Username",
+            "email": "Email",
+            "role": "Role",
+            "select_role": "Select a role",
+            "password": "Password",
+            "password_placeholder": "Strong password",
+            "save_changes": "Save Changes",
+            "create_user": "Create User",
+            "success_create": "User created successfully",
+            "success_update": "User updated successfully",
+            "error_save": "Failed to save user"
+        },
+        "messages": {
+            "create_success": "User created successfully",
+            "create_failed": "Failed to create user: {{message}}",
+            "update_success": "User updated successfully",
+            "update_failed": "Failed to update user: {{message}}",
+            "delete_success": "User deleted successfully",
+            "delete_failed": "Failed to delete user: {{message}}",
+            "update_status_success": "User status updated successfully",
+            "update_status_failed": "Failed to update status: {{message}}"
+        }
+    },
+    "pagination": {
+        "page_info": "Page {{current}} of {{total}}",
+        "previous": "Previous",
+        "next": "Next"
+    },
+    "products": {
+        "title": "Products",
+        "description": "Manage your product inventory.",
+        "add_button": "Add Product",
+        "tabs": {
+            "active": "Active Products",
+            "trash": "Trash ({{count}})",
+            "list": "List View",
+            "grid": "Grid View"
+        },
+        "filters": {
+            "search_placeholder": "Search products...",
+            "category": "Category",
+            "category_all": "All Categories"
+        },
+        "table": {
+            "image": "Image",
+            "name": "Name",
+            "category": "Category",
+            "price": "Price",
+            "stock": "Stock",
+            "actions": "Actions",
+            "empty": "No products found.",
+            "empty_trash": "No trashed products."
+        },
+        "card": {
+            "out_of_stock": "Out of Stock",
+            "stock_left": "{{count}} Left",
+            "uncategorized": "Uncategorized"
+        },
+        "actions": {
+            "edit": "Edit Product",
+            "delete": "Delete Product",
+            "restore": "Restore",
+            "delete_title": "Delete Product?",
+            "delete_desc": "Are you sure you want to delete",
+            "delete_desc_2": "This action cannot be undone.",
+            "deleting": "Deleting...",
+            "cancel": "products.actions.cancel",
+            "delete_confirm": "products.actions.delete_confirm"
+        },
+        "form": {
+            "title_create": "Create New Product",
+            "title_edit": "Edit Product",
+            "desc": "Fill in the details below. Click save when you're done.",
+            "upload_image": "Upload Image",
+            "change_image": "Change Image",
+            "name": "Name",
+            "category": "Category",
+            "select_category": "Select Category",
+            "price": "Price",
+            "stock": "Stock",
+            "variants": "Product Variants",
+            "add_variant": "Add Variant",
+            "variant_name": "Variant Name (e.g. Size XL)",
+            "additional_price": "Additional Price",
+            "no_variants": "No variants added.",
+            "save": "Save Product",
+            "saving": "Saving...",
+            "success_create": "Product created!",
+            "success_update": "Product updated!",
+            "error_category": "Please select a category",
+            "error_name_required": "Product name is required",
+            "error_delete_variant": "Cannot delete existing variants (API limitation)",
+            "tab_details": "Details",
+            "tab_history": "History",
+            "cost_price": "Cost Price"
+        },
+        "messages": {
+            "create_success": "Product created successfully",
+            "create_error": "Failed to create product",
+            "update_success": "Product updated successfully",
+            "update_error": "Failed to update product",
+            "delete_success": "Product deleted successfully",
+            "delete_error": "Failed to delete product",
+            "upload_image_success": "Product image uploaded successfully",
+            "upload_image_error": "Failed to upload image",
+            "create_variant_success": "Product variant created successfully",
+            "create_variant_error": "Failed to create variant",
+            "update_variant_success": "Variant updated successfully",
+            "update_variant_error": "Failed to update variant",
+            "upload_variant_image_success": "Variant image uploaded successfully",
+            "upload_variant_image_error": "Failed to upload variant image",
+            "restore_success": "Product restored successfully",
+            "restore_error": "Failed to restore product"
+        },
+        "stock_history": {
+            "no_history": "No stock history found.",
+            "type_sale": "Sale",
+            "type_restock": "Restock",
+            "type_correction": "Correction",
+            "type_return": "Return",
+            "type_damage": "Damage",
+            "date": "Date",
+            "type": "Type",
+            "amount": "Amount",
+            "initial_stock": "Initial Stock",
+            "final_stock": "Final Stock",
+            "note": "Note"
+        }
+    },
+    "promotions": {
+        "title": "Promotions",
+        "description": "Manage promotions and discounts for customers.",
+        "add_button": "Add Promotion",
+        "table": {
+            "name": "Promotion Name",
+            "scope": "Scope",
+            "discount": "Discount",
+            "period": "Period",
+            "status": "Status",
+            "actions": "Actions",
+            "empty": "No promotions yet.",
+            "max": "Max:"
+        },
+        "tabs": {
+            "active": "Active",
+            "trash": "Trash"
+        },
+        "status": {
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "actions": {
+            "open_menu": "Open menu"
+        },
+        "delete_toast_success": "Promotion deleted",
+        "delete_toast_error": "Failed to delete promotion",
+        "delete_title": "Delete Promotion",
+        "delete_confirm": "Are you sure you want to delete this promotion? It will be moved to the trash.",
+        "restore_title": "Restore Promotion",
+        "restore_confirm": "Are you sure you want to restore this promotion?",
+        "form": {
+            "title_create": "Create New Promotion",
+            "title_edit": "Edit Promotion",
+            "desc": "Fill in the promotion details below.",
+            "name": "Promotion Name",
+            "name_placeholder": "e.g. Year End Sale",
+            "description": "Description",
+            "scope": "Scope",
+            "discount_type": "Discount Type",
+            "discount_value": "Discount Value",
+            "max_discount": "Max Discount Amount",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "is_active": "Activate Promotion",
+            "rules": "Promotion Rules",
+            "add_rule": "Add Rule",
+            "rule_type": "Rule Type",
+            "rule_value": "Rule Value",
+            "rule_desc": "Rule Description",
+            "targets": "Promotion Targets",
+            "add_target": "Add Target",
+            "target_type": "Target Type",
+            "target_id": "Target ID",
+            "save": "Save Promotion",
+            "saving": "Saving...",
+            "success_create": "Promotion created successfully!",
+            "success_update": "Promotion updated successfully!",
+            "pick_date": "Pick a date",
+            "select_scope": "Select scope",
+            "select_product": "Select Product",
+            "select_category": "Select Category",
+            "rule_min_order_amount": "Min Order Amount",
+            "rule_required_product": "Required Product",
+            "rule_required_category": "Required Category"
+        },
+        "types": {
+            "percentage": "Percentage",
+            "fixed_amount": "Fixed Amount",
+            "product": "Product",
+            "category": "Category"
+        },
+        "scope": {
+            "ORDER": "Order",
+            "ITEM": "Item"
+        },
+        "messages": {
+            "restore_success": "Promotion restored successfully",
+            "create_success": "Promotion created successfully",
+            "update_success": "Promotion updated successfully",
+            "delete_success": "Promotion deleted successfully"
+        }
+    },
+    "order": {
+        "search_placeholder": "Search products...",
+        "all_categories": "All",
+        "out_of_stock": "Out of Stock",
+        "no_products": "No products found.",
+        "current_order": "Current Order",
+        "items": "items",
+        "empty_cart": "Cart is empty",
+        "subtotal": "Subtotal",
+        "total": "Total",
+        "charge": "Charge",
+        "order_type": {
+            "dine_in": "Dine In",
+            "take_away": "Take Away"
+        },
+        "refund_success": "Order refunded successfully",
+        "select_customer": "Select Customer",
+        "walk_in": "Walk-in",
+        "tax": "Tax",
+        "static_qris": "Static QRIS",
+        "errors": {
+            "invalid_cart": "Invalid cart state",
+            "stock_empty": "Product out of stock",
+            "load_failed": "Failed to load product info",
+            "insufficient_stock": "Insufficient stock",
+            "create_failed": "Failed to create order",
+            "cash_insufficient": "Cash insufficient!",
+            "payment_failed": "Payment failed",
+            "select_payment": "Please select a payment method"
+        },
+        "success": {
+            "created": "Order created! Proceed to payment.",
+            "creating": "Creating order...",
+            "payment_complete": "Payment completed successfully",
+            "payment_success": "Payment Successful! Change:",
+            "received": "Received",
+            "saved": "Order saved! You can pay later in Transactions."
+        },
+        "payment_dialog": {
+            "title": "Payment Method",
+            "desc": "Select how the customer is paying. Total:",
+            "process_via": "Process payment via",
+            "pay": "Pay Order",
+            "cash_received": "Cash Received",
+            "enter_amount": "Enter amount",
+            "change": "Change",
+            "cancel": "Cancel",
+            "pay_later": "Pay Later",
+            "payment_complete": "Payment complete",
+            "complete": "Complete Payment",
+            "midtrans_auto_confirm": "Payment automatically confirmed by Midtrans/Server",
+            "cancelled_by_user": "Cancelled by user from payment screen",
+            "scan_qr_static": "Scan Static QRIS (Placeholder)",
+            "confirm_payment": "Confirm Payment",
+            "scan_qr_dynamic": "Scan QRIS to pay",
+            "generate_qris_failed": "Failed to generate QRIS code from Midtrans",
+            "qris_generated": "QRIS Generated",
+            "click_to_generate": "Click button above to generate QR code",
+            "generate_qris": "Generate QRIS",
+            "discount": "Discount",
+            "select_promo": "Select Promo",
+            "no_promo": "No promo",
+            "cancel_order_btn": "Cancel Order",
+            "close": "Close"
+        },
+        "variant_dialog": {
+            "title": "Select Variant",
+            "desc": "Choose an option for",
+            "original": "Original",
+            "no_image": "No Image"
+        },
+        "cancel_confirm": {
+            "title": "Cancel Order?",
+            "desc": "Are you sure you want to cancel this order? This action cannot be undone.",
+            "yes": "Yes, Cancel Order"
+        },
+        "qr_code_alt": "QR Code",
+        "promo_applied": "Promo applied successfully",
+        "cancel_success": "Order cancelled successfully",
+        "manual_payment_success": "Manual payment confirmed successfully",
+        "payment_processed": "Payment processed",
+        "status_updated": "Order status updated",
+        "create_success": "Order created successfully",
+        "item_updated": "Order item updated successfully",
+        "printing_invoice": "Printing invoice..."
+    },
+    "errors": {
+        "unexpected_error": {
+            "title": "Oops...",
+            "desc": "An unexpected error occurred while loading this page."
+        },
+        "not_found": {
+            "title": "404",
+            "desc": "Page not found"
+        },
+        "go_home": "Go home",
+        "default_message": "Something went wrong"
+    },
+    "activity_logs": {
+        "title": "Activity Logs",
+        "description": "View and filter system activity logs.",
+        "list_title": "System Activities",
+        "search_placeholder": "Search details or entity ID...",
+        "filters": {
+            "all_actions": "All Actions",
+            "all_entities": "All Entities",
+            "action_type": "Action Type",
+            "entity_type": "Entity Type",
+            "user_id": "User ID",
+            "date_range": "Pick a date range"
+        },
+        "table": {
+            "details": "Details",
+            "id_prefix": "ID:",
+            "toggle": "Toggle"
+        },
+        "columns": {
+            "date": "Date",
+            "user": "User",
+            "action": "Action",
+            "entity": "Entity",
+            "details": "Details"
+        }
+    },
+    "category": {
+        "create_success": "Category created successfully",
+        "update_success": "Category updated successfully",
+        "delete_success": "Category deleted successfully"
+    },
+    "customers": {
+        "title": "Customers",
+        "description": "Manage customer information and history.",
+        "add_button": "Add Customer",
+        "search_placeholder": "Search customers...",
+        "table": {
+            "name": "Name",
+            "phone": "Phone",
+            "email": "Email",
+            "address": "Address",
+            "actions": "Actions",
+            "empty": "No customers found."
+        },
+        "form": {
+            "title_create": "Add New Customer",
+            "title_edit": "Edit Customer",
+            "desc_create": "Fill in the details to create a customer.",
+            "desc_edit": "Update customer details.",
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "address": "Address",
+            "save_changes": "Save Changes",
+            "create_customer": "Create Customer"
+        },
+        "messages": {
+            "create_success": "Customer created successfully",
+            "create_failed": "Failed to create customer: {{message}}",
+            "update_success": "Customer updated successfully",
+            "update_failed": "Failed to update customer: {{message}}",
+            "delete_success": "Customer deleted successfully",
+            "delete_failed": "Failed to delete customer: {{message}}",
+            "save_failed": "Failed to save customer: {{message}}"
+        },
+        "actions": {
+            "open_menu": "Open menu",
+            "edit": "Edit",
+            "delete": "Delete",
+            "delete_title": "Delete Customer",
+            "delete_desc": "Are you sure you want to delete this customer?",
+            "delete_desc_2": "This action cannot be undone.",
+            "cancel": "Cancel",
+            "deleting": "Deleting...",
+            "delete_confirm": "Delete"
+        }
+    },
+    "shift": {
+        "loading": "Loading...",
+        "register_open": "Register Open",
+        "open_register": "Open Register",
+        "messages": {
+            "start_success": "Shift started successfully",
+            "end_success": "Shift ended successfully",
+            "transaction_recorded": "Transaction recorded"
+        },
+        "close_modal": {
+            "title": "Close Register",
+            "title_summary": "Shift Closed",
+            "desc": "Count the cash in drawer and enter the amount to close the shift.",
+            "desc_summary": "Shift summary and reconciliation.",
+            "start_cash": "Start Cash",
+            "expected_cash": "Expected Cash",
+            "actual_cash": "Actual Cash",
+            "difference": "Difference",
+            "close": "Close",
+            "password": "Password",
+            "closing": "Closing...",
+            "submit": "Close Register"
+        },
+        "open_modal": {
+            "title": "Open Register",
+            "desc": "Enter the starting cash amount and your password to begin.",
+            "start_cash": "Start Cash",
+            "password": "Password",
+            "opening": "Opening...",
+            "submit": "Open Register"
+        }
+    },
+    "/": "/",
+    "main": "main",
+    "link": "link",
+    "@/components/dashboard/DashboardCharts": "@/components/dashboard/DashboardCharts",
+    "/auth/refresh": "/auth/refresh",
+    "Printing failed": {
+        " Please check printer connection": {
+            "": "Printing failed. Please check printer connection."
+        }
+    },
+    "canvas": "canvas",
+    "2d": "2d",
+    "T": "T",
+    "a": "a",
+    "cancellation": "cancellation",
+    "@/components/DevToolsPanel": "@/components/DevToolsPanel"
+}

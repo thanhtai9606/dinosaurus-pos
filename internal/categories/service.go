@@ -1,0 +1,274 @@
+package categories
+
+import (
+	"POS-kasir/internal/activitylog"
+	activitylog_repo "POS-kasir/internal/activitylog/repository"
+	categories_repo "POS-kasir/internal/categories/repository"
+	"POS-kasir/internal/common"
+
+	"POS-kasir/pkg/logger"
+	"context"
+	"errors"
+	"strconv"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+)
+
+type CtgService struct {
+	repo            categories_repo.Querier
+	log             logger.ILogger
+	activityService activitylog.IActivityService
+}
+
+type ICtgService interface {
+	GetAllCategories(ctx context.Context, req ListCategoryRequest) ([]CategoryResponse, error)
+	CreateCategory(ctx context.Context, req CreateCategoryRequest) (*CategoryResponse, error)
+	GetCategoryByID(ctx context.Context, categoryID int32) (*CategoryResponse, error)
+	UpdateCategory(ctx context.Context, categoryID int32, req CreateCategoryRequest) (*CategoryResponse, error)
+	DeleteCategory(ctx context.Context, categoryID int32) error
+	GetCategoryWithProductCount(ctx context.Context) (*[]CategoryWithCountResponse, error)
+}
+
+func NewCtgService(repo categories_repo.Querier, log logger.ILogger, activityService activitylog.IActivityService) ICtgService {
+	return &CtgService{
+		repo:            repo,
+		log:             log,
+		activityService: activityService,
+	}
+}
+
+func (s *CtgService) GetCategoryWithProductCount(ctx context.Context) (*[]CategoryWithCountResponse, error) {
+	params := categories_repo.ListCategoriesWithProductsParams{
+		Limit:  100,
+		Offset: 0,
+	}
+
+	categories, err := s.repo.ListCategoriesWithProducts(ctx, params)
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			s.log.Warnf("GetCategoryWithProductCount | No categories found with product count")
+			return nil, common.ErrCategoryNotFound
+		default:
+			s.log.Errorf("GetCategoryWithProductCount | Failed to get categories with product count: %v", err)
+			return nil, err
+		}
+	}
+	var response []CategoryWithCountResponse
+	for _, category := range categories {
+		response = append(response, CategoryWithCountResponse{
+			ID:           category.ID,
+			Name:         category.Name,
+			ProductCount: int32(category.ProductCount),
+			CreatedAt:    category.CreatedAt.Time,
+			UpdatedAt:    category.UpdatedAt.Time,
+		})
+	}
+
+	if len(response) == 0 {
+		s.log.Warnf("GetCategoryWithProductCount | No categories found")
+		return nil, common.ErrCategoryNotFound
+	}
+
+	return &response, nil
+}
+
+func (s *CtgService) DeleteCategory(ctx context.Context, categoryID int32) error {
+	exists, err := s.repo.ExistsCategory(ctx, categoryID)
+	if err != nil {
+		s.log.Errorf("DeleteCategory | Failed to check if category exists: %v, categoryID=%d", err, categoryID)
+		return common.ErrInternal
+	}
+
+	if !exists {
+		s.log.Warnf("DeleteCategory | Category not found: categoryID=%d", categoryID)
+		return common.ErrCategoryNotFound
+	}
+
+	productCount, err := s.repo.CountProductsInCategory(ctx, categoryID)
+	if err != nil {
+		s.log.Errorf("DeleteCategory | Failed to count products in category: %v, categoryID=%d", err, categoryID)
+		return common.ErrInternal
+	}
+
+	if productCount > 0 {
+		s.log.Warnf(
+			"DeleteCategory | Attempted to delete a category that is still in use: categoryID=%d, productCount=%d",
+			categoryID,
+			productCount,
+		)
+		return common.ErrCategoryInUse
+	}
+
+	err = s.repo.DeleteCategory(ctx, categoryID)
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			s.log.Warnf("DeleteCategory | Category not found for deletion: categoryID=%d", categoryID)
+			return common.ErrCategoryNotFound
+		default:
+			s.log.Errorf("DeleteCategory | Failed to delete category: %v, categoryID=%d", err, categoryID)
+			return common.ErrInternal
+		}
+	}
+	actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID)
+	if !ok {
+		s.log.Warnf("DeleteCategory | Actor user ID not found in context for activity logging")
+	}
+
+	logDetails := map[string]interface{}{
+		"deleted_category_id": categoryID,
+	}
+
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeDELETE,
+		activitylog_repo.LogEntityTypeCATEGORY,
+		strconv.Itoa(int(categoryID)),
+		logDetails,
+	)
+	return nil
+}
+
+func (s *CtgService) UpdateCategory(ctx context.Context, categoryID int32, req CreateCategoryRequest) (*CategoryResponse, error) {
+	params := categories_repo.UpdateCategoryParams{
+		ID:   categoryID,
+		Name: req.Name,
+	}
+
+	category, err := s.repo.UpdateCategory(ctx, params)
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			s.log.Warnf("UpdateCategory | Category not found: id=%d", categoryID)
+			return nil, common.ErrCategoryNotFound
+		default:
+			s.log.Errorf("UpdateCategory | Failed to update category: %v", err)
+			return nil, common.ErrInternal
+		}
+	}
+
+	response := &CategoryResponse{
+		ID:        category.ID,
+		Name:      category.Name,
+		CreatedAt: category.CreatedAt.Time,
+		UpdatedAt: category.UpdatedAt.Time,
+	}
+
+	actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID)
+	if !ok {
+		s.log.Warnf("UpdateCategory | Actor user ID not found in context for activity logging")
+	}
+
+	logDetails := map[string]interface{}{
+		"updated_category_id":   categoryID,
+		"updated_category_name": category.Name,
+	}
+
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeUPDATE,
+		activitylog_repo.LogEntityTypeCATEGORY,
+		strconv.Itoa(int(categoryID)),
+		logDetails,
+	)
+
+	return response, nil
+}
+
+func (s *CtgService) GetCategoryByID(ctx context.Context, categoryID int32) (*CategoryResponse, error) {
+
+	category, err := s.repo.GetCategory(ctx, categoryID)
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			s.log.Warnf("GetCategoryByID | Category not found: id=%d", categoryID)
+			return nil, common.ErrCategoryNotFound
+
+		default:
+			s.log.Errorf("GetCategoryByID | Failed to get category by ID: %v", err)
+			return nil, common.ErrInternal
+		}
+	}
+
+	response := &CategoryResponse{
+		ID:        category.ID,
+		Name:      category.Name,
+		CreatedAt: category.CreatedAt.Time,
+		UpdatedAt: category.UpdatedAt.Time,
+	}
+
+	return response, nil
+}
+
+func (s *CtgService) CreateCategory(ctx context.Context, req CreateCategoryRequest) (*CategoryResponse, error) {
+
+	category, err := s.repo.CreateCategory(ctx, req.Name)
+	if err != nil {
+		s.log.Errorf("CreateCategory | Failed to create category: %v", err)
+		return nil, common.ErrInternal
+	}
+
+	response := &CategoryResponse{
+		ID:        category.ID,
+		Name:      category.Name,
+		CreatedAt: category.CreatedAt.Time,
+		UpdatedAt: category.UpdatedAt.Time,
+	}
+
+	actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID)
+	if !ok {
+		s.log.Warnf("CreateCategory | Actor user ID not found in context for activity logging")
+	}
+
+	logDetails := map[string]interface{}{
+		"category_id":   category.ID,
+		"category_name": category.Name,
+	}
+
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeCREATE,
+		activitylog_repo.LogEntityTypeCATEGORY,
+		strconv.FormatUint(uint64(category.ID), 10),
+		logDetails,
+	)
+
+	return response, nil
+}
+
+func (s *CtgService) GetAllCategories(ctx context.Context, req ListCategoryRequest) ([]CategoryResponse, error) {
+	req.SetDefaults()
+
+	params := categories_repo.ListCategoriesParams{
+		Limit:  int32(req.Limit),
+		Offset: int32((req.Page - 1) * req.Limit),
+	}
+
+	categories, err := s.repo.ListCategories(ctx, params)
+	if err != nil {
+		s.log.Errorf("GetAllCategories | Failed to get all categories: %v", err)
+		return nil, err
+	}
+
+	if len(categories) == 0 {
+		s.log.Warnf("GetAllCategories | No categories found")
+		return nil, common.ErrCategoryNotFound
+	}
+
+	var response []CategoryResponse
+	for _, category := range categories {
+		response = append(response, CategoryResponse{
+			ID:        category.ID,
+			Name:      category.Name,
+			CreatedAt: category.CreatedAt.Time,
+			UpdatedAt: category.UpdatedAt.Time,
+		})
+	}
+
+	return response, nil
+}

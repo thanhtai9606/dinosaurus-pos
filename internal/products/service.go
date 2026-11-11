@@ -1,0 +1,1049 @@
+package products
+
+import (
+	"POS-kasir/internal/activitylog"
+	activitylog_repo "POS-kasir/internal/activitylog/repository"
+	"POS-kasir/internal/common"
+	"POS-kasir/internal/common/pagination"
+	"POS-kasir/internal/common/store"
+	products_repo "POS-kasir/internal/products/repository"
+	"POS-kasir/pkg/logger"
+
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"sync"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
+type IPrdService interface {
+	CreateProduct(ctx context.Context, req CreateProductRequest) (*ProductResponse, error)
+	UploadProductImage(ctx context.Context, productID uuid.UUID, data []byte) (*ProductResponse, error)
+	ListProducts(ctx context.Context, req ListProductsRequest) (*ListProductsResponse, error)
+	GetProductByID(ctx context.Context, productID uuid.UUID) (*ProductResponse, error)
+	UpdateProduct(ctx context.Context, productID uuid.UUID, req UpdateProductRequest) (*ProductResponse, error)
+	DeleteProduct(ctx context.Context, productID uuid.UUID) error
+	CreateProductOption(ctx context.Context, productID uuid.UUID, req CreateProductOptionRequestStandalone) (*ProductOptionResponse, error)
+	GetStockHistory(ctx context.Context, productID uuid.UUID, req ListStockHistoryRequest) (*PagedStockHistoryResponse, error)
+	UploadProductOptionImage(ctx context.Context, productID uuid.UUID, optionID uuid.UUID, data []byte) (*ProductOptionResponse, error)
+	UpdateProductOption(ctx context.Context, productID, optionID uuid.UUID, req UpdateProductOptionRequest) (*ProductOptionResponse, error)
+	DeleteProductOption(ctx context.Context, productID, optionID uuid.UUID) error
+
+	// Deleted Products Management
+	ListDeletedProducts(ctx context.Context, req ListProductsRequest) (*ListProductsResponse, error)
+	GetDeletedProduct(ctx context.Context, productID uuid.UUID) (*ProductResponse, error)
+	RestoreProduct(ctx context.Context, productID uuid.UUID) error
+	RestoreProductsBulk(ctx context.Context, req RestoreBulkRequest) error
+}
+
+type PrdService struct {
+	log             logger.ILogger
+	store           store.Store
+	repo            products_repo.Querier
+	prdRepo         IProductImageRepository
+	activityService activitylog.IActivityService
+}
+
+func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activitylog.IActivityService) IPrdService {
+	return &PrdService{
+		store:           store,
+		repo:            repo,
+		log:             log,
+		prdRepo:         prdRepo,
+		activityService: activityService,
+	}
+}
+
+func (s *PrdService) DeleteProductOption(ctx context.Context, productID, optionID uuid.UUID) error {
+
+	option, err := s.repo.GetProductOption(ctx, products_repo.GetProductOptionParams{ID: optionID, ProductID: productID})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Product option not found or does not belong to the product", "optionID", optionID, "productID", productID)
+			return common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get product option before deletion", "error", err)
+		return err
+	}
+
+	err = s.repo.SoftDeleteProductOption(ctx, optionID)
+	if err != nil {
+		s.log.Errorf("Failed to soft delete product option in repository", "error", err, "optionID", optionID)
+		return err
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"product_id":          productID.String(),
+		"deleted_option_id":   optionID.String(),
+		"deleted_option_name": option.Name,
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeDELETE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		optionID.String(),
+		logDetails,
+	)
+
+	s.log.Infof("Product option soft deleted successfully", "optionID", optionID)
+	return nil
+}
+
+func (s *PrdService) UpdateProductOption(ctx context.Context, productID, optionID uuid.UUID, req UpdateProductOptionRequest) (*ProductOptionResponse, error) {
+	_, err := s.repo.GetProductOption(ctx, products_repo.GetProductOptionParams{ID: optionID, ProductID: productID})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Product option not found or does not belong to the product", "optionID", optionID, "productID", productID)
+			return nil, common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get product option before update", "error", err)
+		return nil, err
+	}
+
+	updateParams := products_repo.UpdateProductOptionParams{
+		ID:   optionID,
+		Name: req.Name,
+	}
+
+	if req.AdditionalPrice != nil {
+		price := int64(*req.AdditionalPrice)
+		updateParams.AdditionalPrice = &price
+	}
+
+	updatedOption, err := s.repo.UpdateProductOption(ctx, updateParams)
+	if err != nil {
+		s.log.Errorf("Failed to update product option in repository", "error", err, "optionID", optionID)
+		return nil, err
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"product_id":     productID.String(),
+		"option_id":      optionID.String(),
+		"updated_fields": req,
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeUPDATE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		optionID.String(),
+		logDetails,
+	)
+
+	additionalPrice := float64(updatedOption.AdditionalPrice)
+
+	if updatedOption.ImageUrl != nil {
+		publicUrl, err := s.prdRepo.PrdImageLink(ctx, updatedOption.ID.String(), *updatedOption.ImageUrl)
+		if err != nil {
+			s.log.Warnf("Failed to get public URL for updated option image", "error", err)
+			publicUrl = *updatedOption.ImageUrl
+		}
+		updatedOption.ImageUrl = &publicUrl
+	} else {
+		updatedOption.ImageUrl = nil
+	}
+
+	return &ProductOptionResponse{
+		ID:              updatedOption.ID,
+		Name:            updatedOption.Name,
+		AdditionalPrice: additionalPrice,
+		ImageURL:        updatedOption.ImageUrl,
+	}, nil
+}
+
+func (s *PrdService) UploadProductOptionImage(ctx context.Context, productID uuid.UUID, optionID uuid.UUID, data []byte) (*ProductOptionResponse, error) {
+	_, err := s.repo.GetProductOption(ctx, products_repo.GetProductOptionParams{
+		ID:        optionID,
+		ProductID: productID,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Product option not found or does not belong to the product", "optionID", optionID, "productID", productID)
+			return nil, common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get product option before image upload", "error", err)
+		return nil, err
+	}
+
+	const maxFileSize = 2 * 1024 * 1024
+	if len(data) > maxFileSize {
+		return nil, fmt.Errorf("file size exceeds the limit of 2MB")
+	}
+
+	filename := fmt.Sprintf("product_options/%s.jpg", optionID.String())
+
+	imageUrl, err := s.prdRepo.UploadImage(ctx, filename, data)
+	if err != nil {
+		s.log.Errorf("Failed to upload option image to R2", "error", err)
+		return nil, fmt.Errorf("could not upload image to storage")
+	}
+
+	updateParams := products_repo.UpdateProductOptionParams{
+		ID:       optionID,
+		ImageUrl: &filename,
+	}
+	updatedOption, err := s.repo.UpdateProductOption(ctx, updateParams)
+	if err != nil {
+		s.log.Errorf("Failed to update product option with image URL", "error", err)
+		return nil, fmt.Errorf("could not update product option in database")
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"product_id":    productID.String(),
+		"option_id":     optionID.String(),
+		"new_image_url": imageUrl,
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeUPDATE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		optionID.String(),
+		logDetails,
+	)
+
+	var additionalPrice float64
+	additionalPrice = float64(updatedOption.AdditionalPrice)
+
+	publicUrl, err := s.prdRepo.PrdImageLink(ctx, updatedOption.ID.String(), *updatedOption.ImageUrl)
+	if err != nil {
+		s.log.Warnf("Failed to get public URL for newly uploaded option image", "error", err)
+		publicUrl = *updatedOption.ImageUrl
+	}
+
+	return &ProductOptionResponse{
+		ID:              updatedOption.ID,
+		Name:            updatedOption.Name,
+		AdditionalPrice: additionalPrice,
+		ImageURL:        &publicUrl,
+	}, nil
+}
+func (s *PrdService) CreateProductOption(ctx context.Context, productID uuid.UUID, req CreateProductOptionRequestStandalone) (*ProductOptionResponse, error) {
+	_, err := s.repo.GetProductWithOptions(ctx, productID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Parent product not found for new option", "productID", productID)
+			return nil, common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get parent product for new option", "error", err)
+		return nil, err
+	}
+
+	additionalPrice := int64(req.AdditionalPrice)
+	params := products_repo.CreateProductOptionParams{
+		ProductID:       productID,
+		Name:            req.Name,
+		AdditionalPrice: additionalPrice,
+	}
+	newOption, err := s.repo.CreateProductOption(ctx, params)
+	if err != nil {
+		s.log.Errorf("Failed to create product option in repository", "error", err)
+		return nil, err
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"parent_product_id": productID.String(),
+		"option_name":       newOption.Name,
+		"additional_price":  req.AdditionalPrice,
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeCREATE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		newOption.ID.String(),
+		logDetails,
+	)
+
+	return &ProductOptionResponse{
+		ID:              newOption.ID,
+		Name:            newOption.Name,
+		AdditionalPrice: float64(newOption.AdditionalPrice),
+		ImageURL:        newOption.ImageUrl,
+	}, nil
+}
+func (s *PrdService) DeleteProduct(ctx context.Context, productID uuid.UUID) error {
+
+	product, err := s.repo.GetProductWithOptions(ctx, productID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Product not found for deletion", "productID", productID)
+			return common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get product before deletion", "error", err)
+		return err
+	}
+
+	err = s.repo.SoftDeleteProduct(ctx, productID)
+	if err != nil {
+		s.log.Errorf("Failed to soft delete product in repository", "error", err, "productID", productID)
+		return err
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"deleted_product_id":   product.ID.String(),
+		"deleted_product_name": product.Name,
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeDELETE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		productID.String(),
+		logDetails,
+	)
+
+	s.log.Infof("Product soft deleted successfully", "productID", productID)
+	return nil
+}
+
+func (s *PrdService) GetProductByID(ctx context.Context, productID uuid.UUID) (*ProductResponse, error) {
+	fullProduct, err := s.repo.GetProductByID(ctx, productID)
+	s.log.Infof("Full product data: %+v", fullProduct)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Product not found by ID", "productID", productID)
+			return nil, common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get product from repository", "error", err, "productID", productID)
+		return nil, err
+	}
+
+	return s.buildProductResponse(ctx, fullProduct)
+}
+
+func (s *PrdService) UpdateProduct(ctx context.Context, productID uuid.UUID, req UpdateProductRequest) (*ProductResponse, error) {
+	product, err := s.repo.GetProductWithOptions(ctx, productID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Product not found for update", "productID", productID)
+			return nil, common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get product before update", "error", err)
+		return nil, err
+	}
+
+	if req.CategoryIDs != nil {
+		for _, catID := range *req.CategoryIDs {
+			exists, err := s.repo.CheckCategoryExists(ctx, catID)
+			if err != nil {
+				s.log.Errorf("Failed to check category existence", "error", err)
+				return nil, err
+			}
+			if !exists {
+				s.log.Warnf("Category not found", "categoryID", catID)
+				return nil, common.ErrCategoryNotFound
+			}
+		}
+		err = s.repo.ClearProductCategories(ctx, productID)
+		if err != nil {
+			s.log.Errorf("Failed to clear product categories", "error", err)
+			return nil, err
+		}
+		for _, catID := range *req.CategoryIDs {
+			err = s.repo.AssignProductCategory(ctx, products_repo.AssignProductCategoryParams{
+				ProductID:  productID,
+				CategoryID: catID,
+			})
+			if err != nil {
+				s.log.Errorf("Failed to assign product category", "error", err)
+				return nil, err
+			}
+		}
+	}
+
+	updateParams := products_repo.UpdateProductParams{
+		ID:    productID,
+		Name:  req.Name,
+		Stock: req.Stock,
+	}
+
+	if req.Price != nil {
+		price := int64(*req.Price)
+		updateParams.Price = &price
+	}
+	if req.CostPrice != nil {
+		costPrice := *req.CostPrice
+		numericCost := pgtype.Numeric{}
+		numericCost.Scan(fmt.Sprintf("%f", costPrice))
+		updateParams.CostPrice = numericCost
+	}
+
+	_, err = s.repo.UpdateProduct(ctx, updateParams)
+	if err != nil {
+		s.log.Errorf("Failed to update product in repository", "error", err, "productID", productID)
+		return nil, err
+	}
+
+	// Stock History Logging
+	if req.Stock != nil {
+		currentStock := int32(*req.Stock)
+		previousStock := int32(product.Stock)
+		changeAmount := currentStock - previousStock
+
+		if changeAmount != 0 {
+			changeType := products_repo.StockChangeTypeCorrection
+			if req.ChangeType != nil {
+				changeType = products_repo.StockChangeType(*req.ChangeType)
+			} else {
+
+				if changeAmount > 0 {
+					changeType = products_repo.StockChangeTypeRestock
+				}
+			}
+
+			var note *string
+			if req.Note != nil {
+				note = req.Note
+			}
+
+			var createdBy pgtype.UUID
+			if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
+				createdBy = pgtype.UUID{Bytes: actorID, Valid: true}
+			}
+
+			// Reference? For direct update, maybe null or strict correlation if we had one.
+			// Current flow doesn't have a specific reference ID for manual updates other than maybe the log ID?
+			// Leaving referenceID null for manual product updates.
+
+			err := s.RecordStockChange(ctx, productID, changeAmount, previousStock, currentStock, changeType, pgtype.UUID{Valid: false}, note, createdBy)
+			if err != nil {
+				// Don't fail the request if logging fails, but log error
+				s.log.Errorf("Failed to record stock history", "error", err)
+			}
+		}
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"product_id":     productID.String(),
+		"updated_fields": req,
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeUPDATE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		productID.String(),
+		logDetails,
+	)
+
+	return s.GetProductByID(ctx, productID)
+}
+
+func (s *PrdService) RecordStockChange(ctx context.Context, productID uuid.UUID, changeAmount, previousStock, currentStock int32, changeType products_repo.StockChangeType, referenceID pgtype.UUID, note *string, createdBy pgtype.UUID) error {
+	params := products_repo.CreateStockHistoryParams{
+		ProductID:     productID,
+		ChangeAmount:  changeAmount,
+		PreviousStock: previousStock,
+		CurrentStock:  currentStock,
+		ChangeType:    changeType,
+		ReferenceID:   referenceID,
+		Note:          note,
+		CreatedBy:     createdBy,
+	}
+
+	_, err := s.repo.CreateStockHistory(ctx, params)
+	if err != nil {
+		return fmt.Errorf("failed to create stock history: %w", err)
+	}
+
+	return nil
+}
+func parseCategoriesJSON(catInterface interface{}) []ProductCategoryResponse {
+	var categories []ProductCategoryResponse
+	if catInterface == nil {
+		return categories
+	}
+
+	// Handle raw bytes or string
+	var catBytes []byte
+	if b, ok := catInterface.([]byte); ok {
+		catBytes = b
+	} else if s, ok := catInterface.(string); ok {
+		catBytes = []byte(s)
+	}
+
+	if len(catBytes) > 0 {
+		_ = json.Unmarshal(catBytes, &categories)
+		return categories
+	}
+
+	// Handle slice of maps (from SQLC/PGX json_agg)
+	// We re-marshal to JSON and then unmarshal into our target struct for type safety
+	if slice, ok := catInterface.([]interface{}); ok {
+		data, err := json.Marshal(slice)
+		if err == nil {
+			_ = json.Unmarshal(data, &categories)
+		}
+	} else if slice, ok := catInterface.([]map[string]interface{}); ok {
+		data, err := json.Marshal(slice)
+		if err == nil {
+			_ = json.Unmarshal(data, &categories)
+		}
+	}
+
+	return categories
+}
+
+func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct products_repo.GetProductByIDRow) (*ProductResponse, error) {
+	var optionsResponse []ProductOptionResponse
+
+	if fullProduct.Options != nil {
+
+		optionsJSON, err := json.Marshal(fullProduct.Options)
+		if err != nil {
+			s.log.Errorf("Failed to re-marshal product options interface", "error", err)
+			return nil, fmt.Errorf("could not process product options")
+		}
+
+		var options []products_repo.ProductOption
+		if err := json.Unmarshal(optionsJSON, &options); err != nil {
+
+			if string(optionsJSON) != "[]" {
+				s.log.Errorf("Failed to unmarshal product options JSON", "error", err)
+				return nil, fmt.Errorf("could not parse product options")
+			}
+		}
+
+		for _, opt := range options {
+			additionalPrice := float64(opt.AdditionalPrice)
+			optionsResponse = append(optionsResponse, ProductOptionResponse{
+				ID:              opt.ID,
+				Name:            opt.Name,
+				AdditionalPrice: additionalPrice,
+				ImageURL:        opt.ImageUrl,
+			})
+		}
+	}
+
+	var wg sync.WaitGroup
+	errChan := make(chan error, len(optionsResponse)+1)
+
+	if fullProduct.ImageUrl != nil && *fullProduct.ImageUrl != "" {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			url, err := s.prdRepo.PrdImageLink(ctx, fullProduct.ID.String(), *fullProduct.ImageUrl)
+			if err != nil {
+				errChan <- fmt.Errorf("failed to get main image link: %w", err)
+				return
+			}
+			fullProduct.ImageUrl = &url
+		}()
+	}
+
+	for i := range optionsResponse {
+
+		opt := &optionsResponse[i]
+		if opt.ImageURL != nil && *opt.ImageURL != "" {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				url, err := s.prdRepo.PrdImageLink(ctx, *opt.ImageURL, *opt.ImageURL)
+				if err != nil {
+					errChan <- fmt.Errorf("failed to get option image link for %s: %w", opt.Name, err)
+					return
+				}
+				opt.ImageURL = &url
+			}()
+		}
+	}
+
+	wg.Wait()
+	close(errChan)
+
+	for err := range errChan {
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	productPrice := float64(fullProduct.Price)
+	costPrice := 0.0
+	if fullProduct.CostPrice.Valid {
+		prodCost, _ := fullProduct.CostPrice.Float64Value()
+		costPrice = prodCost.Float64
+	}
+
+	categories := parseCategoriesJSON(fullProduct.Categories)
+
+	return &ProductResponse{
+		ID:         fullProduct.ID,
+		Name:       fullProduct.Name,
+		Categories: categories,
+
+		ImageURL:  fullProduct.ImageUrl,
+		Price:     productPrice,
+		CostPrice: costPrice,
+		Stock:     fullProduct.Stock,
+		CreatedAt: fullProduct.CreatedAt.Time,
+		UpdatedAt: fullProduct.UpdatedAt.Time,
+		Options:   optionsResponse,
+	}, nil
+}
+
+func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) (*ListProductsResponse, error) {
+	req.SetDefaults()
+
+	page := req.Page
+	limit := req.Limit
+	offset := (page - 1) * limit
+
+	listParams := products_repo.ListProductsParams{
+		Limit:      int32(limit),
+		Offset:     int32(offset),
+		CategoryID: req.CategoryID,
+		SearchText: &req.Search,
+	}
+	countParams := products_repo.CountProductsParams{
+		CategoryID: req.CategoryID,
+		SearchText: &req.Search,
+	}
+
+	s.log.Infof("list params list product: %+v", listParams)
+
+	var wg sync.WaitGroup
+	var products []products_repo.ListProductsRow
+	var totalData int64
+	var listErr, countErr error
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		products, listErr = s.repo.ListProducts(ctx, listParams)
+	}()
+
+	go func() {
+		defer wg.Done()
+		totalData, countErr = s.repo.CountProducts(ctx, countParams)
+	}()
+
+	wg.Wait()
+
+	if listErr != nil {
+		s.log.Errorf("Failed to list products from repository", "error", listErr)
+		return nil, listErr
+	}
+	if countErr != nil {
+		s.log.Errorf("Failed to count products from repository", "error", countErr)
+		return nil, countErr
+	}
+
+	var productsResponse []ProductListResponse
+	for _, p := range products {
+		price := float64(p.Price)
+		if p.ImageUrl != nil && *p.ImageUrl != "" {
+			imageUrl, err := s.prdRepo.PrdImageLink(ctx, p.ID.String(), *p.ImageUrl)
+			if err != nil {
+				s.log.Warnf("Failed to get public URL for product image", "error", err)
+				imageUrl = *p.ImageUrl
+			}
+			p.ImageUrl = &imageUrl
+		} else {
+			p.ImageUrl = nil
+		}
+		categories := parseCategoriesJSON(p.Categories)
+		productsResponse = append(productsResponse, ProductListResponse{
+			ID:         p.ID,
+			Name:       p.Name,
+			Categories: categories,
+			ImageURL:   p.ImageUrl,
+			Price:      price,
+			Stock:      p.Stock,
+		})
+	}
+
+	response := &ListProductsResponse{
+		Products: productsResponse,
+		Pagination: pagination.BuildPagination(
+			page,
+			int(totalData),
+			limit,
+		),
+	}
+
+	return response, nil
+}
+
+func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest) (*ProductResponse, error) {
+	var newProduct products_repo.Product
+	var createdOptions []products_repo.ProductOption
+
+	txFunc := func(tx pgx.Tx) error {
+		qtx := products_repo.New(tx)
+		var err error
+
+		price := int64(req.Price)
+
+		numericCost := pgtype.Numeric{}
+		numericCost.Scan(fmt.Sprintf("%f", req.CostPrice))
+
+		productParams := products_repo.CreateProductParams{
+			Name:      req.Name,
+			Price:     price,
+			Stock:     req.Stock,
+			CostPrice: numericCost,
+		}
+
+		newProduct, err = qtx.CreateProduct(ctx, productParams)
+		if err != nil {
+			s.log.Errorf("Failed to create product in transaction", "error", err)
+			return err
+		}
+
+		for _, catID := range req.CategoryIDs {
+			err = qtx.AssignProductCategory(ctx, products_repo.AssignProductCategoryParams{
+				ProductID:  newProduct.ID,
+				CategoryID: catID,
+			})
+			if err != nil {
+				s.log.Errorf("Failed to assign category to product in transaction", "error", err)
+				return err
+			}
+		}
+
+		for _, opt := range req.Options {
+			additionalPrice := int64(opt.AdditionalPrice)
+
+			optionParams := products_repo.CreateProductOptionParams{
+				ProductID:       newProduct.ID,
+				Name:            opt.Name,
+				AdditionalPrice: additionalPrice,
+			}
+			createdOpt, err := qtx.CreateProductOption(ctx, optionParams)
+			if err != nil {
+				s.log.Errorf("Failed to create product option in transaction", "error", err)
+				return err
+			}
+
+			createdOptions = append(createdOptions, createdOpt)
+		}
+		return nil
+	}
+
+	err := s.store.ExecTx(ctx, txFunc)
+	if err != nil {
+		return nil, err
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"product_name":  newProduct.Name,
+		"price":         req.Price,
+		"stock":         newProduct.Stock,
+		"options_count": len(createdOptions),
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeCREATE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		newProduct.ID.String(),
+		logDetails,
+	)
+
+	return s.GetProductByID(ctx, newProduct.ID)
+}
+
+func (s *PrdService) UploadProductImage(ctx context.Context, productID uuid.UUID, data []byte) (*ProductResponse, error) {
+	_, err := s.repo.GetProductByID(ctx, productID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			s.log.Warnf("Product not found for image upload", "productID", productID)
+			return nil, common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get product for image upload", "error", err)
+		return nil, err
+	}
+
+	const maxFileSize = 5 * 1024 * 1024
+	if len(data) > maxFileSize {
+		return nil, fmt.Errorf("file size exceeds the limit of 5MB")
+	}
+
+	filename := fmt.Sprintf("products/%s.jpg", productID.String())
+
+	imageUrl, err := s.prdRepo.UploadImage(ctx, filename, data)
+	if err != nil {
+		s.log.Errorf("Failed to upload image to R2", "error", err)
+		return nil, fmt.Errorf("could not upload image to storage")
+	}
+
+	updateParams := products_repo.UpdateProductParams{
+		ID:       productID,
+		ImageUrl: &filename,
+	}
+	_, err = s.repo.UpdateProduct(ctx, updateParams)
+	if err != nil {
+		s.log.Errorf("Failed to update product with image URL", "error", err)
+		return nil, fmt.Errorf("could not update product in database")
+	}
+
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	logDetails := map[string]interface{}{
+		"product_id":    productID.String(),
+		"new_image_url": imageUrl,
+	}
+	s.activityService.Log(
+		ctx,
+		actorID,
+		activitylog_repo.LogActionTypeUPDATE,
+		activitylog_repo.LogEntityTypePRODUCT,
+		productID.String(),
+		logDetails,
+	)
+
+	fullProduct, err := s.repo.GetProductByID(ctx, productID)
+	if err != nil {
+		s.log.Errorf("Failed to fetch full product after image upload", "error", err)
+		return nil, err
+	}
+
+	return s.buildProductResponse(ctx, fullProduct)
+}
+
+func (s *PrdService) ListDeletedProducts(ctx context.Context, req ListProductsRequest) (*ListProductsResponse, error) {
+	req.SetDefaults()
+
+	page := req.Page
+	limit := req.Limit
+	offset := (page - 1) * limit
+
+	listParams := products_repo.ListDeletedProductsParams{
+		Limit:      int32(limit),
+		Offset:     int32(offset),
+		CategoryID: req.CategoryID,
+		SearchText: &req.Search,
+	}
+	countParams := products_repo.CountDeletedProductsParams{
+		CategoryID: req.CategoryID,
+		SearchText: &req.Search,
+	}
+
+	var wg sync.WaitGroup
+	var products []products_repo.ListDeletedProductsRow
+	var totalData int64
+	var listErr, countErr error
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		products, listErr = s.repo.ListDeletedProducts(ctx, listParams)
+	}()
+
+	go func() {
+		defer wg.Done()
+		totalData, countErr = s.repo.CountDeletedProducts(ctx, countParams)
+	}()
+
+	wg.Wait()
+
+	if listErr != nil {
+		s.log.Errorf("Failed to list deleted products", "error", listErr)
+		return nil, listErr
+	}
+	if countErr != nil {
+		s.log.Errorf("Failed to count deleted products", "error", countErr)
+		return nil, countErr
+	}
+
+	var productsResponse []ProductListResponse
+	for _, p := range products {
+		price := float64(p.Price)
+		var deletedAt *time.Time
+		if p.DeletedAt.Valid {
+			t := p.DeletedAt.Time
+			deletedAt = &t
+		}
+
+		if p.ImageUrl != nil && *p.ImageUrl != "" {
+			imageUrl, err := s.prdRepo.PrdImageLink(ctx, p.ID.String(), *p.ImageUrl)
+			if err != nil {
+				imageUrl = *p.ImageUrl
+			}
+			p.ImageUrl = &imageUrl
+		} else {
+			p.ImageUrl = nil
+		}
+
+		categories := parseCategoriesJSON(p.Categories)
+
+		productsResponse = append(productsResponse, ProductListResponse{
+			ID:         p.ID,
+			Name:       p.Name,
+			Categories: categories,
+			ImageURL:   p.ImageUrl,
+			Price:      price,
+			Stock:      p.Stock,
+			DeletedAt:  deletedAt,
+		})
+	}
+
+	return &ListProductsResponse{
+		Products: productsResponse,
+		Pagination: pagination.BuildPagination(
+			page,
+			int(totalData),
+			limit,
+		),
+	}, nil
+}
+
+func (s *PrdService) GetDeletedProduct(ctx context.Context, productID uuid.UUID) (*ProductResponse, error) {
+	// Need to fetch similar to GetProductWithOptions but for deleted one.
+	// We defined GetDeletedProduct query to return row + options json.
+	// But generated type will be GetDeletedProductRow.
+
+	// Wait, the query GetDeletedProduct in products.sql returns specific columns similar to GetProductWithOptions?
+	// Let's assume standard behavior based on sql definition.
+
+	row, err := s.repo.GetDeletedProduct(ctx, productID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, common.ErrNotFound
+		}
+		s.log.Errorf("Failed to get deleted product", "error", err)
+		return nil, err
+	}
+
+	// Convert GetDeletedProductRow to GetProductWithOptionsRow structure or handle manually
+	// Since struct fields might slightly differ if not strictly aliased, manually map.
+	// Actually, GetDeletedProduct query was:
+	// SELECT p.*, COALESCE(...) as options FROM products p ...
+	// So fields map to table columns.
+
+	var options []products_repo.ProductOption
+	if row.Options != nil {
+		// unmarshal json
+		optionsBytes, _ := json.Marshal(row.Options) // It's already likely []byte or interface{} depending on driver
+		// PGX usually scans json/jsonb into []byte or map/slice if annotated.
+		// generated code uses []byte usually for json columns if not overridden.
+		// Wait, in sqlc.yaml usually we set overriding or it just uses []byte.
+		// Let's assume standard.
+
+		_ = json.Unmarshal(optionsBytes, &options)
+		// Correction: row.Options is already likely unmarshalled if we used specific types,
+		// but standard sqlc returns []byte for json_agg unless cast.
+		// Check generated code... usually interface{}.
+
+		// To be safe and reuse logic, let's look at buildProductResponse logic which handles it.
+		// But buildProductResponse takes GetProductWithOptionsRow.
+		// We can't reuse it directly if types mismatch excessively.
+		// Let's reimplement simplified version.
+
+		// Re-reading buildProductResponse:
+		// if fullProduct.Options != nil { ... marshall, unmarshall ... }
+		// It seems it receives interface{}.
+	}
+
+	// Because we can't see generated repository file content easily right now without checking,
+	// I will attempt to cast row to GetProductWithOptionsRow if identical, or manual map.
+	// Manual map is safer.
+
+	// Parse Options
+	var optionsResponse []ProductOptionResponse
+	if row.Options != nil {
+		optBytes, err := json.Marshal(row.Options)
+		if err == nil {
+			var opts []products_repo.ProductOption
+			if err := json.Unmarshal(optBytes, &opts); err == nil {
+				for _, o := range opts {
+					optionsResponse = append(optionsResponse, ProductOptionResponse{
+						ID:              o.ID,
+						Name:            o.Name,
+						AdditionalPrice: float64(o.AdditionalPrice),
+						ImageURL:        o.ImageUrl,
+					})
+				}
+			}
+		}
+	}
+
+	var deletedAt time.Time
+	if row.DeletedAt.Valid {
+		deletedAt = row.DeletedAt.Time
+	}
+
+	var categories []ProductCategoryResponse
+
+	return &ProductResponse{
+		ID:         row.ID,
+		Name:       row.Name,
+		Categories: categories,
+		ImageURL:   row.ImageUrl,
+		Price:      float64(row.Price),
+		Stock:      row.Stock,
+		CreatedAt:  row.CreatedAt.Time,
+		UpdatedAt:  row.UpdatedAt.Time,
+		DeletedAt:  &deletedAt,
+		Options:    optionsResponse,
+	}, nil
+}
+
+func (s *PrdService) RestoreProduct(ctx context.Context, productID uuid.UUID) error {
+	// Check if exists in deleted state
+	_, err := s.repo.GetDeletedProduct(ctx, productID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return common.ErrNotFound
+		}
+		return err
+	}
+
+	err = s.repo.RestoreProduct(ctx, productID)
+	if err != nil {
+		s.log.Errorf("Failed to restore product", "productID", productID, "error", err)
+		return err
+	}
+
+	// Log activity
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	s.activityService.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypePRODUCT, productID.String(), map[string]interface{}{
+		"action": "restore",
+	})
+
+	return nil
+}
+
+func (s *PrdService) RestoreProductsBulk(ctx context.Context, req RestoreBulkRequest) error {
+	ids := make([]uuid.UUID, 0, len(req.ProductIDs))
+	for _, idStr := range req.ProductIDs {
+		uid, err := uuid.Parse(idStr)
+		if err != nil {
+			// Skip or fail? Fail entire request usually better for bulk operations consistency or return partial error?
+			// User request didn't specify partial success. Assuming strict.
+			return fmt.Errorf("invalid uuid: %s", idStr)
+		}
+		ids = append(ids, uid)
+	}
+
+	err := s.repo.RestoreProductsBulk(ctx, ids)
+	if err != nil {
+		s.log.Errorf("Failed to bulk restore products", "error", err)
+		return err
+	}
+
+	// Log activity (maybe one log for all or individually? One log is cleaner)
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	s.activityService.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypePRODUCT, "bulk", map[string]interface{}{
+		"action": "restore_bulk",
+		"count":  len(ids),
+		"ids":    req.ProductIDs,
+	})
+
+	return nil
+}

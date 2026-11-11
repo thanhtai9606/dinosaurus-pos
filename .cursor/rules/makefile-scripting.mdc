@@ -26,7 +26,7 @@ COMPOSE_PROD := docker-compose.yml
 4. **Utilities** — `logs`, `status`, `clean`, `test`, `lint`, `format`, `deps`
 5. **Shortcuts** — `start` → `up`, `stop` → `down`, `install` → `deps`
 
-Dev lokal: `make up` hanya menjalankan infra; app = `go run ./cmd/app` dan `cd web && bun run dev`.
+Dev lokal: `make up` hanya menjalankan infra; app = `go run ./cmd/app` dan `cd web && pnpm dev`.
 
 ## Docker
 

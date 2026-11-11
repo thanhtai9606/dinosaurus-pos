@@ -60,7 +60,7 @@ Built as a **single-port deployment** — the Go backend serves both the REST AP
 | Technology | Purpose |
 |-----------|---------|
 | **React 19** + [TanStack Router](https://tanstack.com/router) | SPA with file-based routing |
-| **Vite 7** + **Bun** | Build tool & package manager |
+| **Vite 7** + **pnpm** | Build tool & package manager |
 | **Tailwind CSS 4** + [shadcn/ui](https://ui.shadcn.com/) | UI component library |
 | **TanStack Query** | Data fetching & caching |
 | **OpenAPI Generator** | Typed API client from Swagger spec |
@@ -136,7 +136,7 @@ Env lainnya sudah memiliki default yang aman. Lihat [`.env.example`](.env.exampl
 ### Prerequisites
 
 - **Go** 1.25+
-- **Bun** (or Node.js 22+)
+- **Node.js** 22+ & **pnpm** 10+
 - **PostgreSQL** 15+
 - **Redis**
 - **Docker** & Docker Compose (untuk infra)
@@ -180,8 +180,8 @@ Backend berjalan di `http://localhost:8080`
 
 ```bash
 cd web
-bun install
-bun run dev
+pnpm install
+pnpm dev
 ```
 
 Frontend dev server di `http://localhost:5173` (dengan proxy ke backend 8080)
@@ -190,7 +190,7 @@ Frontend dev server di `http://localhost:5173` (dengan proxy ke backend 8080)
 
 ```bash
 cd web
-bun run build
+pnpm build
 # Output: web/dist/
 ```
 
@@ -228,7 +228,7 @@ make swag                # Swagger + OpenAPI client di web/
 # Tooling
 make test                # go test ./... + vitest di web
 make lint                # go vet
-make deps                # go mod tidy + bun install di web
+make deps                # go mod tidy + pnpm install di web
 ```
 
 ## CI/CD
@@ -237,7 +237,7 @@ Pipeline berjalan via **GitHub Actions** dan dipicu dari setiap push/PR ke `mast
 
 | Trigger | Job | Keterangan |
 |---------|-----|------------|
-| Push/PR ke `master` | **test** | `go vet` dan build frontend (`bun run build` di `./web`) |
+| Push/PR ke `master` | **test** | `go vet` dan build frontend (`pnpm build` di `./web`) |
 | Tag `v*.*.*` | **test** + **build-and-push** | Build dan push image ke `ghcr.io/agpprastyo/pos-kasir` dengan tag `X.Y.Z`, `X.Y`, dan `latest` |
 | Tag `v*.*.*` | **deploy** | Koneksi ke VM lewat **Tailscale**, lalu `docker compose pull` + `docker compose up -d` di `/home/ubuntu` |
 
@@ -309,7 +309,7 @@ CI mengandalkan variabel berikut:
 │       │   ├── locales/        # i18n translations (id.json, en.json)
 │       │   └── printer/        # Frontend PrinterService (Bluetooth)
 │       └── routes/             # TanStack Router file-based routes
-├── Dockerfile            # Multi-stage build (Bun + Go → Alpine)
+├── Dockerfile            # Multi-stage build (pnpm + Go → Alpine)
 ├── docker-compose.yml    # Full stack deployment
 └── Makefile              # Command shortcuts
 ```

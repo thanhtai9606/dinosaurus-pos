@@ -28,16 +28,22 @@ jobs:
       # - name: Go Test
       #   run: go test -v ./...
 
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
         with:
-          bun-version: "latest"
+          version: 10.12.4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: web/pnpm-lock.yaml
       - name: Install Frontend Dependencies
         working-directory: ./web
-        run: bun install
+        run: pnpm install --frozen-lockfile
       - name: Build Frontend (SPA)
         working-directory: ./web
-        run: bun run build
+        run: pnpm run build
 
   build-and-push:
     name: Build and Push Docker Image

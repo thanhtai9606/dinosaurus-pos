@@ -70,7 +70,7 @@ help:
 	@echo "  make format         - gofmt on Go sources"
 	@echo "  make deps           - go mod tidy + web install"
 	@echo ""
-	@echo "$(YELLOW)Local app: go run ./cmd/app (or air) and cd web && bun run dev$(NC)"
+	@echo "$(YELLOW)Local app: go run ./cmd/app (or air) and cd web && pnpm dev$(NC)"
 
 ## Development
 
@@ -78,8 +78,8 @@ dev: up
 	@echo ""
 	@echo "$(GREEN)✅ Infrastructure is up.$(NC)"
 	@echo "$(BLUE)Backend:$(NC)  go run ./cmd/app   (or: air)"
-	@echo "$(BLUE)Frontend:$(NC) cd web && bun run dev  → http://localhost:5173"
-	@echo "$(BLUE)Full SPA:$(NC)   cd web && bun run build, then http://localhost:8080"
+	@echo "$(BLUE)Frontend:$(NC) cd web && pnpm dev  → http://localhost:5173"
+	@echo "$(BLUE)Full SPA:$(NC)   cd web && pnpm build, then http://localhost:8080"
 	@echo "$(BLUE)MinIO:$(NC)      http://localhost:9001"
 
 prod:
@@ -161,7 +161,7 @@ swag:
 	@echo "$(GREEN)Generating Swagger and web API client...$(NC)"
 	@swag init -g ./cmd/app/main.go -o ./docs --parseDependency --parseInternal
 	@swag init -g ./cmd/app/main.go -o web/api-docs --parseDependency --parseInternal --outputTypes json
-	@cd web && bun run api:gen && bun run rbac:gen
+	@cd web && pnpm run api:gen && pnpm run rbac:gen
 
 ## Database maintenance
 
@@ -236,7 +236,7 @@ test:
 	@go test ./...
 	@echo ""
 	@echo "$(GREEN)🧪 Frontend tests$(NC)"
-	@cd web && bun run test
+	@cd web && pnpm test
 
 lint:
 	@echo "$(GREEN)🔍 go vet$(NC)"
@@ -250,4 +250,4 @@ deps install:
 	@echo "$(GREEN)📦 go mod tidy$(NC)"
 	@go mod tidy
 	@echo "$(GREEN)📦 web dependencies$(NC)"
-	@cd web && bun install
+	@cd web && pnpm install

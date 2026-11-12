@@ -10,7 +10,8 @@ import { DashboardSalesChart } from "@/components/dashboard/DashboardSalesChart"
 import { DashboardTopProducts } from "@/components/dashboard/DashboardTopProducts"
 import { DashboardPaymentChart } from "@/components/dashboard/DashboardPaymentChart"
 import { DashboardQuickActions } from "@/components/dashboard/DashboardQuickActions"
-import { formatDate, formatRupiah } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
+import { useFormatMoney } from '@/context/MoneyContext'
 
 
 export const Route = createFileRoute('/$locale/_dashboard/')(({
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/$locale/_dashboard/')(({
 
 function DashboardIndex() {
     const { t } = useTranslation()
+    const formatCurrency = useFormatMoney()
     const queryClient = useQueryClient()
     const user = queryClient.getQueryData(meQueryOptions().queryKey) as any
 
@@ -52,7 +54,7 @@ function DashboardIndex() {
                 t={t}
                 summary={summary}
                 isLoading={isLoadingSummary}
-                formatCurrency={formatRupiah}
+                formatCurrency={formatCurrency}
             />
 
             <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
@@ -61,7 +63,7 @@ function DashboardIndex() {
                     isLoading={isLoadingSales}
                     salesData={salesData}
                     paymentsData={paymentsData}
-                    formatCurrency={formatRupiah}
+                    formatCurrency={formatCurrency}
                     formatDate={formatDate}
                 />
 
@@ -69,7 +71,7 @@ function DashboardIndex() {
                     t={t}
                     isLoading={isLoadingProducts}
                     topProducts={topProducts}
-                    formatCurrency={formatRupiah}
+                    formatCurrency={formatCurrency}
                 />
             </div>
 
@@ -79,7 +81,7 @@ function DashboardIndex() {
                     isLoading={isLoadingPayments}
                     salesData={salesData}
                     paymentsData={paymentsData}
-                    formatCurrency={formatRupiah}
+                    formatCurrency={formatCurrency}
                     formatDate={formatDate}
                 />
 

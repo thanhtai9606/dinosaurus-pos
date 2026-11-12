@@ -2,9 +2,9 @@ import { Plus, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatRupiah } from '@/lib/utils'
 import { Product } from '@/lib/api/query/products'
 import { cn } from '@/lib/utils'
+import { useFormatMoney } from '@/context/MoneyContext'
 
 interface PosProductCardProps {
     product: Product
@@ -21,6 +21,7 @@ export function PosProductCard({
     addLabel,
     outOfStockLabel,
 }: PosProductCardProps) {
+    const formatMoney = useFormatMoney()
     const inStock = (product.stock ?? 0) > 0
     const categoryName = product.categories?.map((c) => c.name).filter(Boolean).join(', ')
 
@@ -69,7 +70,7 @@ export function PosProductCard({
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
-                        <span className="text-base font-bold">{formatRupiah(product.price || 0)}</span>
+                        <span className="text-base font-bold">{formatMoney(product.price || 0)}</span>
                         {!product.image_url && <Package className="h-4 w-4 text-muted-foreground/40 hidden sm:block" />}
                     </div>
 

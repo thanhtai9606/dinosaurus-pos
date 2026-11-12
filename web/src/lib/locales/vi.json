@@ -757,6 +757,7 @@
         "select_customer": "Chọn khách hàng",
         "walk_in": "Trải nghiệm",
         "tax": "Thuế",
+        "service_charge": "Phí dịch vụ",
         "static_qris": "QRIS tĩnh",
         "errors": {
             "invalid_cart": "Trạng thái giỏ hàng không hợp lệ",

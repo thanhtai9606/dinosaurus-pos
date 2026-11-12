@@ -14,7 +14,8 @@ import { CancellationReport } from '@/components/reports/CancellationReport'
 import { StockReport } from '@/components/reports/StockReport'
 import { PromotionsReport } from '@/components/reports/PromotionsReport'
 import { ShiftReport } from '@/components/reports/ShiftReport'
-import { formatDate, formatRupiah } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
+import { useFormatMoney } from '@/context/MoneyContext'
 
 export const Route = createFileRoute('/$locale/_dashboard/reports')({
     beforeLoad: async ({ context: { queryClient } }) => {
@@ -40,6 +41,7 @@ export const Route = createFileRoute('/$locale/_dashboard/reports')({
 
 function ReportsPage() {
     const { t } = useTranslation()
+    const formatCurrency = useFormatMoney()
 
     const [dateRange, setDateRange] = useState({
         start: new Date(new Date().setDate(new Date().getDate() - 30)).toISOString().split('T')[0],
@@ -116,7 +118,7 @@ function ReportsPage() {
                             data={salesData || []}
                             isLoading={isLoadingSales}
                             onExport={() => exportToCSV(salesData || [], 'sales_report', ['date', 'total_sales', 'order_count'])}
-                            formatCurrency={formatRupiah}
+                            formatCurrency={formatCurrency}
                             formatDate={formatDate}
                             t={t}
                         />
@@ -130,7 +132,7 @@ function ReportsPage() {
                             productProfitsData={productProfitsData}
                             isLoadingSummary={isLoadingProfitSummary}
                             isLoadingProducts={isLoadingProductProfits}
-                            formatCurrency={formatRupiah}
+                            formatCurrency={formatCurrency}
                             formatDate={formatDate}
                             t={t}
                         />
@@ -142,7 +144,7 @@ function ReportsPage() {
                         <ProductsReport 
                             data={productsData}
                             isLoading={isLoadingProducts}
-                            formatCurrency={formatRupiah}
+                            formatCurrency={formatCurrency}
                             t={t}
                         />
                     </TabsContent>
@@ -155,7 +157,7 @@ function ReportsPage() {
                             cashierData={cashierData || []}
                             isLoadingPayments={isLoadingPayments}
                             isLoadingCashier={isLoadingCashier}
-                            formatCurrency={formatRupiah}
+                            formatCurrency={formatCurrency}
                             t={t}
                         />
                     </TabsContent>
@@ -199,7 +201,7 @@ function ReportsPage() {
                             data={shiftData || []}
                             isLoading={isLoadingShift}
                             onExport={() => exportToCSV(shiftData || [], 'shift_report', ['cashier_name', 'status'])}
-                            formatCurrency={formatRupiah}
+                            formatCurrency={formatCurrency}
                             t={t}
                         />
                     </TabsContent>

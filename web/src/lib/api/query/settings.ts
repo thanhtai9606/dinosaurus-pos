@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError, type AxiosResponse } from 'axios'
 import { settingsApi, printerApi, axiosInstance } from '@/lib/api/client'
 import { InternalSettingsUpdateBrandingRequest, InternalSettingsUpdatePrinterSettingsRequest } from '../generated'
@@ -150,17 +150,22 @@ export function useDiscoverPrintersQuery(enabled: boolean = false) {
     return { ...query, isAllowed }
 }
 
-export function useFinancialSettingsQuery() {
-    const { canAccessApi } = useRBAC()
-    const isAllowed = canAccessApi('GET', '/settings/financial')
-    const query = useQuery({
+export const financialSettingsQueryOptions = () =>
+    queryOptions({
         queryKey: financialSettingsQueryKey,
         queryFn: async () => {
             const res = await axiosInstance.get('/settings/financial')
             return (res.data as any).data as FinancialSettings
         },
-        enabled: isAllowed,
         staleTime: 60_000,
+    })
+
+export function useFinancialSettingsQuery() {
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('GET', '/settings/financial')
+    const query = useQuery({
+        ...financialSettingsQueryOptions(),
+        enabled: isAllowed,
     })
     return { ...query, isAllowed }
 }

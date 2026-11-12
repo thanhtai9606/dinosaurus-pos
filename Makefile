@@ -2,7 +2,8 @@
 # Usage: make <command>
 # Pattern aligned with go-pos; adapted for infra compose + local Go/web dev.
 
-.PHONY: help dev prod up down restart build rebuild start stop \
+.PHONY: help dev dev-setup dev-apps dev-backend dev-frontend dev-local dev-stop \
+	prod up down restart build rebuild start stop \
 	dev-infra dev-infra-down \
 	create-demo-users list-users create-admin remove-data backup restore db-shell db-reset \
 	logs logs-db status clean \
@@ -36,11 +37,21 @@ DB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?
 help:
 	@echo "$(BLUE)POS Kasir — Available Make Commands$(NC)"
 	@echo ""
-	@echo "$(GREEN)Development:$(NC)"
-	@echo "  make dev            - Infra + backend (air) + frontend (pnpm dev)"
-	@echo "  make up             - Start infra in background (alias: dev-infra, start)"
-	@echo "  make down           - Stop infra and production stacks"
-	@echo "  make prod           - Full stack via docker-compose.yml"
+	@echo "$(GREEN)Local development (no app Docker image):$(NC)"
+	@echo "  make dev-setup      - First run: infra + migrate + seed"
+	@echo "  make dev-apps       - Backend (air/go) + frontend (pnpm) — infra already up"
+	@echo "  make dev-backend    - API only on :8080"
+	@echo "  make dev-frontend   - Vite only on :5173 (proxies /api → :8080)"
+	@echo "  make dev            - Same as: infra up + dev-apps (+ seed if empty DB)"
+	@echo "  make dev-local      - Alias for dev-apps"
+	@echo "  make dev-stop       - Free ports :8080 (API) and :5173 (Vite)"
+	@echo ""
+	@echo "$(GREEN)Infrastructure:$(NC)"
+	@echo "  make up             - Postgres, Redis, MinIO (docker-compose.infra.yml)"
+	@echo "  make down           - Stop infra (+ prod stack if running)"
+	@echo ""
+	@echo "$(GREEN)Production Docker (optional):$(NC)"
+	@echo "  make prod           - Build & run app image + infra (docker-compose.yml)"
 	@echo "  make restart        - down + up (infra)"
 	@echo "  make build          - Build production images"
 	@echo "  make rebuild        - Build production images without cache"
@@ -79,6 +90,30 @@ help:
 
 dev:
 	@./scripts/dev.sh
+
+dev-setup:
+	@./scripts/dev-setup.sh
+
+dev-apps dev-local:
+	@./scripts/dev-apps.sh
+
+dev-backend:
+	@./scripts/run-backend.sh
+
+dev-frontend:
+	@./scripts/run-frontend.sh
+
+dev-stop:
+	@echo "$(YELLOW)Stopping local dev listeners on :8080 and :5173...$(NC)"
+	@if command -v lsof >/dev/null 2>&1; then \
+		lsof -i :8080 -t 2>/dev/null | xargs -r kill -TERM 2>/dev/null || true; \
+		lsof -i :5173 -t 2>/dev/null | xargs -r kill -TERM 2>/dev/null || true; \
+		sleep 1; \
+		if lsof -i :8080 -t >/dev/null 2>&1; then echo "$(RED)Port 8080 still in use — try: kill \$$(lsof -t -i :8080)$(NC)"; \
+		else echo "$(GREEN)✅ Port 8080 free$(NC)"; fi; \
+	else \
+		echo "$(YELLOW)lsof not found; stop backend/frontend manually$(NC)"; \
+	fi
 
 prod:
 	@echo "$(GREEN)🚀 Starting production stack...$(NC)"

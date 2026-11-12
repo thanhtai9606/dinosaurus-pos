@@ -209,11 +209,17 @@ Setelah build, akses `http://localhost:8080` — Go backend serve SPA langsung.
 Daftar lengkap: `make` atau `make help`.
 
 ```bash
-# Development & Docker
-make dev                 # Infra + backend (air) + frontend (pnpm dev)
-make up                  # Infra di background (Postgres, Redis, MinIO)
-make down                # Stop semua stack
-make prod                # Full stack (image app + infra) via docker-compose.yml
+# Local dev (Go + Vite, không cần image app)
+make dev-setup           # Lần đầu: infra + migrate + seed
+make dev-apps            # Chỉ backend + frontend (đã make up)
+make dev-backend         # Terminal 1: API :8080
+make dev-frontend        # Terminal 2: UI :5173 → proxy /api
+make dev                 # Infra + apps (+ seed nếu DB trống)
+
+# Infra & production (opsional)
+make up                  # Postgres, Redis, MinIO
+make down                # Stop stack
+make prod                # Docker image app + infra (deploy)
 make status              # Cek container pos-*
 make logs                # Log infra compose
 

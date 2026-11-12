@@ -740,6 +740,7 @@
         "select_customer": "Pilih Pelanggan",
         "walk_in": "Umum/Walk-in",
         "tax": "Pajak",
+        "service_charge": "Biaya layanan",
         "static_qris": "QRIS Statis",
         "errors": {
             "invalid_cart": "Status keranjang tidak valid",

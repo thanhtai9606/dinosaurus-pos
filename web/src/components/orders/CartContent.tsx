@@ -1,7 +1,8 @@
 import { ShoppingCart, Trash2, Minus, Plus, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { formatRupiah } from '@/lib/utils'
+import { useFormatMoney } from '@/context/MoneyContext'
+import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Product } from '@/lib/api/query/products'
@@ -33,6 +34,15 @@ export function CartContent({
     selectedOrderType, setSelectedOrderType, updateQuantity, removeFromCart,
     calculateTotal, handleCheckout, canCheckout
 }: CartContentProps) {
+    const formatMoney = useFormatMoney()
+    const { data: fin } = useFinancialSettingsQuery()
+    const subtotal = calculateTotal()
+    const taxRate = fin?.tax_enabled ? (fin.tax_rate ?? 0) / 100 : 0
+    const serviceRate = (fin?.service_charge_rate ?? 0) / 100
+    const taxAmount = Math.floor(subtotal * taxRate)
+    const serviceAmount = Math.floor(subtotal * serviceRate)
+    const grandTotal = subtotal + taxAmount + serviceAmount
+
     return (
         <div className="flex flex-col h-full overflow-hidden">
             <div className="p-4 border-b bg-muted/40 flex items-center gap-2 shrink-0">
@@ -88,14 +98,14 @@ export function CartContent({
                                                 <div className="min-w-0">
                                                     <span className="font-medium text-sm truncate leading-tight block">{item.product.name}</span>
                                                     {item.variant && (
-                                                        <span className="text-sm text-muted-foreground block truncate">{item.variant.name} (+{formatRupiah(item.variant.additional_price || 0)})</span>
+                                                        <span className="text-sm text-muted-foreground block truncate">{item.variant.name} (+{formatMoney(item.variant.additional_price || 0)})</span>
                                                     )}
                                                 </div>
-                                                <span className="text-sm font-bold ml-1">{formatRupiah(((item.product.price || 0) + (item.variant?.additional_price || 0)) * item.quantity)}</span>
+                                                <span className="text-sm font-bold ml-1">{formatMoney(((item.product.price || 0) + (item.variant?.additional_price || 0)) * item.quantity)}</span>
                                             </div>
                                             <div className="flex items-center justify-between mt-1">
                                                 <div className="text-sm text-muted-foreground">
-                                                    {formatRupiah((item.product.price || 0) + (item.variant?.additional_price || 0))} x {item.quantity}
+                                                    {formatMoney((item.product.price || 0) + (item.variant?.additional_price || 0))} x {item.quantity}
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={(e) => { e.stopPropagation(); updateQuantity(item.product.id!, -1, item.variant?.id) }}>
@@ -124,20 +134,30 @@ export function CartContent({
                 <div className="space-y-1.5">
                     <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">{t('order.subtotal')}</span>
-                        <span>{formatRupiah(calculateTotal())}</span>
+                        <span>{formatMoney(subtotal)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">{t('order.tax', 'Tax (11%)')}</span>
-                        <span>{formatRupiah(Math.floor(calculateTotal() * 0.11))}</span>
-                    </div>
+                    {taxAmount > 0 && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">
+                                {t('order.tax', 'Tax')} ({fin?.tax_rate ?? 0}%)
+                            </span>
+                            <span>{formatMoney(taxAmount)}</span>
+                        </div>
+                    )}
+                    {serviceAmount > 0 && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">{t('order.service_charge', 'Service charge')}</span>
+                            <span>{formatMoney(serviceAmount)}</span>
+                        </div>
+                    )}
 
                     <div className="flex justify-between text-sm font-bold border-t pt-2 mt-2">
                         <span>{t('order.total')}</span>
-                        <span className="text-primary">{formatRupiah(calculateTotal() + Math.floor(calculateTotal() * 0.11))}</span>
+                        <span className="text-primary">{formatMoney(grandTotal)}</span>
                     </div>
                 </div>
                 <Button className="w-full h-12 text-sm " size="lg" disabled={cart.length === 0 || !canCheckout} onClick={handleCheckout}>
-                    {t('order.charge')} {formatRupiah(calculateTotal() + Math.floor(calculateTotal() * 0.11))}
+                    {t('order.charge')} {formatMoney(grandTotal)}
                 </Button>
             </div>
         </div>

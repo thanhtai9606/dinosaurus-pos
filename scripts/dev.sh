@@ -87,26 +87,12 @@ if ! docker run --rm --network host -e PGPASSWORD="$db_password" postgres:15-alp
 	exit 1
 fi
 
-export APP_ENV=development
-export DB_HOST=localhost
-export DB_PORT="$DB_PUBLISH_PORT"
-export REDIS_HOST=localhost
-export WEB_FRONTEND_CROSS_ORIGIN=false
-export CORS_ALLOW_ORIGINS=
-export R2_ENDPOINT="${R2_ENDPOINT:-http://localhost:9000}"
-export R2_USE_SSL=false
-export R2_ACCESS_KEY="${R2_ACCESS_KEY:-minioadmin}"
-export R2_SECRET_KEY="${R2_SECRET_KEY:-minioadmin}"
-export R2_ACCOUNT_ID="${R2_ACCOUNT_ID:-local}"
-export R2_PUBLIC_DOMAIN="${R2_PUBLIC_DOMAIN:-http://localhost:9000}"
-
+# shellcheck source=dev-env.sh
+source "$SCRIPT_DIR/dev-env.sh"
+export_local_dev_env
 APP_PORT="${APP_PORT:-8080}"
 
-if lsof -i :"$APP_PORT" -t >/dev/null 2>&1; then
-	echo -e "${YELLOW}⚠️  Port ${APP_PORT} in use — attempting to free it for backend...${NC}"
-	lsof -i :"$APP_PORT" -t | xargs -r kill -TERM 2>/dev/null || true
-	sleep 1
-fi
+ensure_app_port_free "$APP_PORT"
 
 echo -e "${GREEN}🚀 Starting backend and frontend...${NC}"
 echo -e "${BLUE}Frontend:${NC} http://localhost:5173"

@@ -17,7 +17,7 @@ import {
     SelectItem,
     SelectTrigger,
 } from "@/components/ui/select"
-import { formatRupiah } from '@/lib/utils'
+import { useFormatMoney } from '@/context/MoneyContext'
 import { POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 
 interface TransactionTableProps {
@@ -42,6 +42,7 @@ export function TransactionTable({
     handleOpenPayment, handleOpenCancel, handleOpenRefund, handleFinish, 
     canUpdateStatus, canCancel, canRefund, canPay, t
 }: TransactionTableProps) {
+    const formatMoney = useFormatMoney()
     if (isLoading) {
         return <DataTableSkeleton rows={8} columns={7} />
     }
@@ -123,7 +124,7 @@ export function TransactionTable({
                             </TableCell>
                             <TableCell className="font-bold font-mono text-sm">
                                 <div className="flex flex-col items-start gap-1">
-                                    <span>{formatRupiah(order.net_total || 0)}</span>
+                                    <span>{formatMoney(order.net_total || 0)}</span>
                                     {order.is_paid ? (
                                         <Badge variant="default" className="text-xs h-5">
                                             {t('transactions.status_badge.paid')}

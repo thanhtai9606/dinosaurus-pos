@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ProductActions } from './ProductActions'
-import { formatRupiah } from '@/lib/utils'
+import { useFormatMoney } from '@/context/MoneyContext'
 import { TableColumnHeader } from '@/components/data-table/TableColumnHeader'
 import { useClientSort } from '@/hooks/use-client-sort'
 
@@ -30,6 +30,7 @@ interface ProductTableProps {
 export function ProductTable({
     products, emptyMessage, isTrash, canRestore, onRestore, onEdit, t, hasActions = true
 }: ProductTableProps) {
+    const formatMoney = useFormatMoney()
     const getters = useMemo(
         () => ({
             name: (p: any) => p.name ?? '',
@@ -126,7 +127,7 @@ export function ProductTable({
                                     </div>
                                 </TableCell>
                                 <TableCell className={isTrash ? 'text-muted-foreground' : ''}>
-                                    {formatRupiah(product.price || 0)}
+                                    {formatMoney(product.price || 0)}
                                 </TableCell>
                                 <TableCell>
                                     {isTrash ? (

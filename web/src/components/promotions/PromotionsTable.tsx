@@ -1,4 +1,5 @@
-import { formatDate, formatRupiah } from "@/lib/utils"
+import { formatDate } from "@/lib/utils"
+import { useFormatMoney } from '@/context/MoneyContext'
 import { Pencil, Trash2, MoreHorizontal, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -37,6 +38,7 @@ export function PromotionsTable({
     canDelete,
     canRestore
 }: PromotionsTableProps) {
+    const formatMoney = useFormatMoney()
     const hasAnyAction = (canEdit || canDelete) && !isTrash || (canRestore && isTrash)
 
     return (
@@ -76,10 +78,10 @@ export function PromotionsTable({
                                         <span className="font-bold">
                                             {promo.discount_type === POSKasirInternalPromotionsRepositoryDiscountType.DiscountTypePercentage
                                                 ? `${promo.discount_value}%`
-                                                : formatRupiah(promo.discount_value)}
+                                                : formatMoney(promo.discount_value)}
                                         </span>
                                         {promo.max_discount_amount && promo.max_discount_amount > 0 && (
-                                            <span className="text-sm text-muted-foreground">{t('promotions.table.max')} {formatRupiah(promo.max_discount_amount)}</span>
+                                            <span className="text-sm text-muted-foreground">{t('promotions.table.max')} {formatMoney(promo.max_discount_amount)}</span>
                                         )}
                                     </div>
                                 </TableCell>

@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import { formatRupiah } from "@/lib/utils"
+import { useFormatMoney } from '@/context/MoneyContext'
 import { Package, RotateCcw } from "lucide-react"
 import { ProductActions } from "./ProductActions"
 import { Button } from "@/components/ui/button"
@@ -15,6 +15,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onEdit, onRestore, hasActions = true }: ProductCardProps) {
+    const formatMoney = useFormatMoney()
     const { t } = useTranslation();
     return (
         <div className={cn(
@@ -96,7 +97,7 @@ export function ProductCard({ product, onEdit, onRestore, hasActions = true }: P
 
                     <div className="shrink-0">
                         <p className="text-sm font-medium text-foreground/90">
-                            {formatRupiah(product.price || 0)}
+                            {formatMoney(product.price || 0)}
                         </p>
                     </div>
 

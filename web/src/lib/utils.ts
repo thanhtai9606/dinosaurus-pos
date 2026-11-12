@@ -73,10 +73,23 @@ export async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<
   })
 }
 
-export const formatRupiah = (number: number) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0
-  }).format(number)
+const CURRENCY_LOCALE: Record<string, string> = {
+  IDR: 'id-ID',
+  USD: 'en-US',
 }
+
+/** Format amount using app financial settings currency (see MoneyProvider). */
+export function formatMoney(amount: number, currency = 'IDR') {
+  const code = CURRENCY_LOCALE[currency] ? currency : 'IDR'
+  const locale = CURRENCY_LOCALE[code] ?? 'en-US'
+  const fractionDigits = code === 'IDR' ? 0 : 2
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: code,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(amount)
+}
+
+/** @deprecated Prefer useFormatMoney() — always IDR */
+export const formatRupiah = (number: number) => formatMoney(number, 'IDR')

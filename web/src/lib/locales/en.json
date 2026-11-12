@@ -751,6 +751,7 @@
         "select_customer": "Select Customer",
         "walk_in": "Walk-in",
         "tax": "Tax",
+        "service_charge": "Service charge",
         "static_qris": "Static QRIS",
         "errors": {
             "invalid_cart": "Invalid cart state",

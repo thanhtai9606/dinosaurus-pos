@@ -6,7 +6,8 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { meQueryOptions } from '@/lib/api/query/auth'
 import { useTranslation } from 'react-i18next'
-import { useBrandingSettingsQuery } from '@/lib/api/query/settings'
+import { useBrandingSettingsQuery, financialSettingsQueryOptions } from '@/lib/api/query/settings'
+import { MoneyProvider } from '@/context/MoneyContext'
 import { useNavigationMenu } from '@/hooks/useNavigationMenu'
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar"
 import { DashboardMobileNav } from "@/components/dashboard/DashboardMobileNav"
@@ -16,6 +17,7 @@ import { useQueryClient } from '@tanstack/react-query'
 export const Route = createFileRoute('/$locale/_dashboard')({
     loader: async ({ context: { queryClient }, params }) => {
         try {
+            await queryClient.ensureQueryData(financialSettingsQueryOptions())
             return await queryClient.ensureQueryData(meQueryOptions())
         } catch (error: any) {
             const status = error?.response?.status ?? error?.status
@@ -105,7 +107,9 @@ function DashboardLayout() {
                         />
 
                         <div className="mt-12 md:mt-0 flex-1 min-w-0">
-                            <Outlet />
+                            <MoneyProvider>
+                                <Outlet />
+                            </MoneyProvider>
                         </div>
                     </main>
                 </div>

@@ -1009,6 +1009,16 @@
             "add_line": "Add line",
             "complete": "Complete receipt"
         },
+        "bulk": {
+            "select_all": "Select all on page",
+            "select_row": "Select receipt",
+            "selected": "{{count}} selected",
+            "print_barcodes": "Print barcodes",
+            "export_excel": "Export Excel",
+            "delete": "Delete receipts",
+            "delete_confirm_title": "Delete stock receipts?",
+            "delete_confirm_body": "Only draft or cancelled receipts can be deleted. This cannot be undone."
+        },
         "fields": {
             "receipt_no": "Receipt no.",
             "supplier": "Supplier",
@@ -1033,6 +1043,7 @@
         "form": {
             "create_title": "New stock receipt",
             "edit_title": "Edit stock receipt",
+            "view_title": "Stock receipt details",
             "cost_note": "Unit cost column sets cost_price when you complete the receipt.",
             "sell_note": "Optional sell price column updates product price on complete."
         },
@@ -1041,7 +1052,16 @@
             "update_success": "Receipt saved",
             "complete_success": "Receipt completed — stock updated",
             "complete_failed": "Could not complete receipt",
-            "cancel_success": "Receipt cancelled"
+            "cancel_success": "Receipt cancelled",
+            "delete_success": "Receipt deleted",
+            "delete_failed": "Could not delete receipt",
+            "delete_none": "No draft/cancelled receipts in selection",
+            "print_started": "Opening print dialog…",
+            "print_no_barcodes": "No barcode/SKU to print in selected receipts",
+            "print_popup_blocked": "Popup blocked — allow popups for this site",
+            "print_failed": "Barcode print failed",
+            "export_success": "Download started",
+            "export_failed": "Export failed"
         }
     },
     "importPrices": {

@@ -41,6 +41,7 @@ type StockReceiptItemResponse struct {
 	ProductID          uuid.UUID `json:"product_id"`
 	ProductName        string    `json:"product_name"`
 	ProductSku         *string   `json:"product_sku,omitempty"`
+	ProductBarcode     *string   `json:"product_barcode,omitempty"`
 	Quantity           int32     `json:"quantity"`
 	UnitCost           float64   `json:"unit_cost"`
 	UnitSellPrice      *float64  `json:"unit_sell_price,omitempty"`

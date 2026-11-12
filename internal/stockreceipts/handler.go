@@ -18,6 +18,7 @@ type IStockReceiptHandler interface {
 	UpdateHandler(c fiber.Ctx) error
 	CompleteHandler(c fiber.Ctx) error
 	CancelHandler(c fiber.Ctx) error
+	DeleteHandler(c fiber.Ctx) error
 }
 
 type StockReceiptHandler struct {
@@ -208,5 +209,32 @@ func (h *StockReceiptHandler) CancelHandler(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.SuccessResponse{
 		Message: "Stock receipt cancelled successfully",
 		Data:    resp,
+	})
+}
+
+// @Summary      Delete draft or cancelled stock receipt
+// @Tags         StockReceipts
+// @Param        id path string true "Receipt ID"
+// @Success      200 {object} common.SuccessResponse
+// @x-roles      ["admin", "manager"]
+// @Router       /stock-receipts/{id} [delete]
+func (h *StockReceiptHandler) DeleteHandler(c fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid ID format"})
+	}
+
+	if err := h.service.Delete(c.RequestCtx(), id); err != nil {
+		if errors.Is(err, common.ErrNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "Stock receipt not found"})
+		}
+		if errors.Is(err, common.ErrInvalidState) {
+			return c.Status(fiber.StatusConflict).JSON(common.ErrorResponse{Message: "Only draft or cancelled receipts can be deleted"})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to delete stock receipt"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(common.SuccessResponse{
+		Message: "Stock receipt deleted successfully",
 	})
 }

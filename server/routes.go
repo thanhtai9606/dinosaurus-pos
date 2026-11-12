@@ -185,6 +185,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 		stockReceiptGroup.Put("/:id", container.StockReceiptHandler.UpdateHandler)
 		stockReceiptGroup.Post("/:id/complete", container.StockReceiptHandler.CompleteHandler)
 		stockReceiptGroup.Post("/:id/cancel", container.StockReceiptHandler.CancelHandler)
+		stockReceiptGroup.Delete("/:id", container.StockReceiptHandler.DeleteHandler)
 	}
 
 	SetupFrontend(app)

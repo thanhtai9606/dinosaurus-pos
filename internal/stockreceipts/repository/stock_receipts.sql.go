@@ -88,6 +88,16 @@ func (q *Queries) CreateStockReceipt(ctx context.Context, arg CreateStockReceipt
 	return i, err
 }
 
+const deleteStockReceipt = `-- name: DeleteStockReceipt :exec
+DELETE FROM stock_receipts
+WHERE id = $1 AND status IN ('draft', 'cancelled')
+`
+
+func (q *Queries) DeleteStockReceipt(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteStockReceipt, id)
+	return err
+}
+
 const deleteStockReceiptItems = `-- name: DeleteStockReceiptItems :exec
 DELETE FROM stock_receipt_items WHERE receipt_id = $1
 `
@@ -159,6 +169,7 @@ SELECT
     i.id, i.receipt_id, i.product_id, i.quantity, i.unit_cost, i.line_total, i.created_at, i.unit_sell_price,
     p.name AS product_name,
     p.sku AS product_sku,
+    p.barcode AS product_barcode,
     p.price AS product_sell_price,
     p.cost_price AS product_cost_price
 FROM stock_receipt_items i
@@ -176,9 +187,10 @@ type ListStockReceiptItemsRow struct {
 	LineTotal        pgtype.Numeric     `json:"line_total"`
 	CreatedAt        pgtype.Timestamptz `json:"created_at"`
 	UnitSellPrice    pgtype.Numeric     `json:"unit_sell_price"`
-	ProductName      string             `json:"product_name"`
-	ProductSku       *string            `json:"product_sku"`
-	ProductSellPrice int64              `json:"product_sell_price"`
+	ProductName       string             `json:"product_name"`
+	ProductSku        *string            `json:"product_sku"`
+	ProductBarcode    *string            `json:"product_barcode"`
+	ProductSellPrice  int64              `json:"product_sell_price"`
 	ProductCostPrice pgtype.Numeric     `json:"product_cost_price"`
 }
 
@@ -202,6 +214,7 @@ func (q *Queries) ListStockReceiptItems(ctx context.Context, receiptID uuid.UUID
 			&i.UnitSellPrice,
 			&i.ProductName,
 			&i.ProductSku,
+			&i.ProductBarcode,
 			&i.ProductSellPrice,
 			&i.ProductCostPrice,
 		); err != nil {

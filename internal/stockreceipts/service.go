@@ -25,6 +25,7 @@ type IStockReceiptService interface {
 	UpdateDraft(ctx context.Context, id uuid.UUID, req UpdateStockReceiptRequest) (*StockReceiptResponse, error)
 	Complete(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error)
 	Cancel(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type StockReceiptService struct {
@@ -336,6 +337,25 @@ func (s *StockReceiptService) Cancel(ctx context.Context, id uuid.UUID) (*StockR
 	return s.Get(ctx, id)
 }
 
+func (s *StockReceiptService) Delete(ctx context.Context, id uuid.UUID) error {
+	receipt, err := s.repo.GetStockReceiptByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return common.ErrNotFound
+		}
+		return err
+	}
+	if receipt.Status != sr_repo.StockReceiptStatusDraft && receipt.Status != sr_repo.StockReceiptStatusCancelled {
+		return common.ErrInvalidState
+	}
+
+	if err := s.repo.DeleteStockReceipt(ctx, id); err != nil {
+		s.log.Errorf("DeleteStockReceipt failed", "error", err, "id", id)
+		return err
+	}
+	return nil
+}
+
 func nextReceiptNo(ctx context.Context, q *sr_repo.Queries) (string, error) {
 	now := time.Now()
 	d := pgtype.Date{Time: now, Valid: true}
@@ -398,6 +418,7 @@ func mapReceiptDetail(r sr_repo.StockReceipt, items []sr_repo.ListStockReceiptIt
 			ProductID:        it.ProductID,
 			ProductName:      it.ProductName,
 			ProductSku:       it.ProductSku,
+			ProductBarcode:   it.ProductBarcode,
 			Quantity:         it.Quantity,
 			UnitCost:         numericToFloat(it.UnitCost),
 			UnitSellPrice:    sellPtr,

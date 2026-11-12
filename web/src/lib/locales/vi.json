@@ -1016,6 +1016,16 @@
             "add_line": "Thêm dòng",
             "complete": "Hoàn tất nhập"
         },
+        "bulk": {
+            "select_all": "Chọn tất cả trên trang",
+            "select_row": "Chọn phiếu",
+            "selected": "Đã chọn {{count}}",
+            "print_barcodes": "In mã vạch",
+            "export_excel": "Xuất Excel",
+            "delete": "Xóa phiếu",
+            "delete_confirm_title": "Xóa phiếu nhập?",
+            "delete_confirm_body": "Chỉ phiếu nháp hoặc đã hủy mới xóa được. Thao tác không hoàn tác."
+        },
         "fields": {
             "receipt_no": "Số phiếu",
             "supplier": "Nhà cung cấp",
@@ -1040,6 +1050,7 @@
         "form": {
             "create_title": "Phiếu nhập mới",
             "edit_title": "Sửa phiếu nhập",
+            "view_title": "Chi tiết phiếu nhập",
             "cost_note": "Giá vốn: nhập ở cột «Giá vốn» — khi hoàn tất phiếu sẽ gán vào cost_price.",
             "sell_note": "Giá bán: nhập cột «Giá bán» nếu muốn đổi giá POS; bỏ trống thì không đổi giá bán."
         },
@@ -1048,7 +1059,16 @@
             "update_success": "Đã lưu phiếu",
             "complete_success": "Đã nhập kho — tồn đã cập nhật",
             "complete_failed": "Không hoàn tất được phiếu",
-            "cancel_success": "Đã hủy phiếu"
+            "cancel_success": "Đã hủy phiếu",
+            "delete_success": "Đã xóa phiếu",
+            "delete_failed": "Không xóa được phiếu",
+            "delete_none": "Không có phiếu nháp/đã hủy nào trong lựa chọn",
+            "print_started": "Đang mở hộp thoại in…",
+            "print_no_barcodes": "Không có mã vạch/SKU để in trong các phiếu đã chọn",
+            "print_popup_blocked": "Trình duyệt chặn cửa sổ in — cho phép popup",
+            "print_failed": "In mã vạch thất bại",
+            "export_success": "Đã tải file",
+            "export_failed": "Xuất file thất bại"
         }
     },
     "importPrices": {

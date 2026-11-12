@@ -426,5 +426,9 @@ export const RBAC_RULES: Record<string, string[]> = {
     "POST /stock-receipts/{id}/cancel": [
         "admin",
         "manager"
+    ],
+    "DELETE /stock-receipts/{id}": [
+        "admin",
+        "manager"
     ]
 };

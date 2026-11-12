@@ -43,6 +43,10 @@ SET status = $2, updated_at = NOW()
 WHERE id = $1
 RETURNING *;
 
+-- name: DeleteStockReceipt :exec
+DELETE FROM stock_receipts
+WHERE id = $1 AND status IN ('draft', 'cancelled');
+
 -- name: DeleteStockReceiptItems :exec
 DELETE FROM stock_receipt_items WHERE receipt_id = $1;
 
@@ -56,6 +60,7 @@ SELECT
     i.*,
     p.name AS product_name,
     p.sku AS product_sku,
+    p.barcode AS product_barcode,
     p.price AS product_sell_price,
     p.cost_price AS product_cost_price
 FROM stock_receipt_items i

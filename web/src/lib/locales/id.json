@@ -997,6 +997,16 @@
             "add_line": "Tambah baris",
             "complete": "Selesaikan"
         },
+        "bulk": {
+            "select_all": "Pilih semua di halaman",
+            "select_row": "Pilih penerimaan",
+            "selected": "{{count}} dipilih",
+            "print_barcodes": "Cetak barcode",
+            "export_excel": "Ekspor Excel",
+            "delete": "Hapus penerimaan",
+            "delete_confirm_title": "Hapus penerimaan?",
+            "delete_confirm_body": "Hanya draf atau dibatalkan yang bisa dihapus. Tidak dapat dibatalkan."
+        },
         "fields": {
             "receipt_no": "No. penerimaan",
             "supplier": "Supplier",
@@ -1021,6 +1031,7 @@
         "form": {
             "create_title": "Penerimaan baru",
             "edit_title": "Edit penerimaan",
+            "view_title": "Detail penerimaan",
             "cost_note": "Kolom harga pokok mengatur cost_price setelah selesai.",
             "sell_note": "Kolom harga jual opsional mengatur price produk setelah selesai."
         },
@@ -1029,7 +1040,16 @@
             "update_success": "Penerimaan disimpan",
             "complete_success": "Stok diperbarui",
             "complete_failed": "Gagal menyelesaikan",
-            "cancel_success": "Penerimaan dibatalkan"
+            "cancel_success": "Penerimaan dibatalkan",
+            "delete_success": "Penerimaan dihapus",
+            "delete_failed": "Gagal menghapus",
+            "delete_none": "Tidak ada draf/dibatalkan dalam pilihan",
+            "print_started": "Membuka dialog cetak…",
+            "print_no_barcodes": "Tidak ada barcode/SKU untuk dicetak",
+            "print_popup_blocked": "Popup diblokir — izinkan popup",
+            "print_failed": "Cetak barcode gagal",
+            "export_success": "Unduhan dimulai",
+            "export_failed": "Ekspor gagal"
         }
     },
     "importPrices": {

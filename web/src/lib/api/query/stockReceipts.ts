@@ -11,6 +11,7 @@ export type StockReceiptItem = {
     product_id: string
     product_name?: string
     product_sku?: string | null
+    product_barcode?: string | null
     quantity: number
     unit_cost: number
     unit_sell_price?: number
@@ -141,6 +142,37 @@ export const useCompleteStockReceiptMutation = () => {
                 toast.success(t('stockReceipts.messages.complete_success'))
             },
             onError: () => toast.error(t('stockReceipts.messages.complete_failed')),
+        }),
+        isAllowed,
+    }
+}
+
+export async function fetchStockReceiptDetails(ids: string[]): Promise<StockReceipt[]> {
+    const unique = [...new Set(ids.filter(Boolean))]
+    const results = await Promise.all(
+        unique.map(async (id) => {
+            const res = await axiosInstance.get(`/stock-receipts/${id}`)
+            return (res.data as { data: StockReceipt }).data
+        }),
+    )
+    return results
+}
+
+export const useDeleteStockReceiptMutation = () => {
+    const { t } = useTranslation()
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('DELETE', '/stock-receipts/{id}')
+    return {
+        ...useMutation({
+            mutationFn: async (id: string) => {
+                await axiosInstance.delete(`/stock-receipts/${id}`)
+            },
+            onSuccess: async () => {
+                await qc.invalidateQueries({ queryKey: ['stock-receipts'] })
+                toast.success(t('stockReceipts.messages.delete_success'))
+            },
+            onError: () => toast.error(t('stockReceipts.messages.delete_failed')),
         }),
         isAllowed,
     }

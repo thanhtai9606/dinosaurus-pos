@@ -15,6 +15,7 @@ type Querier interface {
 	CountStockReceipts(ctx context.Context, arg CountStockReceiptsParams) (int64, error)
 	CountStockReceiptsOnDate(ctx context.Context, dollar_1 pgtype.Date) (int32, error)
 	CreateStockReceipt(ctx context.Context, arg CreateStockReceiptParams) (StockReceipt, error)
+	DeleteStockReceipt(ctx context.Context, id uuid.UUID) error
 	DeleteStockReceiptItems(ctx context.Context, receiptID uuid.UUID) error
 	GetStockReceiptByID(ctx context.Context, id uuid.UUID) (StockReceipt, error)
 	InsertStockReceiptItem(ctx context.Context, arg InsertStockReceiptItemParams) (StockReceiptItem, error)

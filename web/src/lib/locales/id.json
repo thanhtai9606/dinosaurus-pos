@@ -745,6 +745,7 @@
             "invalid_cart": "Status keranjang tidak valid",
             "stock_empty": "Stok produk habis",
             "load_failed": "Gagal memuat info produk",
+            "variant_check_skipped": "Ditambahkan ke keranjang; variasi tidak dapat dimuat, memakai produk dasar.",
             "insufficient_stock": "Stok tidak mencukupi",
             "create_failed": "Gagal membuat pesanan",
             "cash_insufficient": "Uang tunai kurang!",

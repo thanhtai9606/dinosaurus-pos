@@ -529,7 +529,6 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 	}
 
 	var wg sync.WaitGroup
-	errChan := make(chan error, len(optionsResponse)+1)
 
 	if fullProduct.ImageUrl != nil && *fullProduct.ImageUrl != "" {
 		wg.Add(1)
@@ -537,7 +536,7 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 			defer wg.Done()
 			url, err := s.prdRepo.PrdImageLink(ctx, fullProduct.ID.String(), *fullProduct.ImageUrl)
 			if err != nil {
-				errChan <- fmt.Errorf("failed to get main image link: %w", err)
+				s.log.Warnf("Failed to resolve product image URL, using stored path", "error", err, "productID", fullProduct.ID)
 				return
 			}
 			fullProduct.ImageUrl = &url
@@ -545,30 +544,22 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 	}
 
 	for i := range optionsResponse {
-
 		opt := &optionsResponse[i]
 		if opt.ImageURL != nil && *opt.ImageURL != "" {
 			wg.Add(1)
-			go func() {
+			go func(o *ProductOptionResponse) {
 				defer wg.Done()
-				url, err := s.prdRepo.PrdImageLink(ctx, *opt.ImageURL, *opt.ImageURL)
+				url, err := s.prdRepo.PrdImageLink(ctx, o.ID.String(), *o.ImageURL)
 				if err != nil {
-					errChan <- fmt.Errorf("failed to get option image link for %s: %w", opt.Name, err)
+					s.log.Warnf("Failed to resolve option image URL, using stored path", "error", err, "optionID", o.ID)
 					return
 				}
-				opt.ImageURL = &url
-			}()
+				o.ImageURL = &url
+			}(opt)
 		}
 	}
 
 	wg.Wait()
-	close(errChan)
-
-	for err := range errChan {
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	productPrice := float64(fullProduct.Price)
 	costPrice := 0.0

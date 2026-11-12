@@ -4,8 +4,8 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useDebounce } from '@/hooks/use-debounce'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
-import { useQueryClient } from '@tanstack/react-query'
-import { useProductsListQuery, Product, productDetailQueryOptions } from '@/lib/api/query/products'
+import { useProductsListQuery, Product } from '@/lib/api/query/products'
+import { productsApi } from '@/lib/api/client'
 import { ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PaymentDialog } from "@/components/payment/PaymentDialog"
@@ -33,7 +33,6 @@ export const Route = createFileRoute('/$locale/_dashboard/order')({
 
 function OrderPage() {
     const { t } = useTranslation()
-    const queryClient = useQueryClient()
     const navigate = useNavigate({ from: Route.fullPath })
     const searchParams = Route.useSearch()
     const selectedCategory = searchParams.category || 'all'
@@ -102,9 +101,14 @@ function OrderPage() {
             toast.error(t('order.errors.stock_empty'))
             return
         }
-        setIsLoadingDetailsId(product.id || null)
+        if (!product.id) {
+            toast.error(t('order.errors.load_failed'))
+            return
+        }
+        setIsLoadingDetailsId(product.id)
         try {
-            const detail = await queryClient.fetchQuery(productDetailQueryOptions(product.id!))
+            const res = await productsApi.productsIdGet(product.id)
+            const detail = (res.data as { data?: Product }).data ?? product
             if (detail.options && detail.options.length > 0) {
                 setProductForVariantSelection(detail)
                 setVariantSelectionOpen(true)
@@ -113,7 +117,8 @@ function OrderPage() {
             addCartItem(detail)
         } catch (error) {
             console.error(error)
-            toast.error(t('order.errors.load_failed'))
+            addCartItem(product)
+            toast.warning(t('order.errors.variant_check_skipped', 'Added to cart; could not load variants.'))
         } finally {
             setIsLoadingDetailsId(null)
         }

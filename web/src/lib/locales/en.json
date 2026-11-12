@@ -756,6 +756,7 @@
             "invalid_cart": "Invalid cart state",
             "stock_empty": "Product out of stock",
             "load_failed": "Failed to load product info",
+            "variant_check_skipped": "Added to cart; could not load variants, using base product.",
             "insufficient_stock": "Insufficient stock",
             "create_failed": "Failed to create order",
             "cash_insufficient": "Cash insufficient!",

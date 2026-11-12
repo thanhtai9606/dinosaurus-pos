@@ -760,8 +760,9 @@
         "static_qris": "QRIS tĩnh",
         "errors": {
             "invalid_cart": "Trạng thái giỏ hàng không hợp lệ",
-            "stock_empty": "<strong>%s sản phẩm</strong> hết hàng",
+            "stock_empty": "Sản phẩm đã hết hàng",
             "load_failed": "Không thể tải thông tin sản phẩm",
+            "variant_check_skipped": "Đã thêm vào giỏ; không tải được biến thể, dùng phiên bản gốc.",
             "insufficient_stock": "Kho không đủ",
             "create_failed": "Không thể tạo lệnh",
             "cash_insufficient": "Tiền mặt không đủ!",

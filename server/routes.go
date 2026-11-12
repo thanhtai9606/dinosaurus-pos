@@ -161,5 +161,24 @@ func SetupRoutes(app *App, container *AppContainer) {
 		customerGroup.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.CustomerHandler.DeleteCustomerHandler)
 	}
 
+	supplierGroup := api.Group("/suppliers", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
+	{
+		supplierGroup.Get("/", container.SupplierHandler.ListSuppliersHandler)
+		supplierGroup.Post("/", container.SupplierHandler.CreateSupplierHandler)
+		supplierGroup.Get("/:id", container.SupplierHandler.GetSupplierHandler)
+		supplierGroup.Put("/:id", container.SupplierHandler.UpdateSupplierHandler)
+		supplierGroup.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SupplierHandler.DeleteSupplierHandler)
+	}
+
+	stockReceiptGroup := api.Group("/stock-receipts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
+	{
+		stockReceiptGroup.Get("/", container.StockReceiptHandler.ListHandler)
+		stockReceiptGroup.Post("/", container.StockReceiptHandler.CreateHandler)
+		stockReceiptGroup.Get("/:id", container.StockReceiptHandler.GetHandler)
+		stockReceiptGroup.Put("/:id", container.StockReceiptHandler.UpdateHandler)
+		stockReceiptGroup.Post("/:id/complete", container.StockReceiptHandler.CompleteHandler)
+		stockReceiptGroup.Post("/:id/cancel", container.StockReceiptHandler.CancelHandler)
+	}
+
 	SetupFrontend(app)
 }

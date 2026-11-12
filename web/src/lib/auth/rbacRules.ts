@@ -357,5 +357,48 @@ export const RBAC_RULES: Record<string, string[]> = {
     ],
     "POST /users/{id}/toggle-status": [
         "admin"
+    ],
+    "GET /suppliers": [
+        "admin",
+        "manager"
+    ],
+    "POST /suppliers": [
+        "admin",
+        "manager"
+    ],
+    "GET /suppliers/{id}": [
+        "admin",
+        "manager"
+    ],
+    "PUT /suppliers/{id}": [
+        "admin",
+        "manager"
+    ],
+    "DELETE /suppliers/{id}": [
+        "admin"
+    ],
+    "GET /stock-receipts": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-receipts": [
+        "admin",
+        "manager"
+    ],
+    "GET /stock-receipts/{id}": [
+        "admin",
+        "manager"
+    ],
+    "PUT /stock-receipts/{id}": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-receipts/{id}/complete": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-receipts/{id}/cancel": [
+        "admin",
+        "manager"
     ]
 };

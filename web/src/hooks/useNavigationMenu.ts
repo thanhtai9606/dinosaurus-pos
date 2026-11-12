@@ -9,7 +9,10 @@ import {
     Receipt,
     Tag,
     ActivityIcon,
-    Users
+    Users,
+    Truck,
+    ClipboardList,
+    Warehouse
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
@@ -62,6 +65,33 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
                 POSKasirInternalUserRepositoryUserRole.UserRoleCashier
+            ]
+        },
+        {
+            label: t('sidebar.inventory'),
+            icon: Warehouse,
+            to: '/$locale/inventory',
+            allowedRoles: [
+                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+                POSKasirInternalUserRepositoryUserRole.UserRoleManager
+            ]
+        },
+        {
+            label: t('sidebar.suppliers'),
+            icon: Truck,
+            to: '/$locale/suppliers',
+            allowedRoles: [
+                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+                POSKasirInternalUserRepositoryUserRole.UserRoleManager
+            ]
+        },
+        {
+            label: t('sidebar.stock_receipts'),
+            icon: ClipboardList,
+            to: '/$locale/stock-receipts',
+            allowedRoles: [
+                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+                POSKasirInternalUserRepositoryUserRole.UserRoleManager
             ]
         },
         {

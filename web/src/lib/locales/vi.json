@@ -87,7 +87,10 @@
         "settings": "Cài đặt",
         "account": "Tài khoản",
         "activity_logs": "Nhật ký hoạt động",
-        "customers": "Khách hàng"
+        "customers": "Khách hàng",
+        "inventory": "Tồn kho",
+        "suppliers": "Nhà cung cấp",
+        "stock_receipts": "Nhập hàng"
     },
     "user_menu": {
         "profile": "Hồ sơ",
@@ -647,6 +650,14 @@
             "restore_success": "Sản phẩm được khôi phục thành công",
             "restore_error": "Không thể khôi phục sản phẩm"
         },
+        "fields": {
+            "sku": "Mã SKU",
+            "barcode": "Mã vạch",
+            "unit": "Đơn vị",
+            "min_stock": "Tồn tối thiểu",
+            "default_supplier": "NCC mặc định",
+            "no_supplier": "Không chọn"
+        },
         "stock_history": {
             "no_history": "Không tìm thấy lịch sử cổ phiếu.",
             "type_sale": "Khuyến mại",
@@ -880,6 +891,75 @@
         "create_success": "Danh mục mới được tạo thành công",
         "update_success": "Danh mục được cập nhật thành công",
         "delete_success": "Danh mục đã xóa thành công."
+    },
+    "suppliers": {
+        "title": "Nhà cung cấp",
+        "search_placeholder": "Tìm theo tên hoặc mã…",
+        "actions": { "add": "Thêm NCC" },
+        "fields": {
+            "code": "Mã",
+            "name": "Tên",
+            "phone": "Điện thoại",
+            "email": "Email",
+            "address": "Địa chỉ",
+            "tax_id": "MST",
+            "is_active": "Đang hoạt động"
+        },
+        "form": {
+            "create_title": "Thêm nhà cung cấp",
+            "edit_title": "Sửa nhà cung cấp"
+        },
+        "messages": {
+            "create_success": "Đã tạo NCC",
+            "create_failed": "Không tạo được NCC: {{message}}",
+            "update_success": "Đã cập nhật NCC",
+            "update_failed": "Không cập nhật được: {{message}}",
+            "delete_success": "Đã xóa NCC",
+            "delete_failed": "Không xóa được: {{message}}"
+        }
+    },
+    "stockReceipts": {
+        "title": "Phiếu nhập kho",
+        "actions": {
+            "add": "Tạo phiếu",
+            "add_line": "Thêm dòng",
+            "complete": "Hoàn tất nhập"
+        },
+        "fields": {
+            "receipt_no": "Số phiếu",
+            "supplier": "Nhà cung cấp",
+            "supplier_placeholder": "Chọn NCC",
+            "status": "Trạng thái",
+            "total": "Tổng tiền",
+            "product": "Hàng hóa",
+            "quantity": "SL",
+            "unit_cost": "Giá vốn",
+            "note": "Ghi chú"
+        },
+        "status": {
+            "draft": "Nháp",
+            "completed": "Đã nhập",
+            "cancelled": "Đã hủy"
+        },
+        "form": {
+            "create_title": "Phiếu nhập mới",
+            "edit_title": "Sửa phiếu nhập",
+            "cost_note": "Khi hoàn tất, giá vốn dòng sẽ ghi đè cost_price sản phẩm (MVP)."
+        },
+        "messages": {
+            "create_success": "Đã tạo phiếu",
+            "update_success": "Đã lưu phiếu",
+            "complete_success": "Đã nhập kho — tồn đã cập nhật",
+            "complete_failed": "Không hoàn tất được phiếu",
+            "cancel_success": "Đã hủy phiếu"
+        }
+    },
+    "inventory": {
+        "title": "Tổng quan tồn kho",
+        "description": "Tồn, SKU và lọc hàng sắp hết.",
+        "low_stock_only": "Chỉ hàng sắp hết",
+        "create_receipt": "Tạo phiếu nhập",
+        "link_from_receipts": "Xem tồn kho"
     },
     "customers": {
         "title": "Khách hàng",

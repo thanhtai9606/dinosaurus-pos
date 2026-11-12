@@ -35,6 +35,7 @@ var (
 	ErrUploadFailed            = errors.New("file upload failed")
 	ErrPaymentFailed           = errors.New("payment processing failed")
 	ErrOrderConflict           = errors.New("order version conflict")
+	ErrInvalidState            = errors.New("invalid state for this operation")
 	ErrAvatarNotFound          = errors.New("avatar not found")
 	ErrAvatarUploadFailed      = errors.New("avatar upload failed")
 	ErrAvatarProcessingFailed  = errors.New("avatar processing failed")

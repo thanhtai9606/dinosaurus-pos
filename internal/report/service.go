@@ -459,6 +459,8 @@ func (r *RptService) GetLowStockProducts(ctx context.Context, req *LowStockReque
 			ProductID:   p.ID.String(),
 			ProductName: p.Name,
 			Stock:       p.Stock,
+			MinStock:    p.MinStock,
+			Sku:         p.Sku,
 		})
 	}
 

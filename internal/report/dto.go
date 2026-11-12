@@ -90,9 +90,11 @@ type LowStockRequest struct {
 }
 
 type LowStockProductResponse struct {
-	ProductID   string `json:"product_id"`
-	ProductName string `json:"product_name"`
-	Stock       int32  `json:"stock"`
+	ProductID   string  `json:"product_id"`
+	ProductName string  `json:"product_name"`
+	Stock       int32   `json:"stock"`
+	MinStock    int32   `json:"min_stock"`
+	Sku         *string `json:"sku,omitempty"`
 }
 
 type PromotionPerformanceResponse struct {

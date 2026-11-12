@@ -85,7 +85,10 @@
         "settings": "Settings",
         "account": "Account",
         "activity_logs": "Activity Logs",
-        "customers": "Customers"
+        "customers": "Customers",
+        "inventory": "Inventory",
+        "suppliers": "Suppliers",
+        "stock_receipts": "Stock receipts"
     },
     "user_menu": {
         "profile": "Profile",
@@ -641,6 +644,14 @@
             "restore_success": "Product restored successfully",
             "restore_error": "Failed to restore product"
         },
+        "fields": {
+            "sku": "SKU",
+            "barcode": "Barcode",
+            "unit": "Unit",
+            "min_stock": "Min. stock",
+            "default_supplier": "Default supplier",
+            "no_supplier": "None"
+        },
         "stock_history": {
             "no_history": "No stock history found.",
             "type_sale": "Sale",
@@ -873,6 +884,75 @@
         "create_success": "Category created successfully",
         "update_success": "Category updated successfully",
         "delete_success": "Category deleted successfully"
+    },
+    "suppliers": {
+        "title": "Suppliers",
+        "search_placeholder": "Search by name or code…",
+        "actions": { "add": "Add supplier" },
+        "fields": {
+            "code": "Code",
+            "name": "Name",
+            "phone": "Phone",
+            "email": "Email",
+            "address": "Address",
+            "tax_id": "Tax ID",
+            "is_active": "Active"
+        },
+        "form": {
+            "create_title": "New supplier",
+            "edit_title": "Edit supplier"
+        },
+        "messages": {
+            "create_success": "Supplier created",
+            "create_failed": "Failed to create supplier: {{message}}",
+            "update_success": "Supplier updated",
+            "update_failed": "Failed to update supplier: {{message}}",
+            "delete_success": "Supplier deleted",
+            "delete_failed": "Failed to delete supplier: {{message}}"
+        }
+    },
+    "stockReceipts": {
+        "title": "Stock receipts",
+        "actions": {
+            "add": "New receipt",
+            "add_line": "Add line",
+            "complete": "Complete receipt"
+        },
+        "fields": {
+            "receipt_no": "Receipt no.",
+            "supplier": "Supplier",
+            "supplier_placeholder": "Select supplier",
+            "status": "Status",
+            "total": "Total",
+            "product": "Product",
+            "quantity": "Qty",
+            "unit_cost": "Unit cost",
+            "note": "Note"
+        },
+        "status": {
+            "draft": "Draft",
+            "completed": "Completed",
+            "cancelled": "Cancelled"
+        },
+        "form": {
+            "create_title": "New stock receipt",
+            "edit_title": "Edit stock receipt",
+            "cost_note": "On complete, unit cost updates product cost price (MVP)."
+        },
+        "messages": {
+            "create_success": "Receipt created",
+            "update_success": "Receipt saved",
+            "complete_success": "Receipt completed — stock updated",
+            "complete_failed": "Could not complete receipt",
+            "cancel_success": "Receipt cancelled"
+        }
+    },
+    "inventory": {
+        "title": "Inventory overview",
+        "description": "Stock levels, SKU, and low-stock filter.",
+        "low_stock_only": "Low stock only",
+        "create_receipt": "New stock receipt",
+        "link_from_receipts": "View inventory"
     },
     "customers": {
         "title": "Customers",

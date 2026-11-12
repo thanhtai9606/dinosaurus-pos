@@ -379,6 +379,21 @@ func (s *PrdService) UpdateProduct(ctx context.Context, productID uuid.UUID, req
 		numericCost.Scan(fmt.Sprintf("%f", costPrice))
 		updateParams.CostPrice = numericCost
 	}
+	if req.Sku != nil {
+		updateParams.Sku = req.Sku
+	}
+	if req.Barcode != nil {
+		updateParams.Barcode = req.Barcode
+	}
+	if req.Unit != nil {
+		updateParams.Unit = req.Unit
+	}
+	if req.MinStock != nil {
+		updateParams.MinStock = req.MinStock
+	}
+	if req.DefaultSupplierID != nil {
+		updateParams.DefaultSupplierID = pgtype.UUID{Bytes: *req.DefaultSupplierID, Valid: true}
+	}
 
 	_, err = s.repo.UpdateProduct(ctx, updateParams)
 	if err != nil {
@@ -570,18 +585,32 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 
 	categories := parseCategoriesJSON(fullProduct.Categories)
 
-	return &ProductResponse{
-		ID:         fullProduct.ID,
-		Name:       fullProduct.Name,
-		Categories: categories,
+	unit := fullProduct.Unit
+	if unit == "" {
+		unit = "pcs"
+	}
+	var defaultSupplierID *uuid.UUID
+	if fullProduct.DefaultSupplierID.Valid {
+		sid := uuid.UUID(fullProduct.DefaultSupplierID.Bytes)
+		defaultSupplierID = &sid
+	}
 
-		ImageURL:  fullProduct.ImageUrl,
-		Price:     productPrice,
-		CostPrice: costPrice,
-		Stock:     fullProduct.Stock,
-		CreatedAt: fullProduct.CreatedAt.Time,
-		UpdatedAt: fullProduct.UpdatedAt.Time,
-		Options:   optionsResponse,
+	return &ProductResponse{
+		ID:                fullProduct.ID,
+		Name:              fullProduct.Name,
+		Categories:        categories,
+		ImageURL:          fullProduct.ImageUrl,
+		Price:             productPrice,
+		CostPrice:         costPrice,
+		Stock:             fullProduct.Stock,
+		Sku:               fullProduct.Sku,
+		Barcode:           fullProduct.Barcode,
+		Unit:              unit,
+		MinStock:          fullProduct.MinStock,
+		DefaultSupplierID: defaultSupplierID,
+		CreatedAt:         fullProduct.CreatedAt.Time,
+		UpdatedAt:         fullProduct.UpdatedAt.Time,
+		Options:           optionsResponse,
 	}, nil
 }
 
@@ -593,14 +622,16 @@ func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) 
 	offset := (page - 1) * limit
 
 	listParams := products_repo.ListProductsParams{
-		Limit:      int32(limit),
-		Offset:     int32(offset),
-		CategoryID: req.CategoryID,
-		SearchText: &req.Search,
+		Limit:        int32(limit),
+		Offset:       int32(offset),
+		CategoryID:   req.CategoryID,
+		SearchText:   &req.Search,
+		LowStockOnly: req.LowStockOnly,
 	}
 	countParams := products_repo.CountProductsParams{
-		CategoryID: req.CategoryID,
-		SearchText: &req.Search,
+		CategoryID:   req.CategoryID,
+		SearchText:   &req.Search,
+		LowStockOnly: req.LowStockOnly,
 	}
 
 	s.log.Infof("list params list product: %+v", listParams)
@@ -647,13 +678,29 @@ func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) 
 			p.ImageUrl = nil
 		}
 		categories := parseCategoriesJSON(p.Categories)
+		costPrice := numericToFloat(p.CostPrice)
+		unit := p.Unit
+		if unit == "" {
+			unit = "pcs"
+		}
+		var defaultSupplierID *uuid.UUID
+		if p.DefaultSupplierID.Valid {
+			sid := uuid.UUID(p.DefaultSupplierID.Bytes)
+			defaultSupplierID = &sid
+		}
 		productsResponse = append(productsResponse, ProductListResponse{
-			ID:         p.ID,
-			Name:       p.Name,
-			Categories: categories,
-			ImageURL:   p.ImageUrl,
-			Price:      price,
-			Stock:      p.Stock,
+			ID:                p.ID,
+			Name:              p.Name,
+			Categories:        categories,
+			ImageURL:          p.ImageUrl,
+			Price:             price,
+			CostPrice:         costPrice,
+			Stock:             p.Stock,
+			Sku:               p.Sku,
+			Barcode:           p.Barcode,
+			Unit:              unit,
+			MinStock:          p.MinStock,
+			DefaultSupplierID: defaultSupplierID,
 		})
 	}
 
@@ -682,11 +729,24 @@ func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest
 		numericCost := pgtype.Numeric{}
 		numericCost.Scan(fmt.Sprintf("%f", req.CostPrice))
 
+		unit := req.Unit
+		if unit == "" {
+			unit = "pcs"
+		}
+		var defaultSupplier pgtype.UUID
+		if req.DefaultSupplierID != nil {
+			defaultSupplier = pgtype.UUID{Bytes: *req.DefaultSupplierID, Valid: true}
+		}
 		productParams := products_repo.CreateProductParams{
-			Name:      req.Name,
-			Price:     price,
-			Stock:     req.Stock,
-			CostPrice: numericCost,
+			Name:              req.Name,
+			Price:             price,
+			Stock:             req.Stock,
+			CostPrice:         numericCost,
+			Sku:               req.Sku,
+			Barcode:           req.Barcode,
+			Unit:              unit,
+			MinStock:          req.MinStock,
+			DefaultSupplierID: defaultSupplier,
 		}
 
 		newProduct, err = qtx.CreateProduct(ctx, productParams)
@@ -1037,4 +1097,12 @@ func (s *PrdService) RestoreProductsBulk(ctx context.Context, req RestoreBulkReq
 	})
 
 	return nil
+}
+
+func numericToFloat(n pgtype.Numeric) float64 {
+	if !n.Valid {
+		return 0
+	}
+	f, _ := n.Float64Value()
+	return f.Float64
 }

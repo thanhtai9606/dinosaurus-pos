@@ -97,9 +97,9 @@ ORDER BY cancelled_orders DESC;
 
 -- name: GetLowStockProducts :many
 SELECT
-    id, name, stock
+    id, name, stock, min_stock, sku
 FROM products
-WHERE stock <= $1
+WHERE stock <= GREATEST(min_stock, $1)
   AND deleted_at IS NULL
 ORDER BY stock ASC;
 

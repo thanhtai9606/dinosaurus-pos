@@ -33,6 +33,7 @@ import { ImageCropperDialog } from "@/components/common/ImageCropperDialog.tsx";
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StockHistoryTable } from "./StockHistoryTable"
+import { useSuppliersListQuery } from '@/lib/api/query/suppliers'
 
 
 interface VariantItem {
@@ -72,6 +73,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
 
     const productId = productToEdit?.id ?? ''
     const { data: detailProduct, isLoading: isLoadingDetail, isError: isDetailError } = useProductDetailQuery(productId)
+    const { data: suppliersData } = useSuppliersListQuery({ limit: 100 })
 
     const cropper = useImageCropper()
 
@@ -81,7 +83,12 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
             category_ids: [] as number[],
             price: 0,
             cost_price: 0,
-            stock: 0
+            stock: 0,
+            sku: '',
+            barcode: '',
+            unit: 'pcs',
+            min_stock: 0,
+            default_supplier_id: '',
         },
         validators: {
             onChange: z.object({
@@ -89,7 +96,12 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                 category_ids: z.array(z.number()).min(1, t('products.form.error_category')),
                 price: z.number().min(0),
                 cost_price: z.number().min(0),
-                stock: z.number().min(0)
+                stock: z.number().min(0),
+                sku: z.string(),
+                barcode: z.string(),
+                unit: z.string(),
+                min_stock: z.number().min(0),
+                default_supplier_id: z.string(),
             })
         },
         onSubmit: async ({ value }) => {
@@ -97,23 +109,33 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                 let productId = productToEdit?.id
 
                 if (productToEdit && productId) {
-                    const payload: InternalProductsUpdateProductRequest = {
-                        name: value.name,
-                        category_ids: value.category_ids,
-                        price: Number(value.price),
-                        cost_price: Number(value.cost_price),
-                        stock: Number(value.stock)
-                    }
-                    await updateMutation.mutateAsync({ id: productId, body: payload })
-                } else {
-                    const payload: InternalProductsCreateProductRequest = {
+                    const payload = {
                         name: value.name,
                         category_ids: value.category_ids,
                         price: Number(value.price),
                         cost_price: Number(value.cost_price),
                         stock: Number(value.stock),
-                        options: []
-                    }
+                        sku: value.sku || undefined,
+                        barcode: value.barcode || undefined,
+                        unit: value.unit || 'pcs',
+                        min_stock: Number(value.min_stock),
+                        default_supplier_id: value.default_supplier_id || undefined,
+                    } as InternalProductsUpdateProductRequest
+                    await updateMutation.mutateAsync({ id: productId, body: payload })
+                } else {
+                    const payload = {
+                        name: value.name,
+                        category_ids: value.category_ids,
+                        price: Number(value.price),
+                        cost_price: Number(value.cost_price),
+                        stock: Number(value.stock),
+                        sku: value.sku || undefined,
+                        barcode: value.barcode || undefined,
+                        unit: value.unit || 'pcs',
+                        min_stock: Number(value.min_stock),
+                        default_supplier_id: value.default_supplier_id || undefined,
+                        options: [],
+                    } as InternalProductsCreateProductRequest
                     const newProduct = await createMutation.mutateAsync(payload)
                     productId = newProduct.id
                 }
@@ -191,6 +213,12 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     form.setFieldValue('price', detailProduct?.price ?? productToEdit.price ?? 0)
                     form.setFieldValue('cost_price', detailProduct?.cost_price ?? productToEdit.cost_price ?? 0)
                     form.setFieldValue('stock', detailProduct?.stock ?? productToEdit.stock ?? 0)
+                    const inv = (detailProduct || productToEdit) as Record<string, unknown>
+                    form.setFieldValue('sku', String(inv.sku ?? ''))
+                    form.setFieldValue('barcode', String(inv.barcode ?? ''))
+                    form.setFieldValue('unit', String(inv.unit || 'pcs'))
+                    form.setFieldValue('min_stock', Number(inv.min_stock ?? 0))
+                    form.setFieldValue('default_supplier_id', String(inv.default_supplier_id ?? ''))
 
                     setPreview(detailProduct?.image_url ?? productToEdit.image_url ?? null)
 
@@ -486,6 +514,69 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                                 <p className="text-sm font-medium text-destructive">{formatError(field.state.meta.errors)}</p>
                                                             )}
                                                         </div>
+                                                    </div>
+                                                )}
+                                            />
+
+                                            <form.Field
+                                                name="sku"
+                                                children={(field) => (
+                                                    <div className="grid grid-cols-4 items-start gap-4">
+                                                        <Label className="text-right mt-3">{t('products.fields.sku')}</Label>
+                                                        <Input className="col-span-3" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                                                    </div>
+                                                )}
+                                            />
+                                            <form.Field
+                                                name="barcode"
+                                                children={(field) => (
+                                                    <div className="grid grid-cols-4 items-start gap-4">
+                                                        <Label className="text-right mt-3">{t('products.fields.barcode')}</Label>
+                                                        <Input className="col-span-3" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                                                    </div>
+                                                )}
+                                            />
+                                            <form.Field
+                                                name="unit"
+                                                children={(field) => (
+                                                    <div className="grid grid-cols-4 items-start gap-4">
+                                                        <Label className="text-right mt-3">{t('products.fields.unit')}</Label>
+                                                        <Input className="col-span-3" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                                                    </div>
+                                                )}
+                                            />
+                                            <form.Field
+                                                name="min_stock"
+                                                children={(field) => (
+                                                    <div className="grid grid-cols-4 items-start gap-4">
+                                                        <Label className="text-right mt-3">{t('products.fields.min_stock')}</Label>
+                                                        <Input
+                                                            className="col-span-3"
+                                                            type="number"
+                                                            min={0}
+                                                            value={field.state.value}
+                                                            onChange={(e) => field.handleChange(Number(e.target.value))}
+                                                        />
+                                                    </div>
+                                                )}
+                                            />
+                                            <form.Field
+                                                name="default_supplier_id"
+                                                children={(field) => (
+                                                    <div className="grid grid-cols-4 items-start gap-4">
+                                                        <Label className="text-right mt-3">{t('products.fields.default_supplier')}</Label>
+                                                        <select
+                                                            className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                            value={field.state.value}
+                                                            onChange={(e) => field.handleChange(e.target.value)}
+                                                        >
+                                                            <option value="">{t('products.fields.no_supplier')}</option>
+                                                            {(suppliersData?.suppliers || []).map((s) => (
+                                                                <option key={s.id} value={s.id}>
+                                                                    {s.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
                                                     </div>
                                                 )}
                                             />

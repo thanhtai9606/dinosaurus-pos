@@ -17,11 +17,14 @@ import { Route as LocaleDashboardIndexRouteImport } from './routes/$locale/_dash
 import { Route as LocaleDashboardAccountRouteImport } from './routes/$locale/_dashboard.account'
 import { Route as LocaleDashboardActivityLogsRouteImport } from './routes/$locale/_dashboard.activity-logs'
 import { Route as LocaleDashboardCustomersRouteImport } from './routes/$locale/_dashboard.customers'
+import { Route as LocaleDashboardInventoryRouteImport } from './routes/$locale/_dashboard.inventory'
 import { Route as LocaleDashboardOrderRouteImport } from './routes/$locale/_dashboard.order'
 import { Route as LocaleDashboardProductRouteImport } from './routes/$locale/_dashboard.product'
 import { Route as LocaleDashboardPromotionsRouteImport } from './routes/$locale/_dashboard.promotions'
 import { Route as LocaleDashboardReportsRouteImport } from './routes/$locale/_dashboard.reports'
 import { Route as LocaleDashboardSettingsRouteImport } from './routes/$locale/_dashboard.settings'
+import { Route as LocaleDashboardStockReceiptsRouteImport } from './routes/$locale/_dashboard.stock-receipts'
+import { Route as LocaleDashboardSuppliersRouteImport } from './routes/$locale/_dashboard.suppliers'
 import { Route as LocaleDashboardTransactionsRouteImport } from './routes/$locale/_dashboard.transactions'
 import { Route as LocaleDashboardUsersRouteImport } from './routes/$locale/_dashboard.users'
 
@@ -66,6 +69,12 @@ const LocaleDashboardCustomersRoute =
     path: '/customers',
     getParentRoute: () => LocaleDashboardRoute,
   } as any)
+const LocaleDashboardInventoryRoute =
+  LocaleDashboardInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => LocaleDashboardRoute,
+  } as any)
 const LocaleDashboardOrderRoute = LocaleDashboardOrderRouteImport.update({
   id: '/order',
   path: '/order',
@@ -92,6 +101,18 @@ const LocaleDashboardSettingsRoute = LocaleDashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => LocaleDashboardRoute,
 } as any)
+const LocaleDashboardStockReceiptsRoute =
+  LocaleDashboardStockReceiptsRouteImport.update({
+    id: '/stock-receipts',
+    path: '/stock-receipts',
+    getParentRoute: () => LocaleDashboardRoute,
+  } as any)
+const LocaleDashboardSuppliersRoute =
+  LocaleDashboardSuppliersRouteImport.update({
+    id: '/suppliers',
+    path: '/suppliers',
+    getParentRoute: () => LocaleDashboardRoute,
+  } as any)
 const LocaleDashboardTransactionsRoute =
   LocaleDashboardTransactionsRouteImport.update({
     id: '/transactions',
@@ -111,11 +132,14 @@ export interface FileRoutesByFullPath {
   '/$locale/account': typeof LocaleDashboardAccountRoute
   '/$locale/activity-logs': typeof LocaleDashboardActivityLogsRoute
   '/$locale/customers': typeof LocaleDashboardCustomersRoute
+  '/$locale/inventory': typeof LocaleDashboardInventoryRoute
   '/$locale/order': typeof LocaleDashboardOrderRoute
   '/$locale/product': typeof LocaleDashboardProductRoute
   '/$locale/promotions': typeof LocaleDashboardPromotionsRoute
   '/$locale/reports': typeof LocaleDashboardReportsRoute
   '/$locale/settings': typeof LocaleDashboardSettingsRoute
+  '/$locale/stock-receipts': typeof LocaleDashboardStockReceiptsRoute
+  '/$locale/suppliers': typeof LocaleDashboardSuppliersRoute
   '/$locale/transactions': typeof LocaleDashboardTransactionsRoute
   '/$locale/users': typeof LocaleDashboardUsersRoute
   '/$locale/': typeof LocaleDashboardIndexRoute
@@ -127,11 +151,14 @@ export interface FileRoutesByTo {
   '/$locale/account': typeof LocaleDashboardAccountRoute
   '/$locale/activity-logs': typeof LocaleDashboardActivityLogsRoute
   '/$locale/customers': typeof LocaleDashboardCustomersRoute
+  '/$locale/inventory': typeof LocaleDashboardInventoryRoute
   '/$locale/order': typeof LocaleDashboardOrderRoute
   '/$locale/product': typeof LocaleDashboardProductRoute
   '/$locale/promotions': typeof LocaleDashboardPromotionsRoute
   '/$locale/reports': typeof LocaleDashboardReportsRoute
   '/$locale/settings': typeof LocaleDashboardSettingsRoute
+  '/$locale/stock-receipts': typeof LocaleDashboardStockReceiptsRoute
+  '/$locale/suppliers': typeof LocaleDashboardSuppliersRoute
   '/$locale/transactions': typeof LocaleDashboardTransactionsRoute
   '/$locale/users': typeof LocaleDashboardUsersRoute
 }
@@ -144,11 +171,14 @@ export interface FileRoutesById {
   '/$locale/_dashboard/account': typeof LocaleDashboardAccountRoute
   '/$locale/_dashboard/activity-logs': typeof LocaleDashboardActivityLogsRoute
   '/$locale/_dashboard/customers': typeof LocaleDashboardCustomersRoute
+  '/$locale/_dashboard/inventory': typeof LocaleDashboardInventoryRoute
   '/$locale/_dashboard/order': typeof LocaleDashboardOrderRoute
   '/$locale/_dashboard/product': typeof LocaleDashboardProductRoute
   '/$locale/_dashboard/promotions': typeof LocaleDashboardPromotionsRoute
   '/$locale/_dashboard/reports': typeof LocaleDashboardReportsRoute
   '/$locale/_dashboard/settings': typeof LocaleDashboardSettingsRoute
+  '/$locale/_dashboard/stock-receipts': typeof LocaleDashboardStockReceiptsRoute
+  '/$locale/_dashboard/suppliers': typeof LocaleDashboardSuppliersRoute
   '/$locale/_dashboard/transactions': typeof LocaleDashboardTransactionsRoute
   '/$locale/_dashboard/users': typeof LocaleDashboardUsersRoute
   '/$locale/_dashboard/': typeof LocaleDashboardIndexRoute
@@ -162,11 +192,14 @@ export interface FileRouteTypes {
     | '/$locale/account'
     | '/$locale/activity-logs'
     | '/$locale/customers'
+    | '/$locale/inventory'
     | '/$locale/order'
     | '/$locale/product'
     | '/$locale/promotions'
     | '/$locale/reports'
     | '/$locale/settings'
+    | '/$locale/stock-receipts'
+    | '/$locale/suppliers'
     | '/$locale/transactions'
     | '/$locale/users'
     | '/$locale/'
@@ -178,11 +211,14 @@ export interface FileRouteTypes {
     | '/$locale/account'
     | '/$locale/activity-logs'
     | '/$locale/customers'
+    | '/$locale/inventory'
     | '/$locale/order'
     | '/$locale/product'
     | '/$locale/promotions'
     | '/$locale/reports'
     | '/$locale/settings'
+    | '/$locale/stock-receipts'
+    | '/$locale/suppliers'
     | '/$locale/transactions'
     | '/$locale/users'
   id:
@@ -194,11 +230,14 @@ export interface FileRouteTypes {
     | '/$locale/_dashboard/account'
     | '/$locale/_dashboard/activity-logs'
     | '/$locale/_dashboard/customers'
+    | '/$locale/_dashboard/inventory'
     | '/$locale/_dashboard/order'
     | '/$locale/_dashboard/product'
     | '/$locale/_dashboard/promotions'
     | '/$locale/_dashboard/reports'
     | '/$locale/_dashboard/settings'
+    | '/$locale/_dashboard/stock-receipts'
+    | '/$locale/_dashboard/suppliers'
     | '/$locale/_dashboard/transactions'
     | '/$locale/_dashboard/users'
     | '/$locale/_dashboard/'
@@ -267,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleDashboardCustomersRouteImport
       parentRoute: typeof LocaleDashboardRoute
     }
+    '/$locale/_dashboard/inventory': {
+      id: '/$locale/_dashboard/inventory'
+      path: '/inventory'
+      fullPath: '/$locale/inventory'
+      preLoaderRoute: typeof LocaleDashboardInventoryRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
     '/$locale/_dashboard/order': {
       id: '/$locale/_dashboard/order'
       path: '/order'
@@ -302,6 +348,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleDashboardSettingsRouteImport
       parentRoute: typeof LocaleDashboardRoute
     }
+    '/$locale/_dashboard/stock-receipts': {
+      id: '/$locale/_dashboard/stock-receipts'
+      path: '/stock-receipts'
+      fullPath: '/$locale/stock-receipts'
+      preLoaderRoute: typeof LocaleDashboardStockReceiptsRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
+    '/$locale/_dashboard/suppliers': {
+      id: '/$locale/_dashboard/suppliers'
+      path: '/suppliers'
+      fullPath: '/$locale/suppliers'
+      preLoaderRoute: typeof LocaleDashboardSuppliersRouteImport
+      parentRoute: typeof LocaleDashboardRoute
+    }
     '/$locale/_dashboard/transactions': {
       id: '/$locale/_dashboard/transactions'
       path: '/transactions'
@@ -323,11 +383,14 @@ interface LocaleDashboardRouteChildren {
   LocaleDashboardAccountRoute: typeof LocaleDashboardAccountRoute
   LocaleDashboardActivityLogsRoute: typeof LocaleDashboardActivityLogsRoute
   LocaleDashboardCustomersRoute: typeof LocaleDashboardCustomersRoute
+  LocaleDashboardInventoryRoute: typeof LocaleDashboardInventoryRoute
   LocaleDashboardOrderRoute: typeof LocaleDashboardOrderRoute
   LocaleDashboardProductRoute: typeof LocaleDashboardProductRoute
   LocaleDashboardPromotionsRoute: typeof LocaleDashboardPromotionsRoute
   LocaleDashboardReportsRoute: typeof LocaleDashboardReportsRoute
   LocaleDashboardSettingsRoute: typeof LocaleDashboardSettingsRoute
+  LocaleDashboardStockReceiptsRoute: typeof LocaleDashboardStockReceiptsRoute
+  LocaleDashboardSuppliersRoute: typeof LocaleDashboardSuppliersRoute
   LocaleDashboardTransactionsRoute: typeof LocaleDashboardTransactionsRoute
   LocaleDashboardUsersRoute: typeof LocaleDashboardUsersRoute
   LocaleDashboardIndexRoute: typeof LocaleDashboardIndexRoute
@@ -337,11 +400,14 @@ const LocaleDashboardRouteChildren: LocaleDashboardRouteChildren = {
   LocaleDashboardAccountRoute: LocaleDashboardAccountRoute,
   LocaleDashboardActivityLogsRoute: LocaleDashboardActivityLogsRoute,
   LocaleDashboardCustomersRoute: LocaleDashboardCustomersRoute,
+  LocaleDashboardInventoryRoute: LocaleDashboardInventoryRoute,
   LocaleDashboardOrderRoute: LocaleDashboardOrderRoute,
   LocaleDashboardProductRoute: LocaleDashboardProductRoute,
   LocaleDashboardPromotionsRoute: LocaleDashboardPromotionsRoute,
   LocaleDashboardReportsRoute: LocaleDashboardReportsRoute,
   LocaleDashboardSettingsRoute: LocaleDashboardSettingsRoute,
+  LocaleDashboardStockReceiptsRoute: LocaleDashboardStockReceiptsRoute,
+  LocaleDashboardSuppliersRoute: LocaleDashboardSuppliersRoute,
   LocaleDashboardTransactionsRoute: LocaleDashboardTransactionsRoute,
   LocaleDashboardUsersRoute: LocaleDashboardUsersRoute,
   LocaleDashboardIndexRoute: LocaleDashboardIndexRoute,

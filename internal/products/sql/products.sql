@@ -8,10 +8,15 @@ INSERT INTO products (
     image_url,
     price,
     stock,
-    cost_price
+    cost_price,
+    sku,
+    barcode,
+    unit,
+    min_stock,
+    default_supplier_id
 ) VALUES (
-             $1, $2, $3, $4, $5
-         ) RETURNING *;
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+) RETURNING *;
 
 -- name: GetProductWithOptions :one
 -- Retrieves a single product and aggregates its options into a JSON array.
@@ -42,6 +47,12 @@ SELECT
     p.price,
     p.stock,
     p.image_url,
+    p.sku,
+    p.barcode,
+    p.unit,
+    p.min_stock,
+    p.cost_price,
+    p.default_supplier_id,
     COALESCE(
         (SELECT json_agg(c.*) 
          FROM product_categories pc 
@@ -54,10 +65,12 @@ FROM
 WHERE
     (sqlc.narg(category_id)::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = sqlc.narg(category_id)))
   AND
-    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%')
+    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%' OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%' OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%')
+  AND
+    (sqlc.narg(low_stock_only)::bool IS NOT TRUE OR p.stock <= p.min_stock)
   AND p.deleted_at IS NULL
 ORDER BY
-    p.name ASC
+    p.stock ASC, p.name ASC
 LIMIT $1 OFFSET $2;
 
 -- name: UpdateProduct :one
@@ -68,7 +81,13 @@ SET
     image_url = COALESCE(sqlc.narg(image_url), image_url),
     price = COALESCE(sqlc.narg(price), price),
     stock = COALESCE(sqlc.narg(stock), stock),
-    cost_price = COALESCE(sqlc.narg(cost_price), cost_price)
+    cost_price = COALESCE(sqlc.narg(cost_price), cost_price),
+    sku = COALESCE(sqlc.narg(sku), sku),
+    barcode = COALESCE(sqlc.narg(barcode), barcode),
+    unit = COALESCE(sqlc.narg(unit), unit),
+    min_stock = COALESCE(sqlc.narg(min_stock), min_stock),
+    default_supplier_id = COALESCE(sqlc.narg(default_supplier_id), default_supplier_id),
+    updated_at = NOW()
 WHERE
     id = sqlc.arg(id)
 RETURNING *;
@@ -84,7 +103,9 @@ SELECT count(*) FROM products p
 WHERE
     (sqlc.narg(category_id)::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = sqlc.narg(category_id)))
   AND
-    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%')
+    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%' OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%' OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%')
+  AND
+    (sqlc.narg(low_stock_only)::bool IS NOT TRUE OR p.stock <= p.min_stock)
   AND p.deleted_at IS NULL;
 
 
@@ -267,8 +288,14 @@ RETURNING *;
 
 -- name: AddProductStock :one
 UPDATE products
-SET stock = stock + sqlc.arg(quantity)
-WHERE id = sqlc.arg(id)
+SET stock = stock + sqlc.arg(quantity), updated_at = NOW()
+WHERE id = sqlc.arg(id) AND deleted_at IS NULL
+RETURNING *;
+
+-- name: SetProductCostPrice :one
+UPDATE products
+SET cost_price = $2, updated_at = NOW()
+WHERE id = $1 AND deleted_at IS NULL
 RETURNING *;
 
 -- name: GetProductsForUpdate :many

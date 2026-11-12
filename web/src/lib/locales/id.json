@@ -87,7 +87,10 @@
         "settings": "Pengaturan",
         "account": "Akun",
         "activity_logs": "Log Aktivitas",
-        "customers": "Pelanggan"
+        "customers": "Pelanggan",
+        "inventory": "Inventaris",
+        "suppliers": "Supplier",
+        "stock_receipts": "Penerimaan stok"
     },
     "user_menu": {
         "profile": "Profil",
@@ -630,6 +633,14 @@
             "restore_success": "Produk berhasil dipulihkan",
             "restore_error": "Gagal memulihkan produk"
         },
+        "fields": {
+            "sku": "SKU",
+            "barcode": "Barcode",
+            "unit": "Satuan",
+            "min_stock": "Stok minimum",
+            "default_supplier": "Supplier default",
+            "no_supplier": "Tidak ada"
+        },
         "stock_history": {
             "no_history": "Tidak ada riwayat stok ditemukan.",
             "type_sale": "Penjualan",
@@ -861,6 +872,75 @@
         "create_success": "Kategori berhasil dibuat",
         "update_success": "Kategori berhasil diperbarui",
         "delete_success": "Kategori berhasil dihapus"
+    },
+    "suppliers": {
+        "title": "Supplier",
+        "search_placeholder": "Cari nama atau kode…",
+        "actions": { "add": "Tambah supplier" },
+        "fields": {
+            "code": "Kode",
+            "name": "Nama",
+            "phone": "Telepon",
+            "email": "Email",
+            "address": "Alamat",
+            "tax_id": "NPWP",
+            "is_active": "Aktif"
+        },
+        "form": {
+            "create_title": "Supplier baru",
+            "edit_title": "Edit supplier"
+        },
+        "messages": {
+            "create_success": "Supplier dibuat",
+            "create_failed": "Gagal membuat: {{message}}",
+            "update_success": "Supplier diperbarui",
+            "update_failed": "Gagal memperbarui: {{message}}",
+            "delete_success": "Supplier dihapus",
+            "delete_failed": "Gagal menghapus: {{message}}"
+        }
+    },
+    "stockReceipts": {
+        "title": "Penerimaan stok",
+        "actions": {
+            "add": "Buat penerimaan",
+            "add_line": "Tambah baris",
+            "complete": "Selesaikan"
+        },
+        "fields": {
+            "receipt_no": "No. penerimaan",
+            "supplier": "Supplier",
+            "supplier_placeholder": "Pilih supplier",
+            "status": "Status",
+            "total": "Total",
+            "product": "Produk",
+            "quantity": "Qty",
+            "unit_cost": "Harga pokok",
+            "note": "Catatan"
+        },
+        "status": {
+            "draft": "Draf",
+            "completed": "Selesai",
+            "cancelled": "Dibatalkan"
+        },
+        "form": {
+            "create_title": "Penerimaan baru",
+            "edit_title": "Edit penerimaan",
+            "cost_note": "Saat selesai, harga pokok baris memperbarui cost_price produk (MVP)."
+        },
+        "messages": {
+            "create_success": "Penerimaan dibuat",
+            "update_success": "Penerimaan disimpan",
+            "complete_success": "Stok diperbarui",
+            "complete_failed": "Gagal menyelesaikan",
+            "cancel_success": "Penerimaan dibatalkan"
+        }
+    },
+    "inventory": {
+        "title": "Ringkasan inventaris",
+        "description": "Stok, SKU, filter stok rendah.",
+        "low_stock_only": "Hanya stok rendah",
+        "create_receipt": "Buat penerimaan",
+        "link_from_receipts": "Lihat inventaris"
     },
     "customers": {
         "title": "Pelanggan",

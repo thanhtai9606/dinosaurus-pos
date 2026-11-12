@@ -121,7 +121,7 @@ func (s *SettingsService) UpdateBranding(ctx context.Context, req UpdateBranding
 	}
 
 	// Activity Log
-	actorID := ctx.Value("user_id").(uuid.UUID)
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
 	logDetails := map[string]interface{}{
 		"app_name":    req.AppName,
 		"app_logo":    req.AppLogo,
@@ -172,7 +172,7 @@ func (s *SettingsService) UpdateLogo(ctx context.Context, data []byte, filename 
 	}
 
 	// Activity Log
-	actorID := ctx.Value("user_id").(uuid.UUID)
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
 	s.activitylog.Log(
 		ctx,
 		actorID,
@@ -275,7 +275,7 @@ func (s *SettingsService) UpdatePrinterSettings(ctx context.Context, req UpdateP
 	}
 
 	// Activity Log
-	actorID := ctx.Value("user_id").(uuid.UUID)
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
 	s.activitylog.Log(
 		ctx,
 		actorID,
@@ -365,7 +365,7 @@ func (s *SettingsService) UpdateFinancialSettings(ctx context.Context, req Updat
 		return nil, txErr
 	}
 
-	actorID := ctx.Value("user_id").(uuid.UUID)
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
 	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
 		"currency": req.Currency, "tax_rate": req.TaxRate, "service_charge_rate": req.ServiceChargeRate,
 	})
@@ -417,7 +417,7 @@ func (s *SettingsService) UpdateInvoiceSettings(ctx context.Context, req UpdateI
 		return nil, txErr
 	}
 
-	actorID := ctx.Value("user_id").(uuid.UUID)
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
 	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
 		"invoice_prefix": req.InvoicePrefix,
 	})

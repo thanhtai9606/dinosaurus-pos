@@ -41,7 +41,8 @@ export function FinancialSettingsCard() {
             },
             {
                 onSuccess: () => toast.success(t('settings.financial.update_success')),
-                onError: () => toast.error(t('settings.financial.update_error')),
+                onError: (err: { response?: { data?: { message?: string } } }) =>
+                    toast.error(err.response?.data?.message || t('settings.financial.update_error')),
             }
         )
     }

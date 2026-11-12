@@ -43,7 +43,8 @@ export function InvoiceSettingsCard() {
             },
             {
                 onSuccess: () => toast.success(t('settings.invoice.update_success')),
-                onError: () => toast.error(t('settings.invoice.update_error')),
+                onError: (err: { response?: { data?: { message?: string } } }) =>
+                    toast.error(err.response?.data?.message || t('settings.invoice.update_error')),
             }
         )
     }

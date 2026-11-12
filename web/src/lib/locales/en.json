@@ -733,8 +733,7 @@
             "unit": "Unit",
             "min_stock": "Min. stock",
             "default_supplier": "Default supplier",
-            "no_supplier": "None",
-            "price": "Sell price"
+            "no_supplier": "None"
         },
         "sale_units": {
             "title": "Sale units & conversion",

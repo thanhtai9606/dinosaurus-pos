@@ -739,8 +739,7 @@
             "unit": "Đơn vị",
             "min_stock": "Tồn tối thiểu",
             "default_supplier": "NCC mặc định",
-            "no_supplier": "Không chọn",
-            "price": "Giá bán"
+            "no_supplier": "Không chọn"
         },
         "sale_units": {
             "title": "Đơn vị bán & quy đổi",

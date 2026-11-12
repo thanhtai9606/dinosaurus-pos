@@ -722,8 +722,7 @@
             "unit": "Satuan",
             "min_stock": "Stok minimum",
             "default_supplier": "Supplier default",
-            "no_supplier": "Tidak ada",
-            "price": "Harga jual"
+            "no_supplier": "Tidak ada"
         },
         "sale_units": {
             "title": "Satuan jual & konversi",

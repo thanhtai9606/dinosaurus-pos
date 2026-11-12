@@ -52,7 +52,7 @@ export function ProductSaleUnitsEditor({ units, onChange, t }: Props) {
 
     return (
         <div className="space-y-4 rounded-lg border p-4">
-            <p className="text-sm font-semibold">{t('products.sale_units.title', 'Đơn vị bán')}</p>
+            <p className="text-sm font-semibold">{t('products.sale_units.title')}</p>
             <p className="text-xs text-muted-foreground">{t('products.sale_units.hint')}</p>
 
             <div className="grid gap-3 rounded-md bg-muted/30 p-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -61,7 +61,7 @@ export function ProductSaleUnitsEditor({ units, onChange, t }: Props) {
                     <Input value={base.name} onChange={(e) => setBase({ name: e.target.value })} />
                 </div>
                 <div>
-                    <Label>{t('products.fields.price')}</Label>
+                    <Label>{t('products.form.price')}</Label>
                     <Input
                         type="number"
                         min={0}
@@ -96,7 +96,7 @@ export function ProductSaleUnitsEditor({ units, onChange, t }: Props) {
                         />
                     </div>
                     <div>
-                        <Label>{t('products.fields.price')}</Label>
+                        <Label>{t('products.form.price')}</Label>
                         <Input
                             type="number"
                             min={0}

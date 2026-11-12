@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import type { LucideIcon } from 'lucide-react'
 import {
     FileText,
     LayoutDashboard,
@@ -6,7 +7,6 @@ import {
     Settings,
     ShoppingCart,
     User as UserIcon,
-    Receipt,
     Tag,
     ActivityIcon,
     Users,
@@ -15,175 +15,189 @@ import {
     Warehouse,
     Store,
     HandCoins,
+    Undo2,
+    Receipt,
+    ShoppingBag,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
-export type DashboardMenuItem = {
+type Role = POSKasirInternalUserRepositoryUserRole
+
+export type DashboardMenuLink = {
+    type: 'link'
     label: string
-    icon: any
+    icon: LucideIcon
     to: string
-    allowedRoles: POSKasirInternalUserRepositoryUserRole[]
+    allowedRoles: Role[]
 }
 
-export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserRole) {
+export type DashboardMenuGroup = {
+    type: 'group'
+    label: string
+    icon: LucideIcon
+    allowedRoles: Role[]
+    children: Omit<DashboardMenuLink, 'type'>[]
+}
+
+export type DashboardMenuEntry = DashboardMenuLink | DashboardMenuGroup
+
+const cashierRoles: Role[] = [
+    POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+    POSKasirInternalUserRepositoryUserRole.UserRoleManager,
+    POSKasirInternalUserRepositoryUserRole.UserRoleCashier,
+]
+
+const managerRoles: Role[] = [
+    POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+    POSKasirInternalUserRepositoryUserRole.UserRoleManager,
+]
+
+function filterEntries(entries: DashboardMenuEntry[], userRole?: Role): DashboardMenuEntry[] {
+    if (!userRole) return []
+    const result: DashboardMenuEntry[] = []
+    for (const entry of entries) {
+        if (entry.type === 'link') {
+            if (entry.allowedRoles.includes(userRole)) result.push(entry)
+            continue
+        }
+        const children = entry.children.filter((c) => c.allowedRoles.includes(userRole))
+        if (children.length > 0) {
+            result.push({ ...entry, children })
+        }
+    }
+    return result
+}
+
+export function useNavigationMenu(userRole?: Role) {
     const { t } = useTranslation()
 
-    const menuItems: DashboardMenuItem[] = [
+    const menuItems: DashboardMenuEntry[] = [
         {
+            type: 'link',
             label: t('sidebar.summary'),
             icon: LayoutDashboard,
             to: '/',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
+            allowedRoles: cashierRoles,
         },
         {
-            label: t('sidebar.pos'),
-            icon: ShoppingCart,
-            to: '/order',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
+            type: 'group',
+            label: t('sidebar.sales'),
+            icon: ShoppingBag,
+            allowedRoles: cashierRoles,
+            children: [
+                {
+                    label: t('sidebar.sales_pos'),
+                    icon: ShoppingCart,
+                    to: '/order',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.retail_pos'),
+                    icon: Store,
+                    to: '/retail-pos',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.sales_returns'),
+                    icon: Undo2,
+                    to: '/sales-returns',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.sales_orders'),
+                    icon: Receipt,
+                    to: '/transactions',
+                    allowedRoles: cashierRoles,
+                },
+            ],
         },
         {
-            label: t('sidebar.retail_pos'),
-            icon: Store,
-            to: '/retail-pos',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
-        },
-        {
-            label: t('sidebar.transactions'),
-            icon: Receipt,
-            to: '/transactions',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
-        },
-        {
+            type: 'link',
             label: t('sidebar.product'),
             icon: Package,
             to: '/product',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
+            allowedRoles: cashierRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.inventory'),
             icon: Warehouse,
             to: '/inventory',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager
-            ]
+            allowedRoles: managerRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.suppliers'),
             icon: Truck,
             to: '/suppliers',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager
-            ]
+            allowedRoles: managerRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.stock_receipts'),
             icon: ClipboardList,
             to: '/stock-receipts',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager
-            ]
+            allowedRoles: managerRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.supplier_debts'),
             icon: HandCoins,
             to: '/supplier-debts',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager
-            ]
+            allowedRoles: managerRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.customer_debts'),
             icon: HandCoins,
             to: '/customer-debts',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager
-            ]
+            allowedRoles: managerRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.promotions'),
             icon: Tag,
             to: '/promotions',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
+            allowedRoles: cashierRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.reports'),
             icon: FileText,
             to: '/reports',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin
-            ]
+            allowedRoles: [POSKasirInternalUserRepositoryUserRole.UserRoleAdmin],
         },
         {
+            type: 'link',
             label: t('sidebar.customers', 'Customers'),
             icon: Users,
             to: '/customers',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
+            allowedRoles: cashierRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.users'),
             icon: UserIcon,
             to: '/users',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager
-            ]
+            allowedRoles: managerRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.settings'),
             icon: Settings,
             to: '/settings',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
-            ]
+            allowedRoles: cashierRoles,
         },
         {
+            type: 'link',
             label: t('sidebar.activity_logs'),
             icon: ActivityIcon,
             to: '/activity-logs',
-            allowedRoles: [
-                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-            ]
-        }
+            allowedRoles: [POSKasirInternalUserRepositoryUserRole.UserRoleAdmin],
+        },
     ]
 
-    const filteredMenu = menuItems.filter(item =>
-        userRole && item.allowedRoles.includes(userRole)
-    )
+    const filteredMenu = filterEntries(menuItems, userRole)
 
     return { menuItems, filteredMenu }
 }

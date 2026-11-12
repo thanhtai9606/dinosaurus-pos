@@ -5,12 +5,14 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/co
 import { SettingsPanel } from "@/components/SettingsPanel.tsx"
 import { ShiftControl } from '@/components/dashboard/ShiftControl'
 import { DashboardUserMenu } from './DashboardUserMenu'
+import { DashboardNavMenu } from './DashboardNavMenu'
+import type { DashboardMenuEntry } from '@/hooks/useNavigationMenu'
 import { cn } from '@/lib/utils'
 
 interface DashboardMobileNavProps {
     t: any
     branding: any
-    filteredMenu: any[]
+    filteredMenu: DashboardMenuEntry[]
     user: any
     userRole?: string
     handleLogout: () => void
@@ -61,21 +63,7 @@ export function DashboardMobileNav({
                 {/* Navigation - scrollable */}
                 <nav className="flex-1 overflow-y-auto py-3 px-3">
                     <div className="grid gap-1">
-                        {filteredMenu.map((item) => (
-                            <Link
-                                key={item.to}
-                                to={item.to}
-                                activeOptions={{ exact: item.to === '/' }}
-                                className={cn(
-                                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200",
-                                    "hover:bg-primary/5 hover:text-primary",
-                                    "[&.active]:bg-primary [&.active]:text-primary-foreground [&.active]:shadow-md [&.active]:shadow-primary/20"
-                                )}
-                            >
-                                <item.icon className="h-[18px] w-[18px]" />
-                                {item.label}
-                            </Link>
-                        ))}
+                        <DashboardNavMenu items={filteredMenu} />
                     </div>
                 </nav>
 

@@ -24,6 +24,7 @@ import { Route as DashboardProductRouteImport } from './routes/_dashboard.produc
 import { Route as DashboardPromotionsRouteImport } from './routes/_dashboard.promotions'
 import { Route as DashboardReportsRouteImport } from './routes/_dashboard.reports'
 import { Route as DashboardRetailPosRouteImport } from './routes/_dashboard.retail-pos'
+import { Route as DashboardSalesReturnsRouteImport } from './routes/_dashboard.sales-returns'
 import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
 import { Route as DashboardStockReceiptsRouteImport } from './routes/_dashboard.stock-receipts'
 import { Route as DashboardSupplierDebtsRouteImport } from './routes/_dashboard.supplier-debts'
@@ -106,6 +107,11 @@ const DashboardRetailPosRoute = DashboardRetailPosRouteImport.update({
   path: '/retail-pos',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSalesReturnsRoute = DashboardSalesReturnsRouteImport.update({
+  id: '/sales-returns',
+  path: '/sales-returns',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/promotions': typeof DashboardPromotionsRoute
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
+  '/sales-returns': typeof DashboardSalesReturnsRoute
   '/settings': typeof DashboardSettingsRoute
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
   '/supplier-debts': typeof DashboardSupplierDebtsRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/promotions': typeof DashboardPromotionsRoute
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
+  '/sales-returns': typeof DashboardSalesReturnsRoute
   '/settings': typeof DashboardSettingsRoute
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
   '/supplier-debts': typeof DashboardSupplierDebtsRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_dashboard/promotions': typeof DashboardPromotionsRoute
   '/_dashboard/reports': typeof DashboardReportsRoute
   '/_dashboard/retail-pos': typeof DashboardRetailPosRoute
+  '/_dashboard/sales-returns': typeof DashboardSalesReturnsRoute
   '/_dashboard/settings': typeof DashboardSettingsRoute
   '/_dashboard/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
   '/_dashboard/supplier-debts': typeof DashboardSupplierDebtsRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/promotions'
     | '/reports'
     | '/retail-pos'
+    | '/sales-returns'
     | '/settings'
     | '/stock-receipts'
     | '/supplier-debts'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/promotions'
     | '/reports'
     | '/retail-pos'
+    | '/sales-returns'
     | '/settings'
     | '/stock-receipts'
     | '/supplier-debts'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/_dashboard/promotions'
     | '/_dashboard/reports'
     | '/_dashboard/retail-pos'
+    | '/_dashboard/sales-returns'
     | '/_dashboard/settings'
     | '/_dashboard/stock-receipts'
     | '/_dashboard/supplier-debts'
@@ -400,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRetailPosRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/sales-returns': {
+      id: '/_dashboard/sales-returns'
+      path: '/sales-returns'
+      fullPath: '/sales-returns'
+      preLoaderRoute: typeof DashboardSalesReturnsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/settings': {
       id: '/_dashboard/settings'
       path: '/settings'
@@ -488,6 +507,7 @@ interface DashboardRouteChildren {
   DashboardPromotionsRoute: typeof DashboardPromotionsRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardRetailPosRoute: typeof DashboardRetailPosRoute
+  DashboardSalesReturnsRoute: typeof DashboardSalesReturnsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardStockReceiptsRoute: typeof DashboardStockReceiptsRouteWithChildren
   DashboardSupplierDebtsRoute: typeof DashboardSupplierDebtsRoute
@@ -508,6 +528,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardPromotionsRoute: DashboardPromotionsRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardRetailPosRoute: DashboardRetailPosRoute,
+  DashboardSalesReturnsRoute: DashboardSalesReturnsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardStockReceiptsRoute: DashboardStockReceiptsRouteWithChildren,
   DashboardSupplierDebtsRoute: DashboardSupplierDebtsRoute,

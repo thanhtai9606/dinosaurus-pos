@@ -6,13 +6,15 @@ import { cn } from '@/lib/utils'
 import { SettingsPanel } from "@/components/SettingsPanel.tsx"
 import { ShiftControl } from '@/components/dashboard/ShiftControl'
 import { DashboardUserMenu } from '@/components/dashboard/DashboardUserMenu'
+import { DashboardNavMenu } from '@/components/dashboard/DashboardNavMenu'
+import type { DashboardMenuEntry } from '@/hooks/useNavigationMenu'
 
 interface DashboardSidebarProps {
     t: any
     branding: any
     isSidebarCollapsed: boolean
     setIsSidebarCollapsed: (collapsed: boolean) => void
-    filteredMenu: any[]
+    filteredMenu: DashboardMenuEntry[]
     user: any
     userRole?: string
     handleLogout: () => void
@@ -61,30 +63,7 @@ export function DashboardSidebar({
                 <div className="flex-1 py-2">
                     <TooltipProvider delayDuration={0}>
                         <nav className="grid items-start px-3 text-sm font-medium gap-1">
-                            {filteredMenu.map((item) => (
-                                <Tooltip key={item.to}>
-                                    <TooltipTrigger asChild>
-                                        <Link
-                                            to={item.to}
-                                            activeOptions={{ exact: item.to === '/' }}
-                                            className={cn(
-                                                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-muted-foreground transition-all duration-200",
-                                                "hover:bg-primary/5 hover:text-primary",
-                                                "[&.active]:bg-primary [&.active]:text-primary-foreground [&.active]:shadow-md [&.active]:shadow-primary/20",
-                                                isSidebarCollapsed && "justify-center px-2"
-                                            )}
-                                        >
-                                            <item.icon className={cn("h-[18px] w-[18px]", isSidebarCollapsed ? "h-5 w-5" : "")} />
-                                            {!isSidebarCollapsed && <span>{item.label}</span>}
-                                        </Link>
-                                    </TooltipTrigger>
-                                    {isSidebarCollapsed && (
-                                        <TooltipContent side="right">
-                                            {item.label}
-                                        </TooltipContent>
-                                    )}
-                                </Tooltip>
-                            ))}
+                            <DashboardNavMenu items={filteredMenu} isSidebarCollapsed={isSidebarCollapsed} />
                         </nav>
                     </TooltipProvider>
                 </div>

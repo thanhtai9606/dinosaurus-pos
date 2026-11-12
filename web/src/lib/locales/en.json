@@ -118,6 +118,14 @@
         "field_line": "Line total",
         "col_queue": "Order no. (SO)",
         "search_placeholder": "SO-20251112-0001, order code…",
+        "view": {
+            "list_label": "List display",
+            "list_table": "Table",
+            "list_cards": "Cards",
+            "detail_label": "Detail display",
+            "detail_classic": "Full detail (table)",
+            "detail_receipt": "Receipt (go-pos style)"
+        },
         "col_time": "Date & time",
         "section": {
             "summary": "Order info",

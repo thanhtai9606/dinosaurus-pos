@@ -13,7 +13,14 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SalesOrdersTable } from '@/components/sales-orders/SalesOrdersTable'
+import { SalesOrdersCardGrid } from '@/components/sales-orders/SalesOrdersCardGrid'
+import { SalesOrdersListViewToggle } from '@/components/sales-orders/SalesOrdersViewToggle'
 import { OrderDetailDialog } from '@/components/sales-orders/OrderDetailDialog'
+import {
+    getSalesOrdersListView,
+    setSalesOrdersListView,
+    type SalesOrdersListView,
+} from '@/lib/ui/viewPreferences'
 
 const searchSchema = z.object({
     page: z.number().catch(1),
@@ -58,6 +65,12 @@ function SalesOrdersPage() {
 
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearch = useDebounce(searchTerm, 400)
+    const [listView, setListView] = useState<SalesOrdersListView>(() => getSalesOrdersListView())
+
+    const handleListViewChange = (view: SalesOrdersListView) => {
+        setListView(view)
+        setSalesOrdersListView(view)
+    }
 
     const { data, isLoading, isFetching } = useQuery(
         ordersListQueryOptions({
@@ -97,7 +110,8 @@ function SalesOrdersPage() {
                     </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                         <Input
                             className="max-w-md"
                             placeholder={t('salesOrders.search_placeholder')}
@@ -128,6 +142,12 @@ function SalesOrdersPage() {
                                 ))}
                             </SelectContent>
                         </Select>
+                        </div>
+                        <SalesOrdersListViewToggle
+                            value={listView}
+                            onChange={handleListViewChange}
+                            t={t}
+                        />
                     </div>
 
                     <Tabs
@@ -150,18 +170,33 @@ function SalesOrdersPage() {
                         </TabsList>
                     </Tabs>
 
-                    <SalesOrdersTable
-                        orders={displayedOrders}
-                        isLoading={isLoading}
-                        userMap={userMap}
-                        t={t}
-                        onRowClick={(order) => {
-                            if (order.id) {
-                                setDetailId(order.id)
-                                setDetailOpen(true)
-                            }
-                        }}
-                    />
+                    {listView === 'cards' ? (
+                        <SalesOrdersCardGrid
+                            orders={displayedOrders}
+                            isLoading={isLoading}
+                            userMap={userMap}
+                            t={t}
+                            onOrderClick={(order) => {
+                                if (order.id) {
+                                    setDetailId(order.id)
+                                    setDetailOpen(true)
+                                }
+                            }}
+                        />
+                    ) : (
+                        <SalesOrdersTable
+                            orders={displayedOrders}
+                            isLoading={isLoading}
+                            userMap={userMap}
+                            t={t}
+                            onRowClick={(order) => {
+                                if (order.id) {
+                                    setDetailId(order.id)
+                                    setDetailOpen(true)
+                                }
+                            }}
+                        />
+                    )}
 
                     <ListPagination
                         pagination={pagination}

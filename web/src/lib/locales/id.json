@@ -120,6 +120,14 @@
         "field_line": "Subtotal",
         "col_queue": "No. pesanan (SO)",
         "search_placeholder": "SO-20251112-0001, kode pesanan…",
+        "view": {
+            "list_label": "Tampilan daftar",
+            "list_table": "Tabel",
+            "list_cards": "Kartu",
+            "detail_label": "Tampilan detail",
+            "detail_classic": "Detail lengkap",
+            "detail_receipt": "Struk (gaya go-pos)"
+        },
         "col_time": "Waktu",
         "section": {
             "summary": "Info pesanan",

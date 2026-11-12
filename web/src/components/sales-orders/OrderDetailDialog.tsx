@@ -36,36 +36,18 @@ import { CancellationDialog } from '@/components/transactions/CancellationDialog
 import { RefundDialog } from '@/components/transactions/RefundDialog'
 import { POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 import type { InternalOrdersUpdateOrderItemsRequest } from '@/lib/api/generated'
-
-type OrderItemRow = {
-    id?: string
-    product_id?: string
-    product_name?: string
-    product_code?: string
-    barcode?: string
-    sku?: string
-    sale_unit_name?: string
-    quantity?: number
-    price_at_sale?: number
-    discount_amount?: number
-    net_subtotal?: number
-    line_total?: number
-    subtotal?: number
-    options?: Array<{ product_option_id?: string | number; option_name?: string }>
-}
-
-function orderItemCode(item: OrderItemRow) {
-    return item.product_code || item.barcode || item.sku || '—'
-}
-
-function orderItemLineTotal(item: OrderItemRow) {
-    if (item.net_subtotal != null) return item.net_subtotal
-    if (item.subtotal != null) {
-        const disc = item.discount_amount ?? 0
-        return disc > 0 ? Math.max(0, item.subtotal - disc) : item.subtotal
-    }
-    return item.line_total ?? 0
-}
+import {
+    getSalesOrdersDetailView,
+    setSalesOrdersDetailView,
+    type SalesOrdersDetailView,
+} from '@/lib/ui/viewPreferences'
+import { OrderDetailReceiptView } from '@/components/sales-orders/OrderDetailReceiptView'
+import { SalesOrdersDetailViewToggle } from '@/components/sales-orders/SalesOrdersViewToggle'
+import {
+    orderItemCode,
+    orderItemLineTotal,
+    type OrderItemRow,
+} from '@/components/sales-orders/orderDetailShared'
 
 type OrderClipboardSource = {
     id?: string
@@ -170,6 +152,13 @@ export function OrderDetailDialog({
     const [cancelNotes, setCancelNotes] = useState('')
     const [refundOpen, setRefundOpen] = useState(false)
     const [refundReason, setRefundReason] = useState('')
+    const [detailView, setDetailView] = useState<SalesOrdersDetailView>(() => getSalesOrdersDetailView())
+
+    const handleDetailViewChange = (view: SalesOrdersDetailView) => {
+        setDetailView(view)
+        setSalesOrdersDetailView(view)
+        if (view === 'receipt') setAdjustMode(false)
+    }
 
     useEffect(() => {
         if (!open) {
@@ -282,8 +271,14 @@ export function OrderDetailDialog({
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="flex max-h-[92vh] w-[min(96rem,calc(100vw-2rem))] flex-col gap-4 overflow-hidden sm:max-w-6xl">
-                    <DialogHeader>
+                <DialogContent
+                    className={
+                        detailView === 'receipt'
+                            ? 'flex max-h-[92vh] flex-col gap-4 overflow-hidden sm:max-w-lg'
+                            : 'flex max-h-[92vh] w-[min(96rem,calc(100vw-2rem))] flex-col gap-4 overflow-hidden sm:max-w-6xl'
+                    }
+                >
+                    <DialogHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
                         <DialogTitle className="flex flex-wrap items-center gap-2">
                             {t('salesOrders.detail_title')}
                             {displayOrderNo && (
@@ -297,6 +292,13 @@ export function OrderDetailDialog({
                                 </Badge>
                             )}
                         </DialogTitle>
+                        {order && !isLoading ? (
+                            <SalesOrdersDetailViewToggle
+                                value={detailView}
+                                onChange={handleDetailViewChange}
+                                t={t}
+                            />
+                        ) : null}
                     </DialogHeader>
 
                     {isLoading ? (
@@ -309,6 +311,18 @@ export function OrderDetailDialog({
                         </p>
                     ) : (
                         <>
+                            {detailView === 'receipt' ? (
+                                <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                                    <OrderDetailReceiptView
+                                        order={order}
+                                        customerName={customerDisplayName}
+                                        customerCode={customer?.code}
+                                        cashierName={cashierDisplayName}
+                                        formatMoney={formatMoney}
+                                        t={t}
+                                    />
+                                </div>
+                            ) : (
                             <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
                                 <section className="rounded-lg border bg-muted/30 p-4">
                                     <h3 className="mb-3 text-sm font-semibold">
@@ -550,6 +564,7 @@ export function OrderDetailDialog({
                                     </dl>
                                 </section>
                             </div>
+                            )}
 
                             <DialogFooter className="flex flex-wrap gap-2 sm:justify-between">
                                 <div className="flex flex-wrap gap-2">
@@ -575,7 +590,7 @@ export function OrderDetailDialog({
                                     )}
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {canAdjust && !adjustMode && (
+                                    {canAdjust && !adjustMode && detailView === 'classic' && (
                                         <Button
                                             type="button"
                                             variant="secondary"

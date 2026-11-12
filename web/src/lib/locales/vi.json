@@ -120,6 +120,14 @@
         "field_line": "Thành tiền",
         "col_queue": "Mã đơn (SO)",
         "search_placeholder": "SO-20251112-0001, mã đơn…",
+        "view": {
+            "list_label": "Cách hiển thị danh sách",
+            "list_table": "Bảng",
+            "list_cards": "Thẻ",
+            "detail_label": "Cách hiển thị chi tiết",
+            "detail_classic": "Chi tiết đầy đủ (bảng)",
+            "detail_receipt": "Biên lai (go-pos)"
+        },
         "col_time": "Thời gian",
         "section": {
             "summary": "Thông tin đơn",

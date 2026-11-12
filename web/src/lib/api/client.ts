@@ -18,6 +18,10 @@ import {
 
 const BASE_PATH = import.meta.env.VITE_API_BASE || '/api/v1'
 
+function isLoginPath(pathname: string): boolean {
+    return pathname === '/login' || pathname.endsWith('/login')
+}
+
 export const axiosInstance = axios.create({
     baseURL: BASE_PATH,
     withCredentials: true,
@@ -36,21 +40,17 @@ axiosInstance.interceptors.response.use(
                 return axiosInstance(originalRequest);
             } catch (refreshError) {
                 console.error("Token refresh failed. Redirecting to login...", refreshError);
-                if (!window.location.pathname.includes('/login')) {
-                    const pathSegments = window.location.pathname.split('/').filter(Boolean);
-                    const locale = (pathSegments.length > 0 && pathSegments[0].length === 2) ? pathSegments[0] : 'id';
-                    window.location.href = `/${locale}/login`;
+                if (!isLoginPath(window.location.pathname)) {
+                    window.location.replace('/login');
                 }
                 return Promise.reject(refreshError);
             }
         }
 
-        if (error.response?.status === 401 && !window.location.pathname.includes('/login') && !originalRequest.url?.includes('/auth/login')) {
+        if (error.response?.status === 401 && !isLoginPath(window.location.pathname) && !originalRequest.url?.includes('/auth/login')) {
 
             if (!originalRequest.url?.includes('/auth/refresh')) {
-                const pathSegments = window.location.pathname.split('/').filter(Boolean);
-                const locale = (pathSegments.length > 0 && pathSegments[0].length === 2) ? pathSegments[0] : 'id';
-                window.location.href = `/${locale}/login`;
+                window.location.replace('/login');
             }
         }
 

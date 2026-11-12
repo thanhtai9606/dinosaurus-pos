@@ -15,13 +15,14 @@ i18n
             id: { translation: id },
             vi: { translation: vi },
         },
-        fallbackLng: 'id',
-        supportedLngs: ['id', 'en', 'vi'],
+        lng: 'en',
+        fallbackLng: 'en',
+        supportedLngs: ['en', 'id', 'vi'],
         interpolation: {
-            escapeValue: false, 
+            escapeValue: false,
         },
         detection: {
-            order: ['localStorage', 'navigator'],
+            order: ['localStorage'],
             caches: ['localStorage'],
         },
     });

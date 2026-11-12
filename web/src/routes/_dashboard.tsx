@@ -22,6 +22,7 @@ export const Route = createFileRoute('/_dashboard')({
         } catch (error: any) {
             const status = error?.response?.status ?? error?.status
             if (status === 401) {
+                queryClient.setQueryData(meQueryOptions().queryKey, null)
                 throw redirect({ to: '/login' })
             }
             throw error

@@ -1208,6 +1208,21 @@
             "delete_failed": "Gagal menghapus pelanggan: {{message}}",
             "save_failed": "Gagal menyimpan pelanggan: {{message}}"
         },
+        "detail": {
+            "title": "Pelanggan",
+            "tab_profile": "Profil",
+            "tab_orders": "Riwayat belanja",
+            "tab_debts": "Piutang",
+            "order_date": "Tanggal",
+            "order_status": "Status",
+            "order_total": "Total",
+            "orders_empty": "Belum ada pesanan untuk pelanggan ini.",
+            "orders_forbidden": "Anda tidak dapat melihat pesanan.",
+            "debts_empty": "Belum ada piutang.",
+            "debts_forbidden": "Anda tidak dapat melihat piutang.",
+            "debt_balance": "Saldo tertunggak",
+            "view_all_debts": "Buka buku piutang"
+        },
         "actions": {
             "open_menu": "Buka menu",
             "edit": "Edit",

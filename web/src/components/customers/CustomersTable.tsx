@@ -9,9 +9,10 @@ interface CustomersTableProps {
     customers: InternalCustomersCustomerResponse[]
     t: any
     renderActions: (customer: InternalCustomersCustomerResponse) => React.ReactNode
+    onRowClick?: (customer: InternalCustomersCustomerResponse) => void
 }
 
-export function CustomersTable({ customers, t, renderActions }: CustomersTableProps) {
+export function CustomersTable({ customers, t, renderActions, onRowClick }: CustomersTableProps) {
     const getters = useMemo(
         () => ({
             name: (c: InternalCustomersCustomerResponse) => c.name ?? '',
@@ -63,12 +64,18 @@ export function CustomersTable({ customers, t, renderActions }: CustomersTablePr
                         </TableRow>
                     ) : (
                         sorted.map((customer) => (
-                            <TableRow key={customer.id}>
+                            <TableRow
+                                key={customer.id}
+                                className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : undefined}
+                                onClick={() => onRowClick?.(customer)}
+                            >
                                 <TableCell className="font-medium">{customer.name}</TableCell>
                                 <TableCell>{customer.phone || '-'}</TableCell>
                                 <TableCell>{customer.email || '-'}</TableCell>
                                 <TableCell>{customer.address || '-'}</TableCell>
-                                <TableCell className="text-right">{renderActions(customer)}</TableCell>
+                                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                                    {renderActions(customer)}
+                                </TableCell>
                             </TableRow>
                         ))
                     )}

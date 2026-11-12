@@ -1057,6 +1057,11 @@ func (s *OrderService) ListOrders(ctx context.Context, req ListOrdersRequest) (*
 		nullUserID.Valid = true
 		nullUserID.Bytes = *req.UserID
 	}
+	var nullCustomerID pgtype.UUID
+	if req.CustomerID != nil {
+		nullCustomerID.Valid = true
+		nullCustomerID.Bytes = *req.CustomerID
+	}
 
 	var statusStrings []string
 	if req.Statuses != nil {
@@ -1067,14 +1072,16 @@ func (s *OrderService) ListOrders(ctx context.Context, req ListOrdersRequest) (*
 	}
 
 	listParams := orders_repo.ListOrdersParams{
-		Limit:    int32(limit),
-		Offset:   int32(offset),
-		Statuses: statusStrings,
-		UserID:   nullUserID,
+		Limit:      int32(limit),
+		Offset:     int32(offset),
+		Statuses:   statusStrings,
+		UserID:     nullUserID,
+		CustomerID: nullCustomerID,
 	}
 	countParams := orders_repo.CountOrdersParams{
-		Statuses: statusStrings,
-		UserID:   nullUserID,
+		Statuses:   statusStrings,
+		UserID:     nullUserID,
+		CustomerID: nullCustomerID,
 	}
 	var wg sync.WaitGroup
 	var orders []orders_repo.ListOrdersRow

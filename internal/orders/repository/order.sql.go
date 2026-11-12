@@ -207,16 +207,19 @@ WHERE
     ($1::text[] IS NULL OR status = ANY($1::text[]::order_status[]))
   AND
     ($2::uuid IS NULL OR user_id = $2)
+  AND
+    ($3::uuid IS NULL OR customer_id = $3)
 `
 
 type CountOrdersParams struct {
-	Statuses []string    `json:"statuses"`
-	UserID   pgtype.UUID `json:"user_id"`
+	Statuses   []string    `json:"statuses"`
+	UserID     pgtype.UUID `json:"user_id"`
+	CustomerID pgtype.UUID `json:"customer_id"`
 }
 
 // Menghitung total pesanan dengan filter.
 func (q *Queries) CountOrders(ctx context.Context, arg CountOrdersParams) (int64, error) {
-	row := q.db.QueryRow(ctx, countOrders, arg.Statuses, arg.UserID)
+	row := q.db.QueryRow(ctx, countOrders, arg.Statuses, arg.UserID, arg.CustomerID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -972,16 +975,19 @@ WHERE
     ($3::text[] IS NULL OR status = ANY($3::text[]::order_status[]))
   AND
     ($4::uuid IS NULL OR user_id = $4)
+  AND
+    ($5::uuid IS NULL OR customer_id = $5)
 ORDER BY
     created_at DESC
 LIMIT $1 OFFSET $2
 `
 
 type ListOrdersParams struct {
-	Limit    int32       `json:"limit"`
-	Offset   int32       `json:"offset"`
-	Statuses []string    `json:"statuses"`
-	UserID   pgtype.UUID `json:"user_id"`
+	Limit      int32       `json:"limit"`
+	Offset     int32       `json:"offset"`
+	Statuses   []string    `json:"statuses"`
+	UserID     pgtype.UUID `json:"user_id"`
+	CustomerID pgtype.UUID `json:"customer_id"`
 }
 
 type ListOrdersRow struct {
@@ -1001,6 +1007,7 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]ListO
 		arg.Offset,
 		arg.Statuses,
 		arg.UserID,
+		arg.CustomerID,
 	)
 	if err != nil {
 		return nil, err

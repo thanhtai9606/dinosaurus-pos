@@ -13,6 +13,7 @@ import {
     type DebtStatus,
 } from '@/lib/api/query/customerDebts'
 import { useCustomersListQuery } from '@/lib/api/query/customers'
+import { CustomerSearchCombobox } from '@/components/customers/CustomerSearchCombobox'
 import { PartnerDebtDetailSheet } from '@/components/debts/PartnerDebtDetailSheet'
 import { ListPagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
@@ -199,18 +200,11 @@ function CustomerDebtsPage() {
                     <div className="space-y-3">
                         <div>
                             <Label>{t('customerDebts.fields.customer')}</Label>
-                            <Select value={manualCustomerId} onValueChange={setManualCustomerId}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder={t('customers.search_placeholder')} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {customers.map((c) => (
-                                        <SelectItem key={c.id} value={c.id!}>
-                                            {c.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <CustomerSearchCombobox
+                                value={manualCustomerId}
+                                onValueChange={(id) => setManualCustomerId(id)}
+                                placeholder={t('customers.search_placeholder')}
+                            />
                         </div>
                         <div>
                             <Label>{t('debts.fields.total')}</Label>

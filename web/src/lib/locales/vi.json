@@ -1227,6 +1227,21 @@
             "delete_failed": "Không thể xóa khách hàng: {{message}}",
             "save_failed": "Không thể lưu khách hàng: {{message}}"
         },
+        "detail": {
+            "title": "Khách hàng",
+            "tab_profile": "Thông tin",
+            "tab_orders": "Lịch sử mua",
+            "tab_debts": "Công nợ",
+            "order_date": "Ngày",
+            "order_status": "Trạng thái",
+            "order_total": "Tổng",
+            "orders_empty": "Chưa có đơn của khách này.",
+            "orders_forbidden": "Bạn không được xem đơn hàng.",
+            "debts_empty": "Chưa có khoản công nợ.",
+            "debts_forbidden": "Bạn không được xem công nợ.",
+            "debt_balance": "Còn phải thu",
+            "view_all_debts": "Mở sổ công nợ khách"
+        },
         "actions": {
             "open_menu": "Mở menu",
             "edit": "Chỉnh sửa",

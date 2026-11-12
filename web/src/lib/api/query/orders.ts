@@ -1,5 +1,5 @@
 import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ordersApi, printerApi } from "../../api/client"
+import { axiosInstance, ordersApi, printerApi } from "../../api/client"
 import {
     POSKasirInternalCommonErrorResponse,
     InternalOrdersApplyPromotionRequest,
@@ -22,6 +22,7 @@ export type OrdersListParams = {
     page?: number
     statuses?: string[]
     userId?: string
+    customerId?: string
 }
 
 export const ordersListQueryOptions = (params?: OrdersListParams) =>
@@ -31,6 +32,18 @@ export const ordersListQueryOptions = (params?: OrdersListParams) =>
     >({
         queryKey: ['orders', 'list', params],
         queryFn: async () => {
+            if (params?.customerId) {
+                const res = await axiosInstance.get('/orders', {
+                    params: {
+                        page: params.page,
+                        limit: params.limit,
+                        statuses: params.statuses,
+                        user_id: params.userId,
+                        customer_id: params.customerId,
+                    },
+                })
+                return (res.data as { data: unknown }).data
+            }
             const res = await ordersApi.ordersGet(
                 params?.page ? params.page : undefined,
                 params?.limit ? params.limit : undefined,

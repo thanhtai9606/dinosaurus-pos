@@ -1220,6 +1220,21 @@
             "delete_failed": "Failed to delete customer: {{message}}",
             "save_failed": "Failed to save customer: {{message}}"
         },
+        "detail": {
+            "title": "Customer",
+            "tab_profile": "Profile",
+            "tab_orders": "Purchase history",
+            "tab_debts": "Receivables",
+            "order_date": "Date",
+            "order_status": "Status",
+            "order_total": "Total",
+            "orders_empty": "No orders for this customer.",
+            "orders_forbidden": "You cannot view orders.",
+            "debts_empty": "No receivables for this customer.",
+            "debts_forbidden": "You cannot view receivables.",
+            "debt_balance": "Outstanding balance",
+            "view_all_debts": "Open receivables ledger"
+        },
         "actions": {
             "open_menu": "Open menu",
             "edit": "Edit",

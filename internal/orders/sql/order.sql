@@ -119,6 +119,8 @@ WHERE
     (sqlc.narg(statuses)::text[] IS NULL OR status = ANY(sqlc.narg(statuses)::text[]::order_status[]))
   AND
     (sqlc.narg(user_id)::uuid IS NULL OR user_id = sqlc.narg(user_id))
+  AND
+    (sqlc.narg(customer_id)::uuid IS NULL OR customer_id = sqlc.narg(customer_id))
 ORDER BY
     created_at DESC
 LIMIT $1 OFFSET $2;
@@ -129,7 +131,9 @@ SELECT count(*) FROM orders
 WHERE
     (sqlc.narg(statuses)::text[] IS NULL OR status = ANY(sqlc.narg(statuses)::text[]::order_status[]))
   AND
-    (sqlc.narg(user_id)::uuid IS NULL OR user_id = sqlc.narg(user_id));
+    (sqlc.narg(user_id)::uuid IS NULL OR user_id = sqlc.narg(user_id))
+  AND
+    (sqlc.narg(customer_id)::uuid IS NULL OR customer_id = sqlc.narg(customer_id));
 
 
 -- name: CancelOrder :one

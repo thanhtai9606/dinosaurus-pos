@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { redirect } from '@tanstack/react-router'
+import { isRedirect, redirect } from '@tanstack/react-router'
 import { meQueryOptions } from "@/lib/api/query/auth.ts";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslation } from 'react-i18next'
@@ -14,9 +14,12 @@ export const Route = createFileRoute('/login')({
             if (me) {
                 throw redirect({ to: '/' })
             }
-        } catch (error: any) {
-            const status = error?.response?.status ?? error?.status ?? error?.cause?.status
+        } catch (error: unknown) {
+            if (isRedirect(error)) throw error
+            const err = error as { response?: { status?: number }; status?: number; cause?: { status?: number } }
+            const status = err?.response?.status ?? err?.status ?? err?.cause?.status
             if (status === 401) {
+                queryClient.setQueryData(meQueryOptions().queryKey, null)
                 return
             }
         }

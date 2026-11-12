@@ -11,7 +11,7 @@ import { CustomersHeader } from "@/components/customers/CustomersHeader"
 import { CustomersFilters } from "@/components/customers/CustomersFilters"
 import { CustomersTable } from "@/components/customers/CustomersTable"
 import { CustomerActions } from "@/components/customers/CustomerActions"
-import { CustomerFormDialog } from "@/components/customers/CustomerFormDialog"
+import { CustomerFormDialog, type CustomerDialogTab } from '@/components/customers/CustomerFormDialog'
 
 const customersSearchSchema = z.object({
     page: z.number().catch(1),
@@ -56,6 +56,7 @@ function CustomersPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedCustomer, setSelectedCustomer] = useState<InternalCustomersCustomerResponse | null>(null)
+    const [dialogInitialTab, setDialogInitialTab] = useState<CustomerDialogTab>('profile')
 
     const [searchTerm, setSearchTerm] = useState(searchParams.search || '')
     const debouncedSearch = useDebounce(searchTerm, 500)
@@ -78,15 +79,15 @@ function CustomersPage() {
         navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
     }
 
-    const openCreateModal = () => {
-        setSelectedCustomer(null)
+    const openCustomerDialog = (customer: InternalCustomersCustomerResponse | null, tab: CustomerDialogTab) => {
+        setSelectedCustomer(customer)
+        setDialogInitialTab(tab)
         setIsDialogOpen(true)
     }
 
-    const openEditModal = (customer: InternalCustomersCustomerResponse) => {
-        setSelectedCustomer(customer)
-        setIsDialogOpen(true)
-    }
+    const openCreateModal = () => openCustomerDialog(null, 'profile')
+
+    const openEditModal = (customer: InternalCustomersCustomerResponse) => openCustomerDialog(customer, 'profile')
 
     return (
         <div className="flex flex-col gap-6">
@@ -103,9 +104,10 @@ function CustomersPage() {
                 isSearching={isSearchPending || customersQuery.isFetching}
             />
 
-            <CustomersTable 
+            <CustomersTable
                 customers={customers}
                 t={t}
+                onRowClick={(customer) => openCustomerDialog(customer, 'orders')}
                 renderActions={(customer) => (canEdit || canDelete) ? (
                     <CustomerActions customer={customer} onEdit={() => openEditModal(customer)} canEdit={canEdit} canDelete={canDelete} />
                 ) : null}
@@ -124,6 +126,7 @@ function CustomersPage() {
                 open={isDialogOpen}
                 onOpenChange={setIsDialogOpen}
                 customerToEdit={selectedCustomer}
+                initialTab={dialogInitialTab}
             />
         </div>
     )

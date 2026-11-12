@@ -96,7 +96,13 @@
     "retailPos": {
         "title": "Bán hàng — tạp hóa / bán lẻ",
         "subtitle": "Quét mã vạch hoặc tìm sản phẩm, thanh toán nhanh.",
-        "search_placeholder": "Tìm / quét mã vạch, SKU hoặc tên hàng (Enter)",
+        "search_placeholder": "Tên, mã vạch, SKU — gõ để gợi ý, Enter để thêm",
+        "suggestions": {
+            "loading": "Đang tìm…",
+            "empty": "Không có sản phẩm phù hợp",
+            "barcode": "Mã",
+            "stock": "Tồn"
+        },
         "add_line": "Thêm",
         "empty_cart": "Chưa có dòng hàng — quét hoặc tìm sản phẩm ở trên.",
         "product_not_found": "Không tìm thấy sản phẩm",

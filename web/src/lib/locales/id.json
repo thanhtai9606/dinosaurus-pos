@@ -96,7 +96,13 @@
     "retailPos": {
         "title": "POS ritel / toko kelontong",
         "subtitle": "Pindai barcode atau cari produk, lalu bayar.",
-        "search_placeholder": "Barcode, SKU, atau nama produk (Enter)",
+        "search_placeholder": "Nama, barcode, SKU — ketik untuk saran, Enter untuk tambah",
+        "suggestions": {
+            "loading": "Mencari…",
+            "empty": "Tidak ada produk",
+            "barcode": "Kode",
+            "stock": "Stok"
+        },
         "add_line": "Tambah",
         "empty_cart": "Belum ada baris — pindai atau cari di atas.",
         "product_not_found": "Produk tidak ditemukan",

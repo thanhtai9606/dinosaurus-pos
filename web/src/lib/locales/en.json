@@ -94,7 +94,13 @@
     "retailPos": {
         "title": "Retail / grocery POS",
         "subtitle": "Scan barcode or search, then checkout.",
-        "search_placeholder": "Scan barcode, SKU, or product name (Enter)",
+        "search_placeholder": "Name, barcode, SKU — type for suggestions, Enter to add",
+        "suggestions": {
+            "loading": "Searching…",
+            "empty": "No matching products",
+            "barcode": "Code",
+            "stock": "Stock"
+        },
         "add_line": "Add",
         "empty_cart": "No line items yet — scan or search above.",
         "product_not_found": "Product not found",

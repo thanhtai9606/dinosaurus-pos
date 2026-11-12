@@ -3,7 +3,6 @@ import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Loader2, RotateCcw, ScanBarcode } from 'lucide-react'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { PaymentDialog } from '@/components/payment/PaymentDialog'
 import { CartItem } from '@/components/orders/CartContent'
@@ -21,6 +20,7 @@ import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepository
 import { useQueryClient } from '@tanstack/react-query'
 import { catalogUnitPrice, lineSubtotal } from '@/lib/retail-pos/pricing'
 import { RetailReturnDialog } from '@/components/retail-pos/RetailReturnDialog'
+import { RetailProductSearchField } from '@/components/retail-pos/RetailProductSearchField'
 import { OfflinePosBanner } from '@/components/retail-pos/OfflinePosBanner'
 import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
 import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
@@ -121,24 +121,37 @@ function RetailPosPage() {
         setProductForVariant(null)
     }
 
+    const addProductToCartFlow = async (product: Product) => {
+        if ((product.stock || 0) <= 0) {
+            toast.error(t('order.errors.stock_empty'))
+            return
+        }
+        let detail = product
+        if (!product.options && product.id) {
+            try {
+                const res = await axiosInstance.get(`/products/${product.id}`)
+                detail = (res.data as { data: Product }).data
+            } catch {
+                /* use list row */
+            }
+        }
+        if (detail.options && detail.options.length > 0) {
+            setProductForVariant(detail)
+            setVariantOpen(true)
+            return
+        }
+        addCartItem(detail)
+        setSearch('')
+        searchRef.current?.focus()
+    }
+
     const resolveAndAdd = async (raw: string) => {
         const code = raw.trim()
         if (!code) return
         setScanning(true)
         try {
             const product = await fetchProductByCode(code)
-            if ((product.stock || 0) <= 0) {
-                toast.error(t('order.errors.stock_empty'))
-                return
-            }
-            if (product.options && product.options.length > 0) {
-                setProductForVariant(product)
-                setVariantOpen(true)
-                return
-            }
-            addCartItem(product)
-            setSearch('')
-            searchRef.current?.focus()
+            await addProductToCartFlow(product)
         } catch {
             toast.error(t('retailPos.product_not_found'))
         } finally {
@@ -325,19 +338,13 @@ function RetailPosPage() {
             <div className="flex min-h-0 flex-1">
                 <div className="flex min-w-0 flex-1 flex-col">
                     <div className="flex shrink-0 gap-2 border-b p-3">
-                        <Input
-                            ref={searchRef}
-                            autoFocus
-                            placeholder={t('retailPos.search_placeholder')}
+                        <RetailProductSearchField
+                            inputRef={searchRef}
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    void resolveAndAdd(search)
-                                }
-                            }}
-                            className="h-11 text-base"
+                            onChange={setSearch}
+                            onSubmit={(raw) => void resolveAndAdd(raw)}
+                            onPickProduct={(p) => void addProductToCartFlow(p)}
+                            t={t}
                         />
                         <Button
                             type="button"

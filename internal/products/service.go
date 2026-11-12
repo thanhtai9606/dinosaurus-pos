@@ -638,8 +638,8 @@ func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) 
 		price := float64(p.Price)
 		if p.ImageUrl != nil && *p.ImageUrl != "" {
 			imageUrl, err := s.prdRepo.PrdImageLink(ctx, p.ID.String(), *p.ImageUrl)
-			if err != nil {
-				s.log.Warnf("Failed to get public URL for product image", "error", err)
+			if err != nil || imageUrl == "" {
+				s.log.Warnf("Failed to get public URL for product image", "error", err, "stored", *p.ImageUrl)
 				imageUrl = *p.ImageUrl
 			}
 			p.ImageUrl = &imageUrl
@@ -863,7 +863,7 @@ func (s *PrdService) ListDeletedProducts(ctx context.Context, req ListProductsRe
 
 		if p.ImageUrl != nil && *p.ImageUrl != "" {
 			imageUrl, err := s.prdRepo.PrdImageLink(ctx, p.ID.String(), *p.ImageUrl)
-			if err != nil {
+			if err != nil || imageUrl == "" {
 				imageUrl = *p.ImageUrl
 			}
 			p.ImageUrl = &imageUrl

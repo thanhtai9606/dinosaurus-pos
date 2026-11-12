@@ -113,6 +113,39 @@ func TestCloudflareR2_GetFileShareLink(t *testing.T) {
 		assert.Equal(t, "https://pub.example.com/image.jpg", url)
 	})
 
+	t.Run("Success_PublicDomain_MinIO_IncludesBucket", func(t *testing.T) {
+		publicCfg := *cfg
+		publicCfg.CloudflareR2.PublicDomain = "http://localhost:9000"
+		publicCfg.CloudflareR2.Endpoint = "http://localhost:9000"
+
+		publicR2 := &r2.CloudflareR2{
+			Cfg:    &publicCfg,
+			Log:    mockLogger,
+			Client: mockClient,
+		}
+
+		url, err := publicR2.GetFileShareLink(ctx, "products/abc.jpg")
+		assert.NoError(t, err)
+		assert.Equal(t, "http://localhost:9000/test-bucket/products/abc.jpg", url)
+	})
+
+	t.Run("Success_Passthrough_AbsoluteURL", func(t *testing.T) {
+		publicCfg := *cfg
+		publicCfg.CloudflareR2.PublicDomain = "http://localhost:9000"
+		publicCfg.CloudflareR2.Endpoint = "http://localhost:9000"
+
+		publicR2 := &r2.CloudflareR2{
+			Cfg:    &publicCfg,
+			Log:    mockLogger,
+			Client: mockClient,
+		}
+
+		external := "https://images.unsplash.com/photo-123?w=400"
+		url, err := publicR2.GetFileShareLink(ctx, external)
+		assert.NoError(t, err)
+		assert.Equal(t, external, url)
+	})
+
 	t.Run("Success_PresignedURL", func(t *testing.T) {
 		// Ensure PublicDomain is empty
 		cfg.CloudflareR2.PublicDomain = ""

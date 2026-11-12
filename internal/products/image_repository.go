@@ -4,6 +4,8 @@ import (
 	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
 	"POS-kasir/pkg/logger"
 	"context"
+	"fmt"
+	"strings"
 )
 
 type ProductImageRepository struct {
@@ -29,15 +31,22 @@ func (p ProductImageRepository) PrdImageLink(ctx context.Context, prdID string, 
 	if image == "" {
 		return "", nil
 	}
+	if strings.HasPrefix(image, "http://") || strings.HasPrefix(image, "https://") {
+		return image, nil
+	}
+
 	if p.r2 == nil {
-		p.log.Warnf("PrdImageLink | R2 storage is not initialized, returning nil url")
-		return "", nil
+		p.log.Warnf("PrdImageLink | R2 storage is not initialized")
+		return "", fmt.Errorf("object storage not configured")
 	}
 
 	url, err := p.r2.GetFileShareLink(ctx, image)
 	if err != nil {
 		p.log.Errorf("Failed to get product image link from R2: %v", err)
 		return "", err
+	}
+	if url == "" {
+		return "", fmt.Errorf("empty share link for %q", image)
 	}
 	return url, nil
 }

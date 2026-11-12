@@ -101,10 +101,32 @@ func (r *CloudflareR2) BucketExists(ctx context.Context) (bool, error) {
 	return exists, nil
 }
 
+func isAbsoluteHTTPURL(s string) bool {
+	return strings.HasPrefix(s, "http://") || strings.HasPrefix(s, "https://")
+}
+
 func (r *CloudflareR2) GetFileShareLink(ctx context.Context, objectName string) (string, error) {
+	if objectName == "" {
+		return "", nil
+	}
+	// DB may still store external URLs (e.g. seeder fallback) — do not prefix with MinIO host.
+	if isAbsoluteHTTPURL(objectName) {
+		return objectName, nil
+	}
 
 	if r.Cfg.CloudflareR2.PublicDomain != "" {
-		return fmt.Sprintf("%s/%s", r.Cfg.CloudflareR2.PublicDomain, objectName), nil
+		domain := strings.TrimSuffix(r.Cfg.CloudflareR2.PublicDomain, "/")
+		key := strings.TrimPrefix(objectName, "/")
+		bucket := strings.Trim(r.Cfg.CloudflareR2.Bucket, "/")
+		// MinIO / path-style S3: http://host:9000/bucket/object
+		if r.Cfg.CloudflareR2.Endpoint != "" {
+			if strings.HasSuffix(domain, "/"+bucket) {
+				return fmt.Sprintf("%s/%s", domain, key), nil
+			}
+			return fmt.Sprintf("%s/%s/%s", domain, bucket, key), nil
+		}
+		// R2 custom public domain (bucket mapped at domain root)
+		return fmt.Sprintf("%s/%s", domain, key), nil
 	}
 
 	presignedURL, err := r.Client.PresignedGetObject(

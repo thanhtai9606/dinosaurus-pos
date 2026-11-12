@@ -130,7 +130,7 @@ ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_email_key;
 CREATE UNIQUE INDEX idx_customers_tenant_phone ON customers (tenant_id, phone) WHERE phone IS NOT NULL AND deleted_at IS NULL;
 CREATE UNIQUE INDEX idx_customers_tenant_email ON customers (tenant_id, email) WHERE email IS NOT NULL AND deleted_at IS NULL;
 
-DROP INDEX IF EXISTS suppliers_code_key;
+ALTER TABLE suppliers DROP CONSTRAINT IF EXISTS suppliers_code_key;
 CREATE UNIQUE INDEX idx_suppliers_tenant_code ON suppliers (tenant_id, code) WHERE code IS NOT NULL;
 
 DROP INDEX IF EXISTS idx_shifts_user_open;

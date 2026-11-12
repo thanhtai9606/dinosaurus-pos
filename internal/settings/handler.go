@@ -248,4 +248,116 @@ func (h *SettingsHandler) UpdatePrinterSettingsHandler(c fiber.Ctx) error {
 	})
 }
 
+// GetFinancialSettingsHandler returns financial configuration
+// @Summary      Get financial settings
+// @Description  Currency, tax rate, and service charge (Roles: authenticated)
+// @Tags         Settings
+// @Produce      json
+// @Success      200 {object} common.SuccessResponse{data=FinancialSettingsResponse}
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /settings/financial [get]
+func (h *SettingsHandler) GetFinancialSettingsHandler(c fiber.Ctx) error {
+	ctx := c.RequestCtx()
+	resp, err := h.service.GetFinancialSettings(ctx)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(common.ErrorResponse{
+			Message: "Failed to fetch financial settings",
+			Error:   err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Financial settings fetched successfully",
+		Data:    resp,
+	})
+}
+
+// UpdateFinancialSettingsHandler updates financial configuration
+// @Summary      Update financial settings
+// @Description  Update currency, tax, and service charge (Roles: admin)
+// @Tags         Settings
+// @Accept       json
+// @Produce      json
+// @Param        request body UpdateFinancialSettingsRequest true "Financial settings"
+// @Success      200 {object} common.SuccessResponse{data=FinancialSettingsResponse}
+// @x-roles      ["admin"]
+// @Router       /settings/financial [put]
+func (h *SettingsHandler) UpdateFinancialSettingsHandler(c fiber.Ctx) error {
+	ctx := c.RequestCtx()
+	var req UpdateFinancialSettingsRequest
+	if err := c.Bind().Body(&req); err != nil {
+		var ve *validator.ValidationErrors
+		if errors.As(err, &ve) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "Validation failed", Error: ve.Error(),
+				Data: map[string]interface{}{"errors": ve.Errors},
+			})
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid request body", Error: err.Error()})
+	}
+	resp, err := h.service.UpdateFinancialSettings(ctx, req)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(common.ErrorResponse{
+			Message: "Failed to update financial settings", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Financial settings updated successfully", Data: resp,
+	})
+}
+
+// GetInvoiceSettingsHandler returns receipt/invoice layout settings
+// @Summary      Get invoice settings
+// @Description  Receipt headers, footers, and legal text (Roles: authenticated)
+// @Tags         Settings
+// @Produce      json
+// @Success      200 {object} common.SuccessResponse{data=InvoiceSettingsResponse}
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /settings/invoice [get]
+func (h *SettingsHandler) GetInvoiceSettingsHandler(c fiber.Ctx) error {
+	ctx := c.RequestCtx()
+	resp, err := h.service.GetInvoiceSettings(ctx)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(common.ErrorResponse{
+			Message: "Failed to fetch invoice settings", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Invoice settings fetched successfully", Data: resp,
+	})
+}
+
+// UpdateInvoiceSettingsHandler updates receipt/invoice layout
+// @Summary      Update invoice settings
+// @Description  Customize printed invoices (Roles: admin)
+// @Tags         Settings
+// @Accept       json
+// @Produce      json
+// @Param        request body UpdateInvoiceSettingsRequest true "Invoice settings"
+// @Success      200 {object} common.SuccessResponse{data=InvoiceSettingsResponse}
+// @x-roles      ["admin"]
+// @Router       /settings/invoice [put]
+func (h *SettingsHandler) UpdateInvoiceSettingsHandler(c fiber.Ctx) error {
+	ctx := c.RequestCtx()
+	var req UpdateInvoiceSettingsRequest
+	if err := c.Bind().Body(&req); err != nil {
+		var ve *validator.ValidationErrors
+		if errors.As(err, &ve) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "Validation failed", Error: ve.Error(),
+				Data: map[string]interface{}{"errors": ve.Errors},
+			})
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid request body", Error: err.Error()})
+	}
+	resp, err := h.service.UpdateInvoiceSettings(ctx, req)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(common.ErrorResponse{
+			Message: "Failed to update invoice settings", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Invoice settings updated successfully", Data: resp,
+	})
+}
+
 // fiber:context-methods migrated

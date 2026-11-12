@@ -314,7 +314,35 @@
             "category": "Kategori",
             "payment_methods": "Metode Pembayaran",
             "branding": "Branding",
-            "printer": "Printer"
+            "printer": "Printer",
+            "financial": "Keuangan",
+            "invoice": "Faktur / Struk"
+        },
+        "financial": {
+            "title": "Pengaturan Keuangan",
+            "description": "Mata uang, pajak, dan service charge untuk pesanan baru.",
+            "currency": "Mata uang",
+            "tax_rate": "Tarif pajak (%)",
+            "service_charge_rate": "Service charge (%)",
+            "tax_enabled": "Terapkan pajak pada pesanan",
+            "tax_enabled_help": "Jika nonaktif, pajak tidak ditambahkan saat checkout.",
+            "update_success": "Pengaturan keuangan disimpan.",
+            "update_error": "Gagal menyimpan pengaturan keuangan."
+        },
+        "invoice": {
+            "title": "Faktur & Struk",
+            "description": "Sesuaikan struk cetak dan informasi legal.",
+            "receipt_header": "Header struk",
+            "receipt_header_placeholder": "Contoh: Terima kasih telah berkunjung!",
+            "receipt_footer": "Footer struk",
+            "receipt_footer_placeholder": "Contoh: Sampai jumpa lagi!",
+            "invoice_prefix": "Prefiks nomor referensi",
+            "show_tax_on_receipt": "Tampilkan pajak di struk",
+            "show_tax_help": "Cetak baris pajak dan service sebelum total.",
+            "legal_text": "Info legal / usaha",
+            "legal_text_placeholder": "NPWP, alamat, telepon…",
+            "update_success": "Pengaturan struk disimpan.",
+            "update_error": "Gagal menyimpan pengaturan struk."
         },
         "cancellation": {
             "title": "Alasan Pembatalan",

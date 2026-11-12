@@ -11,6 +11,8 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -21,6 +23,11 @@ type ISettingsService interface {
 	UpdateBranding(ctx context.Context, req UpdateBrandingRequest) (*BrandingSettingsResponse, error)
 	GetPrinterSettings(ctx context.Context) (*PrinterSettingsResponse, error)
 	UpdatePrinterSettings(ctx context.Context, req UpdatePrinterSettingsRequest) (*PrinterSettingsResponse, error)
+	GetFinancialSettings(ctx context.Context) (*FinancialSettingsResponse, error)
+	UpdateFinancialSettings(ctx context.Context, req UpdateFinancialSettingsRequest) (*FinancialSettingsResponse, error)
+	GetInvoiceSettings(ctx context.Context) (*InvoiceSettingsResponse, error)
+	UpdateInvoiceSettings(ctx context.Context, req UpdateInvoiceSettingsRequest) (*InvoiceSettingsResponse, error)
+	ComputeOrderTaxAndService(ctx context.Context, grossTotal int64) (taxAmount int64, serviceChargeAmount int64, err error)
 	UpdateLogo(ctx context.Context, data []byte, filename string, contentType string) (string, error)
 }
 
@@ -279,4 +286,157 @@ func (s *SettingsService) UpdatePrinterSettings(ctx context.Context, req UpdateP
 	)
 
 	return s.GetPrinterSettings(ctx)
+}
+
+func settingsMap(ctx context.Context, repo repository.Querier) (map[string]string, error) {
+	list, err := repo.GetSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+	m := make(map[string]string, len(list))
+	for _, s := range list {
+		m[s.Key] = s.Value
+	}
+	return m, nil
+}
+
+func parseBoolSetting(val string, defaultVal bool) bool {
+	if val == "" {
+		return defaultVal
+	}
+	v, err := strconv.ParseBool(strings.ToLower(val))
+	if err != nil {
+		return defaultVal
+	}
+	return v
+}
+
+func parseFloatSetting(val string, defaultVal float64) float64 {
+	if val == "" {
+		return defaultVal
+	}
+	v, err := strconv.ParseFloat(val, 64)
+	if err != nil {
+		return defaultVal
+	}
+	return v
+}
+
+func (s *SettingsService) GetFinancialSettings(ctx context.Context) (*FinancialSettingsResponse, error) {
+	m, err := settingsMap(ctx, s.repo)
+	if err != nil {
+		s.log.Error("Failed to fetch settings", "error", err)
+		return nil, err
+	}
+	currency := m["currency"]
+	if currency == "" {
+		currency = "IDR"
+	}
+	return &FinancialSettingsResponse{
+		Currency:          currency,
+		TaxRate:           parseFloatSetting(m["tax_rate"], 11),
+		ServiceChargeRate: parseFloatSetting(m["service_charge_rate"], 0),
+		TaxEnabled:        parseBoolSetting(m["tax_enabled"], true),
+	}, nil
+}
+
+func (s *SettingsService) UpdateFinancialSettings(ctx context.Context, req UpdateFinancialSettingsRequest) (*FinancialSettingsResponse, error) {
+	taxEnabled := "false"
+	if req.TaxEnabled != nil && *req.TaxEnabled {
+		taxEnabled = "true"
+	}
+	txErr := s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		qtx := repository.New(tx)
+		upserts := map[string]string{
+			"currency":              req.Currency,
+			"tax_rate":              fmt.Sprintf("%.2f", req.TaxRate),
+			"service_charge_rate": fmt.Sprintf("%.2f", req.ServiceChargeRate),
+			"tax_enabled":           taxEnabled,
+		}
+		for key, val := range upserts {
+			if _, err := qtx.UpsertSetting(ctx, repository.UpsertSettingParams{Key: key, Value: val}); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if txErr != nil {
+		s.log.Error("Failed to update financial settings", "error", txErr)
+		return nil, txErr
+	}
+
+	actorID := ctx.Value("user_id").(uuid.UUID)
+	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
+		"currency": req.Currency, "tax_rate": req.TaxRate, "service_charge_rate": req.ServiceChargeRate,
+	})
+
+	return s.GetFinancialSettings(ctx)
+}
+
+func (s *SettingsService) GetInvoiceSettings(ctx context.Context) (*InvoiceSettingsResponse, error) {
+	m, err := settingsMap(ctx, s.repo)
+	if err != nil {
+		return nil, err
+	}
+	prefix := m["invoice_prefix"]
+	if prefix == "" {
+		prefix = "INV"
+	}
+	return &InvoiceSettingsResponse{
+		ReceiptHeader:    m["receipt_header"],
+		ReceiptFooter:    m["receipt_footer"],
+		InvoicePrefix:    prefix,
+		ShowTaxOnReceipt: parseBoolSetting(m["show_tax_on_receipt"], true),
+		LegalText:        m["invoice_legal_text"],
+	}, nil
+}
+
+func (s *SettingsService) UpdateInvoiceSettings(ctx context.Context, req UpdateInvoiceSettingsRequest) (*InvoiceSettingsResponse, error) {
+	showTax := "false"
+	if req.ShowTaxOnReceipt != nil && *req.ShowTaxOnReceipt {
+		showTax = "true"
+	}
+	txErr := s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		qtx := repository.New(tx)
+		upserts := map[string]string{
+			"receipt_header":      req.ReceiptHeader,
+			"receipt_footer":      req.ReceiptFooter,
+			"invoice_prefix":      req.InvoicePrefix,
+			"show_tax_on_receipt": showTax,
+			"invoice_legal_text":  req.LegalText,
+		}
+		for key, val := range upserts {
+			if _, err := qtx.UpsertSetting(ctx, repository.UpsertSettingParams{Key: key, Value: val}); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if txErr != nil {
+		s.log.Error("Failed to update invoice settings", "error", txErr)
+		return nil, txErr
+	}
+
+	actorID := ctx.Value("user_id").(uuid.UUID)
+	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
+		"invoice_prefix": req.InvoicePrefix,
+	})
+
+	return s.GetInvoiceSettings(ctx)
+}
+
+func (s *SettingsService) ComputeOrderTaxAndService(ctx context.Context, grossTotal int64) (int64, int64, error) {
+	fin, err := s.GetFinancialSettings(ctx)
+	if err != nil {
+		return 0, 0, err
+	}
+	var tax int64
+	if fin.TaxEnabled && fin.TaxRate > 0 {
+		tax = int64(float64(grossTotal) * fin.TaxRate / 100)
+	}
+	service := int64(0)
+	if fin.ServiceChargeRate > 0 {
+		service = int64(float64(grossTotal) * fin.ServiceChargeRate / 100)
+	}
+	return tax, service, nil
 }

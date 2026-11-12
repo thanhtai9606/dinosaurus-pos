@@ -314,7 +314,35 @@
             "category": "Loại tài sản",
             "payment_methods": "Phương thức Thanh toán",
             "branding": "Branding",
-            "printer": "Máy in"
+            "printer": "Máy in",
+            "financial": "Tài chính",
+            "invoice": "Hóa đơn / Biên lai"
+        },
+        "financial": {
+            "title": "Thiết lập tài chính",
+            "description": "Cấu hình tiền tệ, thuế và phí dịch vụ cho đơn hàng mới.",
+            "currency": "Đơn vị tiền tệ",
+            "tax_rate": "Thuế suất (%)",
+            "service_charge_rate": "Phí dịch vụ (%)",
+            "tax_enabled": "Áp dụng thuế trên đơn",
+            "tax_enabled_help": "Tắt thì không cộng thuế khi thanh toán.",
+            "update_success": "Đã lưu thiết lập tài chính.",
+            "update_error": "Không lưu được thiết lập tài chính."
+        },
+        "invoice": {
+            "title": "Hóa đơn & Biên lai",
+            "description": "Tùy chỉnh biên lai in và thông tin pháp lý.",
+            "receipt_header": "Tiêu đề biên lai",
+            "receipt_header_placeholder": "VD: Cảm ơn quý khách!",
+            "receipt_footer": "Chân biên lai",
+            "receipt_footer_placeholder": "VD: Hẹn gặp lại!",
+            "invoice_prefix": "Tiền tố mã tham chiếu",
+            "show_tax_on_receipt": "Hiện thuế & phí dịch vụ trên biên lai",
+            "show_tax_help": "In dòng thuế và phí dịch vụ trước tổng tiền.",
+            "legal_text": "Thông tin pháp lý / doanh nghiệp",
+            "legal_text_placeholder": "MST, địa chỉ, điện thoại…",
+            "update_success": "Đã lưu thiết lập hóa đơn.",
+            "update_error": "Không lưu được thiết lập hóa đơn."
         },
         "cancellation": {
             "title": "Lý do hủy",

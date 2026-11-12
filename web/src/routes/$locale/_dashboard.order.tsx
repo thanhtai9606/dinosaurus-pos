@@ -57,7 +57,7 @@ function OrderPage() {
 
     const { data: productsData, isLoading: productsLoading, isFetching: productsFetching } =
         useProductsListQuery({
-            limit: 120,
+            limit: 100,
             page: 1,
             search: debouncedSearch || undefined,
             category: Number.isFinite(categoryFilter) ? categoryFilter : undefined,

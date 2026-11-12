@@ -55,7 +55,7 @@ func (s *PrinterService) PrintInvoice(ctx context.Context, orderID uuid.UUID) er
 		return nil
 	}
 
-	order, branding, cashierName, paymentMethodName, err := s.prepareInvoiceData(ctx, orderID)
+	order, branding, cashierName, paymentMethodName, invoice, err := s.prepareInvoiceData(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -67,17 +67,17 @@ func (s *PrinterService) PrintInvoice(ctx context.Context, orderID uuid.UUID) er
 	}
 	defer p.Close()
 
-	return s.printInvoiceToPrinter(p, order, branding, cashierName, paymentMethodName)
+	return s.printInvoiceToPrinter(p, order, branding, cashierName, paymentMethodName, invoice)
 }
 
 func (s *PrinterService) GetInvoiceData(ctx context.Context, orderID uuid.UUID) ([]byte, string, error) {
-	order, branding, cashierName, paymentMethodName, err := s.prepareInvoiceData(ctx, orderID)
+	order, branding, cashierName, paymentMethodName, invoice, err := s.prepareInvoiceData(ctx, orderID)
 	if err != nil {
 		return nil, "", err
 	}
 
 	bp := escpos.NewBufferPrinter()
-	if err := s.printInvoiceToPrinter(bp, order, branding, cashierName, paymentMethodName); err != nil {
+	if err := s.printInvoiceToPrinter(bp, order, branding, cashierName, paymentMethodName, invoice); err != nil {
 		return nil, "", err
 	}
 
@@ -85,15 +85,20 @@ func (s *PrinterService) GetInvoiceData(ctx context.Context, orderID uuid.UUID) 
 	return bp.Buffer.Bytes(), filename, nil
 }
 
-func (s *PrinterService) prepareInvoiceData(ctx context.Context, orderID uuid.UUID) (*orders.OrderDetailResponse, *settings.BrandingSettingsResponse, string, string, error) {
+func (s *PrinterService) prepareInvoiceData(ctx context.Context, orderID uuid.UUID) (*orders.OrderDetailResponse, *settings.BrandingSettingsResponse, string, string, *settings.InvoiceSettingsResponse, error) {
 	order, err := s.orderService.GetOrder(ctx, orderID)
 	if err != nil {
-		return nil, nil, "", "", fmt.Errorf("failed to get order: %w", err)
+		return nil, nil, "", "", nil, fmt.Errorf("failed to get order: %w", err)
 	}
 
 	branding, err := s.settingsService.GetBranding(ctx)
 	if err != nil {
-		return nil, nil, "", "", fmt.Errorf("failed to get branding: %w", err)
+		return nil, nil, "", "", nil, fmt.Errorf("failed to get branding: %w", err)
+	}
+
+	invoice, err := s.settingsService.GetInvoiceSettings(ctx)
+	if err != nil {
+		return nil, nil, "", "", nil, fmt.Errorf("failed to get invoice settings: %w", err)
 	}
 
 	var cashierName string = "Unknown"
@@ -119,10 +124,10 @@ func (s *PrinterService) prepareInvoiceData(ctx context.Context, orderID uuid.UU
 		}
 	}
 
-	return order, branding, cashierName, paymentMethodName, nil
+	return order, branding, cashierName, paymentMethodName, invoice, nil
 }
 
-func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.OrderDetailResponse, branding *settings.BrandingSettingsResponse, cashierName, paymentMethodName string) error {
+func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.OrderDetailResponse, branding *settings.BrandingSettingsResponse, cashierName, paymentMethodName string, invoice *settings.InvoiceSettingsResponse) error {
 	if err := p.Init(); err != nil {
 		return err
 	}
@@ -133,8 +138,15 @@ func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.O
 	p.WriteString(branding.AppName + "\n")
 	p.SetSize(escpos.NormalSize)
 	p.SetBold(false)
+	if invoice != nil && invoice.ReceiptHeader != "" {
+		p.WriteString(invoice.ReceiptHeader + "\n")
+	}
 	p.WriteString(fmt.Sprintf("%s\n", time.Now().Format("02 Jan 2006 15:04")))
-	p.WriteString(fmt.Sprintf("Order #%s\n", order.ID.String()[len(order.ID.String())-4:])) // Short ID
+	refLabel := "Order"
+	if invoice != nil && invoice.InvoicePrefix != "" {
+		refLabel = invoice.InvoicePrefix
+	}
+	p.WriteString(fmt.Sprintf("%s #%s\n", refLabel, order.ID.String()[len(order.ID.String())-4:]))
 	p.WriteString("Cashier: " + cashierName + "\n")
 	p.WriteString("--------------------------------\n")
 
@@ -165,6 +177,14 @@ func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.O
 	if order.DiscountAmount > 0 {
 		writeTotalLine(p, "Discount", "-"+formatCurrency(order.DiscountAmount))
 	}
+	if invoice != nil && invoice.ShowTaxOnReceipt {
+		if order.TaxAmount > 0 {
+			writeTotalLine(p, "Tax", formatCurrency(order.TaxAmount))
+		}
+		if order.ServiceChargeAmount > 0 {
+			writeTotalLine(p, "Service", formatCurrency(order.ServiceChargeAmount))
+		}
+	}
 	p.SetBold(true)
 	writeTotalLine(p, "TOTAL", formatCurrency(order.NetTotal))
 	p.SetBold(false)
@@ -186,8 +206,18 @@ func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.O
 
 	p.SetAlign(escpos.AlignCenter)
 	p.WriteString("\n")
-	p.WriteString("© 2025 " + branding.AppName + "\n")
-	p.WriteString("All rights reserved\n")
+	if invoice != nil && invoice.LegalText != "" {
+		p.WriteString(invoice.LegalText + "\n")
+	}
+	footer := branding.FooterText
+	if invoice != nil && invoice.ReceiptFooter != "" {
+		footer = invoice.ReceiptFooter
+	}
+	if footer != "" {
+		p.WriteString(footer + "\n")
+	} else {
+		p.WriteString("© " + branding.AppName + "\n")
+	}
 	p.WriteString("\n")
 	return p.Cut()
 }

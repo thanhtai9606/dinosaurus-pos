@@ -208,9 +208,14 @@ func BuildAppContainer(app *App) *AppContainer {
 	// Shift Module Repo
 	shiftRepo := shift_repo.New(app.DB.GetPool())
 
+	// Settings Module (needed by orders & printer)
+	settingsRepo := settings_repo.New(app.DB.GetPool())
+	settingsService := settings.NewSettingsService(app.Store, activityService, settingsRepo, app.R2, app.Logger)
+	settingsHandler := settings.NewSettingsHandler(settingsService, app.Logger)
+
 	// Order & Payment Module
 	ordersRepo := orders_repo.New(app.DB.GetPool())
-	orderService := orders.NewOrderService(app.Store, ordersRepo, productsRepo, app.MidtransService, activityService, app.Logger, wsHub)
+	orderService := orders.NewOrderService(app.Store, ordersRepo, productsRepo, app.MidtransService, activityService, settingsService, app.Logger, wsHub)
 	orderHandler := orders.NewOrderHandler(orderService, app.Logger)
 
 	// Payment Method Module
@@ -232,11 +237,6 @@ func BuildAppContainer(app *App) *AppContainer {
 	promotionsRepo := promotions_repo.New(app.DB.GetPool())
 	promotionService := promotions.NewPromotionService(app.Store, promotionsRepo, app.Logger, activityService)
 	promotionHandler := promotions.NewPromotionHandler(promotionService, app.Logger)
-
-	// Settings Module
-	settingsRepo := settings_repo.New(app.DB.GetPool())
-	settingsService := settings.NewSettingsService(app.Store, activityService, settingsRepo, app.R2, app.Logger)
-	settingsHandler := settings.NewSettingsHandler(settingsService, app.Logger)
 
 	// Printer Module
 	printerService := printer.NewPrinterService(orderService, settingsService, paymentMethodService, userRepo, app.Logger, escpos.NewPrinter)

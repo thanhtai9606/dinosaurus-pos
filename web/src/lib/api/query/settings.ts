@@ -1,10 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { settingsApi, printerApi } from '@/lib/api/client'
+import { settingsApi, printerApi, axiosInstance } from '@/lib/api/client'
 import { InternalSettingsUpdateBrandingRequest, InternalSettingsUpdatePrinterSettingsRequest } from '../generated'
 import { useRBAC } from '@/lib/auth/rbac'
 
 export const brandingSettingsQueryKey = ['branding-settings']
 export const printerSettingsQueryKey = ['printer-settings']
+export const financialSettingsQueryKey = ['financial-settings']
+export const invoiceSettingsQueryKey = ['invoice-settings']
+
+export type FinancialSettings = {
+    currency: string
+    tax_rate: number
+    service_charge_rate: number
+    tax_enabled: boolean
+}
+
+export type InvoiceSettings = {
+    receipt_header: string
+    receipt_footer: string
+    invoice_prefix: string
+    show_tax_on_receipt: boolean
+    legal_text: string
+}
 
 export function useBrandingSettingsQuery() {
     const { canAccessApi } = useRBAC();
@@ -118,4 +135,62 @@ export function useDiscoverPrintersQuery(enabled: boolean = false) {
         staleTime: 0,
     })
     return { ...query, isAllowed }
+}
+
+export function useFinancialSettingsQuery() {
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('GET', '/settings/financial')
+    const query = useQuery({
+        queryKey: financialSettingsQueryKey,
+        queryFn: async () => {
+            const res = await axiosInstance.get('/settings/financial')
+            return (res.data as any).data as FinancialSettings
+        },
+        enabled: isAllowed,
+        staleTime: 60_000,
+    })
+    return { ...query, isAllowed }
+}
+
+export function useUpdateFinancialSettingsMutation() {
+    const queryClient = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('PUT', '/settings/financial')
+    const mutation = useMutation({
+        mutationFn: async (data: FinancialSettings) => {
+            const res = await axiosInstance.put('/settings/financial', data)
+            return (res.data as any).data as FinancialSettings
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: financialSettingsQueryKey }),
+    })
+    return { ...mutation, isAllowed }
+}
+
+export function useInvoiceSettingsQuery() {
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('GET', '/settings/invoice')
+    const query = useQuery({
+        queryKey: invoiceSettingsQueryKey,
+        queryFn: async () => {
+            const res = await axiosInstance.get('/settings/invoice')
+            return (res.data as any).data as InvoiceSettings
+        },
+        enabled: isAllowed,
+        staleTime: 60_000,
+    })
+    return { ...query, isAllowed }
+}
+
+export function useUpdateInvoiceSettingsMutation() {
+    const queryClient = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('PUT', '/settings/invoice')
+    const mutation = useMutation({
+        mutationFn: async (data: InvoiceSettings) => {
+            const res = await axiosInstance.put('/settings/invoice', data)
+            return (res.data as any).data as InvoiceSettings
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceSettingsQueryKey }),
+    })
+    return { ...mutation, isAllowed }
 }

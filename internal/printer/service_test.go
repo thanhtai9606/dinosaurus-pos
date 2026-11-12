@@ -113,6 +113,43 @@ func (m *MockSettingsService) UpdateLogo(ctx context.Context, data []byte, filen
 	return args.String(0), args.Error(1)
 }
 
+func (m *MockSettingsService) GetFinancialSettings(ctx context.Context) (*settings.FinancialSettingsResponse, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*settings.FinancialSettingsResponse), args.Error(1)
+}
+
+func (m *MockSettingsService) UpdateFinancialSettings(ctx context.Context, req settings.UpdateFinancialSettingsRequest) (*settings.FinancialSettingsResponse, error) {
+	args := m.Called(ctx, req)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*settings.FinancialSettingsResponse), args.Error(1)
+}
+
+func (m *MockSettingsService) GetInvoiceSettings(ctx context.Context) (*settings.InvoiceSettingsResponse, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*settings.InvoiceSettingsResponse), args.Error(1)
+}
+
+func (m *MockSettingsService) UpdateInvoiceSettings(ctx context.Context, req settings.UpdateInvoiceSettingsRequest) (*settings.InvoiceSettingsResponse, error) {
+	args := m.Called(ctx, req)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*settings.InvoiceSettingsResponse), args.Error(1)
+}
+
+func (m *MockSettingsService) ComputeOrderTaxAndService(ctx context.Context, grossTotal int64) (int64, int64, error) {
+	args := m.Called(ctx, grossTotal)
+	return args.Get(0).(int64), args.Get(1).(int64), args.Error(2)
+}
+
 // Helper for logger mocks
 func allowAllLoggerCalls(mockLogger *mocks.MockILogger) {
 	mockLogger.EXPECT().Warn(gomock.Any()).AnyTimes()

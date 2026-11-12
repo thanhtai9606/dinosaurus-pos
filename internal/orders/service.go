@@ -8,6 +8,7 @@ import (
 	"POS-kasir/internal/common/store"
 	orders_repo "POS-kasir/internal/orders/repository"
 	products_repo "POS-kasir/internal/products/repository"
+	"POS-kasir/internal/settings"
 	"POS-kasir/pkg/logger"
 	"strconv"
 	"time"
@@ -42,22 +43,24 @@ type IOrderService interface {
 }
 
 type OrderService struct {
-	store           store.Store
-	ordersRepo      orders_repo.Querier
-	productsRepo    products_repo.Querier
-	midtransService payment.IMidtrans
-	activityService activitylog.IActivityService
-	log             logger.ILogger
-	wsHub           *ws.Hub
+	store            store.Store
+	ordersRepo       orders_repo.Querier
+	productsRepo     products_repo.Querier
+	midtransService  payment.IMidtrans
+	activityService  activitylog.IActivityService
+	settingsService  settings.ISettingsService
+	log              logger.ILogger
+	wsHub            *ws.Hub
 }
 
-func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activitylog.IActivityService, log logger.ILogger, wsHub *ws.Hub) IOrderService {
+func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activitylog.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub) IOrderService {
 	return &OrderService{
-		store:           store,
-		ordersRepo:      ordersRepo,
-		productsRepo:    productsRepo,
-		midtransService: midtransService,
-		activityService: activityService,
+		store:            store,
+		ordersRepo:       ordersRepo,
+		productsRepo:     productsRepo,
+		midtransService:  midtransService,
+		activityService:  activityService,
+		settingsService:  settingsService,
 		log:             log,
 		wsHub:           wsHub,
 	}
@@ -1362,8 +1365,10 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			}
 		}
 
-		taxAmount := int64(float64(grossTotal) * 0.11) // Default 11% tax
-		serviceChargeAmount := int64(0)
+		taxAmount, serviceChargeAmount, taxErr := s.settingsService.ComputeOrderTaxAndService(ctx, grossTotal)
+		if taxErr != nil {
+			return fmt.Errorf("failed to compute tax: %w", taxErr)
+		}
 		netTotal := grossTotal + taxAmount + serviceChargeAmount
 
 		_, err = qtx.UpdateOrderTotals(ctx, orders_repo.UpdateOrderTotalsParams{

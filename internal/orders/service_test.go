@@ -6,6 +6,7 @@ import (
 	"POS-kasir/internal/orders"
 	orders_repo "POS-kasir/internal/orders/repository"
 	products_repo "POS-kasir/internal/products/repository"
+	"POS-kasir/internal/settings"
 	"POS-kasir/mocks"
 	"POS-kasir/pkg/payment"
 	"POS-kasir/pkg/utils"
@@ -28,6 +29,39 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
+type testSettingsService struct{}
+
+func (testSettingsService) GetBranding(context.Context) (*settings.BrandingSettingsResponse, error) {
+	return &settings.BrandingSettingsResponse{}, nil
+}
+func (testSettingsService) UpdateBranding(context.Context, settings.UpdateBrandingRequest) (*settings.BrandingSettingsResponse, error) {
+	return &settings.BrandingSettingsResponse{}, nil
+}
+func (testSettingsService) GetPrinterSettings(context.Context) (*settings.PrinterSettingsResponse, error) {
+	return &settings.PrinterSettingsResponse{}, nil
+}
+func (testSettingsService) UpdatePrinterSettings(context.Context, settings.UpdatePrinterSettingsRequest) (*settings.PrinterSettingsResponse, error) {
+	return &settings.PrinterSettingsResponse{}, nil
+}
+func (testSettingsService) GetFinancialSettings(context.Context) (*settings.FinancialSettingsResponse, error) {
+	return &settings.FinancialSettingsResponse{TaxEnabled: true, TaxRate: 11}, nil
+}
+func (testSettingsService) UpdateFinancialSettings(context.Context, settings.UpdateFinancialSettingsRequest) (*settings.FinancialSettingsResponse, error) {
+	return &settings.FinancialSettingsResponse{}, nil
+}
+func (testSettingsService) GetInvoiceSettings(context.Context) (*settings.InvoiceSettingsResponse, error) {
+	return &settings.InvoiceSettingsResponse{}, nil
+}
+func (testSettingsService) UpdateInvoiceSettings(context.Context, settings.UpdateInvoiceSettingsRequest) (*settings.InvoiceSettingsResponse, error) {
+	return &settings.InvoiceSettingsResponse{}, nil
+}
+func (testSettingsService) ComputeOrderTaxAndService(_ context.Context, grossTotal int64) (int64, int64, error) {
+	return int64(float64(grossTotal) * 0.11), 0, nil
+}
+func (testSettingsService) UpdateLogo(context.Context, []byte, string, string) (string, error) {
+	return "", nil
+}
+
 // setupTest creates basic mocks for tests that don't need pgxmock.
 func setupTest(t *testing.T) (*mocks.MockStore, *mocks.MockOrderQuerier, *mocks.MockProductQuerier, *mocks.MockIMidtrans, *mocks.MockIActivityService, *mocks.MockILogger, orders.IOrderService) {
 	ctrl := gomock.NewController(t)
@@ -38,7 +72,7 @@ func setupTest(t *testing.T) (*mocks.MockStore, *mocks.MockOrderQuerier, *mocks.
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 	mockLogger := mocks.NewMockILogger(ctrl)
 
-	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, mockLogger, nil)
+	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, testSettingsService{}, mockLogger, nil)
 	return mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, mockLogger, service
 }
 
@@ -84,7 +118,7 @@ func setupTestWithPgxMock(t *testing.T) (pgxmock.PgxPoolIface, *mocks.MockStore,
 		t.Fatalf("failed to create pgxmock pool: %v", err)
 	}
 
-	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, mockLogger, nil)
+	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, testSettingsService{}, mockLogger, nil)
 	return mockPgx, mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, mockLogger, service
 }
 

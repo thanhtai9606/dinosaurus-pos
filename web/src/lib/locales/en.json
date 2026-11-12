@@ -308,7 +308,35 @@
             "category": "Category",
             "payment_methods": "Payment Methods",
             "branding": "Branding",
-            "printer": "Printer"
+            "printer": "Printer",
+            "financial": "Financial",
+            "invoice": "Invoice / Receipt"
+        },
+        "financial": {
+            "title": "Financial Settings",
+            "description": "Configure currency, tax, and service charge for new orders.",
+            "currency": "Currency",
+            "tax_rate": "Tax rate (%)",
+            "service_charge_rate": "Service charge (%)",
+            "tax_enabled": "Apply tax on orders",
+            "tax_enabled_help": "When off, tax is not added at checkout.",
+            "update_success": "Financial settings saved.",
+            "update_error": "Failed to save financial settings."
+        },
+        "invoice": {
+            "title": "Invoice & Receipt",
+            "description": "Customize printed receipts and legal information.",
+            "receipt_header": "Receipt header",
+            "receipt_header_placeholder": "e.g. Thank you for your visit!",
+            "receipt_footer": "Receipt footer",
+            "receipt_footer_placeholder": "e.g. Visit again soon!",
+            "invoice_prefix": "Reference prefix",
+            "show_tax_on_receipt": "Show tax & service on receipt",
+            "show_tax_help": "Print tax and service charge lines before total.",
+            "legal_text": "Legal / business info",
+            "legal_text_placeholder": "NPWP, address, phone…",
+            "update_success": "Invoice settings saved.",
+            "update_error": "Failed to save invoice settings."
         },
         "cancellation": {
             "title": "Cancellation Reasons",

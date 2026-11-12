@@ -1,11 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Ban, ShieldCheck, CreditCard, Palette, Printer } from 'lucide-react'
+import { Ban, Tag, CreditCard, Palette, Printer, DollarSign, FileText } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CancellationReasonsCard } from "@/components/settings/CancellationReasonsCard.tsx";
 import { CategoriesCard } from "@/components/settings/CategoriesCard.tsx";
 import { PaymentMethodsCard } from "@/components/settings/PaymentMethodsCard.tsx";
 import { BrandingSettingsCard } from "@/components/settings/BrandingSettingsCard.tsx";
 import { PrinterSettingsCard } from "@/components/settings/PrinterSettingsCard.tsx";
+import { FinancialSettingsCard } from '@/components/settings/FinancialSettingsCard'
+import { InvoiceSettingsCard } from '@/components/settings/InvoiceSettingsCard'
 import { SettingsHeader } from "@/components/settings/SettingsHeader"
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
@@ -31,6 +33,8 @@ function SettingsPage() {
     const canViewPaymentMethods = canAccessApi('GET', '/payment-methods')
     const canViewBranding = canAccessApi('GET', '/settings/branding')
     const canViewPrinter = canAccessApi('GET', '/settings/printer')
+    const canViewFinancial = canAccessApi('GET', '/settings/financial')
+    const canViewInvoice = canAccessApi('GET', '/settings/invoice')
 
     return (
         <div className="flex flex-col gap-6">
@@ -51,7 +55,7 @@ function SettingsPage() {
 
                     {canViewCategories && (
                         <TabsTrigger value="category" className="flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4" />
+                            <Tag className="h-4 w-4" />
                             {t('settings.tabs.category')}
                         </TabsTrigger>
                     )}
@@ -74,6 +78,18 @@ function SettingsPage() {
                         <TabsTrigger value="printer" className="flex items-center gap-2">
                             <Printer className="h-4 w-4" />
                             {t('settings.tabs.printer')}
+                        </TabsTrigger>
+                    )}
+                    {canViewFinancial && (
+                        <TabsTrigger value="financial" className="flex items-center gap-2">
+                            <DollarSign className="h-4 w-4" />
+                            {t('settings.tabs.financial')}
+                        </TabsTrigger>
+                    )}
+                    {canViewInvoice && (
+                        <TabsTrigger value="invoice" className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            {t('settings.tabs.invoice')}
                         </TabsTrigger>
                     )}
                 </TabsList>
@@ -111,6 +127,16 @@ function SettingsPage() {
                         <div className="grid gap-6">
                             <PrinterSettingsCard />
                         </div>
+                    </TabsContent>
+                )}
+                {canViewFinancial && (
+                    <TabsContent value="financial">
+                        <FinancialSettingsCard />
+                    </TabsContent>
+                )}
+                {canViewInvoice && (
+                    <TabsContent value="invoice">
+                        <InvoiceSettingsCard />
                     </TabsContent>
                 )}
             </Tabs>

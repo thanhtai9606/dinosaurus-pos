@@ -8,7 +8,7 @@ Tài liệu này gom **quyết định sản phẩm, luồng nghiệp vụ và �
 |-----|---------|
 | Module Go | `POS-kasir` |
 | API + SPA | Go Fiber phục vụ API và build `web/dist` (thường cổng **8080**) |
-| DB | PostgreSQL 15, migrate trong `sqlc/migrations/` — **`make migrate-up`** sau mỗi deploy có migration mới |
+| DB | PostgreSQL 15, migrate trong `sqlc/migrations/` — `000001_baseline` + **`000002_multitenant`**. Reset sạch: `make db-reset` |
 | FE | `web/` — React 19, TanStack Router (file routes), TanStack Query, pnpm |
 | i18n | `web/src/lib/locales/{vi,en,id}.json` — thêm key đủ 3 ngôn ngữ |
 | RBAC FE | `web/src/lib/auth/rbacRules.ts` (map method + path → role) |
@@ -26,7 +26,16 @@ Remote hiện tại: GitLab `devops/dinosaurus-pos` (fork/tùy biến từ POS-k
 | Phiếu nhập | `stock_receipts.receipt_no` | `GR-YYYYMMDD-###` | Đã có từ trước |
 | NCC | `suppliers.code` | tùy nhập | Đã có từ trước |
 
-Migration: `000028_business_document_codes` — chạy `make migrate-up` sau deploy.
+Schema mã nghiệp vụ (`order_no`, `customers.code`, `products.code`) nằm trong baseline — không cần migration riêng sau khi reset.
+
+---
+
+## Multi-tenant (MVP)
+
+- Bảng `tenants`, `tenant_users`; cột `tenant_id` trên dữ liệu nghiệp vụ; **RLS** theo `app.tenant_id` (set qua `pkg/database/tenant_db.go` + `store.ExecTx`).
+- JWT claim `tenant_id`; login chọn tenant đầu tiên (hoặc `tenant_code`); `POST /auth/switch-tenant`, `GET /tenants/mine`.
+- Tenant mặc định: UUID `00000000-0000-0000-0000-000000000001`, code `default` — seed + backfill migration.
+- FE: `TenantSwitcher` trên sidebar (`web/src/components/dashboard/TenantSwitcher.tsx`).
 
 ---
 
@@ -44,7 +53,7 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 
 ### Thanh toán khi nhập (NCC)
 
-**Nguồn chuẩn (mới):** cột DB trên `stock_receipts` (migration **000027**):
+**Nguồn chuẩn (mới):** cột DB trên `stock_receipts` (baseline):
 
 - `payment_mode`: `cash` \| `credit` (mặc định `cash`)
 - `amount_paid`: số tiền đã trả NCC lúc hoàn tất (≤ tổng phiếu)
@@ -72,7 +81,7 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 - Đồng bộ kế toán / trừ quỹ ca khi trả NCC (chỉ ghi sổ nợ).
 - Backfill phiếu nhập cũ từ `__payment__` trong `note`.
 
-### Bảng DB (migration `000027_debt_ledgers`)
+### Bảng DB (công nợ — trong baseline)
 
 - `supplier_debts`, `supplier_debt_payments`
 - `customer_debts`, `customer_debt_payments`

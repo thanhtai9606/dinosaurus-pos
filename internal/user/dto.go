@@ -9,8 +9,15 @@ import (
 )
 
 type LoginRequest struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
+	Email      string  `json:"email" validate:"required,email"`
+	Password   string  `json:"password" validate:"required"`
+	TenantCode *string `json:"tenant_code,omitempty" validate:"omitempty,min=2,max=32"`
+}
+
+type TenantSummary struct {
+	ID   uuid.UUID `json:"id"`
+	Code string    `json:"code"`
+	Name string    `json:"name"`
 }
 
 type LoginResponse struct {
@@ -18,6 +25,12 @@ type LoginResponse struct {
 	Token        string          `json:"Token"`
 	RefreshToken string          `json:"refresh_token"`
 	Profile      ProfileResponse `json:"profile"`
+	Tenant       TenantSummary   `json:"tenant"`
+	Tenants      []TenantSummary `json:"tenants"`
+}
+
+type SwitchTenantRequest struct {
+	TenantID uuid.UUID `json:"tenant_id" validate:"required"`
 }
 
 type RegisterRequest struct {
@@ -37,6 +50,8 @@ type ProfileResponse struct {
 	Avatar    *string             `json:"avatar"`
 	Role      repository.UserRole `json:"role"`
 	IsActive  bool                `json:"is_active"`
+	Tenant    *TenantSummary      `json:"tenant,omitempty"`
+	Tenants   []TenantSummary     `json:"tenants,omitempty"`
 }
 
 type UpdatePasswordRequest struct {

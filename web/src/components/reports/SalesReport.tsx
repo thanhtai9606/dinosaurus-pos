@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts'
+import { useFormatMoneyAxis } from '@/context/MoneyContext'
 
 interface SalesReportProps {
     data: any[]
@@ -16,6 +17,7 @@ interface SalesReportProps {
 export function SalesReport({
     data, isLoading, onExport, formatCurrency, formatDate, t
 }: SalesReportProps) {
+    const formatAxis = useFormatMoneyAxis()
     return (
         <Card className="border-0 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -47,7 +49,7 @@ export function SalesReport({
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `Rp${(value / 1000).toLocaleString()}k`}
+                                tickFormatter={(value) => formatAxis(Number(value))}
                             />
                             <Tooltip
                                 formatter={(value: any) => formatCurrency(Number(value || 0))}

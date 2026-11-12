@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts'
+import { useFormatMoneyAxis } from '@/context/MoneyContext'
 
 interface ProfitReportProps {
     profitSummaryData: any[]
@@ -16,6 +17,7 @@ interface ProfitReportProps {
 export function ProfitReport({
     profitSummaryData, productProfitsData, isLoadingSummary, isLoadingProducts, formatCurrency, formatDate, t
 }: ProfitReportProps) {
+    const formatAxis = useFormatMoneyAxis()
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-4 border-0 shadow-sm">
@@ -43,7 +45,7 @@ export function ProfitReport({
                                     fontSize={12}
                                     tickLine={false}
                                     axisLine={false}
-                                    tickFormatter={(value) => `Rp${(value / 1000).toLocaleString()}k`}
+                                    tickFormatter={(value) => formatAxis(Number(value))}
                                 />
                                 <Tooltip
                                     formatter={(value: any) => formatCurrency(Number(value || 0))}

@@ -1,2 +1,0 @@
--- Cannot remove enum values in Postgres easily without dropping the type.
--- This down migration is intentionally left empty/commented for safety.

@@ -1,1 +1,0 @@
-DROP IF EXISTS TYPE sort_order;

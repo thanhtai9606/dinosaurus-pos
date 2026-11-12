@@ -169,11 +169,14 @@ export const financialSettingsQueryOptions = () =>
     })
 
 export function useFinancialSettingsQuery() {
+    const queryClient = useQueryClient()
     const { canAccessApi } = useRBAC()
     const isAllowed = canAccessApi('GET', '/settings/financial')
     const query = useQuery({
         ...financialSettingsQueryOptions(),
-        enabled: isAllowed,
+        initialData: () =>
+            queryClient.getQueryData<FinancialSettings>(financialSettingsQueryKey),
+        staleTime: 60_000,
     })
     return { ...query, isAllowed }
 }

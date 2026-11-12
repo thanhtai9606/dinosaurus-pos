@@ -75,6 +75,11 @@
         "update_password_success": "Password berhasil diubah",
         "update_password_failed": "Gagal memperbarui password: {{message}}"
     },
+    "tenant": {
+        "label": "Toko",
+        "switched": "Berhasil ganti toko",
+        "switch_failed": "Gagal ganti toko"
+    },
     "sidebar": {
         "summary": "Ringkasan",
         "pos": "Kasir",

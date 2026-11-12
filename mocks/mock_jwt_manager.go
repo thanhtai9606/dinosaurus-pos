@@ -43,9 +43,9 @@ func (m *MockManager) EXPECT() *MockManagerMockRecorder {
 }
 
 // GenerateRefreshToken mocks base method.
-func (m *MockManager) GenerateRefreshToken(username, email string, userID uuid.UUID, role string) (string, time.Time, error) {
+func (m *MockManager) GenerateRefreshToken(username, email string, userID uuid.UUID, role string, tenantID uuid.UUID) (string, time.Time, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateRefreshToken", username, email, userID, role)
+	ret := m.ctrl.Call(m, "GenerateRefreshToken", username, email, userID, role, tenantID)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(time.Time)
 	ret2, _ := ret[2].(error)
@@ -53,15 +53,15 @@ func (m *MockManager) GenerateRefreshToken(username, email string, userID uuid.U
 }
 
 // GenerateRefreshToken indicates an expected call of GenerateRefreshToken.
-func (mr *MockManagerMockRecorder) GenerateRefreshToken(username, email, userID, role any) *gomock.Call {
+func (mr *MockManagerMockRecorder) GenerateRefreshToken(username, email, userID, role, tenantID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateRefreshToken", reflect.TypeOf((*MockManager)(nil).GenerateRefreshToken), username, email, userID, role)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateRefreshToken", reflect.TypeOf((*MockManager)(nil).GenerateRefreshToken), username, email, userID, role, tenantID)
 }
 
 // GenerateToken mocks base method.
-func (m *MockManager) GenerateToken(username, email string, userID uuid.UUID, role string) (string, time.Time, error) {
+func (m *MockManager) GenerateToken(username, email string, userID uuid.UUID, role string, tenantID uuid.UUID) (string, time.Time, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateToken", username, email, userID, role)
+	ret := m.ctrl.Call(m, "GenerateToken", username, email, userID, role, tenantID)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(time.Time)
 	ret2, _ := ret[2].(error)
@@ -69,9 +69,9 @@ func (m *MockManager) GenerateToken(username, email string, userID uuid.UUID, ro
 }
 
 // GenerateToken indicates an expected call of GenerateToken.
-func (mr *MockManagerMockRecorder) GenerateToken(username, email, userID, role any) *gomock.Call {
+func (mr *MockManagerMockRecorder) GenerateToken(username, email, userID, role, tenantID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateToken", reflect.TypeOf((*MockManager)(nil).GenerateToken), username, email, userID, role)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateToken", reflect.TypeOf((*MockManager)(nil).GenerateToken), username, email, userID, role, tenantID)
 }
 
 // VerifyToken mocks base method.

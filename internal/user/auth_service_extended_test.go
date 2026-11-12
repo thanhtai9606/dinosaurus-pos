@@ -44,18 +44,18 @@ func TestAuthService_Login_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(userObj, nil)
-		mockToken.EXPECT().GenerateToken(userObj.Username, userObj.Email, userObj.ID, string(userObj.Role)).Return("", time.Time{}, errors.New("token error"))
+		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
+		mockToken.EXPECT().GenerateToken(userObj.Username, userObj.Email, userObj.ID, string(userObj.Role), gomock.Any()).Return("", time.Time{}, errors.New("token error"))
 		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
-		mockActivity.EXPECT().Log(ctx, userObj.ID, activitylog_repo.LogActionTypeLOGINFAILED, activitylog_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
 
 		resp, err := service.Login(ctx, req)
 		assert.Error(t, err)
 		assert.Nil(t, resp)
-		assert.Equal(t, common.ErrInvalidCredentials, err)
+		assert.Equal(t, common.ErrInternal, err)
 	})
 
 	t.Run("GenerateRefreshTokenError", func(t *testing.T) {
@@ -66,12 +66,13 @@ func TestAuthService_Login_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(userObj, nil)
-		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("access_token", time.Now().Add(time.Hour), nil)
-		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("", time.Time{}, errors.New("refresh token error"))
+		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
+		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("access_token", time.Now().Add(time.Hour), nil)
+		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("", time.Time{}, errors.New("refresh token error"))
 		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
 
 		resp, err := service.Login(ctx, req)
@@ -88,12 +89,13 @@ func TestAuthService_Login_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(userObj, nil)
-		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("access_token", time.Now().Add(time.Hour), nil)
-		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("refresh_token", time.Now().Add(time.Hour*24), nil)
+		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
+		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("access_token", time.Now().Add(time.Hour), nil)
+		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("refresh_token", time.Now().Add(time.Hour*24), nil)
 
 		mockRepo.EXPECT().UpdateRefreshToken(ctx, gomock.Any()).Return(errors.New("db error"))
 		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
@@ -124,7 +126,7 @@ func TestAuthService_Profile_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(userObj, nil)
@@ -146,7 +148,7 @@ func TestAuthService_Profile_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(userObj, nil)
@@ -167,7 +169,7 @@ func TestAuthService_Profile_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(userObj, nil)
@@ -198,7 +200,7 @@ func TestAuthService_Register_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(user_repo.User{}, errors.New("db error"))
@@ -217,7 +219,7 @@ func TestAuthService_Register_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(user_repo.User{}, pgx.ErrNoRows)
@@ -255,7 +257,7 @@ func TestAuthService_RefreshToken_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockToken.EXPECT().VerifyToken(refreshToken).Return(utils.JWTClaims{}, errors.New("invalid token"))
@@ -275,7 +277,7 @@ func TestAuthService_RefreshToken_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		accessClaims := claims
@@ -297,7 +299,7 @@ func TestAuthService_RefreshToken_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockToken.EXPECT().VerifyToken(refreshToken).Return(claims, nil)
@@ -318,7 +320,7 @@ func TestAuthService_RefreshToken_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockToken.EXPECT().VerifyToken(refreshToken).Return(claims, nil)
@@ -342,18 +344,17 @@ func TestAuthService_RefreshToken_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockToken.EXPECT().VerifyToken(refreshToken).Return(claims, nil)
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(userObj, nil)
-		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("", time.Time{}, errors.New("token error"))
-		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
+		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("", time.Time{}, errors.New("token error"))
 
 		resp, err := service.RefreshToken(ctx, refreshToken)
 		assert.Error(t, err)
 		assert.Nil(t, resp)
-		assert.Equal(t, common.ErrInternal, err)
+		assert.EqualError(t, err, "token error")
 	})
 
 	t.Run("GenerateRefreshTokenError", func(t *testing.T) {
@@ -364,19 +365,18 @@ func TestAuthService_RefreshToken_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockToken.EXPECT().VerifyToken(refreshToken).Return(claims, nil)
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(userObj, nil)
-		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_access", time.Now(), nil)
-		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("", time.Time{}, errors.New("refresh error"))
-		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
+		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_access", time.Now(), nil)
+		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("", time.Time{}, errors.New("refresh error"))
 
 		resp, err := service.RefreshToken(ctx, refreshToken)
 		assert.Error(t, err)
 		assert.Nil(t, resp)
-		assert.Equal(t, common.ErrInternal, err)
+		assert.EqualError(t, err, "refresh error")
 	})
 
 	t.Run("UpdateRefreshTokenError", func(t *testing.T) {
@@ -387,20 +387,19 @@ func TestAuthService_RefreshToken_Extended(t *testing.T) {
 		mockToken := mocks.NewMockManager(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
-		service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+		service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 		ctx := context.Background()
 
 		mockToken.EXPECT().VerifyToken(refreshToken).Return(claims, nil)
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(userObj, nil)
-		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_access", time.Now(), nil)
-		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_refresh", time.Now().Add(time.Hour), nil)
+		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_access", time.Now(), nil)
+		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_refresh", time.Now().Add(time.Hour), nil)
 
 		mockRepo.EXPECT().UpdateRefreshToken(ctx, gomock.Any()).Return(errors.New("db error"))
-		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
 
 		resp, err := service.RefreshToken(ctx, refreshToken)
 		assert.Error(t, err)
 		assert.Nil(t, resp)
-		assert.Equal(t, common.ErrInternal, err)
+		assert.EqualError(t, err, "db error")
 	})
 }

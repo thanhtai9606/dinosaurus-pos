@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { SettingsPanel } from "@/components/SettingsPanel.tsx"
 import { ShiftControl } from '@/components/dashboard/ShiftControl'
 import { DashboardUserMenu } from '@/components/dashboard/DashboardUserMenu'
+import { TenantSwitcher } from '@/components/dashboard/TenantSwitcher'
 import { DashboardNavMenu } from '@/components/dashboard/DashboardNavMenu'
 import type { DashboardMenuEntry } from '@/hooks/useNavigationMenu'
 
@@ -72,6 +73,9 @@ export function DashboardSidebar({
                 <div className={cn("mt-auto p-4 space-y-3", isSidebarCollapsed && "p-2")}>
                     {!isSidebarCollapsed && (
                         <>
+                            <div className="hidden md:block">
+                                <TenantSwitcher />
+                            </div>
                             <div className="hidden md:block">
                                 <SettingsPanel />
                             </div>

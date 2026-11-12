@@ -1,1 +1,0 @@
-ALTER TABLE orders ALTER COLUMN discount_amount SET DEFAULT 0;

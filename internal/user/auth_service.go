@@ -4,6 +4,8 @@ import (
 	"POS-kasir/internal/activitylog"
 	activitylog_repo "POS-kasir/internal/activitylog/repository"
 	"POS-kasir/internal/common"
+	"POS-kasir/internal/tenant"
+	"POS-kasir/internal/tenants"
 	user_repo "POS-kasir/internal/user/repository"
 	"POS-kasir/pkg/logger"
 	"POS-kasir/pkg/utils"
@@ -20,15 +22,17 @@ import (
 
 type AthService struct {
 	UserRepo       user_repo.Querier
+	Tenants        *tenants.Repository
 	Log            logger.ILogger
 	Token          utils.Manager
 	AvatarRepo     IAthRepo
 	ActivityLogger activitylog.IActivityService
 }
 
-func NewAuthService(userRepo user_repo.Querier, log logger.ILogger, tokenManager utils.Manager, avaRepo IAthRepo, actLog activitylog.IActivityService) IAuthService {
+func NewAuthService(userRepo user_repo.Querier, tenantsRepo *tenants.Repository, log logger.ILogger, tokenManager utils.Manager, avaRepo IAthRepo, actLog activitylog.IActivityService) IAuthService {
 	return &AthService{
 		UserRepo:       userRepo,
+		Tenants:        tenantsRepo,
 		Log:            log,
 		Token:          tokenManager,
 		AvatarRepo:     avaRepo,
@@ -43,6 +47,96 @@ type IAuthService interface {
 	UploadAvatar(ctx context.Context, userID uuid.UUID, data []byte) (*ProfileResponse, error)
 	UpdatePassword(ctx context.Context, userID uuid.UUID, req UpdatePasswordRequest) error
 	RefreshToken(ctx context.Context, refreshToken string) (*LoginResponse, error)
+	SwitchTenant(ctx context.Context, userID uuid.UUID, tenantID uuid.UUID) (*LoginResponse, error)
+}
+
+func tenantSummaries(rows []tenants.Row) []TenantSummary {
+	out := make([]TenantSummary, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, TenantSummary{ID: r.ID, Code: r.Code, Name: r.Name})
+	}
+	return out
+}
+
+func defaultTenantRow() tenants.Row {
+	return tenants.Row{
+		ID:       tenant.DefaultTenantID,
+		Code:     "default",
+		Name:     "Default Store",
+		IsActive: true,
+	}
+}
+
+func (s *AthService) resolveLoginTenant(ctx context.Context, userID uuid.UUID, tenantCode *string) (tenants.Row, []TenantSummary, error) {
+	if s.Tenants == nil {
+		def := defaultTenantRow()
+		return def, tenantSummaries([]tenants.Row{def}), nil
+	}
+	list, err := s.Tenants.ListForUser(ctx, userID)
+	if err != nil {
+		return tenants.Row{}, nil, err
+	}
+	summaries := tenantSummaries(list)
+	if len(list) == 0 {
+		if err := s.Tenants.AddUserToDefaultTenant(ctx, userID); err != nil {
+			return tenants.Row{}, nil, err
+		}
+		list, err = s.Tenants.ListForUser(ctx, userID)
+		if err != nil {
+			return tenants.Row{}, nil, err
+		}
+		summaries = tenantSummaries(list)
+	}
+	if tenantCode != nil && *tenantCode != "" {
+		t, err := s.Tenants.GetByCode(ctx, *tenantCode)
+		if err != nil {
+			return tenants.Row{}, summaries, common.ErrForbidden
+		}
+		ok, err := s.Tenants.UserHasTenant(ctx, userID, t.ID)
+		if err != nil || !ok {
+			return tenants.Row{}, summaries, common.ErrForbidden
+		}
+		return t, summaries, nil
+	}
+	return list[0], summaries, nil
+}
+
+func (s *AthService) buildLoginResponse(ctx context.Context, user user_repo.User, tenantRow tenants.Row, tenantList []TenantSummary, refreshToken string) (*LoginResponse, error) {
+	token, expiredAt, err := s.Token.GenerateToken(user.Username, user.Email, user.ID, string(user.Role), tenantRow.ID)
+	if err != nil {
+		return nil, err
+	}
+	if refreshToken == "" {
+		refreshToken, _, err = s.Token.GenerateRefreshToken(user.Username, user.Email, user.ID, string(user.Role), tenantRow.ID)
+		if err != nil {
+			return nil, err
+		}
+		if err := s.UserRepo.UpdateRefreshToken(ctx, user_repo.UpdateRefreshTokenParams{
+			ID:           user.ID,
+			RefreshToken: &refreshToken,
+		}); err != nil {
+			return nil, err
+		}
+	}
+	return &LoginResponse{
+		ExpiredAt:    expiredAt,
+		Token:        token,
+		RefreshToken: refreshToken,
+		Tenant:       TenantSummary{ID: tenantRow.ID, Code: tenantRow.Code, Name: tenantRow.Name},
+		Tenants:      tenantList,
+		Profile: ProfileResponse{
+			ID:        user.ID,
+			IsActive:  user.IsActive,
+			Username:  user.Username,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt.Time,
+			UpdatedAt: user.UpdatedAt.Time,
+			Avatar:    user.Avatar,
+			Role:      user.Role,
+			Tenant:    &TenantSummary{ID: tenantRow.ID, Code: tenantRow.Code, Name: tenantRow.Name},
+			Tenants:   tenantList,
+		},
+	}, nil
 }
 
 func (s *AthService) Profile(ctx context.Context, userID uuid.UUID) (*ProfileResponse, error) {
@@ -79,6 +173,21 @@ func (s *AthService) Profile(ctx context.Context, userID uuid.UUID) (*ProfileRes
 		UpdatedAt: user.UpdatedAt.Time,
 		Avatar:    user.Avatar,
 		Role:      user.Role,
+	}
+
+	if s.Tenants != nil {
+		if rows, err := s.Tenants.ListForUser(ctx, userID); err == nil {
+			response.Tenants = tenantSummaries(rows)
+		}
+	}
+	if tid, ok := tenant.IDFromContext(ctx); ok {
+		for _, t := range response.Tenants {
+			if t.ID == tid {
+				tc := t
+				response.Tenant = &tc
+				break
+			}
+		}
 	}
 
 	return &response, nil
@@ -261,6 +370,13 @@ func (s *AthService) Register(ctx context.Context, req RegisterRequest) (*Profil
 		}
 	}
 
+	if s.Tenants != nil {
+		if err := s.Tenants.AddUserToDefaultTenant(ctx, user.ID); err != nil {
+			s.Log.Errorf("Register | Failed to assign default tenant: %v", err)
+			return nil, common.ErrInternal
+		}
+	}
+
 	actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID)
 	if !ok {
 		s.Log.Warnf("Register | Actor user ID not found in context for activity logging")
@@ -326,36 +442,15 @@ func (s *AthService) Login(ctx context.Context, req LoginRequest) (*LoginRespons
 		return nil, common.ErrInvalidCredentials
 	}
 
-	token, expiredAt, err := s.Token.GenerateToken(user.Username, user.Email, user.ID, string(user.Role))
+	tenantRow, tenantList, err := s.resolveLoginTenant(ctx, user.ID, req.TenantCode)
 	if err != nil {
-		s.Log.Errorf("Login | Failed to generate Token: %v", err)
-		s.ActivityLogger.Log(
-			ctx,
-			user.ID,
-			activitylog_repo.LogActionTypeLOGINFAILED,
-			activitylog_repo.LogEntityTypeUSER,
-			user.ID.String(),
-			logDetails,
-		)
-		return nil, common.ErrInvalidCredentials
+		s.Log.Errorf("Login | Tenant resolve failed: %v", err)
+		return nil, err
 	}
 
-	refreshToken, _, err := s.Token.GenerateRefreshToken(user.Username, user.Email, user.ID, string(user.Role))
-	if err != nil {
-		s.Log.Errorf("Login | Failed to generate Refresh Token: %v", err)
-		return nil, common.ErrInternal
-	}
-
-	if err := s.UserRepo.UpdateRefreshToken(ctx, user_repo.UpdateRefreshTokenParams{
-		ID:           user.ID,
-		RefreshToken: &refreshToken,
-	}); err != nil {
-		s.Log.Errorf("Login | Failed to update refresh token: %v", err)
-		return nil, common.ErrInternal
-	}
-
+	logCtx := tenant.WithID(ctx, tenantRow.ID)
 	s.ActivityLogger.Log(
-		ctx,
+		logCtx,
 		user.ID,
 		activitylog_repo.LogActionTypeLOGINSUCCESS,
 		activitylog_repo.LogEntityTypeUSER,
@@ -363,20 +458,12 @@ func (s *AthService) Login(ctx context.Context, req LoginRequest) (*LoginRespons
 		logDetails,
 	)
 
-	return &LoginResponse{
-		ExpiredAt:    expiredAt,
-		Token:        token,
-		RefreshToken: refreshToken,
-		Profile: ProfileResponse{
-			ID:        user.ID,
-			IsActive:  user.IsActive,
-			Username:  user.Username,
-			Email:     user.Email,
-			CreatedAt: user.CreatedAt.Time,
-			UpdatedAt: user.UpdatedAt.Time,
-			Role:      user.Role,
-		},
-	}, nil
+	resp, err := s.buildLoginResponse(ctx, user, tenantRow, tenantList, "")
+	if err != nil {
+		s.Log.Errorf("Login | Failed to issue tokens: %v", err)
+		return nil, common.ErrInternal
+	}
+	return resp, nil
 }
 
 func (s *AthService) RefreshToken(ctx context.Context, refreshToken string) (*LoginResponse, error) {
@@ -402,38 +489,64 @@ func (s *AthService) RefreshToken(ctx context.Context, refreshToken string) (*Lo
 		return nil, common.ErrUnauthorized
 	}
 
-	newAccessToken, newExpiredAt, err := s.Token.GenerateToken(user.Username, user.Email, user.ID, string(user.Role))
+	tenantID := claims.TenantID
+	if tenantID == uuid.Nil {
+		tenantID = tenant.DefaultTenantID
+	}
+
+	var tenantRow tenants.Row
+	var list []tenants.Row
+	if s.Tenants == nil {
+		tenantRow = defaultTenantRow()
+		list = []tenants.Row{tenantRow}
+	} else {
+		ok, err := s.Tenants.UserHasTenant(ctx, user.ID, tenantID)
+		if err != nil || !ok {
+			return nil, common.ErrForbidden
+		}
+		list, err = s.Tenants.ListForUser(ctx, user.ID)
+		if err != nil {
+			return nil, common.ErrInternal
+		}
+		for _, r := range list {
+			if r.ID == tenantID {
+				tenantRow = r
+				break
+			}
+		}
+		if tenantRow.ID == uuid.Nil {
+			return nil, common.ErrForbidden
+		}
+	}
+
+	return s.buildLoginResponse(ctx, user, tenantRow, tenantSummaries(list), "")
+}
+
+func (s *AthService) SwitchTenant(ctx context.Context, userID, tenantID uuid.UUID) (*LoginResponse, error) {
+	if s.Tenants == nil {
+		return nil, common.ErrForbidden
+	}
+	ok, err := s.Tenants.UserHasTenant(ctx, userID, tenantID)
+	if err != nil || !ok {
+		return nil, common.ErrForbidden
+	}
+	user, err := s.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
-		s.Log.Errorf("RefreshToken | Failed to generate access token: %v", err)
-		return nil, common.ErrInternal
+		return nil, common.ErrUnauthorized
 	}
-
-	newRefreshToken, _, err := s.Token.GenerateRefreshToken(user.Username, user.Email, user.ID, string(user.Role))
+	list, err := s.Tenants.ListForUser(ctx, userID)
 	if err != nil {
-		s.Log.Errorf("RefreshToken | Failed to generate refresh token: %v", err)
 		return nil, common.ErrInternal
 	}
-
-	if err := s.UserRepo.UpdateRefreshToken(ctx, user_repo.UpdateRefreshTokenParams{
-		ID:           user.ID,
-		RefreshToken: &newRefreshToken,
-	}); err != nil {
-		s.Log.Errorf("RefreshToken | Failed to update refresh token in DB: %v", err)
-		return nil, common.ErrInternal
+	var tenantRow tenants.Row
+	for _, r := range list {
+		if r.ID == tenantID {
+			tenantRow = r
+			break
+		}
 	}
-
-	return &LoginResponse{
-		ExpiredAt:    newExpiredAt,
-		Token:        newAccessToken,
-		RefreshToken: newRefreshToken,
-		Profile: ProfileResponse{
-			ID:        user.ID,
-			IsActive:  user.IsActive,
-			Username:  user.Username,
-			Email:     user.Email,
-			CreatedAt: user.CreatedAt.Time,
-			UpdatedAt: user.UpdatedAt.Time,
-			Role:      user.Role,
-		},
-	}, nil
+	if tenantRow.ID == uuid.Nil {
+		return nil, common.ErrForbidden
+	}
+	return s.buildLoginResponse(ctx, user, tenantRow, tenantSummaries(list), "")
 }

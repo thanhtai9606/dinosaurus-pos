@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Roll back all migrations, re-apply schema, and run seeder.
+# Drop public schema, apply single baseline migration, and run seeder.
 
 set -e
 
@@ -15,15 +15,23 @@ source "$SCRIPT_DIR/common.sh"
 
 require_postgres >/dev/null
 
-echo -e "${YELLOW}This will drop all migrated schema and re-seed sample data.${NC}"
+echo -e "${YELLOW}This will DROP the public schema, re-apply baseline migration, and re-seed.${NC}"
 read -r -p "Type YES to continue: " CONFIRM
 if [[ "$CONFIRM" != "YES" ]]; then
 	echo -e "${BLUE}Cancelled.${NC}"
 	exit 0
 fi
 
+CONTAINER="$(require_postgres)"
+
+docker exec "$CONTAINER" psql -U "$DB_USER" -d "$DB_NAME" -v ON_ERROR_STOP=1 <<-SQL
+DROP SCHEMA IF EXISTS public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO "$DB_USER";
+GRANT ALL ON SCHEMA public TO public;
+SQL
+
 cd "$REPO_ROOT"
-make migrate-down-all
 make migrate-up
 make seed
 

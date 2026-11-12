@@ -41,6 +41,8 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Put("/auth/me/avatar", authMiddleware, container.AuthHandler.UpdateAvatarHandler)
 	api.Put("/auth/me/password", authMiddleware, container.AuthHandler.UpdatePasswordHandler)
 	api.Post("/auth/logout", authMiddleware, container.AuthHandler.LogoutHandler)
+	api.Post("/auth/switch-tenant", authMiddleware, container.AuthHandler.SwitchTenantHandler)
+	api.Get("/tenants/mine", authMiddleware, container.TenantHandler.ListMine)
 
 	api.Get("/users", authMiddleware, container.UserHandler.GetAllUsersHandler)
 	api.Post("/users", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.UserHandler.CreateUserHandler)

@@ -75,6 +75,11 @@
         "update_password_success": "Cập nhật mật khẩu thành công",
         "update_password_failed": "Không thể cập nhật mật khẩu: {{message}}"
     },
+    "tenant": {
+        "label": "Cửa hàng",
+        "switched": "Đã đổi cửa hàng",
+        "switch_failed": "Không thể đổi cửa hàng"
+    },
     "sidebar": {
         "summary": "Tổng quan",
         "pos": "Máy POS",

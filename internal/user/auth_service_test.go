@@ -31,7 +31,7 @@ func TestAuthService_Login(t *testing.T) {
 	mockAvatar := mocks.NewMockIAthRepo(ctrl)
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 
-	service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+	service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 	ctx := context.Background()
 
 	// Setup data
@@ -58,13 +58,10 @@ func TestAuthService_Login(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(testUser, nil)
-
-		mockToken.EXPECT().GenerateToken(testUser.Username, testUser.Email, testUser.ID, string(testUser.Role)).Return("access_token", time.Now().Add(1*time.Hour), nil)
-		mockToken.EXPECT().GenerateRefreshToken(testUser.Username, testUser.Email, testUser.ID, string(testUser.Role)).Return("refresh_token", time.Now().Add(24*time.Hour), nil)
-
+		mockActivity.EXPECT().Log(gomock.Any(), testUser.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, testUser.ID.String(), gomock.Any())
+		mockToken.EXPECT().GenerateToken(testUser.Username, testUser.Email, testUser.ID, string(testUser.Role), gomock.Any()).Return("access_token", time.Now().Add(1*time.Hour), nil)
+		mockToken.EXPECT().GenerateRefreshToken(testUser.Username, testUser.Email, testUser.ID, string(testUser.Role), gomock.Any()).Return("refresh_token", time.Now().Add(24*time.Hour), nil)
 		mockRepo.EXPECT().UpdateRefreshToken(ctx, gomock.Any()).Return(nil)
-
-		mockActivity.EXPECT().Log(ctx, testUser.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, testUser.ID.String(), gomock.Any())
 
 		resp, err := service.Login(ctx, req)
 
@@ -112,7 +109,7 @@ func TestAuthService_Register(t *testing.T) {
 	mockAvatar := mocks.NewMockIAthRepo(ctrl)
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 
-	service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+	service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 	ctx := context.Background()
 
 	req := user.RegisterRequest{
@@ -180,7 +177,7 @@ func TestAuthService_Profile(t *testing.T) {
 	mockAvatar := mocks.NewMockIAthRepo(ctrl)
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 
-	service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+	service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 	ctx := context.Background()
 
 	userID := uuid.New()
@@ -246,7 +243,7 @@ func TestAuthService_UploadAvatar(t *testing.T) {
 	mockAvatar := mocks.NewMockIAthRepo(ctrl)
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 
-	service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+	service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 
 	userID := uuid.New()
 	ctx := context.WithValue(context.Background(), common.UserIDKey, userID)
@@ -329,7 +326,7 @@ func TestAuthService_UpdatePassword(t *testing.T) {
 	mockAvatar := mocks.NewMockIAthRepo(ctrl)
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 
-	service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+	service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 	ctx := context.Background()
 	userID := uuid.New()
 
@@ -429,7 +426,7 @@ func TestAuthService_RefreshToken(t *testing.T) {
 	mockAvatar := mocks.NewMockIAthRepo(ctrl)
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 
-	service := user.NewAuthService(mockRepo, mockLogger, mockToken, mockAvatar, mockActivity)
+	service := user.NewAuthService(mockRepo, nil, mockLogger, mockToken, mockAvatar, mockActivity)
 	ctx := context.Background()
 
 	validRefreshToken := "valid_refresh_token"
@@ -455,9 +452,9 @@ func TestAuthService_RefreshToken(t *testing.T) {
 
 		newAccessToken := "new_access_token"
 		newRefreshToken := "new_refresh_token"
-		mockToken.EXPECT().GenerateToken(u.Username, u.Email, u.ID, string(u.Role)).
+		mockToken.EXPECT().GenerateToken(u.Username, u.Email, u.ID, string(u.Role), gomock.Any()).
 			Return(newAccessToken, time.Now().Add(time.Hour), nil)
-		mockToken.EXPECT().GenerateRefreshToken(u.Username, u.Email, u.ID, string(u.Role)).
+		mockToken.EXPECT().GenerateRefreshToken(u.Username, u.Email, u.ID, string(u.Role), gomock.Any()).
 			Return(newRefreshToken, time.Now().Add(24*time.Hour), nil)
 
 		mockRepo.EXPECT().UpdateRefreshToken(ctx, gomock.Any()).DoAndReturn(func(ctx context.Context, arg user_repo.UpdateRefreshTokenParams) error {
@@ -548,18 +545,17 @@ func TestAuthService_RefreshToken(t *testing.T) {
 		mockToken.EXPECT().VerifyToken(validRefreshToken).Return(claims, nil)
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(u, nil)
 
-		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_access", time.Now(), nil)
-		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_refresh", time.Now(), nil)
+		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_access", time.Now(), nil)
+		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("new_refresh", time.Now(), nil)
 
 		mockRepo.EXPECT().UpdateRefreshToken(ctx, gomock.Any()).Return(pgx.ErrTxClosed)
-		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
 
 		_, err := service.RefreshToken(ctx, validRefreshToken)
 		if err == nil {
 			t.Error("expected error, got nil")
 		}
-		if err != common.ErrInternal {
-			t.Errorf("expected common.ErrInternal, got %v", err)
+		if !errors.Is(err, pgx.ErrTxClosed) {
+			t.Errorf("expected pgx.ErrTxClosed, got %v", err)
 		}
 	})
 }

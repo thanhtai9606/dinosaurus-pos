@@ -35,6 +35,8 @@ import (
 	settings_repo "POS-kasir/internal/settings/repository"
 	"POS-kasir/internal/shift"
 	shift_repo "POS-kasir/internal/shift/repository"
+	"POS-kasir/internal/tenant"
+	"POS-kasir/internal/tenants"
 	"POS-kasir/internal/user"
 	user_repo "POS-kasir/internal/user/repository"
 	"POS-kasir/pkg/cache"
@@ -110,6 +112,7 @@ type AppContainer struct {
 	SettingsHandler           *settings.SettingsHandler
 	PrinterHandler            *printer.PrinterHandler
 	ShiftHandler              shift.Handler
+	TenantHandler             *tenants.Handler
 	ShiftRepo                 shift_repo.Querier
 	ShiftService              shift.Service
 	WSHub                     *ws.Hub
@@ -187,46 +190,51 @@ func InitApp() *App {
 func BuildAppContainer(app *App) *AppContainer {
 	wsHub := ws.InitHub()
 
+	pool := app.DB.GetPool()
+	tenantDB := database.NewTenantDB(pool)
+	tenantRepo := tenants.NewRepository(pool)
+	tenantHandler := tenants.NewHandler(tenantRepo, app.Logger)
+
 	// Activity Log IActivityService
-	activityLogRepo := activitylog_repo.New(app.DB.GetPool())
+	activityLogRepo := activitylog_repo.New(tenantDB)
 	activityService := activitylog.NewActivityService(activityLogRepo, app.Logger)
 	activityLogHandler := activitylog.NewActivityLogHandler(activityService, app.Logger)
 
 	// User Module
 	userAvatarRepo := user.NewAuthRepo(app.Logger, app.R2)
-	userRepo := user_repo.New(app.DB.GetPool())
+	userRepo := user_repo.New(pool)
 	userService := user.NewUsrService(userRepo, app.Logger, activityService, userAvatarRepo)
 	userHandler := user.NewUsrHandler(userService, app.Logger, app.Validator)
 
 	// Auth Module (Merged into user domain)
-	authService := user.NewAuthService(userRepo, app.Logger, app.JWT, userAvatarRepo, activityService)
+	authService := user.NewAuthService(userRepo, tenantRepo, app.Logger, app.JWT, userAvatarRepo, activityService)
 	authHandler := user.NewAuthHandler(authService, app.Logger, app.Validator, app.Config)
 
 	// Category Module
-	categoryRepo := categories_repo.New(app.DB.GetPool())
+	categoryRepo := categories_repo.New(tenantDB)
 	categoryService := categories.NewCtgService(categoryRepo, app.Logger, activityService)
 	categoryHandler := categories.NewCtgHandler(categoryService, app.Logger)
 
 	// Customer Module
-	customerRepo := customers_repo.New(app.DB.GetPool())
+	customerRepo := customers_repo.New(tenantDB)
 	customerService := customers.NewCustomerService(customerRepo, app.Logger)
 	customerHandler := customers.NewCustomerHandler(customerService, app.Logger)
 
 	// Supplier Module
-	supplierRepo := suppliers_repo.New(app.DB.GetPool())
+	supplierRepo := suppliers_repo.New(tenantDB)
 	supplierService := suppliers.NewSupplierService(supplierRepo, app.Logger)
 	supplierHandler := suppliers.NewSupplierHandler(supplierService, app.Logger)
 
 	// Stock receipt Module
-	stockReceiptRepo := sr_repo.New(app.DB.GetPool())
+	stockReceiptRepo := sr_repo.New(tenantDB)
 	stockReceiptService := stockreceipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger)
 	stockReceiptHandler := stockreceipts.NewStockReceiptHandler(stockReceiptService, app.Logger)
 
-	supplierDebtRepo := sd_debts_repo.New(app.DB.GetPool())
+	supplierDebtRepo := sd_debts_repo.New(tenantDB)
 	supplierDebtService := supplierdebts.NewSupplierDebtService(supplierDebtRepo, app.Store, app.Logger)
 	supplierDebtHandler := supplierdebts.NewSupplierDebtHandler(supplierDebtService, app.Logger)
 
-	customerDebtRepo := cd_debts_repo.New(app.DB.GetPool())
+	customerDebtRepo := cd_debts_repo.New(tenantDB)
 	customerDebtService := customerdebts.NewCustomerDebtService(customerDebtRepo, app.Store, app.Logger)
 	customerDebtHandler := customerdebts.NewCustomerDebtHandler(customerDebtService, app.Logger)
 
@@ -243,8 +251,9 @@ func BuildAppContainer(app *App) *AppContainer {
 			app.Logger.Warnf("Meilisearch index setup failed: %v", err)
 		} else if app.Config.Meili.AutoReindex {
 			go func() {
-				svc := products.NewPrdService(app.Store, products_repo.New(app.DB.GetPool()), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer)
-				if n, err := svc.ReindexProductSearch(context.Background()); err != nil {
+				reindexCtx := tenant.WithID(context.Background(), tenant.DefaultTenantID)
+				svc := products.NewPrdService(app.Store, products_repo.New(tenantDB), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer)
+				if n, err := svc.ReindexProductSearch(reindexCtx); err != nil {
 					app.Logger.Warnf("Meilisearch auto-reindex failed: %v", err)
 				} else {
 					app.Logger.Infof("Meilisearch indexed %d products", n)
@@ -255,40 +264,40 @@ func BuildAppContainer(app *App) *AppContainer {
 
 	// Product Module
 	prdRepo := products.NewProductImageRepository(app.R2, app.Logger)
-	productsRepo := products_repo.New(app.DB.GetPool())
+	productsRepo := products_repo.New(tenantDB)
 	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService, productIndexer)
 	prdHandler := products.NewPrdHandler(prdService, app.Logger)
 
 	// Shift Module Repo
-	shiftRepo := shift_repo.New(app.DB.GetPool())
+	shiftRepo := shift_repo.New(tenantDB)
 
 	// Settings Module (needed by orders & printer)
-	settingsRepo := settings_repo.New(app.DB.GetPool())
+	settingsRepo := settings_repo.New(tenantDB)
 	settingsService := settings.NewSettingsService(app.Store, activityService, settingsRepo, app.R2, app.Logger)
 	settingsHandler := settings.NewSettingsHandler(settingsService, app.Logger)
 
 	// Order & Payment Module
-	ordersRepo := orders_repo.New(app.DB.GetPool())
+	ordersRepo := orders_repo.New(tenantDB)
 	orderService := orders.NewOrderService(app.Store, ordersRepo, productsRepo, app.MidtransService, activityService, settingsService, app.Logger, wsHub)
 	orderHandler := orders.NewOrderHandler(orderService, app.Logger)
 
 	// Payment Method Module
-	paymentMethodRepo := payment_methods_repo.New(app.DB.GetPool())
+	paymentMethodRepo := payment_methods_repo.New(tenantDB)
 	paymentMethodService := payment_methods.NewPaymentMethodService(paymentMethodRepo, app.Logger)
 	paymentMethodHandler := payment_methods.NewPaymentMethodHandler(paymentMethodService, app.Logger)
 
 	// Cancellation Reason Module
-	cancellationRepo := cancellation_reasons_repo.New(app.DB.GetPool())
+	cancellationRepo := cancellation_reasons_repo.New(tenantDB)
 	cancellationReasonService := cancellation_reasons.NewCancellationReasonService(cancellationRepo, app.Logger)
 	cancellationReasonHandler := cancellation_reasons.NewCancellationReasonHandler(cancellationReasonService, app.Logger)
 
 	// report module
-	reportRepo := report_repo.New(app.DB.GetPool())
+	reportRepo := report_repo.New(tenantDB)
 	reportService := report.NewRptService(app.Store, reportRepo, activityService, app.Logger, app.RedisCache)
 	reportHandler := report.NewRptHandler(reportService, app.Logger)
 
 	// Promotion Module
-	promotionsRepo := promotions_repo.New(app.DB.GetPool())
+	promotionsRepo := promotions_repo.New(tenantDB)
 	promotionService := promotions.NewPromotionService(app.Store, promotionsRepo, app.Logger, activityService)
 	promotionHandler := promotions.NewPromotionHandler(promotionService, app.Logger)
 
@@ -319,6 +328,7 @@ func BuildAppContainer(app *App) *AppContainer {
 		SettingsHandler:           settingsHandler,
 		PrinterHandler:            printerHandler,
 		ShiftHandler:              shiftHandler,
+		TenantHandler:             tenantHandler,
 		ShiftRepo:                 shiftRepo,
 		ShiftService:              shiftService,
 		WSHub:                     wsHub,

@@ -7,6 +7,8 @@ import (
 	payment_methods_repo "POS-kasir/internal/payment_methods/repository"
 	user_repo "POS-kasir/internal/user/repository"
 	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
+	"POS-kasir/internal/tenant"
+	"POS-kasir/internal/tenants"
 	"POS-kasir/pkg/database"
 	"POS-kasir/pkg/database/seeder"
 	"POS-kasir/pkg/logger"
@@ -41,6 +43,13 @@ func main() {
 	}
 
 	pool := db.GetPool()
+	tenantRepo := tenants.NewRepository(pool)
+	if err := tenantRepo.EnsureDefaultTenant(ctx); err != nil {
+		log.Fatalf("Failed to ensure default tenant: %v", err)
+	}
+
+	tenantDB := database.NewTenantDB(pool)
+	ctx = tenant.WithID(ctx, tenant.DefaultTenantID)
 
 	r2Client, err := cloudflarer2.NewCloudflareR2(cfg, logr)
 	if err != nil {
@@ -48,12 +57,16 @@ func main() {
 	}
 
 	userRepo := user_repo.New(pool)
-	catRepo := categories_repo.New(pool)
-	paymentMethodRepo := payment_methods_repo.New(pool)
-	cancelRepo := cancellation_reasons_repo.New(pool)
+	catRepo := categories_repo.New(tenantDB)
+	paymentMethodRepo := payment_methods_repo.New(tenantDB)
+	cancelRepo := cancellation_reasons_repo.New(tenantDB)
 
 	if err := seeder.RunSeeders(ctx, pool, userRepo, catRepo, paymentMethodRepo, cancelRepo, r2Client, logr); err != nil {
 		log.Fatalf("Seeding failed: %v", err)
+	}
+
+	if err := tenantRepo.AssignAllUsersToDefault(ctx); err != nil {
+		log.Fatalf("Failed to assign users to default tenant: %v", err)
 	}
 
 	log.Println("Seeding completed successfully.")

@@ -91,12 +91,51 @@ export function formatMoney(
   const fd =
     fractionDigits ??
     (code === 'IDR' || code === 'VND' ? 0 : 2)
+  const currencyCode = CURRENCY_LOCALE[code] ? code : 'IDR'
   return new Intl.NumberFormat(loc, {
     style: 'currency',
-    currency: CURRENCY_LOCALE[code] ? code : 'IDR',
+    currency: currencyCode,
     minimumFractionDigits: fd,
     maximumFractionDigits: fd,
   }).format(amount)
+}
+
+/** Currency glyph/symbol for input prefixes and chart axes (e.g. ₫, Rp). */
+export function getCurrencySymbol(currency: string, locale?: string) {
+  const code = (currency || 'IDR').toUpperCase()
+  const loc = locale ?? CURRENCY_LOCALE[code] ?? 'en-US'
+  const currencyCode = CURRENCY_LOCALE[code] ? code : 'IDR'
+  try {
+    const parts = new Intl.NumberFormat(loc, {
+      style: 'currency',
+      currency: currencyCode,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).formatToParts(1)
+    const sym = parts.find((p) => p.type === 'currency')?.value
+    if (sym) return sym
+  } catch {
+    /* fallback */
+  }
+  return code
+}
+
+/** Y-axis shorthand for charts (₫120k / Rp120k). */
+export function formatMoneyAxisCompact(
+  amount: number,
+  currency: string,
+  locale?: string,
+) {
+  const symbol = getCurrencySymbol(currency, locale)
+  const n = Number(amount)
+  if (!Number.isFinite(n)) return symbol
+  if (Math.abs(n) >= 1_000_000) {
+    return `${symbol}${(n / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`
+  }
+  if (Math.abs(n) >= 1_000) {
+    return `${symbol}${(n / 1_000).toLocaleString(undefined, { maximumFractionDigits: 0 })}k`
+  }
+  return `${symbol}${n.toLocaleString()}`
 }
 
 /** @deprecated Prefer useFormatMoney() — always IDR */

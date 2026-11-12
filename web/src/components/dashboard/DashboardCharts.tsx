@@ -20,6 +20,7 @@ import {
     Legend,
 } from 'recharts'
 import { useTranslation } from 'react-i18next'
+import { useFormatMoneyAxis } from '@/context/MoneyContext'
 
 const COLORS = ['#4F46E5', '#F59E0B', '#7C3AED', '#10B981', '#EC4899', '#06B6D4']
 
@@ -49,6 +50,7 @@ export default function DashboardCharts({
     chartType,
 }: DashboardChartsProps) {
     const { t } = useTranslation()
+    const formatAxis = useFormatMoneyAxis()
 
     if (chartType === 'bar') {
         return (
@@ -68,7 +70,7 @@ export default function DashboardCharts({
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
-                        tickFormatter={(value) => `Rp${(value / 1000).toLocaleString()}k`}
+                        tickFormatter={(value) => formatAxis(Number(value))}
                     />
                     <RechartsTooltip
                         formatter={(value: any) => formatCurrency(Number(value || 0))}

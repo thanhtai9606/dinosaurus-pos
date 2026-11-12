@@ -25,6 +25,7 @@ type IAuthHandler interface {
 	AddUserHandler(c fiber.Ctx) error
 	UpdateAvatarHandler(c fiber.Ctx) error
 	RefreshHandler(c fiber.Ctx) error
+	SwitchTenantHandler(c fiber.Ctx) error
 }
 
 type AthHandler struct {
@@ -214,8 +215,10 @@ func (h *AthHandler) LoginHandler(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.SuccessResponse{
 		Message: "Success",
 		Data: fiber.Map{
-			"expired": resp.ExpiredAt,
-			"profile": resp.Profile,
+			"expired":  resp.ExpiredAt,
+			"profile":  resp.Profile,
+			"tenant":   resp.Tenant,
+			"tenants":  resp.Tenants,
 		},
 	})
 }
@@ -576,8 +579,81 @@ func (h *AthHandler) RefreshHandler(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(common.SuccessResponse{
 		Message: "Token refreshed successfully",
 		Data: fiber.Map{
-			"expired": resp.ExpiredAt,
-			"profile": resp.Profile,
+			"expired":  resp.ExpiredAt,
+			"profile":  resp.Profile,
+			"tenant":   resp.Tenant,
+			"tenants":  resp.Tenants,
+		},
+	})
+}
+
+// SwitchTenantHandler issues new tokens for another tenant the user belongs to.
+// @Summary      Switch tenant
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        request body SwitchTenantRequest true "Target tenant"
+// @Success      200 {object} common.SuccessResponse
+// @Failure      403 {object} common.ErrorResponse
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /auth/switch-tenant [post]
+func (h *AthHandler) SwitchTenantHandler(c fiber.Ctx) error {
+	userVal := c.Locals("user_id")
+	userID, ok := userVal.(uuid.UUID)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(common.ErrorResponse{Message: "unauthorized"})
+	}
+	var req SwitchTenantRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "invalid body", Error: err.Error()})
+	}
+	if done, err := common.ValidateAndRespond(c, h.Validator, h.Log, &req); done {
+		return err
+	}
+	resp, err := h.Service.SwitchTenant(c.RequestCtx(), userID, req.TenantID)
+	if err != nil {
+		if errors.Is(err, common.ErrForbidden) {
+			return c.Status(fiber.StatusForbidden).JSON(common.ErrorResponse{Message: "forbidden"})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "switch failed"})
+	}
+	cookie := &fiber.Cookie{
+		Name:     "access_token",
+		Value:    resp.Token,
+		Path:     "/",
+		Domain:   h.cfg.Server.CookieDomain,
+		Expires:  resp.ExpiredAt,
+		MaxAge:   int(time.Until(resp.ExpiredAt).Seconds()),
+		HTTPOnly: true,
+		Secure:   h.cfg.Server.Env == "production",
+		SameSite: fiber.CookieSameSiteLaxMode,
+	}
+	refreshCookie := &fiber.Cookie{
+		Name:     "refresh_token",
+		Value:    resp.RefreshToken,
+		Path:     "/",
+		Domain:   h.cfg.Server.CookieDomain,
+		Expires:  time.Now().Add(h.cfg.JWT.RefreshTokenDuration),
+		MaxAge:   int(h.cfg.JWT.RefreshTokenDuration.Seconds()),
+		HTTPOnly: true,
+		Secure:   h.cfg.Server.Env == "production",
+		SameSite: fiber.CookieSameSiteLaxMode,
+	}
+	if h.cfg.Server.WebFrontendCrossOrigin {
+		cookie.SameSite = fiber.CookieSameSiteNoneMode
+		cookie.Secure = true
+		refreshCookie.SameSite = fiber.CookieSameSiteNoneMode
+		refreshCookie.Secure = true
+	}
+	c.Cookie(cookie)
+	c.Cookie(refreshCookie)
+	return c.Status(fiber.StatusOK).JSON(common.SuccessResponse{
+		Message: "ok",
+		Data: fiber.Map{
+			"expired":  resp.ExpiredAt,
+			"profile":  resp.Profile,
+			"tenant":   resp.Tenant,
+			"tenants":  resp.Tenants,
 		},
 	})
 }

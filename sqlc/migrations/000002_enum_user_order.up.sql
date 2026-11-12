@@ -1,1 +1,0 @@
-CREATE TYPE user_order_column AS ENUM ('created_at', 'username', 'email');

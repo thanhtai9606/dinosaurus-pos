@@ -2,11 +2,13 @@ package middleware
 
 import (
 	"POS-kasir/internal/common"
+	"POS-kasir/internal/tenant"
 	"POS-kasir/pkg/logger"
 
 	"POS-kasir/pkg/utils"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/google/uuid"
 )
 
 func AuthMiddleware(tokenManager utils.Manager, log logger.ILogger) fiber.Handler {
@@ -34,6 +36,13 @@ func AuthMiddleware(tokenManager utils.Manager, log logger.ILogger) fiber.Handle
 		log.Infof("current user is %v, role is %v, email is %v, user ID is %v", claims.Username, claims.Role, claims.Email, claims.UserID)
 
 		c.RequestCtx().SetUserValue(common.UserIDKey, claims.UserID)
+
+		tenantID := claims.TenantID
+		if tenantID == uuid.Nil {
+			tenantID = tenant.DefaultTenantID
+		}
+		c.Locals("tenant_id", tenantID)
+		c.RequestCtx().SetUserValue(common.TenantIDKey, tenantID)
 
 		return c.Next()
 	}

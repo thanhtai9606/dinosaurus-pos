@@ -73,6 +73,11 @@
         "update_password_success": "Password updated successfully",
         "update_password_failed": "Failed to update password: {{message}}"
     },
+    "tenant": {
+        "label": "Store",
+        "switched": "Switched store",
+        "switch_failed": "Could not switch store"
+    },
     "sidebar": {
         "summary": "Summary",
         "pos": "POS",

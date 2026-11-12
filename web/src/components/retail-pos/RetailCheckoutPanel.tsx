@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useFormatMoney } from '@/context/MoneyContext'
+import { useFormatMoney, useMoney } from '@/context/MoneyContext'
 import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
 import { cn } from '@/lib/utils'
 
@@ -63,6 +63,7 @@ export function RetailCheckoutPanel({
     quickAmounts,
 }: Props) {
     const formatMoney = useFormatMoney()
+    const { currencyCode } = useMoney()
     const changeDue = Math.max(0, cashReceived - grandTotal)
     const cashShort = settlementMode === 'cash' && cashReceived > 0 && cashReceived < grandTotal
 
@@ -100,7 +101,7 @@ export function RetailCheckoutPanel({
                     <Tabs value={discountMode} onValueChange={(v) => onDiscountModeChange(v as 'amount' | 'percent')}>
                         <TabsList className="grid w-full grid-cols-2 h-8">
                             <TabsTrigger value="amount" className="text-xs">
-                                VND
+                                {currencyCode}
                             </TabsTrigger>
                             <TabsTrigger value="percent" className="text-xs">
                                 %

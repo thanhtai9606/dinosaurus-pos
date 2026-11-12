@@ -32,6 +32,7 @@ import {
 import { Label } from "@/components/ui/label.tsx";
 import { useImageCropper } from "@/hooks/use-image-cropper.ts";
 import { ImageCropperDialog } from "@/components/common/ImageCropperDialog.tsx";
+import { useMoney } from '@/context/MoneyContext'
 
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -61,6 +62,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
     categories: any[]
 }) {
     const { t } = useTranslation();
+    const { currencySymbol } = useMoney()
     const createMutation = useCreateProductMutation()
     const updateMutation = useUpdateProductMutation()
     const uploadImageMutation = useUploadProductImageMutation()
@@ -476,7 +478,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                         <Label htmlFor={field.name} className="text-right mt-3">{t('products.form.price')}</Label>
                                                         <div className="col-span-3 space-y-1">
                                                             <div className="relative">
-                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
+                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">{currencySymbol}</span>
                                                                 <Input
                                                                     id={field.name}
                                                                     name={field.name}
@@ -508,7 +510,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                         <Label htmlFor={field.name} className="text-right mt-3">{t('products.form.cost_price')}</Label>
                                                         <div className="col-span-3 space-y-1">
                                                             <div className="relative">
-                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
+                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">{currencySymbol}</span>
                                                                 <Input
                                                                     id={field.name}
                                                                     name={field.name}
@@ -661,7 +663,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                                 />
                                                             </div>
                                                             <div className="space-y-1 relative">
-                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">Rp</span>
+                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">{currencySymbol}</span>
                                                                 <Input
                                                                     type="text"
                                                                     inputMode="numeric"

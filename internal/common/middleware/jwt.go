@@ -3,11 +3,13 @@ package middleware
 import (
 	"POS-kasir/config"
 	"POS-kasir/internal/common"
+	"POS-kasir/internal/tenant"
 	"POS-kasir/pkg/logger"
 	"POS-kasir/pkg/utils"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/google/uuid"
 )
 
 func JWTAuthMiddleware(tokenManager utils.Manager, cfg *config.AppConfig, log logger.ILogger, require bool) fiber.Handler {
@@ -47,6 +49,13 @@ func JWTAuthMiddleware(tokenManager utils.Manager, cfg *config.AppConfig, log lo
 		c.Locals("user_id", claims.UserID)
 
 		c.RequestCtx().SetUserValue(common.UserIDKey, claims.UserID)
+
+		tenantID := claims.TenantID
+		if tenantID == uuid.Nil {
+			tenantID = tenant.DefaultTenantID
+		}
+		c.Locals("tenant_id", tenantID)
+		c.RequestCtx().SetUserValue(common.TenantIDKey, tenantID)
 
 		return c.Next()
 	}

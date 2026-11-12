@@ -130,3 +130,18 @@ func (mr *MockIAuthServiceMockRecorder) UploadAvatar(ctx, userID, data any) *gom
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadAvatar", reflect.TypeOf((*MockIAuthService)(nil).UploadAvatar), ctx, userID, data)
 }
+
+// SwitchTenant mocks base method.
+func (m *MockIAuthService) SwitchTenant(ctx context.Context, userID, tenantID uuid.UUID) (*user.LoginResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SwitchTenant", ctx, userID, tenantID)
+	ret0, _ := ret[0].(*user.LoginResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SwitchTenant indicates an expected call of SwitchTenant.
+func (mr *MockIAuthServiceMockRecorder) SwitchTenant(ctx, userID, tenantID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SwitchTenant", reflect.TypeOf((*MockIAuthService)(nil).SwitchTenant), ctx, userID, tenantID)
+}

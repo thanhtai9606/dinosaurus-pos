@@ -3,6 +3,8 @@ package store
 import (
 	"context"
 
+	"POS-kasir/internal/tenant"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -25,6 +27,13 @@ func (store *SQLStore) ExecTx(ctx context.Context, fn func(pgx.Tx) error) (err e
 	tx, err := store.db.Begin(ctx)
 	if err != nil {
 		return err
+	}
+
+	if tid, ok := tenant.IDFromContext(ctx); ok {
+		if _, err = tx.Exec(ctx, `SELECT set_config('app.tenant_id', $1, true)`, tid.String()); err != nil {
+			_ = tx.Rollback(ctx)
+			return err
+		}
 	}
 
 	defer func() {

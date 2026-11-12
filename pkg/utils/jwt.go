@@ -11,8 +11,8 @@ import (
 )
 
 type Manager interface {
-	GenerateToken(username, email string, userID uuid.UUID, role string) (string, time.Time, error)
-	GenerateRefreshToken(username, email string, userID uuid.UUID, role string) (string, time.Time, error)
+	GenerateToken(username, email string, userID uuid.UUID, role string, tenantID uuid.UUID) (string, time.Time, error)
+	GenerateRefreshToken(username, email string, userID uuid.UUID, role string, tenantID uuid.UUID) (string, time.Time, error)
 	VerifyToken(tokenStr string) (JWTClaims, error)
 }
 
@@ -31,24 +31,26 @@ type JWTClaims struct {
 	Email    string    `json:"email"`
 	Role     string    `json:"role"`
 	UserID   uuid.UUID `json:"user_id"`
+	TenantID uuid.UUID `json:"tenant_id"`
 	Type     string    `json:"type"`
 	jwt.RegisteredClaims
 }
 
-func (j *JWTManager) GenerateToken(username, email string, userID uuid.UUID, role string) (string, time.Time, error) {
-	return j.generateToken(username, email, userID, role, "access", j.cfg.JWT.Duration)
+func (j *JWTManager) GenerateToken(username, email string, userID uuid.UUID, role string, tenantID uuid.UUID) (string, time.Time, error) {
+	return j.generateToken(username, email, userID, role, tenantID, "access", j.cfg.JWT.Duration)
 }
 
-func (j *JWTManager) GenerateRefreshToken(username, email string, userID uuid.UUID, role string) (string, time.Time, error) {
-	return j.generateToken(username, email, userID, role, "refresh", j.cfg.JWT.RefreshTokenDuration)
+func (j *JWTManager) GenerateRefreshToken(username, email string, userID uuid.UUID, role string, tenantID uuid.UUID) (string, time.Time, error) {
+	return j.generateToken(username, email, userID, role, tenantID, "refresh", j.cfg.JWT.RefreshTokenDuration)
 }
 
-func (j *JWTManager) generateToken(username, email string, userID uuid.UUID, role string, tokenType string, duration time.Duration) (string, time.Time, error) {
+func (j *JWTManager) generateToken(username, email string, userID uuid.UUID, role string, tenantID uuid.UUID, tokenType string, duration time.Duration) (string, time.Time, error) {
 	claims := JWTClaims{
 		Username: username,
 		Email:    email,
 		Role:     role,
 		UserID:   userID,
+		TenantID: tenantID,
 		Type:     tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),

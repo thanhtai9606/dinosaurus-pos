@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AxiosError, type AxiosResponse } from 'axios'
 import { settingsApi, printerApi, axiosInstance } from '@/lib/api/client'
 import { InternalSettingsUpdateBrandingRequest, InternalSettingsUpdatePrinterSettingsRequest } from '../generated'
 import { useRBAC } from '@/lib/auth/rbac'
@@ -13,6 +14,18 @@ export type FinancialSettings = {
     tax_rate: number
     service_charge_rate: number
     tax_enabled: boolean
+}
+
+async function putSettingsWithFallback<T>(path: string, data: T): Promise<AxiosResponse> {
+    const url = `/settings/${path}`
+    try {
+        return await axiosInstance.put(url, data)
+    } catch (err) {
+        if (err instanceof AxiosError && err.response?.status === 405) {
+            return await axiosInstance.post(url, data)
+        }
+        throw err
+    }
 }
 
 export type InvoiceSettings = {
@@ -158,7 +171,7 @@ export function useUpdateFinancialSettingsMutation() {
     const isAllowed = canAccessApi('PUT', '/settings/financial')
     const mutation = useMutation({
         mutationFn: async (data: FinancialSettings) => {
-            const res = await axiosInstance.put('/settings/financial', data)
+            const res = await putSettingsWithFallback('financial', data)
             return (res.data as any).data as FinancialSettings
         },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: financialSettingsQueryKey }),
@@ -187,7 +200,7 @@ export function useUpdateInvoiceSettingsMutation() {
     const isAllowed = canAccessApi('PUT', '/settings/invoice')
     const mutation = useMutation({
         mutationFn: async (data: InvoiceSettings) => {
-            const res = await axiosInstance.put('/settings/invoice', data)
+            const res = await putSettingsWithFallback('invoice', data)
             return (res.data as any).data as InvoiceSettings
         },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: invoiceSettingsQueryKey }),

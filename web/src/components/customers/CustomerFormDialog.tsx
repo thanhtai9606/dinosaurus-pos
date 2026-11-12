@@ -142,6 +142,12 @@ export function CustomerFormDialog({
 
     const profileFields = (
         <div className="grid gap-4 py-2 sm:grid-cols-2">
+            {customerToEdit?.code ? (
+                <div className="space-y-1 sm:col-span-2">
+                    <Label>{t('customers.table.code', 'Code')}</Label>
+                    <p className="font-mono text-sm font-medium">{customerToEdit.code}</p>
+                </div>
+            ) : null}
             <form.Field
                 name="name"
                 children={(field) => (

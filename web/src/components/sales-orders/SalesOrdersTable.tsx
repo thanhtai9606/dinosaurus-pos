@@ -12,6 +12,7 @@ type OrderRow = {
     status?: string
     created_at?: string
     net_total?: number
+    order_no?: string
     queue_number?: string
     is_paid?: boolean
     items?: Array<{ product_name?: string; quantity?: number }>
@@ -63,7 +64,7 @@ export function SalesOrdersTable({
                             onClick={() => onRowClick(order)}
                         >
                             <TableCell className="font-mono font-medium">
-                                {order.queue_number || order.id?.slice(0, 6) || '—'}
+                                {order.order_no || order.queue_number || '—'}
                             </TableCell>
                             <TableCell className="text-sm">
                                 <div className="flex items-center gap-2">

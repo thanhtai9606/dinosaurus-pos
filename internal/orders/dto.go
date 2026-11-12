@@ -37,6 +37,7 @@ type ListOrdersRequest struct {
 	Statuses   []repository.OrderStatus `query:"statuses" validate:"dive,oneof=open in_progress served paid cancelled"`
 	UserID     *uuid.UUID               `query:"user_id"`
 	CustomerID *uuid.UUID               `query:"customer_id"`
+	Search     string                   `query:"search"`
 }
 
 type CancelOrderRequest struct {
@@ -77,6 +78,7 @@ type OrderItemResponse struct {
 	ProductName    string                    `json:"product_name,omitempty"`
 	Barcode        string                    `json:"barcode,omitempty"`
 	Sku            string                    `json:"sku,omitempty"`
+	ProductCode    string                    `json:"product_code,omitempty"`
 	SaleUnitName   string                    `json:"sale_unit_name,omitempty"`
 	Quantity       int32                     `json:"quantity"`
 	PriceAtSale    int64                     `json:"price_at_sale"`
@@ -88,6 +90,7 @@ type OrderItemResponse struct {
 
 type OrderDetailResponse struct {
 	ID                      uuid.UUID              `json:"id"`
+	OrderNo                 string                 `json:"order_no"`
 	UserID                  *uuid.UUID             `json:"user_id,omitempty"`
 	CustomerID              *uuid.UUID             `json:"customer_id,omitempty"`
 	Type                    repository.OrderType   `json:"type"`
@@ -110,6 +113,7 @@ type OrderDetailResponse struct {
 
 type OrderListResponse struct {
 	ID          uuid.UUID              `json:"id"`
+	OrderNo     string                 `json:"order_no"`
 	UserID      *uuid.UUID             `json:"user_id,omitempty"`
 	Type        repository.OrderType   `json:"type"`
 	Status      repository.OrderStatus `json:"status"`

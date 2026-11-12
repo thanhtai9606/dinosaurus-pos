@@ -56,12 +56,16 @@ function SalesOrdersPage() {
         return undefined
     }, [selectedTab])
 
+    const [searchTerm, setSearchTerm] = useState('')
+    const debouncedSearch = useDebounce(searchTerm, 400)
+
     const { data, isLoading, isFetching } = useQuery(
         ordersListQueryOptions({
             page,
             limit,
             statuses: statusesFilter,
             userId: selectedUserId === 'all' ? undefined : selectedUserId,
+            search: debouncedSearch.trim() || undefined,
         }),
     )
 
@@ -73,32 +77,7 @@ function SalesOrdersPage() {
         total_data: 0,
     }
 
-    const [searchTerm, setSearchTerm] = useState('')
-    const debouncedSearch = useDebounce(searchTerm, 400)
-
-    const displayedOrders = useMemo(() => {
-        const q = debouncedSearch.trim().toLowerCase()
-        if (!q) return orders
-        return orders.filter(
-            (order: {
-                id?: string
-                queue_number?: string
-                user_id?: string
-                items?: { product_name?: string }[]
-            }) => {
-                const queue = String(order.queue_number ?? '')
-                const id = String(order.id ?? '')
-                const cashier = userMap.get(order.user_id || '')?.toLowerCase() ?? ''
-                const itemsText = order.items?.map((i) => i.product_name?.toLowerCase() ?? '').join(' ') ?? ''
-                return (
-                    queue.toLowerCase().includes(q) ||
-                    id.toLowerCase().includes(q) ||
-                    cashier.includes(q) ||
-                    itemsText.includes(q)
-                )
-            },
-        )
-    }, [orders, debouncedSearch, userMap])
+    const displayedOrders = orders
 
     const [detailId, setDetailId] = useState<string | null>(null)
     const [detailOpen, setDetailOpen] = useState(false)
@@ -121,7 +100,7 @@ function SalesOrdersPage() {
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                         <Input
                             className="max-w-md"
-                            placeholder={t('transactions.search_placeholder')}
+                            placeholder={t('salesOrders.search_placeholder')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />

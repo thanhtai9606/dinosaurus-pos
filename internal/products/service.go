@@ -5,6 +5,7 @@ import (
 	activitylog_repo "POS-kasir/internal/activitylog/repository"
 	"POS-kasir/internal/common"
 	"POS-kasir/internal/common/pagination"
+	"POS-kasir/internal/docno"
 	"POS-kasir/internal/common/store"
 	products_repo "POS-kasir/internal/products/repository"
 	"POS-kasir/pkg/logger"
@@ -616,6 +617,10 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 		saleUnits = nil
 	}
 
+	code := ""
+	if fullProduct.Code != nil {
+		code = *fullProduct.Code
+	}
 	return &ProductResponse{
 		ID:                fullProduct.ID,
 		Name:              fullProduct.Name,
@@ -624,6 +629,7 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 		Price:             productPrice,
 		CostPrice:         costPrice,
 		Stock:             fullProduct.Stock,
+		Code:              code,
 		Sku:               fullProduct.Sku,
 		Barcode:           fullProduct.Barcode,
 		Unit:              unit,
@@ -710,6 +716,10 @@ func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) 
 			sid := uuid.UUID(p.DefaultSupplierID.Bytes)
 			defaultSupplierID = &sid
 		}
+		pcode := ""
+		if p.Code != nil {
+			pcode = *p.Code
+		}
 		productsResponse = append(productsResponse, ProductListResponse{
 			ID:                p.ID,
 			Name:              p.Name,
@@ -718,6 +728,7 @@ func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) 
 			Price:             price,
 			CostPrice:         costPrice,
 			Stock:             p.Stock,
+			Code:              pcode,
 			Sku:               p.Sku,
 			Barcode:           p.Barcode,
 			Unit:              unit,
@@ -759,6 +770,11 @@ func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest
 		if req.DefaultSupplierID != nil {
 			defaultSupplier = pgtype.UUID{Bytes: *req.DefaultSupplierID, Valid: true}
 		}
+		productCount, err := qtx.CountActiveProductsForCode(ctx)
+		if err != nil {
+			return err
+		}
+		code := docno.ProductCode(productCount + 1)
 		productParams := products_repo.CreateProductParams{
 			Name:              req.Name,
 			Price:             price,
@@ -769,6 +785,7 @@ func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest
 			Unit:              unit,
 			MinStock:          req.MinStock,
 			DefaultSupplierID: defaultSupplier,
+			Code:              &code,
 		}
 
 		newProduct, err = qtx.CreateProduct(ctx, productParams)

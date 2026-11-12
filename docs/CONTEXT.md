@@ -16,6 +16,18 @@ Tài liệu này gom **quyết định sản phẩm, luồng nghiệp vụ và �
 
 Remote hiện tại: GitLab `devops/dinosaurus-pos` (fork/tùy biến từ POS-kasir gốc).
 
+### Mã nghiệp vụ (UUID vẫn là khóa chính)
+
+| Thực thể | Cột DB | Format mới | Ghi chú |
+|----------|--------|------------|---------|
+| Đơn bán | `orders.order_no` | `SO-YYYYMMDD-####` | Tạo lúc `CreateOrder`; tìm `GET /orders?search=` |
+| Khách | `customers.code` | `CUS-######` | Tìm trong list customers `search` |
+| Sản phẩm | `products.code` | `P-######` | Khác SKU/barcode bán lẻ; tìm trong list products |
+| Phiếu nhập | `stock_receipts.receipt_no` | `GR-YYYYMMDD-###` | Đã có từ trước |
+| NCC | `suppliers.code` | tùy nhập | Đã có từ trước |
+
+Migration: `000028_business_document_codes` — chạy `make migrate-up` sau deploy.
+
 ---
 
 ## Phiếu nhập kho (stock receipts)

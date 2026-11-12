@@ -41,6 +41,7 @@ type OrderItemRow = {
     id?: string
     product_id?: string
     product_name?: string
+    product_code?: string
     barcode?: string
     sku?: string
     sale_unit_name?: string
@@ -54,7 +55,7 @@ type OrderItemRow = {
 }
 
 function orderItemCode(item: OrderItemRow) {
-    return item.barcode || item.sku || '—'
+    return item.product_code || item.barcode || item.sku || '—'
 }
 
 function orderItemLineTotal(item: OrderItemRow) {
@@ -68,6 +69,7 @@ function orderItemLineTotal(item: OrderItemRow) {
 
 type OrderClipboardSource = {
     id?: string
+    order_no?: string
     customer_id?: string
     user_id?: string
     created_at?: string
@@ -87,7 +89,7 @@ function buildOrderClipboardText(
     extras?: { customerName?: string; cashierName?: string },
 ) {
     const lines = [
-        `Order: ${order.id ?? ''}`,
+        `Order: ${order.order_no ?? order.id ?? ''}`,
         `Customer: ${extras?.customerName ?? order.customer_id ?? '—'}`,
         `Cashier: ${extras?.cashierName ?? order.user_id ?? '—'}`,
         `Date: ${order.created_at ? new Date(order.created_at).toLocaleString() : ''}`,
@@ -275,7 +277,7 @@ export function OrderDetailDialog({
         onChanged?.()
     }
 
-    const shortOrderRef = order?.id?.slice(0, 8)?.toUpperCase()
+    const displayOrderNo = order?.order_no
 
     return (
         <>
@@ -284,9 +286,9 @@ export function OrderDetailDialog({
                     <DialogHeader>
                         <DialogTitle className="flex flex-wrap items-center gap-2">
                             {t('salesOrders.detail_title')}
-                            {shortOrderRef && (
+                            {displayOrderNo && (
                                 <span className="font-mono text-base font-normal text-muted-foreground">
-                                    #{shortOrderRef}
+                                    {displayOrderNo}
                                 </span>
                             )}
                             {order?.status && (
@@ -314,14 +316,19 @@ export function OrderDetailDialog({
                                     </h3>
                                     <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                         <MetaField
-                                            label={t('salesOrders.meta.order_id')}
-                                            value={order.id}
+                                            label={t('salesOrders.meta.order_no')}
+                                            value={order.order_no}
                                             mono
                                         />
                                         <MetaField
-                                            label={t('salesOrders.meta.customer_id')}
-                                            value={order.customer_id ?? t('salesOrders.meta.walk_in')}
-                                            mono={!!order.customer_id}
+                                            label={t('salesOrders.meta.customer_code')}
+                                            value={
+                                                customer?.code ??
+                                                (order.customer_id
+                                                    ? t('salesOrders.meta.loading_customer')
+                                                    : t('salesOrders.meta.walk_in'))
+                                            }
+                                            mono={!!customer?.code}
                                         />
                                         <MetaField
                                             label={t('salesOrders.meta.created_at')}

@@ -103,6 +103,7 @@ type ProductResponse struct {
 	Price               float64                   `json:"price"`
 	CostPrice           float64                   `json:"cost_price"`
 	Stock               int32                     `json:"stock"`
+	Code                string                    `json:"code,omitempty"`
 	Sku                 *string                   `json:"sku,omitempty"`
 	Barcode             *string                   `json:"barcode,omitempty"`
 	Unit                string                    `json:"unit"`
@@ -124,6 +125,7 @@ type ProductListResponse struct {
 	Price               float64                   `json:"price"`
 	CostPrice           float64                   `json:"cost_price"`
 	Stock               int32                     `json:"stock"`
+	Code                string                    `json:"code,omitempty"`
 	Sku                 *string                   `json:"sku,omitempty"`
 	Barcode             *string                   `json:"barcode,omitempty"`
 	Unit                string                    `json:"unit"`

@@ -118,15 +118,18 @@
         "field_line_discount": "Giảm giá",
         "field_qty": "SL",
         "field_line": "Thành tiền",
-        "col_queue": "Số / mã",
+        "col_queue": "Mã đơn (SO)",
+        "search_placeholder": "SO-20251112-0001, mã đơn…",
         "col_time": "Thời gian",
         "section": {
             "summary": "Thông tin đơn",
             "lines": "Chi tiết & tổng tiền"
         },
         "meta": {
-            "order_id": "Mã đơn hàng",
-            "customer_id": "Mã khách hàng",
+            "order_no": "Mã đơn (SO)",
+            "order_id": "ID hệ thống",
+            "customer_code": "Mã khách (CUS)",
+            "customer_id": "ID khách hàng",
             "customer_name": "Tên khách hàng",
             "created_at": "Ngày tạo",
             "updated_at": "Cập nhật lúc",
@@ -799,7 +802,7 @@
             "grid": "Chế độ hiển thị theo ô"
         },
         "filters": {
-            "search_placeholder": "Tìm kiếm sản phẩm...",
+            "search_placeholder": "P-000001, SKU, mã vạch, tên…",
             "category": "Loại tài sản",
             "category_all": "Tất cả danh mục"
         },
@@ -876,6 +879,7 @@
             "restore_error": "Không thể khôi phục sản phẩm"
         },
         "fields": {
+            "code": "Mã SP (P)",
             "sku": "Mã SKU",
             "barcode": "Mã vạch",
             "unit": "Đơn vị",
@@ -1263,8 +1267,9 @@
         "title": "Khách hàng",
         "description": "Quản lý thông tin và lịch sử khách hàng.",
         "add_button": "Thêm khách hàng mới",
-        "search_placeholder": "MUỐN TÌM KIẾM KHÁCH HÀNG",
+        "search_placeholder": "CUS-000001, tên, SĐT…",
         "table": {
+            "code": "Mã KH",
             "name": "Tên",
             "phone": "Điện thoại",
             "email": "Email",

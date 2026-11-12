@@ -118,14 +118,17 @@
         "field_line_discount": "Diskon",
         "field_qty": "Qty",
         "field_line": "Subtotal",
-        "col_queue": "Antrian / ID",
+        "col_queue": "No. pesanan (SO)",
+        "search_placeholder": "SO-20251112-0001, kode pesanan…",
         "col_time": "Waktu",
         "section": {
             "summary": "Info pesanan",
             "lines": "Detail & total"
         },
         "meta": {
-            "order_id": "ID pesanan",
+            "order_no": "No. pesanan (SO)",
+            "order_id": "ID sistem",
+            "customer_code": "Kode pelanggan (CUS)",
             "customer_id": "ID pelanggan",
             "customer_name": "Nama pelanggan",
             "created_at": "Dibuat",
@@ -859,6 +862,7 @@
             "restore_error": "Gagal memulihkan produk"
         },
         "fields": {
+            "code": "Kode produk (P)",
             "sku": "SKU",
             "barcode": "Barcode",
             "unit": "Satuan",
@@ -1244,8 +1248,9 @@
         "title": "Pelanggan",
         "description": "Kelola informasi dan riwayat pelanggan.",
         "add_button": "Tambah Pelanggan",
-        "search_placeholder": "Cari pelanggan...",
+        "search_placeholder": "CUS-000001, nama, telepon…",
         "table": {
+            "code": "Kode",
             "name": "Nama",
             "phone": "Telepon",
             "email": "Email",

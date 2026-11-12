@@ -116,14 +116,17 @@
         "field_line_discount": "Discount",
         "field_qty": "Qty",
         "field_line": "Line total",
-        "col_queue": "Queue / ID",
+        "col_queue": "Order no. (SO)",
+        "search_placeholder": "SO-20251112-0001, order code…",
         "col_time": "Date & time",
         "section": {
             "summary": "Order info",
             "lines": "Items & totals"
         },
         "meta": {
-            "order_id": "Order ID",
+            "order_no": "Order no. (SO)",
+            "order_id": "System ID",
+            "customer_code": "Customer code (CUS)",
             "customer_id": "Customer ID",
             "customer_name": "Customer name",
             "created_at": "Created",
@@ -870,6 +873,7 @@
             "restore_error": "Failed to restore product"
         },
         "fields": {
+            "code": "Product code (P)",
             "sku": "SKU",
             "barcode": "Barcode",
             "unit": "Unit",
@@ -1256,8 +1260,9 @@
         "title": "Customers",
         "description": "Manage customer information and history.",
         "add_button": "Add Customer",
-        "search_placeholder": "Search customers...",
+        "search_placeholder": "CUS-000001, name, phone…",
         "table": {
+            "code": "Code",
             "name": "Name",
             "phone": "Phone",
             "email": "Email",

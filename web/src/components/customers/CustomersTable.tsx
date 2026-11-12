@@ -27,6 +27,9 @@ export function CustomersTable({ customers, t, renderActions, onRowClick }: Cust
                 <TableHeader>
                     <TableRow>
                         <TableHead>
+                            <TableColumnHeader title={t('customers.table.code', 'Code')} />
+                        </TableHead>
+                        <TableHead>
                             <TableColumnHeader
                                 title={t('customers.table.name', 'Name')}
                                 icon={Users}
@@ -55,7 +58,7 @@ export function CustomersTable({ customers, t, renderActions, onRowClick }: Cust
                 <TableBody>
                     {sorted.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={5} className="h-32 text-center">
+                            <TableCell colSpan={6} className="h-32 text-center">
                                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                                     <Users className="h-8 w-8 opacity-40" />
                                     {t('customers.table.empty', 'No customers found.')}
@@ -69,6 +72,7 @@ export function CustomersTable({ customers, t, renderActions, onRowClick }: Cust
                                 className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : undefined}
                                 onClick={() => onRowClick?.(customer)}
                             >
+                                <TableCell className="font-mono text-xs">{customer.code || '—'}</TableCell>
                                 <TableCell className="font-medium">{customer.name}</TableCell>
                                 <TableCell>{customer.phone || '-'}</TableCell>
                                 <TableCell>{customer.email || '-'}</TableCell>

@@ -1,7 +1,11 @@
 -- name: CreateOrder :one
-INSERT INTO orders (user_id, type, customer_id )
-VALUES ($1, $2, $3 )
+INSERT INTO orders (user_id, type, customer_id, order_no)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
+
+-- name: CountOrdersOnDate :one
+SELECT COUNT(*)::int FROM orders
+WHERE (created_at AT TIME ZONE 'UTC')::date = ($1::timestamptz AT TIME ZONE 'UTC')::date;
 
 -- name: DeleteOrderItemsByOrderID :exec
 DELETE FROM order_items WHERE order_id = $1;
@@ -113,7 +117,8 @@ SELECT
     gross_total,
     net_total,
     created_at,
-    payment_method_id
+    payment_method_id,
+    order_no
 FROM orders
 WHERE
     (sqlc.narg(statuses)::text[] IS NULL OR status = ANY(sqlc.narg(statuses)::text[]::order_status[]))
@@ -121,6 +126,13 @@ WHERE
     (sqlc.narg(user_id)::uuid IS NULL OR user_id = sqlc.narg(user_id))
   AND
     (sqlc.narg(customer_id)::uuid IS NULL OR customer_id = sqlc.narg(customer_id))
+  AND
+    (
+        sqlc.narg(search)::text IS NULL
+        OR btrim(sqlc.narg(search)::text) = ''
+        OR order_no ILIKE '%' || btrim(sqlc.narg(search)::text) || '%'
+        OR id::text = btrim(sqlc.narg(search)::text)
+    )
 ORDER BY
     created_at DESC
 LIMIT $1 OFFSET $2;
@@ -133,7 +145,14 @@ WHERE
   AND
     (sqlc.narg(user_id)::uuid IS NULL OR user_id = sqlc.narg(user_id))
   AND
-    (sqlc.narg(customer_id)::uuid IS NULL OR customer_id = sqlc.narg(customer_id));
+    (sqlc.narg(customer_id)::uuid IS NULL OR customer_id = sqlc.narg(customer_id))
+  AND
+    (
+        sqlc.narg(search)::text IS NULL
+        OR btrim(sqlc.narg(search)::text) = ''
+        OR order_no ILIKE '%' || btrim(sqlc.narg(search)::text) || '%'
+        OR id::text = btrim(sqlc.narg(search)::text)
+    );
 
 
 -- name: CancelOrder :one

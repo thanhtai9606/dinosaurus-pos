@@ -6,7 +6,10 @@ import (
 	"POS-kasir/internal/common"
 	"POS-kasir/internal/common/pagination"
 	"POS-kasir/internal/customers/repository"
+	"POS-kasir/internal/docno"
 	"POS-kasir/pkg/logger"
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
@@ -29,11 +32,17 @@ func NewCustomerService(repo repository.Querier, log logger.ILogger) ICustomerSe
 }
 
 func (s *CustomerService) CreateCustomer(ctx context.Context, req CreateCustomerRequest) (*CustomerResponse, error) {
+	count, err := s.repo.CountCustomersForCode(ctx)
+	if err != nil {
+		s.log.Errorf("CountCustomersForCode failed", "error", err)
+		return nil, err
+	}
 	cust, err := s.repo.CreateCustomer(ctx, repository.CreateCustomerParams{
 		Name:    req.Name,
 		Phone:   req.Phone,
 		Email:   req.Email,
 		Address: req.Address,
+		Code:    docno.CustomerCode(count + 1),
 	})
 	if err != nil {
 		s.log.Errorf("CreateCustomer failed", "error", err)
@@ -88,16 +97,21 @@ func (s *CustomerService) ListCustomers(ctx context.Context, req ListCustomersRe
 	limit := req.Limit
 	offset := (req.Page - 1) * limit
 
+	var searchPtr *string
+	if q := strings.TrimSpace(req.Search); q != "" {
+		searchPtr = &q
+	}
 	custs, err := s.repo.ListCustomers(ctx, repository.ListCustomersParams{
 		Limit:  int32(limit),
 		Offset: int32(offset),
+		Search: searchPtr,
 	})
 	if err != nil {
 		s.log.Errorf("ListCustomers failed", "error", err)
 		return nil, err
 	}
 
-	count, err := s.repo.CountCustomers(ctx)
+	count, err := s.repo.CountCustomers(ctx, searchPtr)
 	if err != nil {
 		s.log.Errorf("CountCustomers failed", "error", err)
 		return nil, err
@@ -117,6 +131,7 @@ func (s *CustomerService) ListCustomers(ctx context.Context, req ListCustomersRe
 func mapToCustomerResponse(c repository.Customer) *CustomerResponse {
 	return &CustomerResponse{
 		ID:        c.ID,
+		Code:      c.Code,
 		Name:      c.Name,
 		Phone:     c.Phone,
 		Email:     c.Email,

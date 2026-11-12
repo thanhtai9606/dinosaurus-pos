@@ -43,6 +43,11 @@ SET status = $2, updated_at = NOW()
 WHERE id = $1
 RETURNING *;
 
+-- name: UpdateStockReceiptPayment :exec
+UPDATE stock_receipts
+SET payment_mode = $2, amount_paid = $3, updated_at = NOW()
+WHERE id = $1;
+
 -- name: DeleteStockReceipt :exec
 DELETE FROM stock_receipts
 WHERE id = $1 AND status IN ('draft', 'cancelled');

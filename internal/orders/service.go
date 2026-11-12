@@ -7,6 +7,7 @@ import (
 	"POS-kasir/internal/common/pagination"
 	"POS-kasir/internal/common/store"
 	"POS-kasir/internal/customerdebts"
+	"POS-kasir/internal/docno"
 	cd_repo "POS-kasir/internal/customerdebts/repository"
 	orders_repo "POS-kasir/internal/orders/repository"
 	prdunits "POS-kasir/internal/products"
@@ -14,6 +15,7 @@ import (
 	"POS-kasir/internal/settings"
 	"POS-kasir/pkg/logger"
 	"strconv"
+	"strings"
 	"time"
 
 	"POS-kasir/pkg/payment"
@@ -729,6 +731,7 @@ func (s *OrderService) buildOrderDetailResponseFromQueryResult(ctx context.Conte
 			Barcode string
 			Sku     string
 			Unit    string
+			Code    string
 		}
 		productMetaMap := make(map[uuid.UUID]productLineMeta)
 		if len(productIDs) > 0 {
@@ -741,6 +744,9 @@ func (s *OrderService) buildOrderDetailResponseFromQueryResult(ctx context.Conte
 					}
 					if p.Sku != nil {
 						meta.Sku = *p.Sku
+					}
+					if p.Code != nil {
+						meta.Code = *p.Code
 					}
 					productMetaMap[p.ID] = meta
 				}
@@ -784,6 +790,7 @@ func (s *OrderService) buildOrderDetailResponseFromQueryResult(ctx context.Conte
 				ProductName:    meta.Name,
 				Barcode:        meta.Barcode,
 				Sku:            meta.Sku,
+				ProductCode:    meta.Code,
 				SaleUnitName:   saleUnit,
 				Quantity:       tempItem.Quantity,
 				PriceAtSale:    tempItem.PriceAtSale,
@@ -797,6 +804,7 @@ func (s *OrderService) buildOrderDetailResponseFromQueryResult(ctx context.Conte
 
 	return &OrderDetailResponse{
 		ID:                      orderWithDetails.ID,
+		OrderNo:                 orderWithDetails.OrderNo,
 		UserID:                  utils.NullableUUIDToPointer(orderWithDetails.UserID),
 		CustomerID:              utils.NullableUUIDToPointer(orderWithDetails.CustomerID),
 		Type:                    orderWithDetails.Type,
@@ -1094,17 +1102,23 @@ func (s *OrderService) ListOrders(ctx context.Context, req ListOrdersRequest) (*
 		}
 	}
 
+	var searchPtr *string
+	if q := strings.TrimSpace(req.Search); q != "" {
+		searchPtr = &q
+	}
 	listParams := orders_repo.ListOrdersParams{
 		Limit:      int32(limit),
 		Offset:     int32(offset),
 		Statuses:   statusStrings,
 		UserID:     nullUserID,
 		CustomerID: nullCustomerID,
+		Search:     searchPtr,
 	}
 	countParams := orders_repo.CountOrdersParams{
 		Statuses:   statusStrings,
 		UserID:     nullUserID,
 		CustomerID: nullCustomerID,
+		Search:     searchPtr,
 	}
 	var wg sync.WaitGroup
 	var orders []orders_repo.ListOrdersRow
@@ -1182,7 +1196,10 @@ func (s *OrderService) ListOrders(ctx context.Context, req ListOrdersRequest) (*
 			})
 		}
 
-		queueNumber := order.ID.String()[len(order.ID.String())-4:]
+		queueNumber := order.OrderNo
+		if queueNumber == "" {
+			queueNumber = order.ID.String()[len(order.ID.String())-4:]
+		}
 
 		isPaid := false
 		if order.PaymentMethodID != nil {
@@ -1191,13 +1208,14 @@ func (s *OrderService) ListOrders(ctx context.Context, req ListOrdersRequest) (*
 
 		ordersResponse = append(ordersResponse, OrderListResponse{
 			ID:          order.ID,
+			OrderNo:     order.OrderNo,
 			UserID:      utils.NullableUUIDToPointer(order.UserID),
 			Type:        order.Type,
 			Status:      order.Status,
 			NetTotal:    netTotal,
 			CreatedAt:   order.CreatedAt.Time,
 			Items:       itemResponses,
-			QueueNumber: "#" + queueNumber,
+			QueueNumber: queueNumber,
 			IsPaid:      isPaid,
 		})
 	}
@@ -1233,10 +1251,18 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			nullCustomerID.Bytes = *req.CustomerID
 		}
 
+		now := time.Now()
+		countToday, err := qtx.CountOrdersOnDate(ctx, pgtype.Timestamptz{Time: now, Valid: true})
+		if err != nil {
+			return fmt.Errorf("failed to allocate order number: %w", err)
+		}
+		orderNo := docno.OrderNo(now, countToday+1)
+
 		orderHeader, err := qtx.CreateOrder(ctx, orders_repo.CreateOrderParams{
 			UserID:     pgtype.UUID{Bytes: actorID, Valid: ok},
 			Type:       req.Type,
 			CustomerID: nullCustomerID,
+			OrderNo:    orderNo,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to create order header: %w", err)

@@ -26,6 +26,7 @@ type InventoryList = {
     products: Array<{
         id: string
         name: string
+        code?: string | null
         sku?: string | null
         stock: number
         min_stock: number
@@ -124,6 +125,7 @@ function InventoryPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>{t('products.fields.code', 'P-code')}</TableHead>
                                 <TableHead>{t('products.fields.sku')}</TableHead>
                                 <TableHead>{t('products.table.name')}</TableHead>
                                 <TableHead className="text-right">{t('products.table.stock')}</TableHead>
@@ -134,6 +136,7 @@ function InventoryPage() {
                         <TableBody>
                             {(data.products || []).map((p) => (
                                 <TableRow key={p.id}>
+                                    <TableCell className="font-mono text-xs">{p.code || '—'}</TableCell>
                                     <TableCell>{p.sku || '—'}</TableCell>
                                     <TableCell className="font-medium">{p.name}</TableCell>
                                     <TableCell

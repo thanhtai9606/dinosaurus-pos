@@ -124,9 +124,8 @@ func (s *StockReceiptService) List(ctx context.Context, req ListStockReceiptsReq
 
 	if req.Status != nil {
 		st := sr_repo.StockReceiptStatus(*req.Status)
-		nv := sr_repo.NullStockReceiptStatus{StockReceiptStatus: st, Valid: true}
-		params.Status = nv
-		countParams.Status = nv
+		params.Status = &st
+		countParams.Status = &st
 	}
 	if req.SupplierID != nil {
 		sid := pgtype.UUID{Bytes: *req.SupplierID, Valid: true}
@@ -233,7 +232,11 @@ func applyReceiptPayment(ctx context.Context, q sr_repo.Querier, id uuid.UUID, m
 	}
 	var n pgtype.Numeric
 	_ = n.Scan(fmt.Sprintf("%f", amount))
-	return q.UpdateStockReceiptPayment(ctx, id, pm, n)
+	return q.UpdateStockReceiptPayment(ctx, sr_repo.UpdateStockReceiptPaymentParams{
+		ID:          id,
+		PaymentMode: pm,
+		AmountPaid:  n,
+	})
 }
 
 func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error) {

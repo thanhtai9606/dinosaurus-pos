@@ -25,6 +25,7 @@ export interface InternalOrdersOrderItemResponse {
     'options'?: Array<InternalOrdersOrderItemOptionResponse>;
     'price_at_sale'?: number;
     'product_id'?: string;
+    'product_code'?: string;
     'product_name'?: string;
     'quantity'?: number;
     'sale_unit_name'?: string;

@@ -23,6 +23,7 @@ export type OrdersListParams = {
     statuses?: string[]
     userId?: string
     customerId?: string
+    search?: string
 }
 
 export const ordersListQueryOptions = (params?: OrdersListParams) =>
@@ -32,7 +33,7 @@ export const ordersListQueryOptions = (params?: OrdersListParams) =>
     >({
         queryKey: ['orders', 'list', params],
         queryFn: async () => {
-            if (params?.customerId) {
+            if (params?.customerId || params?.search) {
                 const res = await axiosInstance.get('/orders', {
                     params: {
                         page: params.page,
@@ -40,6 +41,7 @@ export const ordersListQueryOptions = (params?: OrdersListParams) =>
                         statuses: params.statuses,
                         user_id: params.userId,
                         customer_id: params.customerId,
+                        search: params.search,
                     },
                 })
                 return (res.data as { data: unknown }).data

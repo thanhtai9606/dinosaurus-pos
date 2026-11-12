@@ -29,6 +29,7 @@ export interface InternalOrdersOrderListResponse {
     'is_paid'?: boolean;
     'items'?: Array<InternalOrdersOrderItemResponse>;
     'net_total'?: number;
+    'order_no'?: string;
     'queue_number'?: string;
     'status'?: POSKasirInternalOrdersRepositoryOrderStatus;
     'type'?: POSKasirInternalOrdersRepositoryOrderType;

@@ -23,10 +23,12 @@ type UpdateCustomerRequest struct {
 
 type ListCustomersRequest struct {
 	pagination.PaginationRequest
+	Search string `query:"search"`
 }
 
 type CustomerResponse struct {
 	ID        uuid.UUID  `json:"id"`
+	Code      string     `json:"code"`
 	Name      string     `json:"name"`
 	Phone     *string    `json:"phone,omitempty"`
 	Email     *string    `json:"email,omitempty"`

@@ -249,8 +249,8 @@ ALTER TABLE promotion_targets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE promotion_targets FORCE ROW LEVEL SECURITY;
 
 CREATE POLICY stock_receipt_items_tenant ON stock_receipt_items FOR ALL
-  USING (EXISTS (SELECT 1 FROM stock_receipts sr WHERE sr.id = stock_receipt_items.stock_receipt_id AND app_tenant_match(sr.tenant_id)))
-  WITH CHECK (EXISTS (SELECT 1 FROM stock_receipts sr WHERE sr.id = stock_receipt_items.stock_receipt_id AND app_tenant_match(sr.tenant_id)));
+  USING (EXISTS (SELECT 1 FROM stock_receipts sr WHERE sr.id = stock_receipt_items.receipt_id AND app_tenant_match(sr.tenant_id)))
+  WITH CHECK (EXISTS (SELECT 1 FROM stock_receipts sr WHERE sr.id = stock_receipt_items.receipt_id AND app_tenant_match(sr.tenant_id)));
 ALTER TABLE stock_receipt_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stock_receipt_items FORCE ROW LEVEL SECURITY;
 

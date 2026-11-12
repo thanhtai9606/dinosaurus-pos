@@ -296,12 +296,54 @@ func (h *SettingsHandler) UpdateFinancialSettingsHandler(c fiber.Ctx) error {
 	}
 	resp, err := h.service.UpdateFinancialSettings(ctx, req)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(common.ErrorResponse{
+		status := http.StatusInternalServerError
+		if errors.Is(err, common.ErrBadRequest) {
+			status = http.StatusBadRequest
+		}
+		return c.Status(status).JSON(common.ErrorResponse{
 			Message: "Failed to update financial settings", Error: err.Error(),
 		})
 	}
 	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
 		Message: "Financial settings updated successfully", Data: resp,
+	})
+}
+
+// UpdateSupportedCurrenciesHandler replaces the enabled currency list (stored in DB).
+// @Summary      Update supported currencies
+// @Description  JSON list of currencies for multi-region deployments (Roles: admin)
+// @Tags         Settings
+// @Accept       json
+// @Produce      json
+// @Param        request body UpdateSupportedCurrenciesRequest true "Currency list"
+// @Success      200 {object} common.SuccessResponse{data=FinancialSettingsResponse}
+// @x-roles      ["admin"]
+// @Router       /settings/financial/currencies [put]
+func (h *SettingsHandler) UpdateSupportedCurrenciesHandler(c fiber.Ctx) error {
+	ctx := c.RequestCtx()
+	var req UpdateSupportedCurrenciesRequest
+	if err := c.Bind().Body(&req); err != nil {
+		var ve *validator.ValidationErrors
+		if errors.As(err, &ve) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "Validation failed", Error: ve.Error(),
+				Data: map[string]interface{}{"errors": ve.Errors},
+			})
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid request body", Error: err.Error()})
+	}
+	resp, err := h.service.UpdateSupportedCurrencies(ctx, req)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if errors.Is(err, common.ErrBadRequest) {
+			status = http.StatusBadRequest
+		}
+		return c.Status(status).JSON(common.ErrorResponse{
+			Message: "Failed to update supported currencies", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Supported currencies updated successfully", Data: resp,
 	})
 }
 

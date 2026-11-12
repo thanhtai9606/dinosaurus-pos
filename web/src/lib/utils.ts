@@ -76,18 +76,26 @@ export async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<
 const CURRENCY_LOCALE: Record<string, string> = {
   IDR: 'id-ID',
   USD: 'en-US',
+  VND: 'vi-VN',
 }
 
 /** Format amount using app financial settings currency (see MoneyProvider). */
-export function formatMoney(amount: number, currency = 'IDR') {
-  const code = CURRENCY_LOCALE[currency] ? currency : 'IDR'
-  const locale = CURRENCY_LOCALE[code] ?? 'en-US'
-  const fractionDigits = code === 'IDR' ? 0 : 2
-  return new Intl.NumberFormat(locale, {
+export function formatMoney(
+  amount: number,
+  currency = 'IDR',
+  locale?: string,
+  fractionDigits?: number,
+) {
+  const code = (currency || 'IDR').toUpperCase()
+  const loc = locale ?? CURRENCY_LOCALE[code] ?? 'en-US'
+  const fd =
+    fractionDigits ??
+    (code === 'IDR' || code === 'VND' ? 0 : 2)
+  return new Intl.NumberFormat(loc, {
     style: 'currency',
-    currency: code,
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
+    currency: CURRENCY_LOCALE[code] ? code : 'IDR',
+    minimumFractionDigits: fd,
+    maximumFractionDigits: fd,
   }).format(amount)
 }
 

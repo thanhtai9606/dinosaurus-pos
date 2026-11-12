@@ -40,17 +40,22 @@ type UpdatePrinterSettingsRequest struct {
 }
 
 type FinancialSettingsResponse struct {
-	Currency            string  `json:"currency"`
-	TaxRate             float64 `json:"tax_rate"`
-	ServiceChargeRate   float64 `json:"service_charge_rate"`
-	TaxEnabled          bool    `json:"tax_enabled"`
+	Currency              string           `json:"currency"`
+	TaxRate               float64          `json:"tax_rate"`
+	ServiceChargeRate     float64          `json:"service_charge_rate"`
+	TaxEnabled            bool             `json:"tax_enabled"`
+	AvailableCurrencies   []CurrencyOption `json:"available_currencies"`
 }
 
 type UpdateFinancialSettingsRequest struct {
-	Currency            string   `json:"currency" validate:"required,oneof=IDR USD"`
+	Currency            string   `json:"currency" validate:"required,len=3"`
 	TaxRate             float64  `json:"tax_rate" validate:"gte=0,lte=100"`
 	ServiceChargeRate   float64  `json:"service_charge_rate" validate:"gte=0,lte=100"`
 	TaxEnabled          *bool    `json:"tax_enabled" validate:"required"`
+}
+
+type UpdateSupportedCurrenciesRequest struct {
+	Currencies []CurrencyOption `json:"currencies" validate:"required,min=1,dive"`
 }
 
 type InvoiceSettingsResponse struct {

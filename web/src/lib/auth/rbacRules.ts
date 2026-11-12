@@ -300,6 +300,9 @@ export const RBAC_RULES: Record<string, string[]> = {
     "PUT /settings/financial": [
         "admin"
     ],
+    "PUT /settings/financial/currencies": [
+        "admin"
+    ],
     "GET /settings/invoice": [
         "admin",
         "manager",

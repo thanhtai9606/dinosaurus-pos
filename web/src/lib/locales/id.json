@@ -327,7 +327,18 @@
             "tax_enabled": "Terapkan pajak pada pesanan",
             "tax_enabled_help": "Jika nonaktif, pajak tidak ditambahkan saat checkout.",
             "update_success": "Pengaturan keuangan disimpan.",
-            "update_error": "Gagal menyimpan pengaturan keuangan."
+            "update_error": "Gagal menyimpan pengaturan keuangan.",
+            "currencies_list_title": "Mata uang yang diaktifkan",
+            "currencies_list_help": "Disimpan di database — tambahkan kode ISO per negara (mis. EUR, THB).",
+            "currency_code": "Kode",
+            "currency_label": "Label tampilan",
+            "currency_locale": "Locale",
+            "currency_decimals": "Desimal",
+            "add_currency": "Tambah mata uang",
+            "save_currencies": "Simpan daftar mata uang",
+            "currencies_save_success": "Daftar mata uang disimpan.",
+            "currencies_save_error": "Gagal menyimpan daftar mata uang.",
+            "currencies_min_one": "Minimal satu mata uang diperlukan."
         },
         "invoice": {
             "title": "Faktur & Struk",

@@ -321,7 +321,18 @@
             "tax_enabled": "Apply tax on orders",
             "tax_enabled_help": "When off, tax is not added at checkout.",
             "update_success": "Financial settings saved.",
-            "update_error": "Failed to save financial settings."
+            "update_error": "Failed to save financial settings.",
+            "currencies_list_title": "Enabled currencies",
+            "currencies_list_help": "Stored in the database — add ISO codes for each country you support (e.g. EUR, THB).",
+            "currency_code": "Code",
+            "currency_label": "Display label",
+            "currency_locale": "Locale",
+            "currency_decimals": "Decimals",
+            "add_currency": "Add currency",
+            "save_currencies": "Save currency list",
+            "currencies_save_success": "Currency list saved.",
+            "currencies_save_error": "Failed to save currency list.",
+            "currencies_min_one": "At least one currency is required."
         },
         "invoice": {
             "title": "Invoice & Receipt",

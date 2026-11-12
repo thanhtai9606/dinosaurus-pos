@@ -9,11 +9,19 @@ export const printerSettingsQueryKey = ['printer-settings']
 export const financialSettingsQueryKey = ['financial-settings']
 export const invoiceSettingsQueryKey = ['invoice-settings']
 
+export type CurrencyOption = {
+    code: string
+    label: string
+    locale: string
+    fraction_digits: number
+}
+
 export type FinancialSettings = {
     currency: string
     tax_rate: number
     service_charge_rate: number
     tax_enabled: boolean
+    available_currencies?: CurrencyOption[]
 }
 
 async function putSettingsWithFallback<T>(path: string, data: T): Promise<AxiosResponse> {
@@ -168,6 +176,20 @@ export function useFinancialSettingsQuery() {
         enabled: isAllowed,
     })
     return { ...query, isAllowed }
+}
+
+export function useUpdateSupportedCurrenciesMutation() {
+    const queryClient = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('PUT', '/settings/financial/currencies')
+    const mutation = useMutation({
+        mutationFn: async (currencies: CurrencyOption[]) => {
+            const res = await putSettingsWithFallback('financial/currencies', { currencies })
+            return (res.data as any).data as FinancialSettings
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: financialSettingsQueryKey }),
+    })
+    return { ...mutation, isAllowed }
 }
 
 export function useUpdateFinancialSettingsMutation() {

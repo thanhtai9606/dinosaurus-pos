@@ -13,6 +13,7 @@ import {
     useUpdateFinancialSettingsMutation,
     type FinancialSettings,
 } from '@/lib/api/query/settings'
+import { SupportedCurrenciesEditor } from '@/components/settings/SupportedCurrenciesEditor'
 
 export function FinancialSettingsCard() {
     const { t } = useTranslation()
@@ -79,8 +80,11 @@ export function FinancialSettingsCard() {
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="IDR">IDR (Rp)</SelectItem>
-                                <SelectItem value="USD">USD ($)</SelectItem>
+                                {(data?.available_currencies ?? []).map((c) => (
+                                    <SelectItem key={c.code} value={c.code}>
+                                        {c.label}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
@@ -124,6 +128,7 @@ export function FinancialSettingsCard() {
                         />
                     </div>
                 </div>
+                <SupportedCurrenciesEditor currencies={data?.available_currencies ?? []} />
                 {canEdit && (
                     <Button onClick={handleSave} disabled={updateMutation.isPending}>
                         {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

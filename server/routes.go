@@ -132,6 +132,8 @@ func SetupRoutes(app *App, container *AppContainer) {
 		settingsGroup.Put("/printer", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdatePrinterSettingsHandler)
 
 		settingsGroup.Get("/financial", container.SettingsHandler.GetFinancialSettingsHandler)
+		settingsGroup.Put("/financial/currencies", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateSupportedCurrenciesHandler)
+		settingsGroup.Post("/financial/currencies", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateSupportedCurrenciesHandler)
 		settingsGroup.Put("/financial", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateFinancialSettingsHandler)
 		settingsGroup.Post("/financial", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateFinancialSettingsHandler)
 

@@ -327,7 +327,18 @@
             "tax_enabled": "Áp dụng thuế trên đơn",
             "tax_enabled_help": "Tắt thì không cộng thuế khi thanh toán.",
             "update_success": "Đã lưu thiết lập tài chính.",
-            "update_error": "Không lưu được thiết lập tài chính."
+            "update_error": "Không lưu được thiết lập tài chính.",
+            "currencies_list_title": "Loại tiền được bật",
+            "currencies_list_help": "Lưu trong DB — thêm mã ISO cho từng quốc gia (vd. EUR, THB).",
+            "currency_code": "Mã",
+            "currency_label": "Nhãn hiển thị",
+            "currency_locale": "Locale",
+            "currency_decimals": "Số lẻ",
+            "add_currency": "Thêm loại tiền",
+            "save_currencies": "Lưu danh sách tiền tệ",
+            "currencies_save_success": "Đã lưu danh sách tiền tệ.",
+            "currencies_save_error": "Không lưu được danh sách tiền tệ.",
+            "currencies_min_one": "Cần ít nhất một loại tiền."
         },
         "invoice": {
             "title": "Hóa đơn & Biên lai",

@@ -25,6 +25,7 @@ type ISettingsService interface {
 	UpdatePrinterSettings(ctx context.Context, req UpdatePrinterSettingsRequest) (*PrinterSettingsResponse, error)
 	GetFinancialSettings(ctx context.Context) (*FinancialSettingsResponse, error)
 	UpdateFinancialSettings(ctx context.Context, req UpdateFinancialSettingsRequest) (*FinancialSettingsResponse, error)
+	UpdateSupportedCurrencies(ctx context.Context, req UpdateSupportedCurrenciesRequest) (*FinancialSettingsResponse, error)
 	GetInvoiceSettings(ctx context.Context) (*InvoiceSettingsResponse, error)
 	UpdateInvoiceSettings(ctx context.Context, req UpdateInvoiceSettingsRequest) (*InvoiceSettingsResponse, error)
 	ComputeOrderTaxAndService(ctx context.Context, grossTotal int64) (taxAmount int64, serviceChargeAmount int64, err error)
@@ -322,25 +323,48 @@ func parseFloatSetting(val string, defaultVal float64) float64 {
 	return v
 }
 
+func (s *SettingsService) loadSupportedCurrencies(m map[string]string) []CurrencyOption {
+	list, err := parseSupportedCurrencies(m["supported_currencies"])
+	if err != nil {
+		s.log.Warnf("Failed to parse supported_currencies, using defaults", "error", err)
+		return defaultSupportedCurrencies()
+	}
+	return list
+}
+
 func (s *SettingsService) GetFinancialSettings(ctx context.Context) (*FinancialSettingsResponse, error) {
 	m, err := settingsMap(ctx, s.repo)
 	if err != nil {
 		s.log.Error("Failed to fetch settings", "error", err)
 		return nil, err
 	}
-	currency := m["currency"]
+	currencies := s.loadSupportedCurrencies(m)
+	currency := strings.ToUpper(strings.TrimSpace(m["currency"]))
 	if currency == "" {
-		currency = "IDR"
+		currency = currencies[0].Code
+	} else if !currencyAllowed(currencies, currency) {
+		currency = currencies[0].Code
 	}
 	return &FinancialSettingsResponse{
-		Currency:          currency,
-		TaxRate:           parseFloatSetting(m["tax_rate"], 11),
-		ServiceChargeRate: parseFloatSetting(m["service_charge_rate"], 0),
-		TaxEnabled:        parseBoolSetting(m["tax_enabled"], true),
+		Currency:            currency,
+		TaxRate:             parseFloatSetting(m["tax_rate"], 11),
+		ServiceChargeRate:   parseFloatSetting(m["service_charge_rate"], 0),
+		TaxEnabled:          parseBoolSetting(m["tax_enabled"], true),
+		AvailableCurrencies: currencies,
 	}, nil
 }
 
 func (s *SettingsService) UpdateFinancialSettings(ctx context.Context, req UpdateFinancialSettingsRequest) (*FinancialSettingsResponse, error) {
+	m, err := settingsMap(ctx, s.repo)
+	if err != nil {
+		return nil, err
+	}
+	currencies := s.loadSupportedCurrencies(m)
+	req.Currency = strings.ToUpper(strings.TrimSpace(req.Currency))
+	if !currencyAllowed(currencies, req.Currency) {
+		return nil, fmt.Errorf("%w: currency %s is not enabled", common.ErrBadRequest, req.Currency)
+	}
+
 	taxEnabled := "false"
 	if req.TaxEnabled != nil && *req.TaxEnabled {
 		taxEnabled = "true"
@@ -371,6 +395,67 @@ func (s *SettingsService) UpdateFinancialSettings(ctx context.Context, req Updat
 	})
 
 	return s.GetFinancialSettings(ctx)
+}
+
+func (s *SettingsService) UpdateSupportedCurrencies(ctx context.Context, req UpdateSupportedCurrenciesRequest) (*FinancialSettingsResponse, error) {
+	normalized := make([]CurrencyOption, 0, len(req.Currencies))
+	seen := map[string]struct{}{}
+	for _, c := range req.Currencies {
+		code := strings.ToUpper(strings.TrimSpace(c.Code))
+		if code == "" {
+			continue
+		}
+		if _, ok := seen[code]; ok {
+			continue
+		}
+		seen[code] = struct{}{}
+		loc := strings.TrimSpace(c.Locale)
+		if loc == "" {
+			loc = "en-US"
+		}
+		label := strings.TrimSpace(c.Label)
+		if label == "" {
+			label = code
+		}
+		fd := c.FractionDigits
+		if fd < 0 {
+			fd = 0
+		}
+		if fd > 4 {
+			fd = 4
+		}
+		normalized = append(normalized, CurrencyOption{
+			Code: code, Label: label, Locale: loc, FractionDigits: fd,
+		})
+	}
+	if len(normalized) == 0 {
+		return nil, fmt.Errorf("%w: at least one currency required", common.ErrBadRequest)
+	}
+
+	raw, err := marshalSupportedCurrencies(normalized)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := s.repo.UpsertSetting(ctx, repository.UpsertSettingParams{Key: "supported_currencies", Value: raw}); err != nil {
+		return nil, err
+	}
+
+	// If active currency was removed, switch to first enabled code
+	fin, err := s.GetFinancialSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !currencyAllowed(normalized, fin.Currency) {
+		_, uerr := s.repo.UpsertSetting(ctx, repository.UpsertSettingParams{
+			Key: "currency", Value: normalized[0].Code,
+		})
+		if uerr != nil {
+			return nil, uerr
+		}
+		return s.GetFinancialSettings(ctx)
+	}
+	return fin, nil
 }
 
 func (s *SettingsService) GetInvoiceSettings(ctx context.Context) (*InvoiceSettingsResponse, error) {

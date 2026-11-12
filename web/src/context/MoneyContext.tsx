@@ -11,7 +11,12 @@ const MoneyContext = createContext<FormatMoneyFn>(defaultFormatter)
 export function MoneyProvider({ children }: { children: ReactNode }) {
     const { data } = useFinancialSettingsQuery()
     const currency = data?.currency ?? 'IDR'
-    const format = useMemo(() => (amount: number) => formatMoney(amount, currency), [currency])
+    const meta = data?.available_currencies?.find((c) => c.code === currency)
+    const format = useMemo(
+        () => (amount: number) =>
+            formatMoney(amount, currency, meta?.locale, meta?.fraction_digits),
+        [currency, meta?.locale, meta?.fraction_digits]
+    )
     return <MoneyContext.Provider value={format}>{children}</MoneyContext.Provider>
 }
 

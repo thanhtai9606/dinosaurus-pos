@@ -934,7 +934,12 @@
             "product": "Hàng hóa",
             "quantity": "SL",
             "unit_cost": "Giá vốn",
-            "note": "Ghi chú"
+            "note": "Ghi chú",
+            "unit_sell_price": "Giá bán (tuỳ chọn)",
+            "unit_cost_hint": "Giá vốn nhập — cập nhật cost_price khi hoàn tất phiếu",
+            "unit_sell_hint": "Điền > 0 để cập nhật giá bán sản phẩm khi hoàn tất",
+            "current_prices": "Hiện tại: vốn {{cost}} · bán {{sell}}",
+            "optional": "Để trống = giữ giá bán"
         },
         "status": {
             "draft": "Nháp",
@@ -944,7 +949,8 @@
         "form": {
             "create_title": "Phiếu nhập mới",
             "edit_title": "Sửa phiếu nhập",
-            "cost_note": "Khi hoàn tất, giá vốn dòng sẽ ghi đè cost_price sản phẩm (MVP)."
+            "cost_note": "Giá vốn: nhập ở cột «Giá vốn» — khi hoàn tất phiếu sẽ gán vào cost_price.",
+            "sell_note": "Giá bán: nhập cột «Giá bán» nếu muốn đổi giá POS; bỏ trống thì không đổi giá bán."
         },
         "messages": {
             "create_success": "Đã tạo phiếu",
@@ -953,6 +959,18 @@
             "complete_failed": "Không hoàn tất được phiếu",
             "cancel_success": "Đã hủy phiếu"
         }
+    },
+    "importPrices": {
+        "title": "Nhập giá hàng loạt",
+        "description": "CSV cập nhật giá vốn và/hoặc giá bán theo SKU hoặc product_id.",
+        "csv_format": "Cột gợi ý",
+        "csv_hint": "sku hoặc product_id; cost_price và/hoặc price. Hàng không có SKU/id bị bỏ qua.",
+        "file": "File CSV",
+        "choose_file": "Chọn file…",
+        "submit": "Import",
+        "success": "Đã cập nhật {{count}} sản phẩm",
+        "partial_fail": "{{count}} dòng lỗi — xem response API",
+        "failed": "Import thất bại"
     },
     "inventory": {
         "title": "Tổng quan tồn kho",

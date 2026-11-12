@@ -39,6 +39,9 @@ type IPrdService interface {
 	GetDeletedProduct(ctx context.Context, productID uuid.UUID) (*ProductResponse, error)
 	RestoreProduct(ctx context.Context, productID uuid.UUID) error
 	RestoreProductsBulk(ctx context.Context, req RestoreBulkRequest) error
+
+	ImportProductPrices(ctx context.Context, rows []ImportPriceRow) (*ImportPricesResult, error)
+	ImportProductPricesCSV(ctx context.Context, data []byte) (*ImportPricesResult, error)
 }
 
 type PrdService struct {

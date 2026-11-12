@@ -178,7 +178,7 @@ function ReportsPage() {
                         <StockReport 
                             data={lowStockData || []}
                             isLoading={isLoadingLowStock}
-                            onExport={() => exportToCSV(lowStockData || [], 'low_stock_report', ['product_name', 'stock'])}
+                            onExport={() => exportToCSV(lowStockData || [], 'low_stock_report', ['product_name', 'sku', 'stock', 'min_stock'])}
                             t={t}
                         />
                     </TabsContent>

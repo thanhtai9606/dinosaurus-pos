@@ -31,6 +31,7 @@ type IPrdHandler interface {
 	RestoreProductHandler(ctx fiber.Ctx) error
 	RestoreProductsBulkHandler(ctx fiber.Ctx) error
 	GetStockHistoryHandler(ctx fiber.Ctx) error
+	ImportProductPricesHandler(ctx fiber.Ctx) error
 }
 
 func NewPrdHandler(prdService IPrdService, log logger.ILogger) IPrdHandler {
@@ -756,5 +757,55 @@ func (h *PrdHandler) GetStockHistoryHandler(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
 		Message: "Stock history retrieved successfully",
 		Data:    historyResponse,
+	})
+}
+
+// ImportProductPricesHandler imports cost/sell prices from CSV or JSON rows
+// @Summary      Import product prices
+// @Tags         Products
+// @Accept       multipart/form-data
+// @Accept       json
+// @Produce      json
+// @Param        file formData file false "CSV file (sku/product_id, cost_price, price)"
+// @Success      200 {object} common.SuccessResponse{data=ImportPricesResult}
+// @x-roles      ["admin", "manager"]
+// @Router       /products/import-prices [post]
+func (h *PrdHandler) ImportProductPricesHandler(ctx fiber.Ctx) error {
+	if fileHeader, err := ctx.FormFile("file"); err == nil && fileHeader != nil {
+		f, err := fileHeader.Open()
+		if err != nil {
+			return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Failed to read file"})
+		}
+		defer f.Close()
+		buf := bytes.NewBuffer(nil)
+		if _, err := io.Copy(buf, f); err != nil {
+			return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Failed to read file"})
+		}
+		result, err := h.prdService.ImportProductPricesCSV(ctx.RequestCtx(), buf.Bytes())
+		if err != nil {
+			if errors.Is(err, common.ErrInvalidInput) {
+				return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
+			}
+			return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Import failed"})
+		}
+		return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
+			Message: "Prices imported",
+			Data:    result,
+		})
+	}
+
+	var body struct {
+		Rows []ImportPriceRow `json:"rows"`
+	}
+	if err := ctx.Bind().Body(&body); err != nil || len(body.Rows) == 0 {
+		return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Provide CSV file or JSON rows"})
+	}
+	result, err := h.prdService.ImportProductPrices(ctx.RequestCtx(), body.Rows)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Import failed"})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
+		Message: "Prices imported",
+		Data:    result,
 	})
 }

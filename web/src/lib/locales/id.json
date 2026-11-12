@@ -915,7 +915,12 @@
             "product": "Produk",
             "quantity": "Qty",
             "unit_cost": "Harga pokok",
-            "note": "Catatan"
+            "note": "Catatan",
+            "unit_sell_price": "Harga jual (opsional)",
+            "unit_cost_hint": "Memperbarui cost_price saat penerimaan diselesaikan",
+            "unit_sell_hint": "Jika > 0, memperbarui harga jual produk",
+            "current_prices": "Saat ini: pokok {{cost}} · jual {{sell}}",
+            "optional": "Kosongkan untuk tetap"
         },
         "status": {
             "draft": "Draf",
@@ -925,7 +930,8 @@
         "form": {
             "create_title": "Penerimaan baru",
             "edit_title": "Edit penerimaan",
-            "cost_note": "Saat selesai, harga pokok baris memperbarui cost_price produk (MVP)."
+            "cost_note": "Kolom harga pokok mengatur cost_price setelah selesai.",
+            "sell_note": "Kolom harga jual opsional mengatur price produk setelah selesai."
         },
         "messages": {
             "create_success": "Penerimaan dibuat",
@@ -934,6 +940,18 @@
             "complete_failed": "Gagal menyelesaikan",
             "cancel_success": "Penerimaan dibatalkan"
         }
+    },
+    "importPrices": {
+        "title": "Import harga (CSV)",
+        "description": "Perbarui harga pokok dan/atau jual per SKU atau product_id.",
+        "csv_format": "Kolom",
+        "csv_hint": "sku atau product_id; cost_price dan/atau price.",
+        "file": "File CSV",
+        "choose_file": "Pilih file…",
+        "submit": "Import",
+        "success": "{{count}} produk diperbarui",
+        "partial_fail": "{{count}} baris gagal",
+        "failed": "Import gagal"
     },
     "inventory": {
         "title": "Ringkasan inventaris",

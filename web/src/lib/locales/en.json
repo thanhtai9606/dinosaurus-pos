@@ -926,8 +926,13 @@
             "total": "Total",
             "product": "Product",
             "quantity": "Qty",
-            "unit_cost": "Unit cost",
-            "note": "Note"
+            "unit_cost": "Cost price (COGS)",
+            "note": "Note",
+            "unit_sell_price": "Sell price (optional)",
+            "unit_cost_hint": "Updates product cost_price when receipt is completed",
+            "unit_sell_hint": "If > 0, updates POS sell price on complete",
+            "current_prices": "Current: cost {{cost}} · sell {{sell}}",
+            "optional": "Leave empty to keep sell price"
         },
         "status": {
             "draft": "Draft",
@@ -937,7 +942,8 @@
         "form": {
             "create_title": "New stock receipt",
             "edit_title": "Edit stock receipt",
-            "cost_note": "On complete, unit cost updates product cost price (MVP)."
+            "cost_note": "Unit cost column sets cost_price when you complete the receipt.",
+            "sell_note": "Optional sell price column updates product price on complete."
         },
         "messages": {
             "create_success": "Receipt created",
@@ -946,6 +952,18 @@
             "complete_failed": "Could not complete receipt",
             "cancel_success": "Receipt cancelled"
         }
+    },
+    "importPrices": {
+        "title": "Import prices (CSV)",
+        "description": "Bulk update cost and/or sell price by SKU or product_id.",
+        "csv_format": "Suggested columns",
+        "csv_hint": "sku or product_id; cost_price and/or price.",
+        "file": "CSV file",
+        "choose_file": "Choose file…",
+        "submit": "Import",
+        "success": "Updated {{count}} products",
+        "partial_fail": "{{count}} rows failed",
+        "failed": "Import failed"
     },
     "inventory": {
         "title": "Inventory overview",

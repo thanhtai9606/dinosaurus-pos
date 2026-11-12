@@ -298,6 +298,17 @@ SET cost_price = $2, updated_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
 RETURNING *;
 
+-- name: SetProductSellPrice :one
+UPDATE products
+SET price = $2, updated_at = NOW()
+WHERE id = $1 AND deleted_at IS NULL
+RETURNING *;
+
+-- name: GetProductBySku :one
+SELECT * FROM products
+WHERE sku = $1 AND deleted_at IS NULL
+LIMIT 1;
+
 -- name: GetProductsForUpdate :many
 SELECT * FROM products
 WHERE id = ANY($1::uuid[])

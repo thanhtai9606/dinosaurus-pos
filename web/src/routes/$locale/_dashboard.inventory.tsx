@@ -9,7 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { PackagePlus } from 'lucide-react'
+import { PackagePlus, Upload } from 'lucide-react'
+import { useState } from 'react'
+import { ProductPriceImportDialog } from '@/components/inventory/ProductPriceImportDialog'
 
 const searchSchema = z.object({
     page: z.number().catch(1),
@@ -57,6 +59,7 @@ function InventoryPage() {
     const { locale } = useParams({ from: '/$locale/_dashboard/inventory' })
     const search = Route.useSearch()
     const { data } = useSuspenseQuery(inventoryQueryOptions(search))
+    const [importOpen, setImportOpen] = useState(false)
 
     return (
         <div className="space-y-4 p-4">
@@ -66,12 +69,18 @@ function InventoryPage() {
                         <CardTitle>{t('inventory.title')}</CardTitle>
                         <CardDescription>{t('inventory.description')}</CardDescription>
                     </div>
-                    <Button asChild>
-                        <Link to="/$locale/stock-receipts" params={{ locale }} search={{}}>
-                            <PackagePlus className="mr-2 h-4 w-4" />
-                            {t('inventory.create_receipt')}
-                        </Link>
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => setImportOpen(true)}>
+                            <Upload className="mr-2 h-4 w-4" />
+                            {t('importPrices.title')}
+                        </Button>
+                        <Button asChild>
+                            <Link to="/$locale/stock-receipts" params={{ locale }} search={{}}>
+                                <PackagePlus className="mr-2 h-4 w-4" />
+                                {t('inventory.create_receipt')}
+                            </Link>
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center gap-2">
@@ -116,6 +125,7 @@ function InventoryPage() {
                     />
                 </CardContent>
             </Card>
+            <ProductPriceImportDialog open={importOpen} onOpenChange={setImportOpen} />
         </div>
     )
 }

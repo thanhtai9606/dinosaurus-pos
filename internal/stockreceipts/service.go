@@ -270,6 +270,19 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 				return err
 			}
 
+			if line.UnitSellPrice.Valid {
+				sellF, _ := line.UnitSellPrice.Float64Value()
+				if sellF.Valid && sellF.Float64 > 0 {
+					sellPrice := int64(sellF.Float64)
+					if _, err := prd.SetProductSellPrice(ctx, products_repo.SetProductSellPriceParams{
+						ID:    line.ProductID,
+						Price: sellPrice,
+					}); err != nil {
+						return err
+					}
+				}
+			}
+
 			_, err = prd.CreateStockHistory(ctx, products_repo.CreateStockHistoryParams{
 				ProductID:     line.ProductID,
 				ChangeAmount:  line.Quantity,
@@ -338,11 +351,18 @@ func insertReceiptItems(ctx context.Context, q *sr_repo.Queries, receiptID uuid.
 		if err := cost.Scan(fmt.Sprintf("%f", it.UnitCost)); err != nil {
 			return err
 		}
+		var sellPrice pgtype.Numeric
+		if it.UnitSellPrice != nil {
+			if err := sellPrice.Scan(fmt.Sprintf("%f", *it.UnitSellPrice)); err != nil {
+				return err
+			}
+		}
 		_, err := q.InsertStockReceiptItem(ctx, sr_repo.InsertStockReceiptItemParams{
-			ReceiptID: receiptID,
-			ProductID: it.ProductID,
-			Quantity:  it.Quantity,
-			UnitCost:  cost,
+			ReceiptID:     receiptID,
+			ProductID:     it.ProductID,
+			Quantity:      it.Quantity,
+			UnitCost:      cost,
+			UnitSellPrice: sellPrice,
 		})
 		if err != nil {
 			return err
@@ -367,14 +387,22 @@ func mapReceiptDetail(r sr_repo.StockReceipt, items []sr_repo.ListStockReceiptIt
 		resp.SupplierID = &sid
 	}
 	for _, it := range items {
+		var sellPtr *float64
+		if it.UnitSellPrice.Valid {
+			v := numericToFloat(it.UnitSellPrice)
+			sellPtr = &v
+		}
 		resp.Items = append(resp.Items, StockReceiptItemResponse{
-			ID:          it.ID,
-			ProductID:   it.ProductID,
-			ProductName: it.ProductName,
-			ProductSku:  it.ProductSku,
-			Quantity:    it.Quantity,
-			UnitCost:    numericToFloat(it.UnitCost),
-			LineTotal:   numericToFloat(it.LineTotal),
+			ID:               it.ID,
+			ProductID:        it.ProductID,
+			ProductName:      it.ProductName,
+			ProductSku:       it.ProductSku,
+			Quantity:         it.Quantity,
+			UnitCost:         numericToFloat(it.UnitCost),
+			UnitSellPrice:    sellPtr,
+			LineTotal:        numericToFloat(it.LineTotal),
+			ProductCostPrice: numericToFloat(it.ProductCostPrice),
+			ProductSellPrice: float64(it.ProductSellPrice),
 		})
 	}
 	return resp

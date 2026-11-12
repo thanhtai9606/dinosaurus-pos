@@ -151,6 +151,10 @@ export const RBAC_RULES: Record<string, string[]> = {
         "admin",
         "manager"
     ],
+    "POST /products/import-prices": [
+        "admin",
+        "manager"
+    ],
     "GET /products/trash": [
         "admin"
     ],

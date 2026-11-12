@@ -8,9 +8,10 @@ import (
 )
 
 type ReceiptItemInput struct {
-	ProductID uuid.UUID `json:"product_id" validate:"required"`
-	Quantity  int32     `json:"quantity" validate:"required,gt=0"`
-	UnitCost  float64   `json:"unit_cost" validate:"required,gte=0"`
+	ProductID     uuid.UUID `json:"product_id" validate:"required"`
+	Quantity      int32     `json:"quantity" validate:"required,gt=0"`
+	UnitCost      float64   `json:"unit_cost" validate:"required,gte=0"`
+	UnitSellPrice *float64  `json:"unit_sell_price" validate:"omitempty,gte=0"`
 }
 
 type CreateStockReceiptRequest struct {
@@ -36,13 +37,16 @@ type ListStockReceiptsRequest struct {
 }
 
 type StockReceiptItemResponse struct {
-	ID          uuid.UUID `json:"id"`
-	ProductID   uuid.UUID `json:"product_id"`
-	ProductName string    `json:"product_name"`
-	ProductSku  *string   `json:"product_sku,omitempty"`
-	Quantity    int32     `json:"quantity"`
-	UnitCost    float64   `json:"unit_cost"`
-	LineTotal   float64   `json:"line_total"`
+	ID                 uuid.UUID `json:"id"`
+	ProductID          uuid.UUID `json:"product_id"`
+	ProductName        string    `json:"product_name"`
+	ProductSku         *string   `json:"product_sku,omitempty"`
+	Quantity           int32     `json:"quantity"`
+	UnitCost           float64   `json:"unit_cost"`
+	UnitSellPrice      *float64  `json:"unit_sell_price,omitempty"`
+	LineTotal          float64   `json:"line_total"`
+	ProductCostPrice   float64   `json:"product_cost_price,omitempty"`
+	ProductSellPrice   float64   `json:"product_sell_price,omitempty"`
 }
 
 type StockReceiptResponse struct {

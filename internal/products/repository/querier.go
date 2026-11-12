@@ -33,6 +33,7 @@ type Querier interface {
 	GetDeletedProduct(ctx context.Context, id uuid.UUID) (GetDeletedProductRow, error)
 	// Retrieves a product by its ID, including its options.
 	GetProductByID(ctx context.Context, id uuid.UUID) (GetProductByIDRow, error)
+	GetProductBySku(ctx context.Context, sku *string) (Product, error)
 	// Mengambil satu varian produk berdasarkan ID dan ID produk induknya.
 	GetProductOption(ctx context.Context, arg GetProductOptionParams) (ProductOption, error)
 	// Retrieves a product option by its ID, including its product details.
@@ -55,6 +56,7 @@ type Querier interface {
 	RestoreProduct(ctx context.Context, id uuid.UUID) error
 	RestoreProductsBulk(ctx context.Context, dollar_1 []uuid.UUID) error
 	SetProductCostPrice(ctx context.Context, arg SetProductCostPriceParams) (Product, error)
+	SetProductSellPrice(ctx context.Context, arg SetProductSellPriceParams) (Product, error)
 	SoftDeleteProduct(ctx context.Context, id uuid.UUID) error
 	// Deletes a single product option.
 	SoftDeleteProductOption(ctx context.Context, id uuid.UUID) error

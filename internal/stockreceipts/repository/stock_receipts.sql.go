@@ -119,16 +119,17 @@ func (q *Queries) GetStockReceiptByID(ctx context.Context, id uuid.UUID) (StockR
 }
 
 const insertStockReceiptItem = `-- name: InsertStockReceiptItem :one
-INSERT INTO stock_receipt_items (receipt_id, product_id, quantity, unit_cost)
-VALUES ($1, $2, $3, $4)
-RETURNING id, receipt_id, product_id, quantity, unit_cost, line_total, created_at
+INSERT INTO stock_receipt_items (receipt_id, product_id, quantity, unit_cost, unit_sell_price)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, receipt_id, product_id, quantity, unit_cost, line_total, created_at, unit_sell_price
 `
 
 type InsertStockReceiptItemParams struct {
-	ReceiptID uuid.UUID      `json:"receipt_id"`
-	ProductID uuid.UUID      `json:"product_id"`
-	Quantity  int32          `json:"quantity"`
-	UnitCost  pgtype.Numeric `json:"unit_cost"`
+	ReceiptID     uuid.UUID      `json:"receipt_id"`
+	ProductID     uuid.UUID      `json:"product_id"`
+	Quantity      int32          `json:"quantity"`
+	UnitCost      pgtype.Numeric `json:"unit_cost"`
+	UnitSellPrice pgtype.Numeric `json:"unit_sell_price"`
 }
 
 func (q *Queries) InsertStockReceiptItem(ctx context.Context, arg InsertStockReceiptItemParams) (StockReceiptItem, error) {
@@ -137,6 +138,7 @@ func (q *Queries) InsertStockReceiptItem(ctx context.Context, arg InsertStockRec
 		arg.ProductID,
 		arg.Quantity,
 		arg.UnitCost,
+		arg.UnitSellPrice,
 	)
 	var i StockReceiptItem
 	err := row.Scan(
@@ -147,15 +149,18 @@ func (q *Queries) InsertStockReceiptItem(ctx context.Context, arg InsertStockRec
 		&i.UnitCost,
 		&i.LineTotal,
 		&i.CreatedAt,
+		&i.UnitSellPrice,
 	)
 	return i, err
 }
 
 const listStockReceiptItems = `-- name: ListStockReceiptItems :many
 SELECT
-    i.id, i.receipt_id, i.product_id, i.quantity, i.unit_cost, i.line_total, i.created_at,
+    i.id, i.receipt_id, i.product_id, i.quantity, i.unit_cost, i.line_total, i.created_at, i.unit_sell_price,
     p.name AS product_name,
-    p.sku AS product_sku
+    p.sku AS product_sku,
+    p.price AS product_sell_price,
+    p.cost_price AS product_cost_price
 FROM stock_receipt_items i
 JOIN products p ON p.id = i.product_id AND p.deleted_at IS NULL
 WHERE i.receipt_id = $1
@@ -163,15 +168,18 @@ ORDER BY i.created_at ASC
 `
 
 type ListStockReceiptItemsRow struct {
-	ID          uuid.UUID          `json:"id"`
-	ReceiptID   uuid.UUID          `json:"receipt_id"`
-	ProductID   uuid.UUID          `json:"product_id"`
-	Quantity    int32              `json:"quantity"`
-	UnitCost    pgtype.Numeric     `json:"unit_cost"`
-	LineTotal   pgtype.Numeric     `json:"line_total"`
-	CreatedAt   pgtype.Timestamptz `json:"created_at"`
-	ProductName string             `json:"product_name"`
-	ProductSku  *string            `json:"product_sku"`
+	ID               uuid.UUID          `json:"id"`
+	ReceiptID        uuid.UUID          `json:"receipt_id"`
+	ProductID        uuid.UUID          `json:"product_id"`
+	Quantity         int32              `json:"quantity"`
+	UnitCost         pgtype.Numeric     `json:"unit_cost"`
+	LineTotal        pgtype.Numeric     `json:"line_total"`
+	CreatedAt        pgtype.Timestamptz `json:"created_at"`
+	UnitSellPrice    pgtype.Numeric     `json:"unit_sell_price"`
+	ProductName      string             `json:"product_name"`
+	ProductSku       *string            `json:"product_sku"`
+	ProductSellPrice int64              `json:"product_sell_price"`
+	ProductCostPrice pgtype.Numeric     `json:"product_cost_price"`
 }
 
 func (q *Queries) ListStockReceiptItems(ctx context.Context, receiptID uuid.UUID) ([]ListStockReceiptItemsRow, error) {
@@ -191,8 +199,11 @@ func (q *Queries) ListStockReceiptItems(ctx context.Context, receiptID uuid.UUID
 			&i.UnitCost,
 			&i.LineTotal,
 			&i.CreatedAt,
+			&i.UnitSellPrice,
 			&i.ProductName,
 			&i.ProductSku,
+			&i.ProductSellPrice,
+			&i.ProductCostPrice,
 		); err != nil {
 			return nil, err
 		}

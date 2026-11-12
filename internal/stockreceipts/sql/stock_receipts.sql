@@ -47,15 +47,17 @@ RETURNING *;
 DELETE FROM stock_receipt_items WHERE receipt_id = $1;
 
 -- name: InsertStockReceiptItem :one
-INSERT INTO stock_receipt_items (receipt_id, product_id, quantity, unit_cost)
-VALUES ($1, $2, $3, $4)
+INSERT INTO stock_receipt_items (receipt_id, product_id, quantity, unit_cost, unit_sell_price)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: ListStockReceiptItems :many
 SELECT
     i.*,
     p.name AS product_name,
-    p.sku AS product_sku
+    p.sku AS product_sku,
+    p.price AS product_sell_price,
+    p.cost_price AS product_cost_price
 FROM stock_receipt_items i
 JOIN products p ON p.id = i.product_id AND p.deleted_at IS NULL
 WHERE i.receipt_id = $1

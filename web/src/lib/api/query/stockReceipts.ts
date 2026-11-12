@@ -13,7 +13,10 @@ export type StockReceiptItem = {
     product_sku?: string | null
     quantity: number
     unit_cost: number
+    unit_sell_price?: number
     line_total?: number
+    product_cost_price?: number
+    product_sell_price?: number
 }
 
 export type StockReceipt = {

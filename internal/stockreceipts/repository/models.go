@@ -886,13 +886,14 @@ type StockReceipt struct {
 }
 
 type StockReceiptItem struct {
-	ID        uuid.UUID          `json:"id"`
-	ReceiptID uuid.UUID          `json:"receipt_id"`
-	ProductID uuid.UUID          `json:"product_id"`
-	Quantity  int32              `json:"quantity"`
-	UnitCost  pgtype.Numeric     `json:"unit_cost"`
-	LineTotal pgtype.Numeric     `json:"line_total"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ID            uuid.UUID          `json:"id"`
+	ReceiptID     uuid.UUID          `json:"receipt_id"`
+	ProductID     uuid.UUID          `json:"product_id"`
+	Quantity      int32              `json:"quantity"`
+	UnitCost      pgtype.Numeric     `json:"unit_cost"`
+	LineTotal     pgtype.Numeric     `json:"line_total"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	UnitSellPrice pgtype.Numeric     `json:"unit_sell_price"`
 }
 
 type Supplier struct {

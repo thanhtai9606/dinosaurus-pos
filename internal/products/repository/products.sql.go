@@ -406,6 +406,34 @@ func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (GetProductB
 	return i, err
 }
 
+const getProductBySku = `-- name: GetProductBySku :one
+SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id FROM products
+WHERE sku = $1 AND deleted_at IS NULL
+LIMIT 1
+`
+
+func (q *Queries) GetProductBySku(ctx context.Context, sku *string) (Product, error) {
+	row := q.db.QueryRow(ctx, getProductBySku, sku)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ImageUrl,
+		&i.Price,
+		&i.Stock,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CostPrice,
+		&i.Sku,
+		&i.Barcode,
+		&i.Unit,
+		&i.MinStock,
+		&i.DefaultSupplierID,
+	)
+	return i, err
+}
+
 const getProductOption = `-- name: GetProductOption :one
 SELECT id, product_id, name, additional_price, image_url, created_at, updated_at, deleted_at FROM product_options
 WHERE id = $1 AND product_id = $2
@@ -913,6 +941,40 @@ type SetProductCostPriceParams struct {
 
 func (q *Queries) SetProductCostPrice(ctx context.Context, arg SetProductCostPriceParams) (Product, error) {
 	row := q.db.QueryRow(ctx, setProductCostPrice, arg.ID, arg.CostPrice)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ImageUrl,
+		&i.Price,
+		&i.Stock,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CostPrice,
+		&i.Sku,
+		&i.Barcode,
+		&i.Unit,
+		&i.MinStock,
+		&i.DefaultSupplierID,
+	)
+	return i, err
+}
+
+const setProductSellPrice = `-- name: SetProductSellPrice :one
+UPDATE products
+SET price = $2, updated_at = NOW()
+WHERE id = $1 AND deleted_at IS NULL
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id
+`
+
+type SetProductSellPriceParams struct {
+	ID    uuid.UUID `json:"id"`
+	Price int64     `json:"price"`
+}
+
+func (q *Queries) SetProductSellPrice(ctx context.Context, arg SetProductSellPriceParams) (Product, error) {
+	row := q.db.QueryRow(ctx, setProductSellPrice, arg.ID, arg.Price)
 	var i Product
 	err := row.Scan(
 		&i.ID,

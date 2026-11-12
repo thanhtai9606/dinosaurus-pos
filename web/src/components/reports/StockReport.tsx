@@ -35,20 +35,24 @@ export function StockReport({
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>{t('products.fields.sku')}</TableHead>
                                 <TableHead>{t('reports.products.product')}</TableHead>
                                 <TableHead className="text-right">{t('reports.products.stock') || 'Stock'}</TableHead>
+                                <TableHead className="text-right">{t('products.fields.min_stock')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {(data || []).map((product: any, idx: number) => (
                                 <TableRow key={idx} className="hover:bg-muted/50">
+                                    <TableCell>{product.sku || '—'}</TableCell>
                                     <TableCell className="font-medium">{product.product_name}</TableCell>
                                     <TableCell className="text-right text-destructive font-bold">{product.stock ?? 0}</TableCell>
+                                    <TableCell className="text-right">{product.min_stock ?? 0}</TableCell>
                                 </TableRow>
                             ))}
                             {(!data || data.length === 0) && (
                                 <TableRow>
-                                    <TableCell colSpan={2} className="text-center text-muted-foreground">{t('common.no_data')}</TableCell>
+                                    <TableCell colSpan={4} className="text-center text-muted-foreground">{t('common.no_data')}</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

@@ -1,0 +1,33 @@
+---
+description: Domain context for dinosaur-pos — stock receipts, debt ledgers, integration hooks (read docs/CONTEXT.md for detail)
+alwaysApply: true
+---
+
+# dinosaur-pos — domain context (tóm tắt)
+
+**Full doc:** [docs/CONTEXT.md](mdc:docs/CONTEXT.md) — cập nhật khi thêm module lớn.
+
+## Stack nhanh
+
+- Go `POS-kasir`, Fiber, sqlc/PostgreSQL, migrations `sqlc/migrations/` → `make migrate-up` on deploy.
+- React 19 in `web/`, TanStack Router + Query, i18n vi/en/id, RBAC `web/src/lib/auth/rbacRules.ts`.
+
+## Stock receipts
+
+- **List** `_dashboard.stock-receipts.tsx`; **create** full page `/stock-receipts/new` (POS-style + `StockReceiptCheckoutPanel`); **edit/view** modal `StockReceiptEditorDialog` only.
+- Payment: DB columns `payment_mode` (`cash`|`credit`), `amount_paid` (migration 027). Legacy `note` + `__payment__` JSON via `web/src/lib/stock-receipts/paymentNote.ts` — display only for old rows, no backfill.
+- **Complete** receipt: if balance > 0 → one `supplier_debts` row (`supplierdebts.CreateDebtFromStockReceiptTx`).
+
+## Debt ledgers MVP (v1)
+
+- Packages: `internal/supplierdebts`, `internal/customerdebts`; routes `/supplier-debts`, `/customer-debts` (manager+).
+- FE: `_dashboard.supplier-debts.tsx`, `_dashboard.customer-debts.tsx`, queries `supplierDebts.ts` / `customerDebts.ts`, shared sheet `components/debts/PartnerDebtDetailSheet.tsx`.
+- Status: `open|partial|settled|void`; partial payments + manual entries + void; summary endpoints per partner.
+- **Orders:** create unpaid + customer → `customer_debts`; cancel → void debt; Transactions full pay → `RecordOrderPaymentTx` (avoid duplicate with debt-module pay).
+- **Out of scope v1:** aging, credit limits, accounting/cash drawer sync, backfill old receipt notes.
+
+## Conventions when changing this area
+
+- Add RBAC rules for new API paths; wire `server/routes.go` + `server/server.go`.
+- Mirror patterns between supplier/customer debt packages when reasonable.
+- Minimize scope; match existing stockreceipts/suppliers style; i18n all three locales.

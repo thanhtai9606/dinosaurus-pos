@@ -6,6 +6,10 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## Maintainer context (fork / dinosaur-pos)
+
+For **product decisions, debt ledgers, stock-receipt flows, and file map** (Vietnamese + technical detail), see **[docs/CONTEXT.md](docs/CONTEXT.md)**. Cursor loads a short summary from `.cursor/rules/project-domain-context.mdc` — update both when you add major features.
+
 ## Overview
 
 **POS Kasir** is a modern, high-performance Fullstack Point of Sales application designed to streamline retail operations. It provides a robust solution for managing products, processing orders, handling payments (including Digital Payments via Midtrans), and analyzing sales performance.

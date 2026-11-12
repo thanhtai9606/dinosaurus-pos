@@ -115,7 +115,46 @@
         "field_qty": "Qty",
         "field_line": "Subtotal",
         "col_queue": "Antrian / ID",
-        "col_time": "Waktu"
+        "col_time": "Waktu",
+        "section": {
+            "summary": "Info pesanan",
+            "lines": "Detail & total"
+        },
+        "meta": {
+            "order_id": "ID pesanan",
+            "customer_id": "ID pelanggan",
+            "customer_name": "Nama pelanggan",
+            "created_at": "Dibuat",
+            "updated_at": "Diperbarui",
+            "cashier": "Kasir",
+            "status": "Status",
+            "order_type": "Jenis pesanan",
+            "payment_ref": "Referensi pembayaran",
+            "walk_in": "Pelanggan umum",
+            "loading_customer": "Memuat pelanggan…",
+            "loading_cashier": "Memuat kasir…"
+        },
+        "totals": {
+            "gross": "Subtotal",
+            "discount": "Diskon",
+            "promotion": "Promosi",
+            "tax": "Pajak",
+            "service": "Biaya layanan",
+            "cash_received": "Uang diterima",
+            "change": "Kembalian"
+        },
+        "adjust_min_one": "Minimal satu baris diperlukan.",
+        "actions": {
+            "copy": "Salin",
+            "copy_success": "Disalin ke clipboard",
+            "copy_failed": "Gagal menyalin",
+            "print": "Cetak struk",
+            "adjust": "Sesuaikan",
+            "save_adjust": "Simpan",
+            "delete_open": "Batalkan pesanan",
+            "delete_paid": "Refund / batalkan",
+            "already_cancelled": "Pesanan sudah dibatalkan"
+        }
     },
     "debts": {
         "detail_title": "Detail hutang/piutang",

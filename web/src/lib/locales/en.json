@@ -113,7 +113,46 @@
         "field_qty": "Qty",
         "field_line": "Line total",
         "col_queue": "Queue / ID",
-        "col_time": "Date & time"
+        "col_time": "Date & time",
+        "section": {
+            "summary": "Order info",
+            "lines": "Items & totals"
+        },
+        "meta": {
+            "order_id": "Order ID",
+            "customer_id": "Customer ID",
+            "customer_name": "Customer name",
+            "created_at": "Created",
+            "updated_at": "Updated",
+            "cashier": "Cashier",
+            "status": "Status",
+            "order_type": "Order type",
+            "payment_ref": "Payment reference",
+            "walk_in": "Walk-in",
+            "loading_customer": "Loading customer…",
+            "loading_cashier": "Loading cashier…"
+        },
+        "totals": {
+            "gross": "Subtotal",
+            "discount": "Discount",
+            "promotion": "Promotion",
+            "tax": "Tax",
+            "service": "Service charge",
+            "cash_received": "Cash received",
+            "change": "Change"
+        },
+        "adjust_min_one": "At least one line is required.",
+        "actions": {
+            "copy": "Copy",
+            "copy_success": "Copied to clipboard",
+            "copy_failed": "Could not copy",
+            "print": "Print receipt",
+            "adjust": "Adjust items",
+            "save_adjust": "Save changes",
+            "delete_open": "Cancel order",
+            "delete_paid": "Refund / void",
+            "already_cancelled": "Order already cancelled"
+        }
     },
     "debts": {
         "detail_title": "Debt detail",

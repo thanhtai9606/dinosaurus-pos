@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 import { useMemo, useState } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SalesOrdersTable } from '@/components/sales-orders/SalesOrdersTable'
-import { OrderDetailSheet } from '@/components/sales-orders/OrderDetailSheet'
+import { OrderDetailDialog } from '@/components/sales-orders/OrderDetailDialog'
 
 const searchSchema = z.object({
     page: z.number().catch(1),
@@ -29,6 +29,7 @@ export const Route = createFileRoute('/_dashboard/sales-orders')({
 
 function SalesOrdersPage() {
     const { t } = useTranslation()
+    const queryClient = useQueryClient()
     const navigate = useNavigate({ from: Route.fullPath })
     const searchParams = Route.useSearch()
 
@@ -192,12 +193,15 @@ function SalesOrdersPage() {
                 </CardContent>
             </Card>
 
-            <OrderDetailSheet
+            <OrderDetailDialog
                 orderId={detailId}
                 open={detailOpen}
                 onOpenChange={(open) => {
                     setDetailOpen(open)
                     if (!open) setDetailId(null)
+                }}
+                onChanged={() => {
+                    void queryClient.invalidateQueries({ queryKey: ['orders', 'list'] })
                 }}
             />
         </div>

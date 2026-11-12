@@ -115,7 +115,46 @@
         "field_qty": "SL",
         "field_line": "Thành tiền",
         "col_queue": "Số / mã",
-        "col_time": "Thời gian"
+        "col_time": "Thời gian",
+        "section": {
+            "summary": "Thông tin đơn",
+            "lines": "Chi tiết & tổng tiền"
+        },
+        "meta": {
+            "order_id": "Mã đơn hàng",
+            "customer_id": "Mã khách hàng",
+            "customer_name": "Tên khách hàng",
+            "created_at": "Ngày tạo",
+            "updated_at": "Cập nhật lúc",
+            "cashier": "Nhân viên bán",
+            "status": "Trạng thái",
+            "order_type": "Loại đơn",
+            "payment_ref": "Mã thanh toán",
+            "walk_in": "Khách lẻ",
+            "loading_customer": "Đang tải khách…",
+            "loading_cashier": "Đang tải NV…"
+        },
+        "totals": {
+            "gross": "Tạm tính",
+            "discount": "Giảm giá",
+            "promotion": "Khuyến mãi",
+            "tax": "Thuế",
+            "service": "Phí dịch vụ",
+            "cash_received": "Tiền khách đưa",
+            "change": "Tiền thối"
+        },
+        "adjust_min_one": "Cần ít nhất một dòng hàng.",
+        "actions": {
+            "copy": "Sao chép",
+            "copy_success": "Đã sao chép",
+            "copy_failed": "Không sao chép được",
+            "print": "In hóa đơn",
+            "adjust": "Điều chỉnh",
+            "save_adjust": "Lưu thay đổi",
+            "delete_open": "Hủy đơn",
+            "delete_paid": "Hoàn / hủy đơn",
+            "already_cancelled": "Đơn đã hủy"
+        }
     },
     "debts": {
         "detail_title": "Chi tiết công nợ",

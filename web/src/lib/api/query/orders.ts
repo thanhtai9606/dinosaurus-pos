@@ -7,7 +7,7 @@ import {
     InternalOrdersConfirmManualPaymentRequest,
     InternalOrdersCreateOrderRequest,
     InternalOrdersUpdateOrderStatusRequest,
-    InternalOrdersUpdateOrderItemRequest,
+    InternalOrdersUpdateOrderItemsRequest,
     InternalOrdersOrderDetailResponse,
     InternalOrdersMidtransPaymentResponse,
     InternalOrdersRefundOrderRequest,
@@ -277,16 +277,16 @@ export const useCreateOrderMutation = () => {
 export const useUpdateOrderItemsMutation = () => {
     const qc = useQueryClient()
     const { canAccessApi } = useRBAC()
-    const isAllowed = canAccessApi('PUT', '/orders/{id}/items')
+    const isAllowed = canAccessApi('PATCH', '/orders/{id}/items')
 
     const mutation = useMutation<
         InternalOrdersOrderDetailResponse,
         AxiosError<POSKasirInternalCommonErrorResponse>,
-        { id: string; body: InternalOrdersUpdateOrderItemRequest[] }
+        { id: string; body: InternalOrdersUpdateOrderItemsRequest }
     >({
         mutationKey: ['orders', 'update-items'],
         mutationFn: async ({ id, body }) => {
-            const res = await ordersApi.ordersIdItemsPatch(id, body as any)
+            const res = await ordersApi.ordersIdItemsPatch(id, body)
             return (res.data as any).data
         },
         onSuccess: (_, variables) => {

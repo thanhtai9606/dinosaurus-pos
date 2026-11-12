@@ -942,16 +942,23 @@
         }
     },
     "importPrices": {
-        "title": "Import harga (CSV)",
-        "description": "Perbarui harga pokok dan/atau jual per SKU atau product_id.",
+        "title": "Import harga",
+        "description": "Perbarui harga pokok dan/atau jual per SKU atau product_id (CSV atau Excel).",
         "csv_format": "Kolom",
         "csv_hint": "sku atau product_id; cost_price dan/atau price.",
-        "file": "File CSV",
+        "file": "File CSV atau Excel",
         "choose_file": "Pilih file…",
         "submit": "Import",
         "success": "{{count}} produk diperbarui",
         "partial_fail": "{{count}} baris gagal",
-        "failed": "Import gagal"
+        "failed": "Import gagal",
+        "download_template": "Unduh template Excel",
+        "template_failed": "Gagal mengunduh template"
+    },
+    "exportPrices": {
+        "title": "Ekspor Excel",
+        "success": "Unduhan dimulai",
+        "failed": "Ekspor gagal"
     },
     "inventory": {
         "title": "Ringkasan inventaris",

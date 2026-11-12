@@ -962,15 +962,22 @@
     },
     "importPrices": {
         "title": "Nhập giá hàng loạt",
-        "description": "CSV cập nhật giá vốn và/hoặc giá bán theo SKU hoặc product_id.",
+        "description": "Cập nhật giá vốn và/hoặc giá bán theo SKU hoặc product_id (CSV hoặc Excel).",
         "csv_format": "Cột gợi ý",
         "csv_hint": "sku hoặc product_id; cost_price và/hoặc price. Hàng không có SKU/id bị bỏ qua.",
-        "file": "File CSV",
+        "file": "File CSV hoặc Excel",
         "choose_file": "Chọn file…",
         "submit": "Import",
         "success": "Đã cập nhật {{count}} sản phẩm",
         "partial_fail": "{{count}} dòng lỗi — xem response API",
-        "failed": "Import thất bại"
+        "failed": "Import thất bại",
+        "download_template": "Tải mẫu Excel",
+        "template_failed": "Không tải được mẫu"
+    },
+    "exportPrices": {
+        "title": "Xuất Excel",
+        "success": "Đang tải file",
+        "failed": "Xuất file thất bại"
     },
     "inventory": {
         "title": "Tổng quan tồn kho",

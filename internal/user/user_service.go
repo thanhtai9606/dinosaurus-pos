@@ -147,10 +147,9 @@ func (s *UsrService) UpdateUser(ctx context.Context, userID uuid.UUID, req Updat
 		existingUser.IsActive = *req.IsActive
 	}
 
-	var roleParam *user_repo.UserRole
+	var roleParam user_repo.NullUserRole
 	if existingUser.Role != "" {
-		r := existingUser.Role
-		roleParam = &r
+		roleParam = user_repo.NullUserRole{UserRole: existingUser.Role, Valid: true}
 	}
 
 	user, err := s.repo.UpdateUser(ctx, user_repo.UpdateUserParams{
@@ -359,7 +358,7 @@ func (s *UsrService) GetAllUsers(ctx context.Context, req UsersRequest) (*UsersR
 	}
 	if req.Role != nil {
 		r := user_repo.UserRole(*req.Role)
-		listParams.Role = &r
+		listParams.Role = user_repo.NullUserRole{UserRole: r, Valid: true}
 	}
 
 	users, err := s.repo.ListUsers(ctx, listParams)

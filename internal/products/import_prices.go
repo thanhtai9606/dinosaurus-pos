@@ -43,6 +43,26 @@ func (s *PrdService) ImportProductPricesCSV(ctx context.Context, data []byte) (*
 	return s.ImportProductPrices(ctx, rows)
 }
 
+func (s *PrdService) ImportProductPricesXLSX(ctx context.Context, data []byte) (*ImportPricesResult, error) {
+	rows, err := ParseImportPricesXLSX(data)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", common.ErrInvalidInput, err)
+	}
+	return s.ImportProductPrices(ctx, rows)
+}
+
+func (s *PrdService) BuildImportPricesTemplate() ([]byte, error) {
+	return BuildImportPricesTemplateXLSX()
+}
+
+func (s *PrdService) ExportProductPricesXLSX(ctx context.Context) ([]byte, error) {
+	rows, err := s.repo.ListProductsForPriceExport(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return BuildProductPricesExportXLSX(rows)
+}
+
 func (s *PrdService) ImportProductPrices(ctx context.Context, rows []ImportPriceRow) (*ImportPricesResult, error) {
 	result := &ImportPricesResult{Failed: []ImportPriceFailure{}}
 

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"mime/multipart"
+	"strings"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
@@ -32,6 +33,8 @@ type IPrdHandler interface {
 	RestoreProductsBulkHandler(ctx fiber.Ctx) error
 	GetStockHistoryHandler(ctx fiber.Ctx) error
 	ImportProductPricesHandler(ctx fiber.Ctx) error
+	DownloadImportPricesTemplateHandler(ctx fiber.Ctx) error
+	ExportProductPricesHandler(ctx fiber.Ctx) error
 }
 
 func NewPrdHandler(prdService IPrdService, log logger.ILogger) IPrdHandler {
@@ -781,7 +784,16 @@ func (h *PrdHandler) ImportProductPricesHandler(ctx fiber.Ctx) error {
 		if _, err := io.Copy(buf, f); err != nil {
 			return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Failed to read file"})
 		}
-		result, err := h.prdService.ImportProductPricesCSV(ctx.RequestCtx(), buf.Bytes())
+		raw := buf.Bytes()
+		var result *ImportPricesResult
+		var importErr error
+		name := strings.ToLower(fileHeader.Filename)
+		if strings.HasSuffix(name, ".xlsx") || strings.HasSuffix(name, ".xls") {
+			result, importErr = h.prdService.ImportProductPricesXLSX(ctx.RequestCtx(), raw)
+		} else {
+			result, importErr = h.prdService.ImportProductPricesCSV(ctx.RequestCtx(), raw)
+		}
+		err = importErr
 		if err != nil {
 			if errors.Is(err, common.ErrInvalidInput) {
 				return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
@@ -808,4 +820,40 @@ func (h *PrdHandler) ImportProductPricesHandler(ctx fiber.Ctx) error {
 		Message: "Prices imported",
 		Data:    result,
 	})
+}
+
+// DownloadImportPricesTemplateHandler serves an Excel template for bulk price import
+// @Summary      Download import prices template
+// @Tags         Products
+// @Produce      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @Success      200 {file} file "Excel template"
+// @x-roles      ["admin", "manager"]
+// @Router       /products/import-prices/template [get]
+func (h *PrdHandler) DownloadImportPricesTemplateHandler(ctx fiber.Ctx) error {
+	data, err := h.prdService.BuildImportPricesTemplate()
+	if err != nil {
+		h.log.Error("Failed to build import template", "error", err)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to build template"})
+	}
+	ctx.Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	ctx.Set("Content-Disposition", `attachment; filename="import_prices_template.xlsx"`)
+	return ctx.Send(data)
+}
+
+// ExportProductPricesHandler exports product prices and stock to Excel
+// @Summary      Export product prices
+// @Tags         Products
+// @Produce      application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @Success      200 {file} file "Excel export"
+// @x-roles      ["admin", "manager"]
+// @Router       /products/export-prices [get]
+func (h *PrdHandler) ExportProductPricesHandler(ctx fiber.Ctx) error {
+	data, err := h.prdService.ExportProductPricesXLSX(ctx.RequestCtx())
+	if err != nil {
+		h.log.Error("Failed to export product prices", "error", err)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Export failed"})
+	}
+	ctx.Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	ctx.Set("Content-Disposition", `attachment; filename="product_prices_export.xlsx"`)
+	return ctx.Send(data)
 }

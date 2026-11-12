@@ -954,16 +954,23 @@
         }
     },
     "importPrices": {
-        "title": "Import prices (CSV)",
-        "description": "Bulk update cost and/or sell price by SKU or product_id.",
+        "title": "Import prices",
+        "description": "Bulk update cost and/or sell price by SKU or product_id (CSV or Excel).",
         "csv_format": "Suggested columns",
         "csv_hint": "sku or product_id; cost_price and/or price.",
-        "file": "CSV file",
+        "file": "CSV or Excel file",
         "choose_file": "Choose file…",
         "submit": "Import",
         "success": "Updated {{count}} products",
         "partial_fail": "{{count}} rows failed",
-        "failed": "Import failed"
+        "failed": "Import failed",
+        "download_template": "Download Excel template",
+        "template_failed": "Could not download template"
+    },
+    "exportPrices": {
+        "title": "Export to Excel",
+        "success": "Download started",
+        "failed": "Export failed"
     },
     "inventory": {
         "title": "Inventory overview",

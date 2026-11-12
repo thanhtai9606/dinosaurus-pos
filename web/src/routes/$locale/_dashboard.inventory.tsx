@@ -9,9 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { PackagePlus, Upload } from 'lucide-react'
+import { Download, Loader2, PackagePlus, Upload } from 'lucide-react'
 import { useState } from 'react'
 import { ProductPriceImportDialog } from '@/components/inventory/ProductPriceImportDialog'
+import { downloadAuthenticatedFile } from '@/lib/api/downloadBlob'
+import { toast } from 'sonner'
+import { useRBAC } from '@/lib/auth/rbac'
 
 const searchSchema = z.object({
     page: z.number().catch(1),
@@ -60,6 +63,9 @@ function InventoryPage() {
     const search = Route.useSearch()
     const { data } = useSuspenseQuery(inventoryQueryOptions(search))
     const [importOpen, setImportOpen] = useState(false)
+    const [exporting, setExporting] = useState(false)
+    const { canAccessApi } = useRBAC()
+    const canExport = canAccessApi('GET', '/products/export-prices')
 
     return (
         <div className="space-y-4 p-4">
@@ -69,7 +75,31 @@ function InventoryPage() {
                         <CardTitle>{t('inventory.title')}</CardTitle>
                         <CardDescription>{t('inventory.description')}</CardDescription>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
+                        {canExport && (
+                            <Button
+                                variant="outline"
+                                disabled={exporting}
+                                onClick={async () => {
+                                    setExporting(true)
+                                    try {
+                                        await downloadAuthenticatedFile('/products/export-prices', 'product_prices_export.xlsx')
+                                        toast.success(t('exportPrices.success'))
+                                    } catch {
+                                        toast.error(t('exportPrices.failed'))
+                                    } finally {
+                                        setExporting(false)
+                                    }
+                                }}
+                            >
+                                {exporting ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Download className="mr-2 h-4 w-4" />
+                                )}
+                                {t('exportPrices.title')}
+                            </Button>
+                        )}
                         <Button variant="outline" onClick={() => setImportOpen(true)}>
                             <Upload className="mr-2 h-4 w-4" />
                             {t('importPrices.title')}

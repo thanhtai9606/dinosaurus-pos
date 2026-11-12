@@ -118,8 +118,9 @@ func (s *StockReceiptService) List(ctx context.Context, req ListStockReceiptsReq
 
 	if req.Status != nil {
 		st := sr_repo.StockReceiptStatus(*req.Status)
-		params.Status = &st
-		countParams.Status = &st
+		nv := sr_repo.NullStockReceiptStatus{StockReceiptStatus: st, Valid: true}
+		params.Status = nv
+		countParams.Status = nv
 	}
 	if req.SupplierID != nil {
 		sid := pgtype.UUID{Bytes: *req.SupplierID, Valid: true}

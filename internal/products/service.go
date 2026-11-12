@@ -42,6 +42,9 @@ type IPrdService interface {
 
 	ImportProductPrices(ctx context.Context, rows []ImportPriceRow) (*ImportPricesResult, error)
 	ImportProductPricesCSV(ctx context.Context, data []byte) (*ImportPricesResult, error)
+	ImportProductPricesXLSX(ctx context.Context, data []byte) (*ImportPricesResult, error)
+	BuildImportPricesTemplate() ([]byte, error)
+	ExportProductPricesXLSX(ctx context.Context) ([]byte, error)
 }
 
 type PrdService struct {

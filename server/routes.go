@@ -57,6 +57,8 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Delete("/categories/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.CategoryHandler.DeleteCategoryHandler)
 
 	api.Post("/products", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.CreateProductHandler)
+	api.Get("/products/import-prices/template", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.DownloadImportPricesTemplateHandler)
+	api.Get("/products/export-prices", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.ExportProductPricesHandler)
 	api.Post("/products/import-prices", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.ImportProductPricesHandler)
 	api.Post("/products/:id/image", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.UploadProductImageHandler)
 

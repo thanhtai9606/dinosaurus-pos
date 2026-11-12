@@ -313,3 +313,17 @@ LIMIT 1;
 SELECT * FROM products
 WHERE id = ANY($1::uuid[])
 FOR UPDATE;
+
+-- name: ListProductsForPriceExport :many
+SELECT
+    p.id,
+    p.sku,
+    p.name,
+    p.cost_price,
+    p.price,
+    p.stock,
+    p.min_stock,
+    p.unit
+FROM products p
+WHERE p.deleted_at IS NULL
+ORDER BY p.name ASC;

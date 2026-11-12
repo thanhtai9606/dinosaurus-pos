@@ -73,13 +73,15 @@ func (s *ActivityService) GetActivityLogs(ctx context.Context, req GetActivityLo
 	countArg := repository.CountActivityLogsParams{}
 
 	if req.ActionType != nil {
-		arg.ActionType = req.ActionType
-		countArg.ActionType = req.ActionType
+		nv := repository.NullLogActionType{LogActionType: *req.ActionType, Valid: true}
+		arg.ActionType = nv
+		countArg.ActionType = nv
 	}
 
 	if req.EntityType != nil {
-		arg.EntityType = req.EntityType
-		countArg.EntityType = req.EntityType
+		nv := repository.NullLogEntityType{LogEntityType: *req.EntityType, Valid: true}
+		arg.EntityType = nv
+		countArg.EntityType = nv
 	}
 
 	if req.UserID != nil {

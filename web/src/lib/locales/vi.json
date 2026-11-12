@@ -96,7 +96,13 @@
     "retailPos": {
         "title": "Bán hàng — tạp hóa / bán lẻ",
         "subtitle": "Quét mã vạch hoặc tìm sản phẩm, thanh toán nhanh.",
-        "search_placeholder": "Tên, mã vạch, SKU — gõ để gợi ý, Enter để thêm",
+        "search_placeholder": "Tìm theo mã vạch, mã sản phẩm",
+        "tabs": {
+            "order": "Đơn hàng {{n}}",
+            "new": "Thêm đơn",
+            "close": "Đóng tab",
+            "close_confirm": "Tab này còn hàng — đóng và bỏ giỏ?"
+        },
         "suggestions": {
             "loading": "Đang tìm…",
             "empty": "Không có sản phẩm phù hợp",

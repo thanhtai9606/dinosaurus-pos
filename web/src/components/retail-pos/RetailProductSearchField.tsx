@@ -15,6 +15,7 @@ type Props = {
     onSubmit: (raw: string) => void
     onPickProduct: (product: Product) => void
     t: (key: string, fallback?: string) => string
+    busy?: boolean
 }
 
 async function searchProducts(q: string, limit = 10): Promise<Product[]> {
@@ -29,6 +30,7 @@ export function RetailProductSearchField({
     onSubmit,
     onPickProduct,
     t,
+    busy,
 }: Props) {
     const listId = useId()
     const debounced = useDebounce(value.trim(), 280)
@@ -53,16 +55,21 @@ export function RetailProductSearchField({
     const showPanel = open && value.trim().length >= minChars
 
     const pick = (p: Product) => {
+        onChange('')
         onPickProduct(p)
         setOpen(false)
     }
 
     return (
-        <div className="relative min-w-0 flex-1">
+        <div className="relative w-[min(100%,280px)] shrink-0 basis-[24%] max-w-[320px]">
+            {busy && (
+                <Loader2 className="pointer-events-none absolute right-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+            )}
             <Input
                 ref={inputRef}
                 autoFocus
                 autoComplete="off"
+                disabled={busy}
                 role="combobox"
                 aria-expanded={showPanel}
                 aria-controls={listId}
@@ -101,13 +108,13 @@ export function RetailProductSearchField({
                         setOpen(false)
                     }
                 }}
-                className="h-11 text-base"
+                className={cn('h-10 text-sm', busy && 'pr-10')}
             />
             {showPanel && (
                 <div
                     id={listId}
                     role="listbox"
-                    className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 max-h-72 overflow-y-auto rounded-md border bg-popover text-popover-foreground shadow-md"
+                    className="absolute left-0 z-50 max-h-72 w-max min-w-full max-w-md overflow-y-auto rounded-md border bg-popover text-popover-foreground shadow-md top-[calc(100%+4px)]"
                 >
                     {isFetching && (
                         <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">

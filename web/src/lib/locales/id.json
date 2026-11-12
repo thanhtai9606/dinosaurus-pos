@@ -97,6 +97,12 @@
         "title": "POS ritel / toko kelontong",
         "subtitle": "Pindai barcode atau cari produk, lalu bayar.",
         "search_placeholder": "Nama, barcode, SKU — ketik untuk saran, Enter untuk tambah",
+        "tabs": {
+            "order": "Order {{n}}",
+            "new": "Tab baru",
+            "close": "Tutup tab",
+            "close_confirm": "Tab masih berisi barang. Tutup dan buang keranjang?"
+        },
         "suggestions": {
             "loading": "Mencari…",
             "empty": "Tidak ada produk",

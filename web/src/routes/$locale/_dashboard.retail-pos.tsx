@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Loader2, RotateCcw, ScanBarcode } from 'lucide-react'
+import { RotateCcw, ScanBarcode } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PaymentDialog } from '@/components/payment/PaymentDialog'
 import { CartItem } from '@/components/orders/CartContent'
@@ -24,12 +24,15 @@ import { RetailProductSearchField } from '@/components/retail-pos/RetailProductS
 import { OfflinePosBanner } from '@/components/retail-pos/OfflinePosBanner'
 import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
 import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
+import { RetailPosTabs } from '@/components/retail-pos/RetailPosTabs'
+import { createRetailSaleTab, patchTab, updateTabCart, type RetailSaleTab } from '@/lib/retail-pos/saleTabs'
 
 export const Route = createFileRoute('/$locale/_dashboard/retail-pos')({
     component: RetailPosPage,
 })
 
 const QUICK_CASH = [10000, 20000, 50000, 100000, 200000]
+const MAX_TABS = 10
 
 async function fetchProductByCode(code: string): Promise<Product> {
     try {
@@ -52,21 +55,39 @@ async function fetchProductByCode(code: string): Promise<Product> {
 function RetailPosPage() {
     const { t } = useTranslation()
     const searchRef = useRef<HTMLInputElement>(null)
-    const [search, setSearch] = useState('')
+    const [tabs, setTabs] = useState<RetailSaleTab[]>(() => [createRetailSaleTab()])
+    const [activeTabId, setActiveTabId] = useState(() => tabs[0]?.id ?? '')
     const [scanning, setScanning] = useState(false)
-    const [cart, setCart] = useState<CartItem[]>([])
-    const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
     const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
     const [variantOpen, setVariantOpen] = useState(false)
     const [productForVariant, setProductForVariant] = useState<Product | null>(null)
     const [priceEditItem, setPriceEditItem] = useState<CartItem | null>(null)
-    const [discountMode, setDiscountMode] = useState<'amount' | 'percent'>('amount')
-    const [discountInput, setDiscountInput] = useState('')
-    const [cashReceived, setCashReceived] = useState(0)
-    const [settlementMode, setSettlementMode] = useState<RetailSettlementMode>('cash')
     const [returnOpen, setReturnOpen] = useState(false)
     const { online, pending, syncing, flush, refresh: refreshQueue } = usePosOfflineSync()
+
+    const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0]
+    const cart = activeTab?.cart ?? []
+    const search = activeTab?.search ?? ''
+    const selectedCustomerId = activeTab?.selectedCustomerId ?? null
+    const discountMode = activeTab?.discountMode ?? 'amount'
+    const discountInput = activeTab?.discountInput ?? ''
+    const cashReceived = activeTab?.cashReceived ?? 0
+    const settlementMode = activeTab?.settlementMode ?? 'cash'
+
+    const patchActive = (patch: Partial<RetailSaleTab>) => {
+        if (!activeTab) return
+        setTabs((prev) => patchTab(prev, activeTab.id, patch))
+    }
+
+    const setCart = (updater: (prev: CartItem[]) => CartItem[]) => {
+        if (!activeTab) return
+        setTabs((prev) => updateTabCart(activeTab.id, prev, updater))
+    }
+
+    useEffect(() => {
+        searchRef.current?.focus()
+    }, [activeTabId])
 
     const { data: customersData } = useCustomersListQuery({ limit: 100 })
     const customers = customersData?.customers || []
@@ -99,6 +120,37 @@ function RetailPosPage() {
     const serviceAmount = Math.floor(taxable * serviceRate)
     const grandTotal = taxable + taxAmount + serviceAmount
     const itemCount = cart.reduce((n, item) => n + item.quantity, 0)
+
+    const tabSummaries = tabs.map((tab) => ({
+        id: tab.id,
+        itemCount: tab.cart.reduce((n, item) => n + item.quantity, 0),
+    }))
+
+    const addTab = () => {
+        if (tabs.length >= MAX_TABS) return
+        const tab = createRetailSaleTab()
+        setTabs((prev) => [...prev, tab])
+        setActiveTabId(tab.id)
+    }
+
+    const closeTab = (id: string) => {
+        const tab = tabs.find((x) => x.id === id)
+        if (tab && tab.cart.length > 0) {
+            const ok = window.confirm(t('retailPos.tabs.close_confirm'))
+            if (!ok) return
+        }
+        const remaining = tabs.filter((x) => x.id !== id)
+        if (remaining.length === 0) {
+            const fresh = createRetailSaleTab()
+            setTabs([fresh])
+            setActiveTabId(fresh.id)
+            return
+        }
+        setTabs(remaining)
+        if (activeTabId === id) {
+            setActiveTabId(remaining[0].id)
+        }
+    }
 
     const addCartItem = (product: Product, variant?: InternalProductsProductOptionResponse) => {
         setCart((prev) => {
@@ -141,7 +193,7 @@ function RetailPosPage() {
             return
         }
         addCartItem(detail)
-        setSearch('')
+        patchActive({ search: '' })
         searchRef.current?.focus()
     }
 
@@ -222,9 +274,13 @@ function RetailPosPage() {
     })
 
     const resetAfterSale = () => {
-        setCart([])
-        setDiscountInput('')
-        setCashReceived(0)
+        patchActive({
+            cart: [],
+            discountInput: '',
+            cashReceived: 0,
+            search: '',
+            selectedCustomerId: null,
+        })
         setCreatedOrderId(null)
         void queryClient.invalidateQueries({ queryKey: ['products'] })
         searchRef.current?.focus()
@@ -320,6 +376,8 @@ function RetailPosPage() {
 
     const canPay = cart.length > 0 && createOrderMutation.isAllowed
 
+    if (!activeTab) return null
+
     return (
         <div className="flex h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-xl border bg-background">
             <header className="flex shrink-0 items-center gap-2 border-b bg-muted/30 px-4 py-3">
@@ -337,23 +395,25 @@ function RetailPosPage() {
 
             <div className="flex min-h-0 flex-1">
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <div className="flex shrink-0 gap-2 border-b p-3">
+                    <div className="flex shrink-0 items-center gap-2 border-b bg-background px-3 py-2">
                         <RetailProductSearchField
                             inputRef={searchRef}
                             value={search}
-                            onChange={setSearch}
+                            onChange={(v) => patchActive({ search: v })}
                             onSubmit={(raw) => void resolveAndAdd(raw)}
                             onPickProduct={(p) => void addProductToCartFlow(p)}
+                            busy={scanning}
                             t={t}
                         />
-                        <Button
-                            type="button"
-                            className="h-11 px-6"
-                            disabled={!search.trim() || scanning}
-                            onClick={() => void resolveAndAdd(search)}
-                        >
-                            {scanning ? <Loader2 className="h-4 w-4 animate-spin" /> : t('retailPos.add_line')}
-                        </Button>
+                        <RetailPosTabs
+                            tabs={tabSummaries}
+                            activeId={activeTabId}
+                            onSelect={setActiveTabId}
+                            onAdd={addTab}
+                            onClose={closeTab}
+                            maxTabs={MAX_TABS}
+                            t={t}
+                        />
                     </div>
                     <div className="min-h-0 flex-1 p-2">
                         <RetailLineItemsTable
@@ -371,7 +431,7 @@ function RetailPosPage() {
                         t={t}
                         customers={customers}
                         selectedCustomerId={selectedCustomerId}
-                        onCustomerChange={setSelectedCustomerId}
+                        onCustomerChange={(id) => patchActive({ selectedCustomerId: id })}
                         subtotal={subtotal}
                         itemCount={itemCount}
                         taxAmount={taxAmount}
@@ -379,13 +439,13 @@ function RetailPosPage() {
                         orderDiscount={orderDiscount}
                         discountMode={discountMode}
                         discountInput={discountInput}
-                        onDiscountModeChange={setDiscountMode}
-                        onDiscountInputChange={setDiscountInput}
+                        onDiscountModeChange={(m) => patchActive({ discountMode: m })}
+                        onDiscountInputChange={(v) => patchActive({ discountInput: v })}
                         grandTotal={grandTotal}
                         cashReceived={cashReceived}
-                        onCashReceivedChange={setCashReceived}
+                        onCashReceivedChange={(v) => patchActive({ cashReceived: v })}
                         settlementMode={settlementMode}
-                        onSettlementModeChange={setSettlementMode}
+                        onSettlementModeChange={(m: RetailSettlementMode) => patchActive({ settlementMode: m })}
                         onPay={() => void handlePay()}
                         onOtherPayment={() => void handleOtherPayment()}
                         canPay={canPay}
@@ -412,7 +472,7 @@ function RetailPosPage() {
                 t={t}
                 onSelect={(product, variant) => {
                     addCartItem(product, variant)
-                    setSearch('')
+                    patchActive({ search: '' })
                     searchRef.current?.focus()
                 }}
             />

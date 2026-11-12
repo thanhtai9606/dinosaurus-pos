@@ -95,6 +95,12 @@
         "title": "Retail / grocery POS",
         "subtitle": "Scan barcode or search, then checkout.",
         "search_placeholder": "Name, barcode, SKU — type for suggestions, Enter to add",
+        "tabs": {
+            "order": "Sale {{n}}",
+            "new": "New tab",
+            "close": "Close tab",
+            "close_confirm": "This tab has items. Close and discard the cart?"
+        },
         "suggestions": {
             "loading": "Searching…",
             "empty": "No matching products",

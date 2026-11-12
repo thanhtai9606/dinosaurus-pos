@@ -16,6 +16,8 @@ type Props = {
     onPickProduct: (product: Product) => void
     t: (key: string, fallback?: string) => string
     busy?: boolean
+    wrapperClassName?: string
+    placeholder?: string
 }
 
 async function searchProducts(q: string, limit = 10): Promise<Product[]> {
@@ -31,6 +33,8 @@ export function RetailProductSearchField({
     onPickProduct,
     t,
     busy,
+    wrapperClassName,
+    placeholder,
 }: Props) {
     const listId = useId()
     const debounced = useDebounce(value.trim(), 280)
@@ -61,7 +65,12 @@ export function RetailProductSearchField({
     }
 
     return (
-        <div className="relative w-[min(100%,280px)] shrink-0 basis-[24%] max-w-[320px]">
+        <div
+            className={cn(
+                'relative w-[min(100%,280px)] shrink-0 basis-[24%] max-w-[320px]',
+                wrapperClassName,
+            )}
+        >
             {busy && (
                 <Loader2 className="pointer-events-none absolute right-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
             )}
@@ -74,7 +83,7 @@ export function RetailProductSearchField({
                 aria-expanded={showPanel}
                 aria-controls={listId}
                 aria-autocomplete="list"
-                placeholder={t('retailPos.search_placeholder')}
+                placeholder={placeholder ?? t('retailPos.search_placeholder')}
                 value={value}
                 onChange={(e) => {
                     onChange(e.target.value)

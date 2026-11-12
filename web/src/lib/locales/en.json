@@ -1033,7 +1033,8 @@
             "unit_cost_hint": "Updates product cost_price when receipt is completed",
             "unit_sell_hint": "If > 0, updates POS sell price on complete",
             "current_prices": "Current: cost {{cost}} · sell {{sell}}",
-            "optional": "Leave empty to keep sell price"
+            "optional": "Leave empty to keep sell price",
+            "line_total": "Line total"
         },
         "status": {
             "draft": "Draft",
@@ -1044,6 +1045,10 @@
             "create_title": "New stock receipt",
             "edit_title": "Edit stock receipt",
             "view_title": "Stock receipt details",
+            "search_placeholder": "Scan barcode / SKU / name — suggestions while typing, Enter to add",
+            "scan_hint": "Like retail POS: scan or search — duplicate items increase quantity.",
+            "empty_lines": "Scan or search to add products to this receipt",
+            "line_count": "{{count}} items",
             "cost_note": "Unit cost column sets cost_price when you complete the receipt.",
             "sell_note": "Optional sell price column updates product price on complete."
         },
@@ -1061,7 +1066,8 @@
             "print_popup_blocked": "Popup blocked — allow popups for this site",
             "print_failed": "Barcode print failed",
             "export_success": "Download started",
-            "export_failed": "Export failed"
+            "export_failed": "Export failed",
+            "product_not_found": "No product found for that code/SKU/name"
         }
     },
     "importPrices": {

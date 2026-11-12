@@ -1040,7 +1040,8 @@
             "unit_cost_hint": "Giá vốn nhập — cập nhật cost_price khi hoàn tất phiếu",
             "unit_sell_hint": "Điền > 0 để cập nhật giá bán sản phẩm khi hoàn tất",
             "current_prices": "Hiện tại: vốn {{cost}} · bán {{sell}}",
-            "optional": "Để trống = giữ giá bán"
+            "optional": "Để trống = giữ giá bán",
+            "line_total": "Tổng dòng"
         },
         "status": {
             "draft": "Nháp",
@@ -1051,6 +1052,10 @@
             "create_title": "Phiếu nhập mới",
             "edit_title": "Sửa phiếu nhập",
             "view_title": "Chi tiết phiếu nhập",
+            "search_placeholder": "Quét mã vạch / SKU / tên — gợi ý khi gõ, Enter để thêm",
+            "scan_hint": "Giống bán lẻ: quét hoặc tìm hàng — mỗi lần thêm tăng SL nếu trùng mã.",
+            "empty_lines": "Quét hoặc tìm hàng để thêm vào phiếu",
+            "line_count": "{{count}} mặt hàng",
             "cost_note": "Giá vốn: nhập ở cột «Giá vốn» — khi hoàn tất phiếu sẽ gán vào cost_price.",
             "sell_note": "Giá bán: nhập cột «Giá bán» nếu muốn đổi giá POS; bỏ trống thì không đổi giá bán."
         },
@@ -1068,7 +1073,8 @@
             "print_popup_blocked": "Trình duyệt chặn cửa sổ in — cho phép popup",
             "print_failed": "In mã vạch thất bại",
             "export_success": "Đã tải file",
-            "export_failed": "Xuất file thất bại"
+            "export_failed": "Xuất file thất bại",
+            "product_not_found": "Không tìm thấy hàng với mã/SKU/tên đó"
         }
     },
     "importPrices": {

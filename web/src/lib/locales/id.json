@@ -1021,7 +1021,8 @@
             "unit_cost_hint": "Memperbarui cost_price saat penerimaan diselesaikan",
             "unit_sell_hint": "Jika > 0, memperbarui harga jual produk",
             "current_prices": "Saat ini: pokok {{cost}} · jual {{sell}}",
-            "optional": "Kosongkan untuk tetap"
+            "optional": "Kosongkan untuk tetap",
+            "line_total": "Subtotal baris"
         },
         "status": {
             "draft": "Draf",
@@ -1032,6 +1033,10 @@
             "create_title": "Penerimaan baru",
             "edit_title": "Edit penerimaan",
             "view_title": "Detail penerimaan",
+            "search_placeholder": "Pindai barcode / SKU / nama — Enter untuk tambah",
+            "scan_hint": "Seperti POS: pindai atau cari — item sama menambah qty.",
+            "empty_lines": "Pindai atau cari produk untuk penerimaan ini",
+            "line_count": "{{count}} item",
             "cost_note": "Kolom harga pokok mengatur cost_price setelah selesai.",
             "sell_note": "Kolom harga jual opsional mengatur price produk setelah selesai."
         },
@@ -1049,7 +1054,8 @@
             "print_popup_blocked": "Popup diblokir — izinkan popup",
             "print_failed": "Cetak barcode gagal",
             "export_success": "Unduhan dimulai",
-            "export_failed": "Ekspor gagal"
+            "export_failed": "Ekspor gagal",
+            "product_not_found": "Produk tidak ditemukan"
         }
     },
     "importPrices": {

@@ -100,6 +100,23 @@
         "customer_debts": "Công nợ khách",
         "retail_pos": "Bán hàng POS"
     },
+    "salesOrders": {
+        "subtitle": "Xem toàn bộ đơn đã bán và chi tiết từng dòng.",
+        "tabs": {
+            "sold": "Đã bán (đã thanh toán)",
+            "all": "Tất cả"
+        },
+        "empty": "Không có đơn phù hợp.",
+        "open_transactions": "Thanh toán & vận hành",
+        "detail_title": "Chi tiết đơn",
+        "load_failed": "Không tải được đơn.",
+        "field_total": "Tổng",
+        "field_item": "Sản phẩm",
+        "field_qty": "SL",
+        "field_line": "Thành tiền",
+        "col_queue": "Số / mã",
+        "col_time": "Thời gian"
+    },
     "debts": {
         "detail_title": "Chi tiết công nợ",
         "payment_history": "Lịch sử thanh toán",

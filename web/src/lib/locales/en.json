@@ -98,6 +98,23 @@
         "customer_debts": "Customer debts",
         "retail_pos": "Retail POS"
     },
+    "salesOrders": {
+        "subtitle": "Browse sold orders and open line-item detail.",
+        "tabs": {
+            "sold": "Sold (paid)",
+            "all": "All"
+        },
+        "empty": "No orders match this filter.",
+        "open_transactions": "Payment & operations",
+        "detail_title": "Order detail",
+        "load_failed": "Could not load order.",
+        "field_total": "Total",
+        "field_item": "Item",
+        "field_qty": "Qty",
+        "field_line": "Line total",
+        "col_queue": "Queue / ID",
+        "col_time": "Date & time"
+    },
     "debts": {
         "detail_title": "Debt detail",
         "payment_history": "Payment history",

@@ -106,7 +106,7 @@ export function useNavigationMenu(userRole?: Role) {
                 {
                     label: t('sidebar.sales_orders'),
                     icon: Receipt,
-                    to: '/transactions',
+                    to: '/sales-orders',
                     allowedRoles: cashierRoles,
                 },
             ],

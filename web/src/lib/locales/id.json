@@ -100,6 +100,23 @@
         "customer_debts": "Piutang pelanggan",
         "retail_pos": "POS ritel"
     },
+    "salesOrders": {
+        "subtitle": "Lihat semua pesanan terjual dan detail item.",
+        "tabs": {
+            "sold": "Terjual (lunas)",
+            "all": "Semua"
+        },
+        "empty": "Tidak ada pesanan yang cocok.",
+        "open_transactions": "Pembayaran & operasi",
+        "detail_title": "Detail pesanan",
+        "load_failed": "Gagal memuat pesanan.",
+        "field_total": "Total",
+        "field_item": "Produk",
+        "field_qty": "Qty",
+        "field_line": "Subtotal",
+        "col_queue": "Antrian / ID",
+        "col_time": "Waktu"
+    },
     "debts": {
         "detail_title": "Detail hutang/piutang",
         "payment_history": "Riwayat pembayaran",

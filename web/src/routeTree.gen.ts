@@ -24,6 +24,7 @@ import { Route as DashboardProductRouteImport } from './routes/_dashboard.produc
 import { Route as DashboardPromotionsRouteImport } from './routes/_dashboard.promotions'
 import { Route as DashboardReportsRouteImport } from './routes/_dashboard.reports'
 import { Route as DashboardRetailPosRouteImport } from './routes/_dashboard.retail-pos'
+import { Route as DashboardSalesOrdersRouteImport } from './routes/_dashboard.sales-orders'
 import { Route as DashboardSalesReturnsRouteImport } from './routes/_dashboard.sales-returns'
 import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
 import { Route as DashboardStockReceiptsRouteImport } from './routes/_dashboard.stock-receipts'
@@ -107,6 +108,11 @@ const DashboardRetailPosRoute = DashboardRetailPosRouteImport.update({
   path: '/retail-pos',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSalesOrdersRoute = DashboardSalesOrdersRouteImport.update({
+  id: '/sales-orders',
+  path: '/sales-orders',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSalesReturnsRoute = DashboardSalesReturnsRouteImport.update({
   id: '/sales-returns',
   path: '/sales-returns',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/promotions': typeof DashboardPromotionsRoute
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
+  '/sales-orders': typeof DashboardSalesOrdersRoute
   '/sales-returns': typeof DashboardSalesReturnsRoute
   '/settings': typeof DashboardSettingsRoute
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/promotions': typeof DashboardPromotionsRoute
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
+  '/sales-orders': typeof DashboardSalesOrdersRoute
   '/sales-returns': typeof DashboardSalesReturnsRoute
   '/settings': typeof DashboardSettingsRoute
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/_dashboard/promotions': typeof DashboardPromotionsRoute
   '/_dashboard/reports': typeof DashboardReportsRoute
   '/_dashboard/retail-pos': typeof DashboardRetailPosRoute
+  '/_dashboard/sales-orders': typeof DashboardSalesOrdersRoute
   '/_dashboard/sales-returns': typeof DashboardSalesReturnsRoute
   '/_dashboard/settings': typeof DashboardSettingsRoute
   '/_dashboard/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/promotions'
     | '/reports'
     | '/retail-pos'
+    | '/sales-orders'
     | '/sales-returns'
     | '/settings'
     | '/stock-receipts'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/promotions'
     | '/reports'
     | '/retail-pos'
+    | '/sales-orders'
     | '/sales-returns'
     | '/settings'
     | '/stock-receipts'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/_dashboard/promotions'
     | '/_dashboard/reports'
     | '/_dashboard/retail-pos'
+    | '/_dashboard/sales-orders'
     | '/_dashboard/sales-returns'
     | '/_dashboard/settings'
     | '/_dashboard/stock-receipts'
@@ -412,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRetailPosRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/sales-orders': {
+      id: '/_dashboard/sales-orders'
+      path: '/sales-orders'
+      fullPath: '/sales-orders'
+      preLoaderRoute: typeof DashboardSalesOrdersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/sales-returns': {
       id: '/_dashboard/sales-returns'
       path: '/sales-returns'
@@ -507,6 +526,7 @@ interface DashboardRouteChildren {
   DashboardPromotionsRoute: typeof DashboardPromotionsRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardRetailPosRoute: typeof DashboardRetailPosRoute
+  DashboardSalesOrdersRoute: typeof DashboardSalesOrdersRoute
   DashboardSalesReturnsRoute: typeof DashboardSalesReturnsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardStockReceiptsRoute: typeof DashboardStockReceiptsRouteWithChildren
@@ -528,6 +548,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardPromotionsRoute: DashboardPromotionsRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardRetailPosRoute: DashboardRetailPosRoute,
+  DashboardSalesOrdersRoute: DashboardSalesOrdersRoute,
   DashboardSalesReturnsRoute: DashboardSalesReturnsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardStockReceiptsRoute: DashboardStockReceiptsRouteWithChildren,

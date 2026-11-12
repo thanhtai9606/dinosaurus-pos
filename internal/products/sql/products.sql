@@ -309,6 +309,11 @@ SELECT * FROM products
 WHERE sku = $1 AND deleted_at IS NULL
 LIMIT 1;
 
+-- name: GetProductByBarcode :one
+SELECT * FROM products
+WHERE barcode = $1 AND deleted_at IS NULL
+LIMIT 1;
+
 -- name: GetProductsForUpdate :many
 SELECT * FROM products
 WHERE id = ANY($1::uuid[])

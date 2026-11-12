@@ -88,7 +88,33 @@
         "customers": "Customers",
         "inventory": "Inventory",
         "suppliers": "Suppliers",
-        "stock_receipts": "Stock receipts"
+        "stock_receipts": "Stock receipts",
+        "retail_pos": "Retail POS"
+    },
+    "retailPos": {
+        "title": "Retail / grocery POS",
+        "subtitle": "Scan barcode or search, then checkout.",
+        "search_placeholder": "Scan barcode, SKU, or product name (Enter)",
+        "add_line": "Add",
+        "empty_cart": "No line items yet — scan or search above.",
+        "product_not_found": "Product not found",
+        "customer": "Customer",
+        "walk_in": "Walk-in",
+        "pay": "Pay",
+        "table": {
+            "barcode": "Barcode",
+            "name": "Product",
+            "unit": "Unit",
+            "quantity": "Qty",
+            "price": "Price",
+            "subtotal": "Subtotal",
+            "hint": "Takeaway / retail sale."
+        },
+        "totals": {
+            "subtotal": "Subtotal",
+            "items": "Item qty",
+            "due": "Amount due"
+        }
     },
     "user_menu": {
         "profile": "Profile",

@@ -25,6 +25,7 @@ type IPrdService interface {
 	CreateProduct(ctx context.Context, req CreateProductRequest) (*ProductResponse, error)
 	UploadProductImage(ctx context.Context, productID uuid.UUID, data []byte) (*ProductResponse, error)
 	ListProducts(ctx context.Context, req ListProductsRequest) (*ListProductsResponse, error)
+	LookupProductByCode(ctx context.Context, code string) (*ProductResponse, error)
 	GetProductByID(ctx context.Context, productID uuid.UUID) (*ProductResponse, error)
 	UpdateProduct(ctx context.Context, productID uuid.UUID, req UpdateProductRequest) (*ProductResponse, error)
 	DeleteProduct(ctx context.Context, productID uuid.UUID) error

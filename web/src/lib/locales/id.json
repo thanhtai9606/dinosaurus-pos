@@ -90,7 +90,33 @@
         "customers": "Pelanggan",
         "inventory": "Inventaris",
         "suppliers": "Supplier",
-        "stock_receipts": "Penerimaan stok"
+        "stock_receipts": "Penerimaan stok",
+        "retail_pos": "POS ritel"
+    },
+    "retailPos": {
+        "title": "POS ritel / toko kelontong",
+        "subtitle": "Pindai barcode atau cari produk, lalu bayar.",
+        "search_placeholder": "Barcode, SKU, atau nama produk (Enter)",
+        "add_line": "Tambah",
+        "empty_cart": "Belum ada baris — pindai atau cari di atas.",
+        "product_not_found": "Produk tidak ditemukan",
+        "customer": "Pelanggan",
+        "walk_in": "Pelanggan umum",
+        "pay": "Bayar",
+        "table": {
+            "barcode": "Barcode",
+            "name": "Produk",
+            "unit": "Satuan",
+            "quantity": "Qty",
+            "price": "Harga",
+            "subtotal": "Subtotal",
+            "hint": "Penjualan ritel / takeaway."
+        },
+        "totals": {
+            "subtotal": "Subtotal",
+            "items": "Jumlah item",
+            "due": "Total tagihan"
+        }
     },
     "user_menu": {
         "profile": "Profil",

@@ -338,6 +338,34 @@ func (q *Queries) GetDeletedProduct(ctx context.Context, id uuid.UUID) (GetDelet
 	return i, err
 }
 
+const getProductByBarcode = `-- name: GetProductByBarcode :one
+SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id FROM products
+WHERE barcode = $1 AND deleted_at IS NULL
+LIMIT 1
+`
+
+func (q *Queries) GetProductByBarcode(ctx context.Context, barcode *string) (Product, error) {
+	row := q.db.QueryRow(ctx, getProductByBarcode, barcode)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ImageUrl,
+		&i.Price,
+		&i.Stock,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CostPrice,
+		&i.Sku,
+		&i.Barcode,
+		&i.Unit,
+		&i.MinStock,
+		&i.DefaultSupplierID,
+	)
+	return i, err
+}
+
 const getProductByID = `-- name: GetProductByID :one
 SELECT
     p.id, p.name, p.image_url, p.price, p.stock, p.created_at, p.updated_at, p.deleted_at, p.cost_price, p.sku, p.barcode, p.unit, p.min_stock, p.default_supplier_id,

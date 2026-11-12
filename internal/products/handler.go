@@ -18,6 +18,7 @@ type IPrdHandler interface {
 	CreateProductHandler(ctx fiber.Ctx) error
 	UploadProductImageHandler(ctx fiber.Ctx) error
 	ListProductsHandler(ctx fiber.Ctx) error
+	LookupProductByCodeHandler(ctx fiber.Ctx) error
 	GetProductHandler(ctx fiber.Ctx) error
 	UpdateProductHandler(ctx fiber.Ctx) error
 	DeleteProductHandler(ctx fiber.Ctx) error
@@ -353,6 +354,36 @@ func (h *PrdHandler) UpdateProductHandler(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
 		Message: "Product updated successfully",
 		Data:    productResponse,
+	})
+}
+
+// LookupProductByCodeHandler finds a product by exact barcode or SKU (retail POS scan)
+// @Summary      Lookup product by barcode or SKU
+// @Tags         Products
+// @Produce      json
+// @Param        code query string true "Barcode or SKU"
+// @Success      200 {object} common.SuccessResponse{data=ProductResponse}
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /products/lookup [get]
+func (h *PrdHandler) LookupProductByCodeHandler(ctx fiber.Ctx) error {
+	code := strings.TrimSpace(ctx.Query("code"))
+	if code == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "code is required"})
+	}
+	product, err := h.prdService.LookupProductByCode(ctx.RequestCtx(), code)
+	if err != nil {
+		if errors.Is(err, common.ErrNotFound) {
+			return ctx.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "Product not found"})
+		}
+		if errors.Is(err, common.ErrInvalidInput) {
+			return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid code"})
+		}
+		h.log.Error("Product lookup failed", "error", err)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Lookup failed"})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
+		Message: "Product found",
+		Data:    product,
 	})
 }
 

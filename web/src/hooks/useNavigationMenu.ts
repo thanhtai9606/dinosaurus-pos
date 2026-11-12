@@ -12,7 +12,8 @@ import {
     Users,
     Truck,
     ClipboardList,
-    Warehouse
+    Warehouse,
+    Store,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
@@ -41,6 +42,16 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
             label: t('sidebar.pos'),
             icon: ShoppingCart,
             to: '/$locale/order',
+            allowedRoles: [
+                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+                POSKasirInternalUserRepositoryUserRole.UserRoleManager,
+                POSKasirInternalUserRepositoryUserRole.UserRoleCashier
+            ]
+        },
+        {
+            label: t('sidebar.retail_pos'),
+            icon: Store,
+            to: '/$locale/retail-pos',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,

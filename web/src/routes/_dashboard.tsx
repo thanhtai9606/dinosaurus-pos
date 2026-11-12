@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createFileRoute, Outlet, redirect, useRouter, useParams } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouter } from '@tanstack/react-router'
 import { OpenShiftModal } from "@/components/modals/OpenShiftModal"
 import { CloseShiftModal } from "@/components/modals/CloseShiftModal"
 import { cn } from '@/lib/utils'
@@ -14,19 +14,15 @@ import { DashboardMobileNav } from "@/components/dashboard/DashboardMobileNav"
 import { useAppWebSocket } from '@/hooks/useAppWebSocket'
 import { useQueryClient } from '@tanstack/react-query'
 
-export const Route = createFileRoute('/$locale/_dashboard')({
-    loader: async ({ context: { queryClient }, params }) => {
+export const Route = createFileRoute('/_dashboard')({
+    loader: async ({ context: { queryClient } }) => {
         try {
             await queryClient.ensureQueryData(financialSettingsQueryOptions())
             return await queryClient.ensureQueryData(meQueryOptions())
         } catch (error: any) {
             const status = error?.response?.status ?? error?.status
             if (status === 401) {
-                throw redirect({
-                    to: '/$locale/login',
-
-                    params: { locale: params.locale },
-                })
+                throw redirect({ to: '/login' })
             }
             throw error
         }
@@ -35,7 +31,6 @@ export const Route = createFileRoute('/$locale/_dashboard')({
 })
 
 function DashboardLayout() {
-    const { locale } = useParams({ from: '/$locale/_dashboard' })
     const { t } = useTranslation()
     const auth = useAuth()
     const router = useRouter()
@@ -62,11 +57,7 @@ function DashboardLayout() {
 
         try {
             await auth.logout()
-            await router.navigate({
-                to: '/$locale/login',
-                params: { locale },
-                replace: true
-            })
+            await router.navigate({ to: '/login', replace: true })
         } catch (error) {
             console.error("Logout UI error:", error)
         } finally {
@@ -83,7 +74,6 @@ function DashboardLayout() {
         )}>
             <DashboardSidebar
                 t={t}
-                locale={locale}
                 branding={branding}
                 isSidebarCollapsed={isSidebarCollapsed}
                 setIsSidebarCollapsed={setIsSidebarCollapsed}
@@ -98,7 +88,6 @@ function DashboardLayout() {
                     <main className="flex flex-1 flex-col gap-4 p-4 sm:p-5 lg:gap-6 lg:p-6 relative overflow-y-auto overflow-x-hidden min-w-0">
                         <DashboardMobileNav
                             t={t}
-                            locale={locale}
                             branding={branding}
                             filteredMenu={filteredMenu}
                             user={auth.user}

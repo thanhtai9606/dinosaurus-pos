@@ -26,7 +26,7 @@ const promotionsSearchSchema = z.object({
     limit: z.number().min(1).catch(10),
 })
 
-export const Route = createFileRoute('/$locale/_dashboard/promotions')({
+export const Route = createFileRoute('/_dashboard/promotions')({
     validateSearch: (search) => promotionsSearchSchema.parse(search),
     loaderDeps: ({ search }) => ({
         page: search.page,

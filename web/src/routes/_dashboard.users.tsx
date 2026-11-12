@@ -26,7 +26,7 @@ const usersSearchSchema = z.object({
     is_active: z.boolean().optional(),
 })
 
-export const Route = createFileRoute('/$locale/_dashboard/users')({
+export const Route = createFileRoute('/_dashboard/users')({
     validateSearch: (search) => usersSearchSchema.parse(search),
 
     loaderDeps: ({ search }) => ({

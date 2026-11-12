@@ -16,7 +16,6 @@ import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
 interface DashboardUserMenuProps {
     t: (key: string) => string
-    locale: string
     user: {
         username?: string
         email?: string
@@ -31,7 +30,6 @@ interface DashboardUserMenuProps {
 
 export function DashboardUserMenu({
     t,
-    locale,
     user,
     userRole,
     isSidebarCollapsed,
@@ -105,8 +103,7 @@ export function DashboardUserMenu({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link
-                        to="/$locale/account"
-                        params={{ locale }}
+                        to="/account"
                         search={{ tab: 'account' }}
                         className="cursor-pointer"
                     >
@@ -117,8 +114,7 @@ export function DashboardUserMenu({
                 {canSettings && (
                     <DropdownMenuItem asChild>
                         <Link
-                            to="/$locale/settings"
-                            params={{ locale }}
+                            to="/settings"
                             search={{ tab: 'cancellation' }}
                             className="cursor-pointer"
                         >
@@ -130,8 +126,7 @@ export function DashboardUserMenu({
                 {canActivityLogs && (
                     <DropdownMenuItem asChild>
                         <Link
-                            to="/$locale/activity-logs"
-                            params={{ locale }}
+                            to="/activity-logs"
                             search={{ page: 1, limit: 10 }}
                             className="cursor-pointer"
                         >

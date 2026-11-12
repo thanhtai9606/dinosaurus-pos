@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils'
 
 interface DashboardMobileNavProps {
     t: any
-    locale: string
     branding: any
     filteredMenu: any[]
     user: any
@@ -19,7 +18,6 @@ interface DashboardMobileNavProps {
 
 export function DashboardMobileNav({
     t,
-    locale,
     branding,
     filteredMenu,
     user,
@@ -42,11 +40,7 @@ export function DashboardMobileNav({
                 {/* Header */}
                 <SheetHeader className="p-4 pb-3 border-b border-border/50">
                     <SheetTitle className="sr-only">Navigation</SheetTitle>
-                    <Link
-                        to="/$locale"
-                        params={{ locale } as any}
-                        className="flex items-center gap-3 font-heading font-bold"
-                    >
+                    <Link to="/" className="flex items-center gap-3 font-heading font-bold">
                         {branding?.app_logo ? (
                             <img src={branding.app_logo} alt={t('settings.branding.logo')} className="h-9 w-9 object-contain rounded-xl" />
                         ) : (
@@ -71,8 +65,7 @@ export function DashboardMobileNav({
                             <Link
                                 key={item.to}
                                 to={item.to}
-                                params={{ locale } as any}
-                                activeOptions={{ exact: item.to === '/$locale' }}
+                                activeOptions={{ exact: item.to === '/' }}
                                 className={cn(
                                     "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200",
                                     "hover:bg-primary/5 hover:text-primary",
@@ -90,7 +83,6 @@ export function DashboardMobileNav({
                 <div className="mt-auto p-3 border-t border-border/50">
                     <DashboardUserMenu
                         t={t}
-                        locale={locale}
                         user={user}
                         userRole={userRole as any}
                         handleLogout={handleLogout}

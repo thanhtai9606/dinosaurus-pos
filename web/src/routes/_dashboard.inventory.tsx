@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate, useParams } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useSuspenseQuery, queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
@@ -49,7 +49,7 @@ const inventoryQueryOptions = (params: { page?: number; limit?: number; low_stoc
         },
     })
 
-export const Route = createFileRoute('/$locale/_dashboard/inventory')({
+export const Route = createFileRoute('/_dashboard/inventory')({
     validateSearch: (search) => searchSchema.parse(search),
     loaderDeps: ({ search }) => search,
     loader: ({ context: { queryClient }, deps }) => queryClient.ensureQueryData(inventoryQueryOptions(deps)),
@@ -59,7 +59,6 @@ export const Route = createFileRoute('/$locale/_dashboard/inventory')({
 function InventoryPage() {
     const { t } = useTranslation()
     const navigate = useNavigate({ from: Route.fullPath })
-    const { locale } = useParams({ from: '/$locale/_dashboard/inventory' })
     const search = Route.useSearch()
     const { data } = useSuspenseQuery(inventoryQueryOptions(search))
     const [importOpen, setImportOpen] = useState(false)
@@ -105,7 +104,7 @@ function InventoryPage() {
                             {t('importPrices.title')}
                         </Button>
                         <Button asChild>
-                            <Link to="/$locale/stock-receipts" params={{ locale }} search={{}}>
+                            <Link to="/stock-receipts" search={{}}>
                                 <PackagePlus className="mr-2 h-4 w-4" />
                                 {t('inventory.create_receipt')}
                             </Link>

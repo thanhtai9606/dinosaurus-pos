@@ -17,7 +17,7 @@ import { ShiftReport } from '@/components/reports/ShiftReport'
 import { formatDate } from '@/lib/utils'
 import { useFormatMoney } from '@/context/MoneyContext'
 
-export const Route = createFileRoute('/$locale/_dashboard/reports')({
+export const Route = createFileRoute('/_dashboard/reports')({
     beforeLoad: async ({ context: { queryClient } }) => {
         const user = await queryClient.ensureQueryData(meQueryOptions())
 
@@ -28,11 +28,8 @@ export const Route = createFileRoute('/$locale/_dashboard/reports')({
 
         if (!user || !user.role || !allowedRoles.includes(user.role)) {
             throw redirect({
-                to: '/$locale/login',
-                params: { locale: 'en' },
-                search: {
-                    error: 'Unauthorized',
-                },
+                to: '/login',
+                search: { error: 'Unauthorized' },
             })
         }
     },

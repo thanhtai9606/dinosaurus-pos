@@ -24,7 +24,7 @@ const transactionsSearchSchema = z.object({
     user_id: z.string().optional(),
 })
 
-export const Route = createFileRoute('/$locale/_dashboard/transactions')({
+export const Route = createFileRoute('/_dashboard/transactions')({
     validateSearch: (search) => transactionsSearchSchema.parse(search),
     loaderDeps: ({ search }) => ({
         page: search.page,

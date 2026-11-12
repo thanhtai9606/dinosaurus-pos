@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter, useParams } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { redirect } from '@tanstack/react-router'
 import { meQueryOptions } from "@/lib/api/query/auth.ts";
 import { useAuth } from "@/context/AuthContext";
@@ -6,16 +6,13 @@ import { useTranslation } from 'react-i18next'
 import { SettingsPanel } from "@/components/SettingsPanel.tsx";
 import { LoginForm } from "@/components/auth/LoginForm"
 
-export const Route = createFileRoute('/$locale/login')({
+export const Route = createFileRoute('/login')({
     ssr: false,
-    loader: async ({ context: { queryClient }, params }) => {
+    loader: async ({ context: { queryClient } }) => {
         try {
             const me = await queryClient.ensureQueryData(meQueryOptions())
             if (me) {
-                throw redirect({
-                    to: '/$locale',
-                    params: { locale: params.locale }
-                })
+                throw redirect({ to: '/' })
             }
         } catch (error: any) {
             const status = error?.response?.status ?? error?.status ?? error?.cause?.status
@@ -28,7 +25,6 @@ export const Route = createFileRoute('/$locale/login')({
 })
 
 function LoginPage() {
-    const { locale } = useParams({ from: '/$locale/login' })
     const { t } = useTranslation()
     const auth = useAuth()
     const router = useRouter()
@@ -50,14 +46,9 @@ function LoginPage() {
                 auth={auth}
                 onSubmitSuccess={async () => {
                     await router.invalidate()
-                    await router.navigate({
-                        to: '/$locale',
-                        params: { locale },
-                        replace: true
-                    })
+                    await router.navigate({ to: '/', replace: true })
                 }}
             />
         </div>
     )
 }
-

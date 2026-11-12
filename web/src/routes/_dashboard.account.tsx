@@ -13,7 +13,7 @@ const searchSchema = z.object({
   tab: z.string().optional().default('account'),
 })
 
-export const Route = createFileRoute("/$locale/_dashboard/account")({
+export const Route = createFileRoute("/_dashboard/account")({
   validateSearch: (search) => searchSchema.parse(search),
   component: AccountPage,
 })

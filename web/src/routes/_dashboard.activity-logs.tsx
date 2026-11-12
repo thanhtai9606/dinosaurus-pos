@@ -11,7 +11,7 @@ import { ActivityLogsHeader } from "@/components/activity-logs/ActivityLogsHeade
 import { ActivityLogsFilters } from "@/components/activity-logs/ActivityLogsFilters"
 import { ActivityLogsTable } from "@/components/activity-logs/ActivityLogsTable"
 
-export const Route = createFileRoute('/$locale/_dashboard/activity-logs')(({
+export const Route = createFileRoute('/_dashboard/activity-logs')(({
     validateSearch: activityLogsSearchSchema,
     loaderDeps: ({ search }: any) => search,
     loader: ({ context: { queryClient }, deps }: any) => {
@@ -24,11 +24,8 @@ export const Route = createFileRoute('/$locale/_dashboard/activity-logs')(({
         ];
         if (!user || !user.role || !allowedRoles.includes(user.role)) {
             throw redirect({
-                to: '/$locale/login',
-                params: { locale: 'en' },
-                search: {
-                    error: 'Unauthorized',
-                },
+                to: '/login',
+                search: { error: 'Unauthorized' },
             });
         }
     },

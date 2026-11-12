@@ -19,7 +19,7 @@ const customersSearchSchema = z.object({
     search: z.string().optional(),
 })
 
-export const Route = createFileRoute('/$locale/_dashboard/customers')({
+export const Route = createFileRoute('/_dashboard/customers')({
     validateSearch: (search) => customersSearchSchema.parse(search),
 
     loaderDeps: ({ search }) => ({

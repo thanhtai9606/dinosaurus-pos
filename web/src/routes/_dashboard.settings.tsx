@@ -17,7 +17,7 @@ const searchSchema = z.object({
     tab: z.string().optional().default('cancellation'),
 })
 
-export const Route = createFileRoute("/$locale/_dashboard/settings")({
+export const Route = createFileRoute("/_dashboard/settings")({
     validateSearch: (search) => searchSchema.parse(search),
     component: SettingsPage,
 })

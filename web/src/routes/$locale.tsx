@@ -1,27 +1,15 @@
-import { createFileRoute, Outlet, useParams } from '@tanstack/react-router'
-import { useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import i18n from '@/lib/i18n'
 
+const LOCALES = new Set(['vi', 'en', 'id'])
+
+/** Legacy URLs like `/vi` → home */
 export const Route = createFileRoute('/$locale')({
-  component: LocaleLayout,
-  beforeLoad: ({ params }) => {
-    
-    if ((params as any).locale && i18n.language !== (params as any).locale) {
-      i18n.changeLanguage((params as any).locale)
-    }
-  }
+    beforeLoad: ({ params }) => {
+        if (!LOCALES.has(params.locale)) {
+            throw redirect({ to: '/', replace: true })
+        }
+        void i18n.changeLanguage(params.locale)
+        throw redirect({ to: '/', replace: true })
+    },
 })
-
-function LocaleLayout() {
-  const { locale } = useParams({ from: '/$locale' })
-  const { i18n } = useTranslation()
-
-  useEffect(() => {
-    if (locale && i18n.language !== locale) {
-      i18n.changeLanguage(locale)
-    }
-  }, [locale, i18n])
-
-  return <Outlet />
-}

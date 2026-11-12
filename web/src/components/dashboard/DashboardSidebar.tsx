@@ -9,7 +9,6 @@ import { DashboardUserMenu } from '@/components/dashboard/DashboardUserMenu'
 
 interface DashboardSidebarProps {
     t: any
-    locale: string
     branding: any
     isSidebarCollapsed: boolean
     setIsSidebarCollapsed: (collapsed: boolean) => void
@@ -21,7 +20,6 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({
     t,
-    locale,
     branding,
     isSidebarCollapsed,
     setIsSidebarCollapsed,
@@ -36,8 +34,7 @@ export function DashboardSidebar({
                 {/* Logo */}
                 <div className={cn("flex h-16 items-center px-5", isSidebarCollapsed ? "justify-center" : "justify-between")}>
                     <Link
-                        to="/$locale"
-                        params={{ locale } as any}
+                        to="/"
                         className={cn("flex items-center gap-3 font-heading font-bold", isSidebarCollapsed && "hidden")}
                     >
                         {branding?.app_logo ? (
@@ -69,8 +66,7 @@ export function DashboardSidebar({
                                     <TooltipTrigger asChild>
                                         <Link
                                             to={item.to}
-                                            params={{ locale } as any}
-                                            activeOptions={{ exact: item.to === '/$locale' }}
+                                            activeOptions={{ exact: item.to === '/' }}
                                             className={cn(
                                                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-muted-foreground transition-all duration-200",
                                                 "hover:bg-primary/5 hover:text-primary",
@@ -108,7 +104,6 @@ export function DashboardSidebar({
 
                     <DashboardUserMenu
                         t={t}
-                        locale={locale}
                         user={user}
                         userRole={userRole as any}
                         isSidebarCollapsed={isSidebarCollapsed}

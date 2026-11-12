@@ -31,7 +31,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.summary'),
             icon: LayoutDashboard,
-            to: '/$locale',
+            to: '/',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -41,7 +41,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.pos'),
             icon: ShoppingCart,
-            to: '/$locale/order',
+            to: '/order',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -51,7 +51,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.retail_pos'),
             icon: Store,
-            to: '/$locale/retail-pos',
+            to: '/retail-pos',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -61,7 +61,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.transactions'),
             icon: Receipt,
-            to: '/$locale/transactions',
+            to: '/transactions',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -71,7 +71,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.product'),
             icon: Package,
-            to: '/$locale/product',
+            to: '/product',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -81,7 +81,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.inventory'),
             icon: Warehouse,
-            to: '/$locale/inventory',
+            to: '/inventory',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager
@@ -90,7 +90,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.suppliers'),
             icon: Truck,
-            to: '/$locale/suppliers',
+            to: '/suppliers',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager
@@ -99,7 +99,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.stock_receipts'),
             icon: ClipboardList,
-            to: '/$locale/stock-receipts',
+            to: '/stock-receipts',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager
@@ -108,7 +108,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.promotions'),
             icon: Tag,
-            to: '/$locale/promotions',
+            to: '/promotions',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -118,7 +118,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.reports'),
             icon: FileText,
-            to: '/$locale/reports',
+            to: '/reports',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin
             ]
@@ -126,7 +126,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.customers', 'Customers'),
             icon: Users,
-            to: '/$locale/customers',
+            to: '/customers',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -136,7 +136,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.users'),
             icon: UserIcon,
-            to: '/$locale/users',
+            to: '/users',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager
@@ -145,7 +145,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.settings'),
             icon: Settings,
-            to: '/$locale/settings',
+            to: '/settings',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager,
@@ -155,7 +155,7 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
         {
             label: t('sidebar.activity_logs'),
             icon: ActivityIcon,
-            to: '/$locale/activity-logs',
+            to: '/activity-logs',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
             ]

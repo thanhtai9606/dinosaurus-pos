@@ -34,7 +34,7 @@ import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
 import { RetailPosTabs } from '@/components/retail-pos/RetailPosTabs'
 import { createRetailSaleTab, patchTab, updateTabCart, type RetailSaleTab } from '@/lib/retail-pos/saleTabs'
 
-export const Route = createFileRoute('/$locale/_dashboard/retail-pos')({
+export const Route = createFileRoute('/_dashboard/retail-pos')({
     component: RetailPosPage,
 })
 

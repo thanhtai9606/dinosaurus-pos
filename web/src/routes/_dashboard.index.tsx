@@ -14,7 +14,7 @@ import { formatDate } from '@/lib/utils'
 import { useFormatMoney } from '@/context/MoneyContext'
 
 
-export const Route = createFileRoute('/$locale/_dashboard/')(({
+export const Route = createFileRoute('/_dashboard/')(({
     component: DashboardIndex,
     loader: ({ context: { queryClient } }: any) => queryClient.ensureQueryData(meQueryOptions()),
 } as any))

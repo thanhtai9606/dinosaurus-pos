@@ -15,8 +15,7 @@ export function DashboardQuickActions({ t }: DashboardQuickActionsProps) {
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
                 <Link
-                    to="/$locale/product"
-                    params={{ locale: 'en' }}
+                    to="/product"
                     search={{ page: 1, limit: 10, tab: 'active' }}
                     className="group h-28 flex flex-col gap-3 items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 transition-all duration-300 hover:border-primary/40 hover:bg-primary/5 hover:shadow-md"
                 >
@@ -26,8 +25,7 @@ export function DashboardQuickActions({ t }: DashboardQuickActionsProps) {
                     <span className="text-sm font-semibold">{t('dashboard.widgets.manage_products')}</span>
                 </Link>
                 <Link
-                    to="/$locale/reports"
-                    params={{ locale: 'en' }}
+                    to="/reports"
                     className="group h-28 flex flex-col gap-3 items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 transition-all duration-300 hover:border-amber/40 hover:bg-amber/5 hover:shadow-md"
                 >
                     <div className="h-12 w-12 rounded-xl bg-amber/10 flex items-center justify-center group-hover:bg-amber/20 transition-colors">

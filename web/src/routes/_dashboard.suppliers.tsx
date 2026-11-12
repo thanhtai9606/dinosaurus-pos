@@ -25,7 +25,7 @@ const searchSchema = z.object({
     search: z.string().optional(),
 })
 
-export const Route = createFileRoute('/$locale/_dashboard/suppliers')({
+export const Route = createFileRoute('/_dashboard/suppliers')({
     validateSearch: (search) => searchSchema.parse(search),
     loaderDeps: ({ search }) => search,
     loader: ({ context: { queryClient }, deps }) =>

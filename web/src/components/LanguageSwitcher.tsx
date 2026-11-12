@@ -1,35 +1,19 @@
-import { useTranslation } from 'react-i18next';
-import { useRouter, useLocation } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next'
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
-import { Globe } from 'lucide-react';
+} from '@/components/ui/select'
+import { Globe } from 'lucide-react'
 
 export function LanguageSwitcher() {
-    const { t, i18n } = useTranslation();
-    const router = useRouter();
-    const location = useLocation();
+    const { t, i18n } = useTranslation()
 
     const handleLanguageChange = (value: string) => {
-        const currentPath = location.pathname;
-        const segments = currentPath.split('/');
-
-        if (segments.length >= 2) {
-            segments[1] = value;
-        } else {
-            segments.push(value);
-        }
-        const newPath = segments.join('/');
-        router.navigate({
-            to: newPath,
-            search: (old) => old,
-            replace: true
-        });
-    };
+        void i18n.changeLanguage(value)
+    }
 
     return (
         <Select value={i18n.language} onValueChange={handleLanguageChange}>
@@ -43,5 +27,5 @@ export function LanguageSwitcher() {
                 <SelectItem value="vi">{t('common.language_vi')}</SelectItem>
             </SelectContent>
         </Select>
-    );
+    )
 }

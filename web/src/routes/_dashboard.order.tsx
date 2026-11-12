@@ -25,7 +25,7 @@ const orderSearchSchema = z.object({
     category: z.string().optional().catch('all'),
 })
 
-export const Route = createFileRoute('/$locale/_dashboard/order')({
+export const Route = createFileRoute('/_dashboard/order')({
     validateSearch: (search) => orderSearchSchema.parse(search),
     loaderDeps: ({ search }) => ({ category: search.category }),
     component: OrderPage,

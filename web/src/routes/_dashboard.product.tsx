@@ -22,7 +22,7 @@ const productsSearchSchema = z.object({
     tab: z.enum(['active', 'trash']).catch('active'),
 })
 
-export const Route = createFileRoute('/$locale/_dashboard/product')({
+export const Route = createFileRoute('/_dashboard/product')({
     validateSearch: (search) => productsSearchSchema.parse(search),
 
     loaderDeps: ({ search }) => ({

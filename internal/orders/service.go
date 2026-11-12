@@ -724,13 +724,25 @@ func (s *OrderService) buildOrderDetailResponseFromQueryResult(ctx context.Conte
 			}
 		}
 
-		// Fetch Names
-		productNameMap := make(map[uuid.UUID]string)
+		type productLineMeta struct {
+			Name    string
+			Barcode string
+			Sku     string
+			Unit    string
+		}
+		productMetaMap := make(map[uuid.UUID]productLineMeta)
 		if len(productIDs) > 0 {
 			products, err := s.productsRepo.GetProductsByIDs(ctx, productIDs)
 			if err == nil {
 				for _, p := range products {
-					productNameMap[p.ID] = p.Name
+					meta := productLineMeta{Name: p.Name, Unit: p.Unit}
+					if p.Barcode != nil {
+						meta.Barcode = *p.Barcode
+					}
+					if p.Sku != nil {
+						meta.Sku = *p.Sku
+					}
+					productMetaMap[p.ID] = meta
 				}
 			} else {
 				s.log.Warn("Failed to fetch product names for order detail", "error", err)
@@ -759,15 +771,26 @@ func (s *OrderService) buildOrderDetailResponseFromQueryResult(ctx context.Conte
 					PriceAtSale:     opt.PriceAtSale,
 				})
 			}
-			pName := productNameMap[tempItem.ProductID]
+			meta := productMetaMap[tempItem.ProductID]
+			saleUnit := ""
+			if tempItem.SaleUnitName != nil && *tempItem.SaleUnitName != "" {
+				saleUnit = *tempItem.SaleUnitName
+			} else {
+				saleUnit = meta.Unit
+			}
 			itemResponses = append(itemResponses, OrderItemResponse{
-				ID:          tempItem.ID,
-				ProductID:   tempItem.ProductID,
-				ProductName: pName,
-				Quantity:    tempItem.Quantity,
-				PriceAtSale: tempItem.PriceAtSale,
-				Subtotal:    tempItem.Subtotal,
-				Options:     optionResponses,
+				ID:             tempItem.ID,
+				ProductID:      tempItem.ProductID,
+				ProductName:    meta.Name,
+				Barcode:        meta.Barcode,
+				Sku:            meta.Sku,
+				SaleUnitName:   saleUnit,
+				Quantity:       tempItem.Quantity,
+				PriceAtSale:    tempItem.PriceAtSale,
+				Subtotal:       tempItem.Subtotal,
+				DiscountAmount: tempItem.DiscountAmount,
+				NetSubtotal:    tempItem.NetSubtotal,
+				Options:        optionResponses,
 			})
 		}
 	}

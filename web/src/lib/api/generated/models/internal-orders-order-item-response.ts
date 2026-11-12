@@ -18,12 +18,17 @@
 import type { InternalOrdersOrderItemOptionResponse } from './internal-orders-order-item-option-response';
 
 export interface InternalOrdersOrderItemResponse {
+    'barcode'?: string;
+    'discount_amount'?: number;
     'id'?: string;
+    'net_subtotal'?: number;
     'options'?: Array<InternalOrdersOrderItemOptionResponse>;
     'price_at_sale'?: number;
     'product_id'?: string;
     'product_name'?: string;
     'quantity'?: number;
+    'sale_unit_name'?: string;
+    'sku'?: string;
     'subtotal'?: number;
 }
 

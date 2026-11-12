@@ -72,13 +72,18 @@ type OrderItemOptionResponse struct {
 }
 
 type OrderItemResponse struct {
-	ID          uuid.UUID                 `json:"id"`
-	ProductID   uuid.UUID                 `json:"product_id"`
-	ProductName string                    `json:"product_name,omitempty"`
-	Quantity    int32                     `json:"quantity"`
-	PriceAtSale int64                     `json:"price_at_sale"`
-	Subtotal    int64                     `json:"subtotal"`
-	Options     []OrderItemOptionResponse `json:"options,omitempty"`
+	ID             uuid.UUID                 `json:"id"`
+	ProductID      uuid.UUID                 `json:"product_id"`
+	ProductName    string                    `json:"product_name,omitempty"`
+	Barcode        string                    `json:"barcode,omitempty"`
+	Sku            string                    `json:"sku,omitempty"`
+	SaleUnitName   string                    `json:"sale_unit_name,omitempty"`
+	Quantity       int32                     `json:"quantity"`
+	PriceAtSale    int64                     `json:"price_at_sale"`
+	Subtotal       int64                     `json:"subtotal"`
+	DiscountAmount int64                     `json:"discount_amount"`
+	NetSubtotal    int64                     `json:"net_subtotal"`
+	Options        []OrderItemOptionResponse `json:"options,omitempty"`
 }
 
 type OrderDetailResponse struct {

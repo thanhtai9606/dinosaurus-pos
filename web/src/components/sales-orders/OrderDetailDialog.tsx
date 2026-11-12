@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import {
     useOrderDetailQuery,
@@ -37,12 +38,32 @@ import { POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated
 import type { InternalOrdersUpdateOrderItemsRequest } from '@/lib/api/generated'
 
 type OrderItemRow = {
+    id?: string
     product_id?: string
     product_name?: string
+    barcode?: string
+    sku?: string
+    sale_unit_name?: string
     quantity?: number
+    price_at_sale?: number
+    discount_amount?: number
+    net_subtotal?: number
     line_total?: number
     subtotal?: number
     options?: Array<{ product_option_id?: string | number; option_name?: string }>
+}
+
+function orderItemCode(item: OrderItemRow) {
+    return item.barcode || item.sku || '—'
+}
+
+function orderItemLineTotal(item: OrderItemRow) {
+    if (item.net_subtotal != null) return item.net_subtotal
+    if (item.subtotal != null) {
+        const disc = item.discount_amount ?? 0
+        return disc > 0 ? Math.max(0, item.subtotal - disc) : item.subtotal
+    }
+    return item.line_total ?? 0
 }
 
 type OrderClipboardSource = {
@@ -78,10 +99,12 @@ function buildOrderClipboardText(
         `Net: ${formatMoney(order.net_total || 0)}`,
         order.applied_promotion_id ? `Promotion: ${order.applied_promotion_id}` : '',
         'Items:',
-        ...(order.items || []).map(
-            (i) =>
-                `  - ${i.product_name} × ${i.quantity} (${formatMoney((i as { subtotal?: number }).subtotal ?? i.line_total ?? 0)})`,
-        ),
+        ...(order.items || []).map((i) => {
+            const unit = i.sale_unit_name ? ` ${i.sale_unit_name}` : ''
+            const code = orderItemCode(i)
+            const disc = i.discount_amount ?? 0
+            return `  - [${code}] ${i.product_name} · ${i.quantity}${unit} @ ${formatMoney(i.price_at_sale ?? 0)}${disc > 0 ? ` −${formatMoney(disc)}` : ''} = ${formatMoney(orderItemLineTotal(i))}`
+        }),
     ].filter(Boolean)
     return lines.join('\n')
 }
@@ -358,61 +381,106 @@ export function OrderDetailDialog({
                                     <h3 className="mb-3 text-sm font-semibold">
                                         {t('salesOrders.section.lines')}
                                     </h3>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>{t('salesOrders.field_item')}</TableHead>
-                                                <TableHead className="text-right w-24">
-                                                    {t('salesOrders.field_qty')}
-                                                </TableHead>
-                                                <TableHead className="text-right w-36">
-                                                    {t('salesOrders.field_line')}
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {(order.items as OrderItemRow[] | undefined)?.map((item) => (
-                                                <TableRow key={item.product_id || item.product_name}>
-                                                    <TableCell>
-                                                        <div>{item.product_name}</div>
-                                                        {item.options?.length ? (
-                                                            <ul className="mt-1 text-xs text-muted-foreground">
-                                                                {item.options.map((o) => (
-                                                                    <li key={String(o.product_option_id)}>
-                                                                        + {o.option_name}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        ) : null}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        {adjustMode && item.product_id && canAdjust ? (
-                                                            <Input
-                                                                type="number"
-                                                                min={1}
-                                                                className="ml-auto h-8 w-20 text-right"
-                                                                value={draftQty[item.product_id] ?? item.quantity}
-                                                                onChange={(e) =>
-                                                                    setDraftQty((prev) => ({
-                                                                        ...prev,
-                                                                        [item.product_id!]: Math.max(
-                                                                            1,
-                                                                            Number(e.target.value) || 1,
-                                                                        ),
-                                                                    }))
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            item.quantity
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        {formatMoney(item.subtotal ?? item.line_total ?? 0)}
-                                                    </TableCell>
+                                    <ScrollArea className="max-h-[min(55vh,28rem)] rounded-md border">
+                                        <Table className="min-w-[56rem]">
+                                            <TableHeader className="sticky top-0 z-10 bg-background">
+                                                <TableRow>
+                                                    <TableHead className="w-10 text-center">#</TableHead>
+                                                    <TableHead className="w-32">
+                                                        {t('salesOrders.field_barcode')}
+                                                    </TableHead>
+                                                    <TableHead className="min-w-[10rem]">
+                                                        {t('salesOrders.field_item')}
+                                                    </TableHead>
+                                                    <TableHead className="w-20 text-center">
+                                                        {t('salesOrders.field_unit')}
+                                                    </TableHead>
+                                                    <TableHead className="w-24 text-right">
+                                                        {t('salesOrders.field_qty')}
+                                                    </TableHead>
+                                                    <TableHead className="w-28 text-right">
+                                                        {t('salesOrders.field_unit_price')}
+                                                    </TableHead>
+                                                    <TableHead className="w-28 text-right">
+                                                        {t('salesOrders.field_line_discount')}
+                                                    </TableHead>
+                                                    <TableHead className="w-32 text-right">
+                                                        {t('salesOrders.field_line')}
+                                                    </TableHead>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {(order.items as OrderItemRow[] | undefined)?.map(
+                                                    (item, index) => (
+                                                        <TableRow
+                                                            key={item.id || `${item.product_id}-${index}`}
+                                                        >
+                                                            <TableCell className="text-center text-muted-foreground">
+                                                                {index + 1}
+                                                            </TableCell>
+                                                            <TableCell className="font-mono text-xs">
+                                                                {orderItemCode(item)}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div>{item.product_name}</div>
+                                                                {item.options?.length ? (
+                                                                    <ul className="mt-1 text-xs text-muted-foreground">
+                                                                        {item.options.map((o) => (
+                                                                            <li
+                                                                                key={String(o.product_option_id)}
+                                                                            >
+                                                                                + {o.option_name}
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                ) : null}
+                                                            </TableCell>
+                                                            <TableCell className="text-center text-sm">
+                                                                {item.sale_unit_name || '—'}
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                {adjustMode &&
+                                                                item.product_id &&
+                                                                canAdjust ? (
+                                                                    <Input
+                                                                        type="number"
+                                                                        min={1}
+                                                                        className="ml-auto h-8 w-20 text-right"
+                                                                        value={
+                                                                            draftQty[item.product_id] ??
+                                                                            item.quantity
+                                                                        }
+                                                                        onChange={(e) =>
+                                                                            setDraftQty((prev) => ({
+                                                                                ...prev,
+                                                                                [item.product_id!]: Math.max(
+                                                                                    1,
+                                                                                    Number(e.target.value) || 1,
+                                                                                ),
+                                                                            }))
+                                                                        }
+                                                                    />
+                                                                ) : (
+                                                                    item.quantity
+                                                                )}
+                                                            </TableCell>
+                                                            <TableCell className="text-right tabular-nums">
+                                                                {formatMoney(item.price_at_sale ?? 0)}
+                                                            </TableCell>
+                                                            <TableCell className="text-right tabular-nums text-destructive">
+                                                                {(item.discount_amount ?? 0) > 0
+                                                                    ? `−${formatMoney(item.discount_amount ?? 0)}`
+                                                                    : '—'}
+                                                            </TableCell>
+                                                            <TableCell className="text-right font-medium tabular-nums">
+                                                                {formatMoney(orderItemLineTotal(item))}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </ScrollArea>
 
                                     <dl className="mt-4 space-y-2 border-t pt-4 text-sm">
                                         <div className="flex justify-between gap-4">

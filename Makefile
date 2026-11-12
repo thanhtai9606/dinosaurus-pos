@@ -57,7 +57,7 @@ help:
 	@echo "  make rebuild        - Build production images without cache"
 	@echo ""
 	@echo "$(GREEN)Database:$(NC)"
-	@echo "  make migrate-up     - Apply all migrations"
+	@echo "  make migrate-up     - Apply all migrations (uses Docker if migrate CLI missing)"
 	@echo "  make migrate-down-all - Roll back all migrations"
 	@echo "  make migrate-create name=<name> - New migration file"
 	@echo "  make seed           - Run Go seeder"
@@ -160,26 +160,26 @@ docker-be-down: down
 ## Migrations & generation
 
 migrate-version:
-	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) version
+	@./scripts/run-migrate.sh version
 
 migrate-up:
-	@if [ "$(DB_HOST)" = "localhost" ] || [ "$(DB_HOST)" = "127.0.0.1" ]; then \
-		$(MIGRATE) -path $(MIGRATIONS_PATH) -database "$(LOCAL_DB_URL)" up; \
-	else \
-		$(MIGRATE) -path $(MIGRATIONS_PATH) -database "$(DB_URL)" up; \
-	fi
+	@./scripts/run-migrate.sh up
 
 migrate-down:
-	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) down
+	@./scripts/run-migrate.sh down
 
 migrate-down-one:
-	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) down 1
+	@./scripts/run-migrate.sh down 1
 
 migrate-down-all:
-	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) down -all
+	@./scripts/run-migrate.sh down -all
 
 migrate-force:
-	$(MIGRATE) -path $(MIGRATIONS_PATH) -database $(DB_URL) force $(version)
+	@if [ -z "$(version)" ]; then \
+		echo "$(RED)Error: version= required. Example: make migrate-force version=22$(NC)"; \
+		exit 1; \
+	fi
+	@./scripts/run-migrate.sh force $(version)
 
 migrate-create:
 	@if [ -z "$(name)" ]; then \

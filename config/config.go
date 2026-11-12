@@ -15,10 +15,19 @@ type AppConfig struct {
 	CloudflareR2   CloudflareR2Config
 	Midtrans       MidtransConfig
 	Redis          RedisConfig
+	Meili          MeiliConfig
 	AutoMigrate      bool
 	MigrationsPath   string
 	EnableDbWipe     bool
 	WipeCronSchedule string
+}
+
+type MeiliConfig struct {
+	Host          string
+	APIKey        string
+	Index         string
+	Enabled       bool
+	AutoReindex   bool
 }
 
 type RedisConfig struct {
@@ -96,6 +105,13 @@ func Load() *AppConfig {
 			Port:     getEnv("REDIS_PORT", "6379"),
 			Password: getEnv("REDIS_PASSWORD", ""),
 			DB:       getInt("REDIS_DB", 0),
+		},
+		Meili: MeiliConfig{
+			Host:        getEnv("MEILI_HOST", "http://localhost:7700"),
+			APIKey:      getEnv("MEILI_API_KEY", ""),
+			Index:       getEnv("MEILI_INDEX", "products"),
+			Enabled:     getBool("MEILI_ENABLED", false),
+			AutoReindex: getBool("MEILI_AUTO_REINDEX", true),
 		},
 		DB: DbConfig{
 			Host:        getEnv("DB_HOST", "localhost"),

@@ -8,6 +8,7 @@ import (
 	"POS-kasir/internal/common/store"
 	products_repo "POS-kasir/internal/products/repository"
 	"POS-kasir/pkg/logger"
+	"POS-kasir/pkg/productsearch"
 
 	"context"
 	"encoding/json"
@@ -46,6 +47,8 @@ type IPrdService interface {
 	ImportProductPricesXLSX(ctx context.Context, data []byte) (*ImportPricesResult, error)
 	BuildImportPricesTemplate() ([]byte, error)
 	ExportProductPricesXLSX(ctx context.Context) ([]byte, error)
+	SearchProducts(ctx context.Context, query string, limit int) (*ListProductsResponse, error)
+	ReindexProductSearch(ctx context.Context) (int, error)
 }
 
 type PrdService struct {
@@ -54,15 +57,17 @@ type PrdService struct {
 	repo            products_repo.Querier
 	prdRepo         IProductImageRepository
 	activityService activitylog.IActivityService
+	search          productsearch.Indexer
 }
 
-func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activitylog.IActivityService) IPrdService {
+func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activitylog.IActivityService, search productsearch.Indexer) IPrdService {
 	return &PrdService{
 		store:           store,
 		repo:            repo,
 		log:             log,
 		prdRepo:         prdRepo,
 		activityService: activityService,
+		search:          search,
 	}
 }
 
@@ -311,6 +316,7 @@ func (s *PrdService) DeleteProduct(ctx context.Context, productID uuid.UUID) err
 		logDetails,
 	)
 
+	s.removeProductFromSearch(ctx, productID)
 	s.log.Infof("Product soft deleted successfully", "productID", productID)
 	return nil
 }
@@ -460,6 +466,7 @@ func (s *PrdService) UpdateProduct(ctx context.Context, productID uuid.UUID, req
 		productID.String(),
 		logDetails,
 	)
+	s.syncProductToSearch(ctx, productID)
 
 	return s.GetProductByID(ctx, productID)
 }
@@ -812,6 +819,7 @@ func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest
 		newProduct.ID.String(),
 		logDetails,
 	)
+	s.syncProductToSearch(ctx, newProduct.ID)
 
 	return s.GetProductByID(ctx, newProduct.ID)
 }
@@ -1073,6 +1081,7 @@ func (s *PrdService) RestoreProduct(ctx context.Context, productID uuid.UUID) er
 	s.activityService.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypePRODUCT, productID.String(), map[string]interface{}{
 		"action": "restore",
 	})
+	s.syncProductToSearch(ctx, productID)
 
 	return nil
 }

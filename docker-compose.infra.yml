@@ -36,6 +36,21 @@ services:
     networks:
       - pos-network
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.12
+    container_name: pos-meilisearch
+    restart: always
+    environment:
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MASTER_KEY: ${MEILI_API_KEY:-dev_meili_master_key}
+    ports:
+      - "7700:7700"
+    volumes:
+      - meili_data:/meili_data
+    networks:
+      - pos-network
+
   redis:
     image: redis:7-alpine
     container_name: pos-redis
@@ -53,6 +68,7 @@ services:
 volumes:
   postgres_data:
   minio_data:
+  meili_data:
 
 networks:
   pos-network:

@@ -39,6 +39,7 @@ import (
 	"POS-kasir/pkg/escpos"
 	"POS-kasir/pkg/logger"
 	"POS-kasir/pkg/payment"
+	"POS-kasir/pkg/productsearch"
 	"POS-kasir/pkg/utils"
 	"POS-kasir/pkg/validator"
 	"context"
@@ -215,10 +216,33 @@ func BuildAppContainer(app *App) *AppContainer {
 	stockReceiptService := stockreceipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger)
 	stockReceiptHandler := stockreceipts.NewStockReceiptHandler(stockReceiptService, app.Logger)
 
+	// Product search (Meilisearch)
+	var productIndexer productsearch.Indexer = productsearch.NoopIndexer{}
+	if app.Config.Meili.Enabled {
+		productIndexer = productsearch.NewMeiliIndexer(productsearch.MeiliConfig{
+			Host:    app.Config.Meili.Host,
+			APIKey:  app.Config.Meili.APIKey,
+			Index:   app.Config.Meili.Index,
+			Enabled: true,
+		})
+		if err := productIndexer.EnsureIndex(context.Background()); err != nil {
+			app.Logger.Warnf("Meilisearch index setup failed: %v", err)
+		} else if app.Config.Meili.AutoReindex {
+			go func() {
+				svc := products.NewPrdService(app.Store, products_repo.New(app.DB.GetPool()), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer)
+				if n, err := svc.ReindexProductSearch(context.Background()); err != nil {
+					app.Logger.Warnf("Meilisearch auto-reindex failed: %v", err)
+				} else {
+					app.Logger.Infof("Meilisearch indexed %d products", n)
+				}
+			}()
+		}
+	}
+
 	// Product Module
 	prdRepo := products.NewProductImageRepository(app.R2, app.Logger)
 	productsRepo := products_repo.New(app.DB.GetPool())
-	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService)
+	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService, productIndexer)
 	prdHandler := products.NewPrdHandler(prdService, app.Logger)
 
 	// Shift Module Repo

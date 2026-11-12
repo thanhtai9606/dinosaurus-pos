@@ -55,6 +55,7 @@ type Querier interface {
 	// Does not include variants for performance reasons on a list view.
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]ListProductsRow, error)
 	ListProductsForPriceExport(ctx context.Context) ([]ListProductsForPriceExportRow, error)
+	ListProductsForSearchIndex(ctx context.Context) ([]ListProductsForSearchIndexRow, error)
 	RestoreProduct(ctx context.Context, id uuid.UUID) error
 	RestoreProductsBulk(ctx context.Context, dollar_1 []uuid.UUID) error
 	SetProductCostPrice(ctx context.Context, arg SetProductCostPriceParams) (Product, error)

@@ -141,7 +141,25 @@
         "pay_cash": "Pay cash",
         "pay_debt": "Record credit",
         "other_payment": "Other payment…",
-        "debt_success": "Credit order created — collect payment in Transactions"
+        "debt_success": "Credit order created — collect payment in Transactions",
+        "offline": {
+            "offline": "Offline — sales are queued locally and sync when online",
+            "pending": "{{count}} sale(s) waiting to sync",
+            "sync": "Sync now",
+            "synced": "Synced {{count}} sale(s)",
+            "queued": "Saved to offline queue"
+        },
+        "return": {
+            "button": "Return",
+            "title": "Return / refund",
+            "order_id": "Order ID",
+            "lookup": "Lookup",
+            "not_found": "Order not found",
+            "total": "Order total",
+            "not_paid": "Unpaid order cannot be refunded",
+            "reason": "Return reason",
+            "confirm": "Refund order"
+        }
     },
     "user_menu": {
         "profile": "Profile",

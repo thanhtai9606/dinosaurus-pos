@@ -143,7 +143,25 @@
         "pay_cash": "Thanh toán tiền mặt",
         "pay_debt": "Ghi nợ / chưa thu",
         "other_payment": "Thanh toán khác…",
-        "debt_success": "Đã tạo đơn nợ — thu tiền sau tại Giao dịch"
+        "debt_success": "Đã tạo đơn nợ — thu tiền sau tại Giao dịch",
+        "offline": {
+            "offline": "Mất mạng — bán hàng sẽ lưu cục bộ và đồng bộ khi có mạng",
+            "pending": "{{count}} giao dịch chờ đồng bộ",
+            "sync": "Đồng bộ",
+            "synced": "Đã đồng bộ {{count}} giao dịch",
+            "queued": "Đã lưu vào hàng đợi ngoại tuyến"
+        },
+        "return": {
+            "button": "Trả hàng",
+            "title": "Trả hàng / hoàn tiền",
+            "order_id": "Mã đơn hàng",
+            "lookup": "Tra cứu",
+            "not_found": "Không tìm thấy đơn",
+            "total": "Tổng đơn",
+            "not_paid": "Đơn chưa thanh toán — không hoàn được",
+            "reason": "Lý do trả hàng",
+            "confirm": "Hoàn tiền đơn"
+        }
     },
     "user_menu": {
         "profile": "Hồ sơ",

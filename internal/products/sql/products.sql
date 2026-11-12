@@ -319,6 +319,19 @@ SELECT * FROM products
 WHERE id = ANY($1::uuid[])
 FOR UPDATE;
 
+-- name: ListProductsForSearchIndex :many
+SELECT
+    p.id,
+    p.name,
+    p.sku,
+    p.barcode,
+    p.price,
+    p.stock,
+    p.unit
+FROM products p
+WHERE p.deleted_at IS NULL
+ORDER BY p.updated_at DESC;
+
 -- name: ListProductsForPriceExport :many
 SELECT
     p.id,

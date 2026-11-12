@@ -988,6 +988,58 @@ func (q *Queries) ListProductsForPriceExport(ctx context.Context) ([]ListProduct
 	return items, nil
 }
 
+const listProductsForSearchIndex = `-- name: ListProductsForSearchIndex :many
+SELECT
+    p.id,
+    p.name,
+    p.sku,
+    p.barcode,
+    p.price,
+    p.stock,
+    p.unit
+FROM products p
+WHERE p.deleted_at IS NULL
+ORDER BY p.updated_at DESC
+`
+
+type ListProductsForSearchIndexRow struct {
+	ID      uuid.UUID `json:"id"`
+	Name    string    `json:"name"`
+	Sku     *string   `json:"sku"`
+	Barcode *string   `json:"barcode"`
+	Price   int64     `json:"price"`
+	Stock   int32     `json:"stock"`
+	Unit    string    `json:"unit"`
+}
+
+func (q *Queries) ListProductsForSearchIndex(ctx context.Context) ([]ListProductsForSearchIndexRow, error) {
+	rows, err := q.db.Query(ctx, listProductsForSearchIndex)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListProductsForSearchIndexRow{}
+	for rows.Next() {
+		var i ListProductsForSearchIndexRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Sku,
+			&i.Barcode,
+			&i.Price,
+			&i.Stock,
+			&i.Unit,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const restoreProduct = `-- name: RestoreProduct :exec
 UPDATE products
 SET deleted_at = NULL

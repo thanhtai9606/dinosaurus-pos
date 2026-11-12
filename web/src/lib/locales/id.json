@@ -143,7 +143,25 @@
         "pay_cash": "Bayar tunai",
         "pay_debt": "Catat piutang",
         "other_payment": "Pembayaran lain…",
-        "debt_success": "Order piutang dibuat — terima bayar di Transaksi"
+        "debt_success": "Order piutang dibuat — terima bayar di Transaksi",
+        "offline": {
+            "offline": "Offline — penjualan antre lokal, disinkron saat online",
+            "pending": "{{count}} transaksi menunggu sinkron",
+            "sync": "Sinkron",
+            "synced": "{{count}} transaksi disinkronkan",
+            "queued": "Disimpan ke antrean offline"
+        },
+        "return": {
+            "button": "Retur",
+            "title": "Retur / refund",
+            "order_id": "ID order",
+            "lookup": "Cari",
+            "not_found": "Order tidak ditemukan",
+            "total": "Total order",
+            "not_paid": "Order belum dibayar",
+            "reason": "Alasan retur",
+            "confirm": "Refund order"
+        }
     },
     "user_menu": {
         "profile": "Profil",

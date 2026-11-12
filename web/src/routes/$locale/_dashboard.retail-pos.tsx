@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Loader2, ScanBarcode } from 'lucide-react'
+import { Loader2, RotateCcw, ScanBarcode } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { PaymentDialog } from '@/components/payment/PaymentDialog'
@@ -20,6 +20,10 @@ import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
 import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
 import { useQueryClient } from '@tanstack/react-query'
 import { catalogUnitPrice, lineSubtotal } from '@/lib/retail-pos/pricing'
+import { RetailReturnDialog } from '@/components/retail-pos/RetailReturnDialog'
+import { OfflinePosBanner } from '@/components/retail-pos/OfflinePosBanner'
+import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
+import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
 
 export const Route = createFileRoute('/$locale/_dashboard/retail-pos')({
     component: RetailPosPage,
@@ -35,7 +39,7 @@ async function fetchProductByCode(code: string): Promise<Product> {
         const status = (err as { response?: { status?: number } })?.response?.status
         if (status !== 404) throw err
     }
-    const list = await axiosInstance.get('/products', { params: { page: 1, limit: 8, search: code } })
+    const list = await axiosInstance.get('/products/search', { params: { q: code, limit: 12 } })
     const products = ((list.data as { data?: { products?: Product[] } }).data?.products ?? []) as Product[]
     const exact = products.find(
         (p) => p.barcode === code || p.sku === code || p.name?.toLowerCase() === code.toLowerCase(),
@@ -61,6 +65,8 @@ function RetailPosPage() {
     const [discountInput, setDiscountInput] = useState('')
     const [cashReceived, setCashReceived] = useState(0)
     const [settlementMode, setSettlementMode] = useState<RetailSettlementMode>('cash')
+    const [returnOpen, setReturnOpen] = useState(false)
+    const { online, pending, syncing, flush, refresh: refreshQueue } = usePosOfflineSync()
 
     const { data: customersData } = useCustomersListQuery({ limit: 100 })
     const customers = customersData?.customers || []
@@ -220,6 +226,19 @@ function RetailPosPage() {
         return (order.data as { data: { id?: string; version?: number; net_total?: number } }).data
     }
 
+    const queueCurrentSale = (kind: 'retail_cash' | 'retail_debt' | 'retail_other', payment?: { payment_method_id: number; cash_received: number }) => {
+        const idempotencyKey = crypto.randomUUID()
+        enqueuePosOp({
+            idempotencyKey,
+            kind,
+            orderBody: buildOrderPayload() as Record<string, unknown>,
+            payment,
+        })
+        refreshQueue()
+        toast.info(t('retailPos.offline.queued'))
+        resetAfterSale()
+    }
+
     const handlePay = async () => {
         if (settlementMode === 'debt') {
             if (!selectedCustomerId) {
@@ -230,7 +249,11 @@ function RetailPosPage() {
                 await submitOrder()
                 toast.success(t('retailPos.debt_success'))
                 resetAfterSale()
-            } catch {
+            } catch (err) {
+                if (isNetworkError(err)) {
+                    queueCurrentSale('retail_debt')
+                    return
+                }
                 toast.error(t('order.errors.create_failed'))
             }
             return
@@ -258,7 +281,11 @@ function RetailPosPage() {
                 },
             })
             resetAfterSale()
-        } catch {
+        } catch (err) {
+            if (isNetworkError(err)) {
+                queueCurrentSale('retail_cash', { payment_method_id: cashMethodId, cash_received: received })
+                return
+            }
             toast.error(t('order.errors.create_failed'))
         }
     }
@@ -269,7 +296,11 @@ function RetailPosPage() {
             const order = await submitOrder()
             setCreatedOrderId(order?.id || null)
             setIsPaymentOpen(true)
-        } catch {
+        } catch (err) {
+            if (isNetworkError(err)) {
+                queueCurrentSale('retail_other')
+                return
+            }
             toast.error(t('order.errors.create_failed'))
         }
     }
@@ -284,7 +315,12 @@ function RetailPosPage() {
                     <p className="text-sm font-semibold">{t('retailPos.title')}</p>
                     <p className="text-xs text-muted-foreground">{t('retailPos.subtitle')}</p>
                 </div>
+                <Button type="button" variant="outline" size="sm" onClick={() => setReturnOpen(true)}>
+                    <RotateCcw className="mr-1 h-4 w-4" />
+                    {t('retailPos.return.button')}
+                </Button>
             </header>
+            <OfflinePosBanner online={online} pending={pending} syncing={syncing} onSync={() => void flush()} t={t} />
 
             <div className="flex min-h-0 flex-1">
                 <div className="flex min-w-0 flex-1 flex-col">
@@ -380,6 +416,7 @@ function RetailPosPage() {
                 orderId={createdOrderId}
                 onPaymentSuccess={resetAfterSale}
             />
+            <RetailReturnDialog open={returnOpen} onOpenChange={setReturnOpen} t={t} />
         </div>
     )
 }

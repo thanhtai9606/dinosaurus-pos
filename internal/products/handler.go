@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"mime/multipart"
+	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
@@ -36,6 +37,8 @@ type IPrdHandler interface {
 	ImportProductPricesHandler(ctx fiber.Ctx) error
 	DownloadImportPricesTemplateHandler(ctx fiber.Ctx) error
 	ExportProductPricesHandler(ctx fiber.Ctx) error
+	SearchProductsHandler(ctx fiber.Ctx) error
+	ReindexProductsSearchHandler(ctx fiber.Ctx) error
 }
 
 func NewPrdHandler(prdService IPrdService, log logger.ILogger) IPrdHandler {
@@ -878,6 +881,40 @@ func (h *PrdHandler) DownloadImportPricesTemplateHandler(ctx fiber.Ctx) error {
 // @Success      200 {file} file "Excel export"
 // @x-roles      ["admin", "manager"]
 // @Router       /products/export-prices [get]
+// SearchProductsHandler full-text product search (Meilisearch with SQL fallback)
+// @Router /products/search [get]
+func (h *PrdHandler) SearchProductsHandler(ctx fiber.Ctx) error {
+	q := strings.TrimSpace(ctx.Query("q"))
+	if q == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "q is required"})
+	}
+	limit := 20
+	if l := ctx.Query("limit"); l != "" {
+		if v, err := strconv.Atoi(l); err == nil && v > 0 {
+			limit = v
+		}
+	}
+	res, err := h.prdService.SearchProducts(ctx.RequestCtx(), q, limit)
+	if err != nil {
+		h.log.Error("Product search failed", "error", err)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Search failed"})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{Message: "OK", Data: res})
+}
+
+// ReindexProductsSearchHandler rebuilds Meilisearch product index
+// @Router /products/search/reindex [post]
+func (h *PrdHandler) ReindexProductsSearchHandler(ctx fiber.Ctx) error {
+	n, err := h.prdService.ReindexProductSearch(ctx.RequestCtx())
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Reindex failed"})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
+		Message: "Reindexed",
+		Data:    map[string]int{"count": n},
+	})
+}
+
 func (h *PrdHandler) ExportProductPricesHandler(ctx fiber.Ctx) error {
 	data, err := h.prdService.ExportProductPricesXLSX(ctx.RequestCtx())
 	if err != nil {

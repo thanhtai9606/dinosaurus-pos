@@ -722,7 +722,16 @@
             "unit": "Satuan",
             "min_stock": "Stok minimum",
             "default_supplier": "Supplier default",
-            "no_supplier": "Tidak ada"
+            "no_supplier": "Tidak ada",
+            "price": "Harga jual"
+        },
+        "sale_units": {
+            "title": "Satuan jual & konversi",
+            "hint": "Stok dihitung dalam satuan dasar. Satuan lain (karton, pack…) punya faktor, harga, dan barcode sendiri.",
+            "base_name": "Satuan dasar",
+            "unit_name": "Nama satuan",
+            "factor": "Konversi (× dasar)",
+            "add": "Tambah satuan"
         },
         "stock_history": {
             "no_history": "Tidak ada riwayat stok ditemukan.",

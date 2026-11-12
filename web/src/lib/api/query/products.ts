@@ -1,5 +1,5 @@
 import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { productsApi } from "../../api/client"
+import { axiosInstance, productsApi } from '../../api/client'
 import {
     POSKasirInternalCommonErrorResponse,
     InternalProductsCreateProductOptionRequestStandalone,
@@ -17,7 +17,10 @@ import { AxiosError } from "axios"
 import { useRBAC } from '@/lib/auth/rbac'
 
 
-export type Product = InternalProductsProductResponse
+export type Product = InternalProductsProductResponse & {
+    sale_units?: ProductSaleUnit[]
+    matched_sale_unit_id?: string | null
+}
 export type ProductListResponse = InternalProductsListProductsResponse
 
 export type ProductsListParams = {
@@ -394,6 +397,23 @@ export const stockHistoryQueryOptions = (productId: string, params?: StockHistor
         enabled: !!productId,
         placeholderData: keepPreviousData,
     })
+
+export async function replaceProductSaleUnits(productId: string, units: ProductSaleUnit[]) {
+    const payload = {
+        units: units.map((u, index) => ({
+            id: u.id || undefined,
+            name: u.name,
+            is_base: u.is_base,
+            factor_to_base: u.factor_to_base,
+            sell_price: u.sell_price,
+            barcode: u.barcode || undefined,
+            sku: u.sku || undefined,
+            sort_order: u.sort_order ?? index,
+        })),
+    }
+    const res = await axiosInstance.put(`/products/${productId}/sale-units`, payload)
+    return (res.data as { data: Product }).data
+}
 
 export const useStockHistoryQuery = (productId: string, params?: StockHistoryParams) => {
     const { canAccessApi } = useRBAC();

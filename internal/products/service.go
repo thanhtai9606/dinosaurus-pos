@@ -49,6 +49,7 @@ type IPrdService interface {
 	ExportProductPricesXLSX(ctx context.Context) ([]byte, error)
 	SearchProducts(ctx context.Context, query string, limit int) (*ListProductsResponse, error)
 	ReindexProductSearch(ctx context.Context) (int, error)
+	ReplaceSaleUnits(ctx context.Context, productID uuid.UUID, req ReplaceSaleUnitsRequest) (*ProductResponse, error)
 }
 
 type PrdService struct {
@@ -609,6 +610,12 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 		defaultSupplierID = &sid
 	}
 
+	saleUnits, err := s.loadSaleUnits(ctx, fullProduct.ID)
+	if err != nil {
+		s.log.Warnf("Failed to load sale units", "error", err, "productID", fullProduct.ID)
+		saleUnits = nil
+	}
+
 	return &ProductResponse{
 		ID:                fullProduct.ID,
 		Name:              fullProduct.Name,
@@ -625,6 +632,7 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 		CreatedAt:         fullProduct.CreatedAt.Time,
 		UpdatedAt:         fullProduct.UpdatedAt.Time,
 		Options:           optionsResponse,
+		SaleUnits:         saleUnits,
 	}, nil
 }
 
@@ -766,6 +774,11 @@ func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest
 		newProduct, err = qtx.CreateProduct(ctx, productParams)
 		if err != nil {
 			s.log.Errorf("Failed to create product in transaction", "error", err)
+			return err
+		}
+
+		if err := s.ensureBaseSaleUnit(ctx, qtx, newProduct); err != nil {
+			s.log.Errorf("Failed to create base sale unit", "error", err)
 			return err
 		}
 

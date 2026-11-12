@@ -51,7 +51,10 @@ INSERT INTO order_items (
     price_at_sale,
     subtotal,
     net_subtotal,
-    cost_price_at_sale
+    cost_price_at_sale,
+    product_unit_id,
+    sale_unit_name,
+    factor_to_base
 )
 SELECT
     $1 AS order_id,
@@ -60,8 +63,11 @@ SELECT
     unnest($4::numeric[]) AS price_at_sale,
     unnest($5::numeric[]) AS subtotal,
     unnest($6::numeric[]) AS net_subtotal,
-    unnest($7::numeric[]) AS cost_price_at_sale
-RETURNING id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale
+    unnest($7::numeric[]) AS cost_price_at_sale,
+    unnest($8::uuid[]) AS product_unit_id,
+    unnest($9::text[]) AS sale_unit_name,
+    unnest($10::numeric[]) AS factor_to_base
+RETURNING id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale, product_unit_id, sale_unit_name, factor_to_base
 `
 
 type BatchCreateOrderItemsParams struct {
@@ -72,6 +78,9 @@ type BatchCreateOrderItemsParams struct {
 	Subtotals        []pgtype.Numeric `json:"subtotals"`
 	NetSubtotals     []pgtype.Numeric `json:"net_subtotals"`
 	CostPricesAtSale []pgtype.Numeric `json:"cost_prices_at_sale"`
+	ProductUnitIds   []uuid.UUID      `json:"product_unit_ids"`
+	SaleUnitNames    []string         `json:"sale_unit_names"`
+	FactorsToBase    []pgtype.Numeric `json:"factors_to_base"`
 }
 
 // Memasukkan banyak item sekaligus menggunakan array (Bulk Insert).
@@ -84,6 +93,9 @@ func (q *Queries) BatchCreateOrderItems(ctx context.Context, arg BatchCreateOrde
 		arg.Subtotals,
 		arg.NetSubtotals,
 		arg.CostPricesAtSale,
+		arg.ProductUnitIds,
+		arg.SaleUnitNames,
+		arg.FactorsToBase,
 	)
 	if err != nil {
 		return nil, err
@@ -102,6 +114,9 @@ func (q *Queries) BatchCreateOrderItems(ctx context.Context, arg BatchCreateOrde
 			&i.DiscountAmount,
 			&i.NetSubtotal,
 			&i.CostPriceAtSale,
+			&i.ProductUnitID,
+			&i.SaleUnitName,
+			&i.FactorToBase,
 		); err != nil {
 			return nil, err
 		}
@@ -260,7 +275,7 @@ INSERT INTO order_items (
     cost_price_at_sale
 ) VALUES (
              $1, $2, $3, $4, $5, $6, $7
-         ) RETURNING id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale
+         ) RETURNING id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale, product_unit_id, sale_unit_name, factor_to_base
 `
 
 type CreateOrderItemParams struct {
@@ -295,6 +310,9 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 		&i.DiscountAmount,
 		&i.NetSubtotal,
 		&i.CostPriceAtSale,
+		&i.ProductUnitID,
+		&i.SaleUnitName,
+		&i.FactorToBase,
 	)
 	return i, err
 }
@@ -561,7 +579,7 @@ func (q *Queries) GetOrderForUpdate(ctx context.Context, id uuid.UUID) (Order, e
 }
 
 const getOrderItem = `-- name: GetOrderItem :one
-SELECT id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale FROM order_items WHERE id = $1 AND order_id = $2
+SELECT id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale, product_unit_id, sale_unit_name, factor_to_base FROM order_items WHERE id = $1 AND order_id = $2
 `
 
 type GetOrderItemParams struct {
@@ -583,12 +601,15 @@ func (q *Queries) GetOrderItem(ctx context.Context, arg GetOrderItemParams) (Ord
 		&i.DiscountAmount,
 		&i.NetSubtotal,
 		&i.CostPriceAtSale,
+		&i.ProductUnitID,
+		&i.SaleUnitName,
+		&i.FactorToBase,
 	)
 	return i, err
 }
 
 const getOrderItemsByOrderID = `-- name: GetOrderItemsByOrderID :many
-SELECT id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale FROM order_items WHERE order_id = $1
+SELECT id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale, product_unit_id, sale_unit_name, factor_to_base FROM order_items WHERE order_id = $1
 `
 
 // Mengambil semua item dari sebuah pesanan untuk menghitung ulang total.
@@ -611,6 +632,9 @@ func (q *Queries) GetOrderItemsByOrderID(ctx context.Context, orderID uuid.UUID)
 			&i.DiscountAmount,
 			&i.NetSubtotal,
 			&i.CostPriceAtSale,
+			&i.ProductUnitID,
+			&i.SaleUnitName,
+			&i.FactorToBase,
 		); err != nil {
 			return nil, err
 		}
@@ -629,7 +653,7 @@ SELECT
             (SELECT json_agg(items)
              FROM (
                       SELECT
-                          oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price_at_sale, oi.subtotal, oi.discount_amount, oi.net_subtotal, oi.cost_price_at_sale,
+                          oi.id, oi.order_id, oi.product_id, oi.quantity, oi.price_at_sale, oi.subtotal, oi.discount_amount, oi.net_subtotal, oi.cost_price_at_sale, oi.product_unit_id, oi.sale_unit_name, oi.factor_to_base,
                           (SELECT json_agg(oio.*) FROM order_item_options oio WHERE oio.order_item_id = oi.id) AS options
                       FROM order_items oi
                       WHERE oi.order_id = o.id
@@ -1072,7 +1096,7 @@ SET
     net_subtotal = $5
 WHERE
     id = $1 AND order_id = $2
-RETURNING id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale
+RETURNING id, order_id, product_id, quantity, price_at_sale, subtotal, discount_amount, net_subtotal, cost_price_at_sale, product_unit_id, sale_unit_name, factor_to_base
 `
 
 type UpdateOrderItemQuantityParams struct {
@@ -1104,6 +1128,9 @@ func (q *Queries) UpdateOrderItemQuantity(ctx context.Context, arg UpdateOrderIt
 		&i.DiscountAmount,
 		&i.NetSubtotal,
 		&i.CostPriceAtSale,
+		&i.ProductUnitID,
+		&i.SaleUnitName,
+		&i.FactorToBase,
 	)
 	return i, err
 }

@@ -76,7 +76,7 @@
         "update_password_failed": "Không thể cập nhật mật khẩu: {{message}}"
     },
     "sidebar": {
-        "summary": "Bản chất kỹ thuật của sáng chế",
+        "summary": "Tổng quan",
         "pos": "Máy POS",
         "date": "Ngày",
         "transactions": "Giao dịch",
@@ -91,7 +91,7 @@
         "inventory": "Tồn kho",
         "suppliers": "Nhà cung cấp",
         "stock_receipts": "Nhập hàng",
-        "retail_pos": "Bán hàng POS (tạp hóa)"
+        "retail_pos": "Bán hàng POS"
     },
     "retailPos": {
         "title": "Bán hàng — tạp hóa / bán lẻ",
@@ -739,7 +739,16 @@
             "unit": "Đơn vị",
             "min_stock": "Tồn tối thiểu",
             "default_supplier": "NCC mặc định",
-            "no_supplier": "Không chọn"
+            "no_supplier": "Không chọn",
+            "price": "Giá bán"
+        },
+        "sale_units": {
+            "title": "Đơn vị bán & quy đổi",
+            "hint": "Tồn kho tính theo đơn vị cơ bản. Đơn vị khác (thùng, lốc…) có hệ số quy đổi, giá và mã vạch riêng.",
+            "base_name": "ĐVT cơ bản",
+            "unit_name": "Tên ĐVT",
+            "factor": "Quy đổi (× cơ bản)",
+            "add": "Thêm đơn vị"
         },
         "stock_history": {
             "no_history": "Không tìm thấy lịch sử cổ phiếu.",

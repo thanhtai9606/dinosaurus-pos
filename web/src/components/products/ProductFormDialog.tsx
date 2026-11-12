@@ -9,8 +9,11 @@ import {
     useCreateProductOptionMutation,
     useUpdateProductOptionMutation,
     useUploadProductOptionImageMutation,
-    useProductDetailQuery
+    useProductDetailQuery,
+    replaceProductSaleUnits,
 } from '@/lib/api/query/products'
+import { ProductSaleUnitsEditor } from '@/components/products/ProductSaleUnitsEditor'
+import type { ProductSaleUnit } from '@/lib/retail-pos/productUnits'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -146,6 +149,24 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
 
                 // Handle Variants
                 if (productId) {
+                    const unitsToSave = saleUnits
+                        .map((u, index) => {
+                            if (u.is_base) {
+                                return {
+                                    ...u,
+                                    name: value.unit || u.name || 'pcs',
+                                    sell_price: Number(value.price),
+                                    barcode: value.barcode || null,
+                                    sku: value.sku || null,
+                                    factor_to_base: 1,
+                                    sort_order: 0,
+                                }
+                            }
+                            return { ...u, sort_order: u.sort_order ?? index }
+                        })
+                        .filter((u) => u.is_base || u.name.trim().length > 0)
+                    await replaceProductSaleUnits(productId, unitsToSave)
+
                     for (const variant of variants) {
                         let optionId = variant.id
 
@@ -194,6 +215,9 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [preview, setPreview] = useState<string | null>(null)
     const [variants, setVariants] = useState<VariantItem[]>([])
+    const [saleUnits, setSaleUnits] = useState<ProductSaleUnit[]>([
+        { name: 'pcs', is_base: true, factor_to_base: 1, sell_price: 0, sort_order: 0 },
+    ])
     const [activeCropContext, setActiveCropContext] = useState<'main' | number>('main')
 
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -230,11 +254,29 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                         image_url: opt.image_url,
                         isNew: false
                     })))
+
+                    const dp = detailProduct as Product & { sale_units?: ProductSaleUnit[] }
+                    if (dp?.sale_units?.length) {
+                        setSaleUnits(dp.sale_units)
+                    } else {
+                        setSaleUnits([
+                            {
+                                name: String(inv.unit || 'pcs'),
+                                is_base: true,
+                                factor_to_base: 1,
+                                sell_price: Number(detailProduct?.price ?? productToEdit.price ?? 0),
+                                barcode: String(inv.barcode ?? '') || null,
+                                sku: String(inv.sku ?? '') || null,
+                                sort_order: 0,
+                            },
+                        ])
+                    }
                 } else {
                     form.reset()
                     setPreview(null)
                     setSelectedFile(null)
                     setVariants([])
+                    setSaleUnits([{ name: 'pcs', is_base: true, factor_to_base: 1, sell_price: 0, sort_order: 0 }])
                 }
             }, 0)
             setActiveCropContext('main')
@@ -582,6 +624,8 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                             />
                                         </div>
 
+
+                                        <ProductSaleUnitsEditor units={saleUnits} onChange={setSaleUnits} t={t} />
 
                                         {/* Variants Section */}
                                         <div className="space-y-4">

@@ -754,6 +754,9 @@ type OrderItem struct {
 	DiscountAmount  int64          `json:"discount_amount"`
 	NetSubtotal     int64          `json:"net_subtotal"`
 	CostPriceAtSale pgtype.Numeric `json:"cost_price_at_sale"`
+	ProductUnitID   pgtype.UUID    `json:"product_unit_id"`
+	SaleUnitName    *string        `json:"sale_unit_name"`
+	FactorToBase    pgtype.Numeric `json:"factor_to_base"`
 }
 
 type OrderItemOption struct {
@@ -803,6 +806,21 @@ type ProductOption struct {
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
 	DeletedAt       pgtype.Timestamptz `json:"deleted_at"`
+}
+
+type ProductUnit struct {
+	ID           uuid.UUID          `json:"id"`
+	ProductID    uuid.UUID          `json:"product_id"`
+	Name         string             `json:"name"`
+	IsBase       bool               `json:"is_base"`
+	FactorToBase pgtype.Numeric     `json:"factor_to_base"`
+	SellPrice    int64              `json:"sell_price"`
+	Barcode      *string            `json:"barcode"`
+	Sku          *string            `json:"sku"`
+	SortOrder    int32              `json:"sort_order"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt    pgtype.Timestamptz `json:"deleted_at"`
 }
 
 type Promotion struct {

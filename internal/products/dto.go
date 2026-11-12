@@ -64,6 +64,32 @@ type ProductOptionResponse struct {
 	ImageURL        *string   `json:"image_url,omitempty"`
 }
 
+type ProductSaleUnitResponse struct {
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	IsBase       bool      `json:"is_base"`
+	FactorToBase float64   `json:"factor_to_base"`
+	SellPrice    float64   `json:"sell_price"`
+	Barcode      *string   `json:"barcode,omitempty"`
+	Sku          *string   `json:"sku,omitempty"`
+	SortOrder    int32     `json:"sort_order"`
+}
+
+type SaleUnitInput struct {
+	ID           *uuid.UUID `json:"id,omitempty"`
+	Name         string     `json:"name" validate:"required,min=1,max=50"`
+	IsBase       bool       `json:"is_base"`
+	FactorToBase float64    `json:"factor_to_base" validate:"required,gt=0"`
+	SellPrice    float64    `json:"sell_price" validate:"required,gte=0"`
+	Barcode      *string    `json:"barcode" validate:"omitempty,max=100"`
+	Sku          *string    `json:"sku" validate:"omitempty,max=50"`
+	SortOrder    int32      `json:"sort_order"`
+}
+
+type ReplaceSaleUnitsRequest struct {
+	Units []SaleUnitInput `json:"units" validate:"required,min=1,dive"`
+}
+
 type ProductCategoryResponse struct {
 	ID   int32  `json:"id"`
 	Name string `json:"name"`
@@ -86,6 +112,8 @@ type ProductResponse struct {
 	UpdatedAt           time.Time                 `json:"updated_at"`
 	DeletedAt           *time.Time                `json:"deleted_at,omitempty"`
 	Options             []ProductOptionResponse   `json:"options,omitempty"`
+	SaleUnits           []ProductSaleUnitResponse `json:"sale_units,omitempty"`
+	MatchedSaleUnitID   *uuid.UUID                `json:"matched_sale_unit_id,omitempty"`
 }
 
 type ProductListResponse struct {

@@ -7,6 +7,7 @@ import (
 	"POS-kasir/internal/common/pagination"
 	"POS-kasir/internal/common/store"
 	orders_repo "POS-kasir/internal/orders/repository"
+	prdunits "POS-kasir/internal/products"
 	products_repo "POS-kasir/internal/products/repository"
 	"POS-kasir/internal/settings"
 	"POS-kasir/pkg/logger"
@@ -1235,18 +1236,27 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		}
 
 		var (
-			itemOrderIDs   []uuid.UUID
-			itemProductIDs []uuid.UUID
-			itemQuantities []int32
-			itemPrices     []pgtype.Numeric
-			itemSubtotals  []pgtype.Numeric
-			itemNetSubs    []pgtype.Numeric
-			itemCostPrices []pgtype.Numeric
-			stockUpdateIDs []uuid.UUID
-			stockUpdateQty []int32
+			itemProductIDs   []uuid.UUID
+			itemQuantities   []int32
+			itemPrices       []pgtype.Numeric
+			itemSubtotals    []pgtype.Numeric
+			itemNetSubs      []pgtype.Numeric
+			itemCostPrices   []pgtype.Numeric
+			itemProductUnits []uuid.UUID
+			itemUnitNames    []string
+			itemFactors      []pgtype.Numeric
 		)
 
+		stockNeeded := make(map[uuid.UUID]int32)
 		var grossTotal int64 = 0
+
+		type saleLine struct {
+			req         CreateOrderItemRequest
+			unit        products_repo.ProductUnit
+			priceAtSale int64
+			baseQty     int32
+		}
+		var saleLines []saleLine
 
 		for _, itemReq := range req.Items {
 			product, exists := productMap[itemReq.ProductID]
@@ -1254,11 +1264,28 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 				return fmt.Errorf("product %s not found", itemReq.ProductID)
 			}
 
-			if product.Stock < itemReq.Quantity {
-				return fmt.Errorf("insufficient stock for %s: available %d, requested %d", product.Name, product.Stock, itemReq.Quantity)
+			var saleUnit products_repo.ProductUnit
+			var uErr error
+			if itemReq.ProductUnitID != nil {
+				saleUnit, uErr = qPrd.GetProductUnit(ctx, *itemReq.ProductUnitID)
+			} else {
+				saleUnit, uErr = qPrd.GetBaseProductUnit(ctx, itemReq.ProductID)
+			}
+			if uErr != nil {
+				if errors.Is(uErr, pgx.ErrNoRows) {
+					return fmt.Errorf("sale unit not configured for %s", product.Name)
+				}
+				return uErr
+			}
+			if saleUnit.ProductID != itemReq.ProductID {
+				return fmt.Errorf("sale unit does not match product %s", product.Name)
 			}
 
-			priceAtSale := product.Price
+			factor := prdunits.FloatFromNumeric(saleUnit.FactorToBase)
+			baseQty := prdunits.SaleQtyToBase(itemReq.Quantity, factor)
+			stockNeeded[itemReq.ProductID] += baseQty
+
+			priceAtSale := saleUnit.SellPrice
 			if itemReq.UnitPrice != nil {
 				priceAtSale = *itemReq.UnitPrice
 			}
@@ -1272,13 +1299,31 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 				}
 			}
 
-			subtotal := priceAtSale * int64(itemReq.Quantity)
+			saleLines = append(saleLines, saleLine{
+				req:         itemReq,
+				unit:        saleUnit,
+				priceAtSale: priceAtSale,
+				baseQty:     baseQty,
+			})
+		}
+
+		for pid, need := range stockNeeded {
+			product := productMap[pid]
+			if product.Stock < need {
+				return fmt.Errorf("insufficient stock for %s: available %d, requested %d (base units)", product.Name, product.Stock, need)
+			}
+		}
+
+		stockUpdateQtyMap := make(map[uuid.UUID]int32)
+
+		for _, line := range saleLines {
+			product := productMap[line.req.ProductID]
+			subtotal := line.priceAtSale * int64(line.req.Quantity)
 			grossTotal += subtotal
 
-			itemOrderIDs = append(itemOrderIDs, newOrderID)
-			itemProductIDs = append(itemProductIDs, itemReq.ProductID)
-			itemQuantities = append(itemQuantities, itemReq.Quantity)
-			itemPrices = append(itemPrices, utils.Int64ToNumeric(priceAtSale))
+			itemProductIDs = append(itemProductIDs, line.req.ProductID)
+			itemQuantities = append(itemQuantities, line.req.Quantity)
+			itemPrices = append(itemPrices, utils.Int64ToNumeric(line.priceAtSale))
 			itemSubtotals = append(itemSubtotals, utils.Int64ToNumeric(subtotal))
 			itemNetSubs = append(itemNetSubs, utils.Int64ToNumeric(subtotal))
 
@@ -1291,8 +1336,18 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			numericCost.Scan(fmt.Sprintf("%f", costPrice))
 			itemCostPrices = append(itemCostPrices, numericCost)
 
-			stockUpdateIDs = append(stockUpdateIDs, itemReq.ProductID)
-			stockUpdateQty = append(stockUpdateQty, itemReq.Quantity)
+			itemProductUnits = append(itemProductUnits, line.unit.ID)
+			itemUnitNames = append(itemUnitNames, line.unit.Name)
+			itemFactors = append(itemFactors, line.unit.FactorToBase)
+
+			stockUpdateQtyMap[line.req.ProductID] += line.baseQty
+		}
+
+		var stockUpdateIDs []uuid.UUID
+		var stockUpdateQty []int32
+		for pid, qty := range stockUpdateQtyMap {
+			stockUpdateIDs = append(stockUpdateIDs, pid)
+			stockUpdateQty = append(stockUpdateQty, qty)
 		}
 
 		createdItems, err := qtx.BatchCreateOrderItems(ctx, orders_repo.BatchCreateOrderItemsParams{
@@ -1303,6 +1358,9 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			Subtotals:        itemSubtotals,
 			NetSubtotals:     itemNetSubs,
 			CostPricesAtSale: itemCostPrices,
+			ProductUnitIds:   itemProductUnits,
+			SaleUnitNames:    itemUnitNames,
+			FactorsToBase:    itemFactors,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to batch insert items: %w", err)

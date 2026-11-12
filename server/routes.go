@@ -75,6 +75,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Get("/products/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.ProductHandler.GetProductHandler)
 	api.Get("/products/:id/stock-history", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.GetStockHistoryHandler)
 	api.Patch("/products/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.UpdateProductHandler)
+	api.Put("/products/:id/sale-units", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.ReplaceSaleUnitsHandler)
 	api.Delete("/products/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.ProductHandler.DeleteProductHandler)
 
 	api.Post("/products/:product_id/options", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.ProductHandler.CreateProductOptionHandler)

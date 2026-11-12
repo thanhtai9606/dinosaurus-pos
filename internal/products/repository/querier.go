@@ -26,10 +26,12 @@ type Querier interface {
 	// Queries for Product Options (Variants)
 	// Creates a new option for a specific product.
 	CreateProductOption(ctx context.Context, arg CreateProductOptionParams) (ProductOption, error)
+	CreateProductUnit(ctx context.Context, arg CreateProductUnitParams) (ProductUnit, error)
 	CreateStockHistory(ctx context.Context, arg CreateStockHistoryParams) (StockHistory, error)
 	DecreaseProductStock(ctx context.Context, arg DecreaseProductStockParams) (Product, error)
 	// Deletes a product. Its options will be deleted automatically due to 'ON DELETE CASCADE'.
 	DeleteProduct(ctx context.Context, id uuid.UUID) error
+	GetBaseProductUnit(ctx context.Context, productID uuid.UUID) (ProductUnit, error)
 	GetDeletedProduct(ctx context.Context, id uuid.UUID) (GetDeletedProductRow, error)
 	GetProductByBarcode(ctx context.Context, barcode *string) (Product, error)
 	// Retrieves a product by its ID, including its options.
@@ -40,6 +42,8 @@ type Querier interface {
 	// Retrieves a product option by its ID, including its product details.
 	GetProductOptionByID(ctx context.Context, id uuid.UUID) (GetProductOptionByIDRow, error)
 	GetProductOptionsByIDs(ctx context.Context, dollar_1 []uuid.UUID) ([]ProductOption, error)
+	GetProductUnit(ctx context.Context, id uuid.UUID) (ProductUnit, error)
+	GetProductUnitByBarcode(ctx context.Context, barcode *string) (ProductUnit, error)
 	// Retrieves a single product and aggregates its options into a JSON array.
 	// This is an efficient way to fetch a product and its variants in one query.
 	// Now filters out soft-deleted options.
@@ -51,6 +55,8 @@ type Querier interface {
 	ListDeletedProducts(ctx context.Context, arg ListDeletedProductsParams) ([]ListDeletedProductsRow, error)
 	// Retrieves all options for a single product.
 	ListOptionsForProduct(ctx context.Context, productID uuid.UUID) ([]ProductOption, error)
+	ListProductUnitsByProduct(ctx context.Context, productID uuid.UUID) ([]ProductUnit, error)
+	ListProductUnitsByProductIDs(ctx context.Context, productIds []uuid.UUID) ([]ProductUnit, error)
 	// Lists products with filtering and pagination.
 	// Does not include variants for performance reasons on a list view.
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]ListProductsRow, error)
@@ -63,6 +69,7 @@ type Querier interface {
 	SoftDeleteProduct(ctx context.Context, id uuid.UUID) error
 	// Deletes a single product option.
 	SoftDeleteProductOption(ctx context.Context, id uuid.UUID) error
+	SoftDeleteProductUnitsByProduct(ctx context.Context, productID uuid.UUID) error
 	// Updates a product's details. Use COALESCE for optional fields.
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 	// Updates a specific product option.

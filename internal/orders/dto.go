@@ -18,10 +18,11 @@ type CreateOrderItemOptionRequest struct {
 }
 
 type CreateOrderItemRequest struct {
-	ProductID uuid.UUID                      `json:"product_id" validate:"required"`
-	Quantity  int32                          `json:"quantity" validate:"required,gt=0"`
-	Options   []CreateOrderItemOptionRequest `json:"options" validate:"dive"`
-	UnitPrice *int64                         `json:"unit_price,omitempty" validate:"omitempty,gte=0"`
+	ProductID     uuid.UUID                      `json:"product_id" validate:"required"`
+	ProductUnitID *uuid.UUID                     `json:"product_unit_id,omitempty"`
+	Quantity      int32                          `json:"quantity" validate:"required,gt=0"`
+	Options       []CreateOrderItemOptionRequest `json:"options" validate:"dive"`
+	UnitPrice     *int64                         `json:"unit_price,omitempty" validate:"omitempty,gte=0"`
 }
 
 type CreateOrderRequest struct {

@@ -245,7 +245,10 @@ INSERT INTO order_items (
     price_at_sale,
     subtotal,
     net_subtotal,
-    cost_price_at_sale
+    cost_price_at_sale,
+    product_unit_id,
+    sale_unit_name,
+    factor_to_base
 )
 SELECT
     sqlc.arg(order_id) AS order_id,
@@ -254,7 +257,10 @@ SELECT
     unnest(sqlc.arg(prices_at_sale)::numeric[]) AS price_at_sale,
     unnest(sqlc.arg(subtotals)::numeric[]) AS subtotal,
     unnest(sqlc.arg(net_subtotals)::numeric[]) AS net_subtotal,
-    unnest(sqlc.arg(cost_prices_at_sale)::numeric[]) AS cost_price_at_sale
+    unnest(sqlc.arg(cost_prices_at_sale)::numeric[]) AS cost_price_at_sale,
+    unnest(sqlc.arg(product_unit_ids)::uuid[]) AS product_unit_id,
+    unnest(sqlc.arg(sale_unit_names)::text[]) AS sale_unit_name,
+    unnest(sqlc.arg(factors_to_base)::numeric[]) AS factor_to_base
 RETURNING *;
 
 -- name: BatchDecreaseProductStock :exec

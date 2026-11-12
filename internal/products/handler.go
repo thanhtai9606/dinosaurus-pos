@@ -22,6 +22,7 @@ type IPrdHandler interface {
 	LookupProductByCodeHandler(ctx fiber.Ctx) error
 	GetProductHandler(ctx fiber.Ctx) error
 	UpdateProductHandler(ctx fiber.Ctx) error
+	ReplaceSaleUnitsHandler(ctx fiber.Ctx) error
 	DeleteProductHandler(ctx fiber.Ctx) error
 	CreateProductOptionHandler(ctx fiber.Ctx) error
 	UploadProductOptionImageHandler(ctx fiber.Ctx) error
@@ -356,6 +357,47 @@ func (h *PrdHandler) UpdateProductHandler(ctx fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
 		Message: "Product updated successfully",
+		Data:    productResponse,
+	})
+}
+
+// ReplaceSaleUnitsHandler replaces all sale units for a product
+// @Summary      Replace product sale units
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        id   path string true "Product ID" Format(uuid)
+// @Param        body body ReplaceSaleUnitsRequest true "Sale units"
+// @Success      200 {object} common.SuccessResponse{data=ProductResponse}
+// @x-roles      ["admin", "manager"]
+// @Router       /products/{id}/sale-units [put]
+func (h *PrdHandler) ReplaceSaleUnitsHandler(ctx fiber.Ctx) error {
+	productID, err := fiber.Convert(ctx.Params("id"), uuid.Parse)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid product ID format"})
+	}
+	var req ReplaceSaleUnitsRequest
+	if err := ctx.Bind().Body(&req); err != nil {
+		var ve *validator.ValidationErrors
+		if errors.As(err, &ve) {
+			return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "Validation failed",
+				Error:   ve.Error(),
+				Data:    map[string]interface{}{"errors": ve.Errors},
+			})
+		}
+		return ctx.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid request body", Error: err.Error()})
+	}
+	productResponse, err := h.prdService.ReplaceSaleUnits(ctx.RequestCtx(), productID, req)
+	if err != nil {
+		if errors.Is(err, common.ErrNotFound) {
+			return ctx.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "Product not found"})
+		}
+		h.log.Error("Failed to replace sale units", "error", err, "productID", productID)
+		return ctx.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: err.Error()})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(common.SuccessResponse{
+		Message: "Sale units updated",
 		Data:    productResponse,
 	})
 }

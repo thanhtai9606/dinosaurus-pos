@@ -733,7 +733,16 @@
             "unit": "Unit",
             "min_stock": "Min. stock",
             "default_supplier": "Default supplier",
-            "no_supplier": "None"
+            "no_supplier": "None",
+            "price": "Sell price"
+        },
+        "sale_units": {
+            "title": "Sale units & conversion",
+            "hint": "Stock is tracked in the base unit. Other units (case, pack…) have their own factor, price, and barcode.",
+            "base_name": "Base unit",
+            "unit_name": "Unit name",
+            "factor": "Conversion (× base)",
+            "add": "Add unit"
         },
         "stock_history": {
             "no_history": "No stock history found.",

@@ -6,6 +6,7 @@ import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Product } from '@/lib/api/query/products'
+import type { ProductSaleUnit } from '@/lib/retail-pos/productUnits'
 import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
 
 export interface CartItem {
@@ -14,6 +15,8 @@ export interface CartItem {
     quantity: number
     /** Overrides catalog sell price for this line (retail POS). */
     unitPrice?: number
+    /** Sale unit (chai, thùng, …). */
+    saleUnit?: ProductSaleUnit
 }
 
 interface CartContentProps {

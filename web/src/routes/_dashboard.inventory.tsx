@@ -104,7 +104,7 @@ function InventoryPage() {
                             {t('importPrices.title')}
                         </Button>
                         <Button asChild>
-                            <Link to="/stock-receipts" search={{}}>
+                            <Link to="/stock-receipts/new">
                                 <PackagePlus className="mr-2 h-4 w-4" />
                                 {t('inventory.create_receipt')}
                             </Link>

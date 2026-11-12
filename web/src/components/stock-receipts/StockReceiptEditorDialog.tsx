@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScanBarcode } from 'lucide-react'
-import {
-    useCreateStockReceiptMutation,
-    useUpdateStockReceiptMutation,
-    useStockReceiptDetailQuery,
-} from '@/lib/api/query/stockReceipts'
+import { useUpdateStockReceiptMutation, useStockReceiptDetailQuery } from '@/lib/api/query/stockReceipts'
+import { stripPaymentFromNote, type StockReceiptPaymentMeta, type StockReceiptPaymentMode } from '@/lib/stock-receipts/paymentNote'
+import type { StockReceipt } from '@/lib/api/query/stockReceipts'
 import { useSuppliersListQuery } from '@/lib/api/query/suppliers'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -31,7 +29,6 @@ export function StockReceiptEditorDialog({
 }) {
     const { t } = useTranslation()
     const formatMoney = useFormatMoney()
-    const createMutation = useCreateStockReceiptMutation()
     const updateMutation = useUpdateStockReceiptMutation()
     const { data: detail, isFetching } = useStockReceiptDetailQuery(receiptId || '')
     const { data: suppliersData } = useSuppliersListQuery({ limit: 100 })
@@ -40,6 +37,7 @@ export function StockReceiptEditorDialog({
 
     const [supplierId, setSupplierId] = useState<string>('')
     const [note, setNote] = useState('')
+    const [paymentMeta, setPaymentMeta] = useState<StockReceiptPaymentMeta | undefined>()
 
     const draft = useStockReceiptDraft({ open, receiptId, detail, readOnly, t })
 
@@ -47,36 +45,41 @@ export function StockReceiptEditorDialog({
         if (!open) return
         if (receiptId && detail) {
             setSupplierId(detail.supplier_id || '')
-            setNote(detail.note || '')
-        } else if (!receiptId) {
-            setSupplierId('')
-            setNote('')
+            const parsed = stripPaymentFromNote(detail.note)
+            setNote(parsed.text)
+            setPaymentMeta(resolvePaymentMeta(detail, parsed.meta))
         }
     }, [open, receiptId, detail])
 
+    if (!receiptId) return null
+
     const suppliers = suppliersData?.suppliers || []
-    const pending = createMutation.isPending || updateMutation.isPending
+    const pending = updateMutation.isPending
     const items = linesToApiItems(draft.lines)
     const receiptTotal = draft.lines.reduce((sum, l) => sum + l.quantity * l.unit_cost, 0)
+    const debt =
+        paymentMeta && paymentMeta.mode === 'credit'
+            ? Math.max(0, receiptTotal - paymentMeta.amount_paid)
+            : 0
 
     const handleSave = async () => {
-        const body = { supplier_id: supplierId || undefined, note: note || undefined, items }
-        if (receiptId) {
-            await updateMutation.mutateAsync({ id: receiptId, body })
-        } else {
-            await createMutation.mutateAsync(body)
+        const body: Record<string, unknown> = {
+            supplier_id: supplierId || undefined,
+            note: note || undefined,
+            items,
         }
+        if (paymentMeta) {
+            body.payment_mode = paymentMeta.mode
+            body.amount_paid = paymentMeta.amount_paid
+        }
+        await updateMutation.mutateAsync({ id: receiptId, body })
         onOpenChange(false)
     }
 
-    const title = receiptId
-        ? readOnly
-            ? t('stockReceipts.form.view_title')
-            : t('stockReceipts.form.edit_title')
-        : t('stockReceipts.form.create_title')
+    const title = readOnly ? t('stockReceipts.form.view_title') : t('stockReceipts.form.edit_title')
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open && !!receiptId} onOpenChange={onOpenChange}>
             <DialogContent className="flex w-[min(96rem,calc(100vw-2rem))] max-h-[92vh] flex-col gap-4 overflow-y-auto sm:max-w-7xl">
                 <DialogHeader>
                     <div className="flex flex-wrap items-center gap-2">
@@ -161,6 +164,24 @@ export function StockReceiptEditorDialog({
                             onRemove={draft.removeLine}
                         />
 
+                        {paymentMeta && (
+                            <div className="rounded-md border bg-muted/40 p-3 text-sm space-y-1">
+                                <p>
+                                    {paymentMeta.mode === 'credit'
+                                        ? t('stockReceipts.checkout.pay_credit')
+                                        : t('stockReceipts.checkout.pay_cash')}
+                                </p>
+                                <p>
+                                    {t('stockReceipts.checkout.amount_paid')}: {formatMoney(paymentMeta.amount_paid)}
+                                </p>
+                                {debt > 0 && (
+                                    <p className="font-medium text-destructive">
+                                        {t('stockReceipts.checkout.debt')}: {formatMoney(debt)}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
                         <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">
                                 {t('stockReceipts.form.line_count', { count: draft.lines.length })}
@@ -183,4 +204,17 @@ export function StockReceiptEditorDialog({
             </DialogContent>
         </Dialog>
     )
+}
+
+function resolvePaymentMeta(
+    detail: StockReceipt,
+    fromNote?: StockReceiptPaymentMeta,
+): StockReceiptPaymentMeta | undefined {
+    if (detail.payment_mode) {
+        return {
+            mode: detail.payment_mode as StockReceiptPaymentMode,
+            amount_paid: detail.amount_paid ?? 0,
+        }
+    }
+    return fromNote
 }

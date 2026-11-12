@@ -430,5 +430,53 @@ export const RBAC_RULES: Record<string, string[]> = {
     "DELETE /stock-receipts/{id}": [
         "admin",
         "manager"
+    ],
+    "GET /supplier-debts": [
+        "admin",
+        "manager"
+    ],
+    "GET /supplier-debts/summary": [
+        "admin",
+        "manager"
+    ],
+    "POST /supplier-debts": [
+        "admin",
+        "manager"
+    ],
+    "GET /supplier-debts/{id}": [
+        "admin",
+        "manager"
+    ],
+    "POST /supplier-debts/{id}/payments": [
+        "admin",
+        "manager"
+    ],
+    "POST /supplier-debts/{id}/void": [
+        "admin",
+        "manager"
+    ],
+    "GET /customer-debts": [
+        "admin",
+        "manager"
+    ],
+    "GET /customer-debts/summary": [
+        "admin",
+        "manager"
+    ],
+    "POST /customer-debts": [
+        "admin",
+        "manager"
+    ],
+    "GET /customer-debts/{id}": [
+        "admin",
+        "manager"
+    ],
+    "POST /customer-debts/{id}/payments": [
+        "admin",
+        "manager"
+    ],
+    "POST /customer-debts/{id}/void": [
+        "admin",
+        "manager"
     ]
 };

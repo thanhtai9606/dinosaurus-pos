@@ -10,6 +10,8 @@ import (
 	"POS-kasir/internal/common/pagination"
 	"POS-kasir/internal/common/store"
 	products_repo "POS-kasir/internal/products/repository"
+	"POS-kasir/internal/supplierdebts"
+	sd_repo "POS-kasir/internal/supplierdebts/repository"
 	sr_repo "POS-kasir/internal/stockreceipts/repository"
 	"POS-kasir/pkg/logger"
 
@@ -74,7 +76,10 @@ func (s *StockReceiptService) Create(ctx context.Context, req CreateStockReceipt
 			return err
 		}
 
-		return insertReceiptItems(ctx, qtx, receipt.ID, req.Items)
+		if err := insertReceiptItems(ctx, qtx, receipt.ID, req.Items); err != nil {
+			return err
+		}
+		return applyReceiptPayment(ctx, qtx, receipt.ID, req.PaymentMode, req.AmountPaid)
 	})
 	if err != nil {
 		s.log.Errorf("CreateStockReceipt failed", "error", err)
@@ -205,13 +210,30 @@ func (s *StockReceiptService) UpdateDraft(ctx context.Context, id uuid.UUID, req
 		if err := qtx.DeleteStockReceiptItems(ctx, id); err != nil {
 			return err
 		}
-		return insertReceiptItems(ctx, qtx, id, req.Items)
+		if err := insertReceiptItems(ctx, qtx, id, req.Items); err != nil {
+			return err
+		}
+		return applyReceiptPayment(ctx, qtx, id, req.PaymentMode, req.AmountPaid)
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return s.Get(ctx, id)
+}
+
+func applyReceiptPayment(ctx context.Context, q sr_repo.Querier, id uuid.UUID, mode *string, paid *float64) error {
+	pm := sr_repo.StockReceiptPaymentModeCash
+	if mode != nil && *mode == "credit" {
+		pm = sr_repo.StockReceiptPaymentModeCredit
+	}
+	amount := 0.0
+	if paid != nil {
+		amount = *paid
+	}
+	var n pgtype.Numeric
+	_ = n.Scan(fmt.Sprintf("%f", amount))
+	return q.UpdateStockReceiptPayment(ctx, id, pm, n)
 }
 
 func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error) {
@@ -304,7 +326,32 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 			ID:     id,
 			Status: sr_repo.StockReceiptStatusCompleted,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+
+		rec, err := qtx.GetStockReceiptByID(ctx, id)
+		if err != nil {
+			return err
+		}
+		lineTotal, err := qtx.SumReceiptLineTotal(ctx, id)
+		if err != nil {
+			return err
+		}
+		totalF := numericToFloat(lineTotal)
+		paidF := numericToFloat(rec.AmountPaid)
+		if rec.SupplierID.Valid {
+			sdq := sd_repo.New(tx)
+			return supplierdebts.CreateDebtFromStockReceiptTx(ctx, sdq, supplierdebts.FromStockReceiptParams{
+				SupplierID: uuid.UUID(rec.SupplierID.Bytes),
+				ReceiptID:  id,
+				ReceiptNo:  rec.ReceiptNo,
+				Total:      totalF,
+				AmountPaid: paidF,
+				CreatedBy:  createdBy,
+			})
+		}
+		return nil
 	})
 	if err != nil {
 		s.log.Errorf("CompleteStockReceipt failed", "error", err)
@@ -399,6 +446,8 @@ func mapReceiptDetail(r sr_repo.StockReceipt, items []sr_repo.ListStockReceiptIt
 		Status:      string(r.Status),
 		ReceivedAt:  r.ReceivedAt.Time,
 		Note:        r.Note,
+		PaymentMode: string(r.PaymentMode),
+		AmountPaid:  numericToFloat(r.AmountPaid),
 		TotalAmount: numericToFloat(total),
 		CreatedAt:   r.CreatedAt.Time,
 		UpdatedAt:   r.UpdatedAt.Time,

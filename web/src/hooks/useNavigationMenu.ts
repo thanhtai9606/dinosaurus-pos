@@ -14,6 +14,7 @@ import {
     ClipboardList,
     Warehouse,
     Store,
+    HandCoins,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
@@ -100,6 +101,24 @@ export function useNavigationMenu(userRole?: POSKasirInternalUserRepositoryUserR
             label: t('sidebar.stock_receipts'),
             icon: ClipboardList,
             to: '/stock-receipts',
+            allowedRoles: [
+                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+                POSKasirInternalUserRepositoryUserRole.UserRoleManager
+            ]
+        },
+        {
+            label: t('sidebar.supplier_debts'),
+            icon: HandCoins,
+            to: '/supplier-debts',
+            allowedRoles: [
+                POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+                POSKasirInternalUserRepositoryUserRole.UserRoleManager
+            ]
+        },
+        {
+            label: t('sidebar.customer_debts'),
+            icon: HandCoins,
+            to: '/customer-debts',
             allowedRoles: [
                 POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
                 POSKasirInternalUserRepositoryUserRole.UserRoleManager

@@ -24,6 +24,7 @@ type Querier interface {
 	SetStockReceiptStatus(ctx context.Context, arg SetStockReceiptStatusParams) (StockReceipt, error)
 	SumReceiptLineTotal(ctx context.Context, receiptID uuid.UUID) (pgtype.Numeric, error)
 	UpdateStockReceiptDraft(ctx context.Context, arg UpdateStockReceiptDraftParams) (StockReceipt, error)
+	UpdateStockReceiptPayment(ctx context.Context, id uuid.UUID, mode StockReceiptPaymentMode, amountPaid pgtype.Numeric) error
 }
 
 var _ Querier = (*Queries)(nil)

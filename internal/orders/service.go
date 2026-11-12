@@ -6,6 +6,8 @@ import (
 	"POS-kasir/internal/common"
 	"POS-kasir/internal/common/pagination"
 	"POS-kasir/internal/common/store"
+	"POS-kasir/internal/customerdebts"
+	cd_repo "POS-kasir/internal/customerdebts/repository"
 	orders_repo "POS-kasir/internal/orders/repository"
 	prdunits "POS-kasir/internal/products"
 	products_repo "POS-kasir/internal/products/repository"
@@ -444,6 +446,11 @@ func (s *OrderService) ConfirmManualPayment(ctx context.Context, orderID uuid.UU
 				return common.ErrOrderConflict
 			}
 			return err
+		}
+
+		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
+			cdq := cd_repo.New(tx)
+			_ = customerdebts.RecordOrderPaymentTx(ctx, cdq, orderID, float64(netTotal), pgtype.UUID{Bytes: actorID, Valid: true})
 		}
 
 		finalOrder, err = qtx.GetOrderWithDetails(ctx, orderID)
@@ -919,6 +926,10 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID uuid.UUID, req C
 			}
 		}
 
+		cdq := cd_repo.New(tx)
+		if err := customerdebts.VoidDebtByOrderTx(ctx, cdq, orderID); err != nil {
+			return err
+		}
 		return nil
 	})
 
@@ -1452,6 +1463,20 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		})
 		if err != nil {
 			return fmt.Errorf("failed to update order totals: %w", err)
+		}
+
+		if nullCustomerID.Valid && netTotal > 0 {
+			cdq := cd_repo.New(tx)
+			ref := fmt.Sprintf("ORD-%s", newOrderID.String()[:8])
+			if err := customerdebts.CreateDebtFromOrderTx(ctx, cdq, customerdebts.FromOrderParams{
+				CustomerID:  uuid.UUID(nullCustomerID.Bytes),
+				OrderID:     newOrderID,
+				ReferenceNo: ref,
+				Total:       float64(netTotal),
+				CreatedBy:   pgtype.UUID{Bytes: actorID, Valid: ok},
+			}); err != nil {
+				return err
+			}
 		}
 
 		finalOrder, err = qtx.GetOrderWithDetails(ctx, newOrderID)

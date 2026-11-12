@@ -108,7 +108,7 @@ func (q *Queries) DeleteStockReceiptItems(ctx context.Context, receiptID uuid.UU
 }
 
 const getStockReceiptByID = `-- name: GetStockReceiptByID :one
-SELECT id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at FROM stock_receipts WHERE id = $1
+SELECT id, receipt_no, supplier_id, status, received_at, note, payment_mode, amount_paid, created_by, created_at, updated_at FROM stock_receipts WHERE id = $1
 `
 
 func (q *Queries) GetStockReceiptByID(ctx context.Context, id uuid.UUID) (StockReceipt, error) {
@@ -121,11 +121,22 @@ func (q *Queries) GetStockReceiptByID(ctx context.Context, id uuid.UUID) (StockR
 		&i.Status,
 		&i.ReceivedAt,
 		&i.Note,
+		&i.PaymentMode,
+		&i.AmountPaid,
 		&i.CreatedBy,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateStockReceiptPayment = `-- name: UpdateStockReceiptPayment :exec
+UPDATE stock_receipts SET payment_mode = $2, amount_paid = $3, updated_at = NOW() WHERE id = $1
+`
+
+func (q *Queries) UpdateStockReceiptPayment(ctx context.Context, id uuid.UUID, mode StockReceiptPaymentMode, amountPaid pgtype.Numeric) error {
+	_, err := q.db.Exec(ctx, updateStockReceiptPayment, id, mode, amountPaid)
+	return err
 }
 
 const insertStockReceiptItem = `-- name: InsertStockReceiptItem :one

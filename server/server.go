@@ -16,6 +16,10 @@ import (
 	sr_repo "POS-kasir/internal/stockreceipts/repository"
 	"POS-kasir/internal/suppliers"
 	suppliers_repo "POS-kasir/internal/suppliers/repository"
+	"POS-kasir/internal/supplierdebts"
+	sd_debts_repo "POS-kasir/internal/supplierdebts/repository"
+	"POS-kasir/internal/customerdebts"
+	cd_debts_repo "POS-kasir/internal/customerdebts/repository"
 	"POS-kasir/internal/orders"
 	orders_repo "POS-kasir/internal/orders/repository"
 	"POS-kasir/internal/payment_methods"
@@ -94,6 +98,8 @@ type AppContainer struct {
 	CustomerHandler           customers.ICustomerHandler
 	SupplierHandler           suppliers.ISupplierHandler
 	StockReceiptHandler       stockreceipts.IStockReceiptHandler
+	SupplierDebtHandler       supplierdebts.ISupplierDebtHandler
+	CustomerDebtHandler       customerdebts.ICustomerDebtHandler
 	ProductHandler            products.IPrdHandler
 	OrderHandler              orders.IOrderHandler
 	PaymentMethodHandler      payment_methods.IPaymentMethodHandler
@@ -216,6 +222,14 @@ func BuildAppContainer(app *App) *AppContainer {
 	stockReceiptService := stockreceipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger)
 	stockReceiptHandler := stockreceipts.NewStockReceiptHandler(stockReceiptService, app.Logger)
 
+	supplierDebtRepo := sd_debts_repo.New(app.DB.GetPool())
+	supplierDebtService := supplierdebts.NewSupplierDebtService(supplierDebtRepo, app.Store, app.Logger)
+	supplierDebtHandler := supplierdebts.NewSupplierDebtHandler(supplierDebtService, app.Logger)
+
+	customerDebtRepo := cd_debts_repo.New(app.DB.GetPool())
+	customerDebtService := customerdebts.NewCustomerDebtService(customerDebtRepo, app.Store, app.Logger)
+	customerDebtHandler := customerdebts.NewCustomerDebtHandler(customerDebtService, app.Logger)
+
 	// Product search (Meilisearch)
 	var productIndexer productsearch.Indexer = productsearch.NoopIndexer{}
 	if app.Config.Meili.Enabled {
@@ -293,6 +307,8 @@ func BuildAppContainer(app *App) *AppContainer {
 		CustomerHandler:           customerHandler,
 		SupplierHandler:           supplierHandler,
 		StockReceiptHandler:       stockReceiptHandler,
+		SupplierDebtHandler:       supplierDebtHandler,
+		CustomerDebtHandler:       customerDebtHandler,
 		ProductHandler:            prdHandler,
 		OrderHandler:              orderHandler,
 		PaymentMethodHandler:      paymentMethodHandler,

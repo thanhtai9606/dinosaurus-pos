@@ -89,7 +89,83 @@
         "inventory": "Inventory",
         "suppliers": "Suppliers",
         "stock_receipts": "Stock receipts",
+        "supplier_debts": "Supplier debts",
+        "customer_debts": "Customer debts",
         "retail_pos": "Retail POS"
+    },
+    "debts": {
+        "detail_title": "Debt detail",
+        "payment_history": "Payment history",
+        "no_payments": "No payments yet",
+        "record_payment": "Record payment",
+        "filters": {
+            "status": "Status",
+            "all_status": "All statuses"
+        },
+        "fields": {
+            "reference": "Reference",
+            "status": "Status",
+            "total": "Total",
+            "paid": "Paid",
+            "balance": "Balance due",
+            "amount": "Amount",
+            "note": "Note",
+            "date": "Date"
+        },
+        "status": {
+            "open": "Open",
+            "partial": "Partial",
+            "settled": "Settled",
+            "void": "Void"
+        },
+        "actions": {
+            "pay": "Record payment",
+            "void": "Void entry"
+        }
+    },
+    "supplierDebts": {
+        "title": "Supplier debts (AP)",
+        "fields": {
+            "supplier": "Supplier"
+        },
+        "filters": {
+            "supplier": "Supplier",
+            "all_suppliers": "All suppliers"
+        },
+        "actions": {
+            "add_manual": "Add manual debt",
+            "view_suppliers": "Suppliers"
+        },
+        "messages": {
+            "create_success": "Supplier debt created",
+            "create_failed": "Could not create debt: {{message}}",
+            "payment_success": "Payment recorded",
+            "payment_failed": "Payment failed",
+            "void_success": "Debt voided",
+            "void_failed": "Could not void debt"
+        }
+    },
+    "customerDebts": {
+        "title": "Customer debts (AR)",
+        "fields": {
+            "customer": "Customer"
+        },
+        "filters": {
+            "customer": "Customer",
+            "all_customers": "All customers"
+        },
+        "actions": {
+            "add_manual": "Add manual receivable",
+            "view_customers": "Customers"
+        },
+        "messages": {
+            "create_success": "Customer debt created",
+            "create_failed": "Could not create receivable: {{message}}",
+            "payment_success": "Payment recorded",
+            "payment_failed": "Payment failed",
+            "void_success": "Receivable voided",
+            "void_failed": "Could not void receivable"
+        }
     },
     "retailPos": {
         "title": "Retail / grocery POS",
@@ -1009,6 +1085,19 @@
             "add_line": "Add line",
             "complete": "Complete receipt"
         },
+        "checkout": {
+            "subtitle": "Scan on the left — totals and supplier payment on the right.",
+            "subtotal": "Merchandise total",
+            "item_qty": "Total qty",
+            "grand_total": "Payable to supplier",
+            "pay_cash": "Paid in full / cash",
+            "pay_credit": "On supplier credit",
+            "credit_requires_supplier": "Credit requires a supplier",
+            "amount_paid": "Amount paid",
+            "pay_full": "Pay full",
+            "debt": "Balance due",
+            "save_draft": "Save draft"
+        },
         "bulk": {
             "select_all": "Select all on page",
             "select_row": "Select receipt",
@@ -1067,7 +1156,8 @@
             "print_failed": "Barcode print failed",
             "export_success": "Download started",
             "export_failed": "Export failed",
-            "product_not_found": "No product found for that code/SKU/name"
+            "product_not_found": "No product found for that code/SKU/name",
+            "draft_failed": "Could not save draft"
         }
     },
     "importPrices": {

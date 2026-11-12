@@ -91,7 +91,83 @@
         "inventory": "Inventaris",
         "suppliers": "Supplier",
         "stock_receipts": "Penerimaan stok",
+        "supplier_debts": "Hutang supplier",
+        "customer_debts": "Piutang pelanggan",
         "retail_pos": "POS ritel"
+    },
+    "debts": {
+        "detail_title": "Detail hutang/piutang",
+        "payment_history": "Riwayat pembayaran",
+        "no_payments": "Belum ada pembayaran",
+        "record_payment": "Catat pembayaran",
+        "filters": {
+            "status": "Status",
+            "all_status": "Semua status"
+        },
+        "fields": {
+            "reference": "Referensi",
+            "status": "Status",
+            "total": "Total",
+            "paid": "Dibayar",
+            "balance": "Sisa",
+            "amount": "Jumlah",
+            "note": "Catatan",
+            "date": "Tanggal"
+        },
+        "status": {
+            "open": "Terbuka",
+            "partial": "Sebagian",
+            "settled": "Lunas",
+            "void": "Batal"
+        },
+        "actions": {
+            "pay": "Catat pembayaran",
+            "void": "Batalkan"
+        }
+    },
+    "supplierDebts": {
+        "title": "Hutang supplier",
+        "fields": {
+            "supplier": "Supplier"
+        },
+        "filters": {
+            "supplier": "Supplier",
+            "all_suppliers": "Semua supplier"
+        },
+        "actions": {
+            "add_manual": "Tambah hutang manual",
+            "view_suppliers": "Supplier"
+        },
+        "messages": {
+            "create_success": "Hutang supplier dibuat",
+            "create_failed": "Gagal: {{message}}",
+            "payment_success": "Pembayaran dicatat",
+            "payment_failed": "Pembayaran gagal",
+            "void_success": "Hutang dibatalkan",
+            "void_failed": "Gagal membatalkan"
+        }
+    },
+    "customerDebts": {
+        "title": "Piutang pelanggan",
+        "fields": {
+            "customer": "Pelanggan"
+        },
+        "filters": {
+            "customer": "Pelanggan",
+            "all_customers": "Semua pelanggan"
+        },
+        "actions": {
+            "add_manual": "Tambah piutang manual",
+            "view_customers": "Pelanggan"
+        },
+        "messages": {
+            "create_success": "Piutang dibuat",
+            "create_failed": "Gagal: {{message}}",
+            "payment_success": "Pembayaran dicatat",
+            "payment_failed": "Pembayaran gagal",
+            "void_success": "Piutang dibatalkan",
+            "void_failed": "Gagal membatalkan"
+        }
     },
     "retailPos": {
         "title": "POS ritel / toko kelontong",
@@ -997,6 +1073,19 @@
             "add_line": "Tambah baris",
             "complete": "Selesaikan"
         },
+        "checkout": {
+            "subtitle": "Pindai kiri — total & bayar supplier kanan.",
+            "subtotal": "Total barang",
+            "item_qty": "Total qty",
+            "grand_total": "Hutang ke supplier",
+            "pay_cash": "Lunas / tunai",
+            "pay_credit": "Piutang supplier",
+            "credit_requires_supplier": "Piutang butuh supplier",
+            "amount_paid": "Sudah dibayar",
+            "pay_full": "Bayar penuh",
+            "debt": "Sisa hutang",
+            "save_draft": "Simpan draf"
+        },
         "bulk": {
             "select_all": "Pilih semua di halaman",
             "select_row": "Pilih penerimaan",
@@ -1055,7 +1144,8 @@
             "print_failed": "Cetak barcode gagal",
             "export_success": "Unduhan dimulai",
             "export_failed": "Ekspor gagal",
-            "product_not_found": "Produk tidak ditemukan"
+            "product_not_found": "Produk tidak ditemukan",
+            "draft_failed": "Gagal simpan draf"
         }
     },
     "importPrices": {

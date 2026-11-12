@@ -891,16 +891,37 @@ type StockHistory struct {
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 }
 
+type StockReceiptPaymentMode string
+
+const (
+	StockReceiptPaymentModeCash   StockReceiptPaymentMode = "cash"
+	StockReceiptPaymentModeCredit StockReceiptPaymentMode = "credit"
+)
+
+func (e *StockReceiptPaymentMode) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case string:
+		*e = StockReceiptPaymentMode(s)
+	case []byte:
+		*e = StockReceiptPaymentMode(s)
+	default:
+		return fmt.Errorf("unsupported scan type for StockReceiptPaymentMode: %T", src)
+	}
+	return nil
+}
+
 type StockReceipt struct {
-	ID         uuid.UUID          `json:"id"`
-	ReceiptNo  string             `json:"receipt_no"`
-	SupplierID pgtype.UUID        `json:"supplier_id"`
-	Status     StockReceiptStatus `json:"status"`
-	ReceivedAt pgtype.Timestamptz `json:"received_at"`
-	Note       *string            `json:"note"`
-	CreatedBy  pgtype.UUID        `json:"created_by"`
-	CreatedAt  pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+	ID          uuid.UUID               `json:"id"`
+	ReceiptNo   string                  `json:"receipt_no"`
+	SupplierID  pgtype.UUID             `json:"supplier_id"`
+	Status      StockReceiptStatus      `json:"status"`
+	ReceivedAt  pgtype.Timestamptz      `json:"received_at"`
+	Note        *string                 `json:"note"`
+	PaymentMode StockReceiptPaymentMode `json:"payment_mode"`
+	AmountPaid  pgtype.Numeric          `json:"amount_paid"`
+	CreatedBy   pgtype.UUID             `json:"created_by"`
+	CreatedAt   pgtype.Timestamptz      `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz      `json:"updated_at"`
 }
 
 type StockReceiptItem struct {

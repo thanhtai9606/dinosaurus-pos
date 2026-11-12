@@ -18,6 +18,8 @@ type CreateStockReceiptRequest struct {
 	SupplierID *uuid.UUID         `json:"supplier_id" validate:"omitempty"`
 	ReceivedAt *time.Time         `json:"received_at" validate:"omitempty"`
 	Note       *string            `json:"note" validate:"omitempty,max=500"`
+	PaymentMode *string           `json:"payment_mode" validate:"omitempty,oneof=cash credit"`
+	AmountPaid  *float64          `json:"amount_paid" validate:"omitempty,gte=0"`
 	Items      []ReceiptItemInput `json:"items" validate:"omitempty,dive"`
 }
 
@@ -25,6 +27,8 @@ type UpdateStockReceiptRequest struct {
 	SupplierID *uuid.UUID         `json:"supplier_id"`
 	ReceivedAt *time.Time         `json:"received_at"`
 	Note       *string            `json:"note" validate:"omitempty,max=500"`
+	PaymentMode *string           `json:"payment_mode" validate:"omitempty,oneof=cash credit"`
+	AmountPaid  *float64          `json:"amount_paid" validate:"omitempty,gte=0"`
 	Items      []ReceiptItemInput `json:"items" validate:"required,min=1,dive"`
 }
 
@@ -58,6 +62,8 @@ type StockReceiptResponse struct {
 	Status       string                     `json:"status"`
 	ReceivedAt   time.Time                  `json:"received_at"`
 	Note         *string                    `json:"note,omitempty"`
+	PaymentMode  string                     `json:"payment_mode,omitempty"`
+	AmountPaid   float64                    `json:"amount_paid"`
 	TotalAmount  float64                    `json:"total_amount"`
 	Items        []StockReceiptItemResponse `json:"items,omitempty"`
 	CreatedAt    time.Time                  `json:"created_at"`

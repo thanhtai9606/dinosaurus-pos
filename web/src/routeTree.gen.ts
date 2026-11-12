@@ -16,6 +16,7 @@ import { Route as LocaleSplatRouteImport } from './routes/$locale.$splat'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
 import { Route as DashboardAccountRouteImport } from './routes/_dashboard.account'
 import { Route as DashboardActivityLogsRouteImport } from './routes/_dashboard.activity-logs'
+import { Route as DashboardCustomerDebtsRouteImport } from './routes/_dashboard.customer-debts'
 import { Route as DashboardCustomersRouteImport } from './routes/_dashboard.customers'
 import { Route as DashboardInventoryRouteImport } from './routes/_dashboard.inventory'
 import { Route as DashboardOrderRouteImport } from './routes/_dashboard.order'
@@ -25,9 +26,11 @@ import { Route as DashboardReportsRouteImport } from './routes/_dashboard.report
 import { Route as DashboardRetailPosRouteImport } from './routes/_dashboard.retail-pos'
 import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
 import { Route as DashboardStockReceiptsRouteImport } from './routes/_dashboard.stock-receipts'
+import { Route as DashboardSupplierDebtsRouteImport } from './routes/_dashboard.supplier-debts'
 import { Route as DashboardSuppliersRouteImport } from './routes/_dashboard.suppliers'
 import { Route as DashboardTransactionsRouteImport } from './routes/_dashboard.transactions'
 import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
+import { Route as DashboardStockReceiptsNewRouteImport } from './routes/_dashboard.stock-receipts.new'
 
 const LocaleRoute = LocaleRouteImport.update({
   id: '/$locale',
@@ -61,6 +64,11 @@ const DashboardAccountRoute = DashboardAccountRouteImport.update({
 const DashboardActivityLogsRoute = DashboardActivityLogsRouteImport.update({
   id: '/activity-logs',
   path: '/activity-logs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCustomerDebtsRoute = DashboardCustomerDebtsRouteImport.update({
+  id: '/customer-debts',
+  path: '/customer-debts',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardCustomersRoute = DashboardCustomersRouteImport.update({
@@ -108,6 +116,11 @@ const DashboardStockReceiptsRoute = DashboardStockReceiptsRouteImport.update({
   path: '/stock-receipts',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSupplierDebtsRoute = DashboardSupplierDebtsRouteImport.update({
+  id: '/supplier-debts',
+  path: '/supplier-debts',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSuppliersRoute = DashboardSuppliersRouteImport.update({
   id: '/suppliers',
   path: '/suppliers',
@@ -123,6 +136,12 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardStockReceiptsNewRoute =
+  DashboardStockReceiptsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => DashboardStockReceiptsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/$locale': typeof LocaleRouteWithChildren
@@ -131,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/$locale/$splat': typeof LocaleSplatRoute
   '/account': typeof DashboardAccountRoute
   '/activity-logs': typeof DashboardActivityLogsRoute
+  '/customer-debts': typeof DashboardCustomerDebtsRoute
   '/customers': typeof DashboardCustomersRoute
   '/inventory': typeof DashboardInventoryRoute
   '/order': typeof DashboardOrderRoute
@@ -139,10 +159,12 @@ export interface FileRoutesByFullPath {
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
   '/settings': typeof DashboardSettingsRoute
-  '/stock-receipts': typeof DashboardStockReceiptsRoute
+  '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
+  '/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/suppliers': typeof DashboardSuppliersRoute
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
+  '/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRoutesByTo {
   '/$locale': typeof LocaleRouteWithChildren
@@ -150,6 +172,7 @@ export interface FileRoutesByTo {
   '/$locale/$splat': typeof LocaleSplatRoute
   '/account': typeof DashboardAccountRoute
   '/activity-logs': typeof DashboardActivityLogsRoute
+  '/customer-debts': typeof DashboardCustomerDebtsRoute
   '/customers': typeof DashboardCustomersRoute
   '/inventory': typeof DashboardInventoryRoute
   '/order': typeof DashboardOrderRoute
@@ -158,11 +181,13 @@ export interface FileRoutesByTo {
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
   '/settings': typeof DashboardSettingsRoute
-  '/stock-receipts': typeof DashboardStockReceiptsRoute
+  '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
+  '/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/suppliers': typeof DashboardSuppliersRoute
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
   '/': typeof DashboardIndexRoute
+  '/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -172,6 +197,7 @@ export interface FileRoutesById {
   '/$locale/$splat': typeof LocaleSplatRoute
   '/_dashboard/account': typeof DashboardAccountRoute
   '/_dashboard/activity-logs': typeof DashboardActivityLogsRoute
+  '/_dashboard/customer-debts': typeof DashboardCustomerDebtsRoute
   '/_dashboard/customers': typeof DashboardCustomersRoute
   '/_dashboard/inventory': typeof DashboardInventoryRoute
   '/_dashboard/order': typeof DashboardOrderRoute
@@ -180,11 +206,13 @@ export interface FileRoutesById {
   '/_dashboard/reports': typeof DashboardReportsRoute
   '/_dashboard/retail-pos': typeof DashboardRetailPosRoute
   '/_dashboard/settings': typeof DashboardSettingsRoute
-  '/_dashboard/stock-receipts': typeof DashboardStockReceiptsRoute
+  '/_dashboard/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
+  '/_dashboard/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/_dashboard/suppliers': typeof DashboardSuppliersRoute
   '/_dashboard/transactions': typeof DashboardTransactionsRoute
   '/_dashboard/users': typeof DashboardUsersRoute
   '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -195,6 +223,7 @@ export interface FileRouteTypes {
     | '/$locale/$splat'
     | '/account'
     | '/activity-logs'
+    | '/customer-debts'
     | '/customers'
     | '/inventory'
     | '/order'
@@ -204,9 +233,11 @@ export interface FileRouteTypes {
     | '/retail-pos'
     | '/settings'
     | '/stock-receipts'
+    | '/supplier-debts'
     | '/suppliers'
     | '/transactions'
     | '/users'
+    | '/stock-receipts/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/$locale'
@@ -214,6 +245,7 @@ export interface FileRouteTypes {
     | '/$locale/$splat'
     | '/account'
     | '/activity-logs'
+    | '/customer-debts'
     | '/customers'
     | '/inventory'
     | '/order'
@@ -223,10 +255,12 @@ export interface FileRouteTypes {
     | '/retail-pos'
     | '/settings'
     | '/stock-receipts'
+    | '/supplier-debts'
     | '/suppliers'
     | '/transactions'
     | '/users'
     | '/'
+    | '/stock-receipts/new'
   id:
     | '__root__'
     | '/$locale'
@@ -235,6 +269,7 @@ export interface FileRouteTypes {
     | '/$locale/$splat'
     | '/_dashboard/account'
     | '/_dashboard/activity-logs'
+    | '/_dashboard/customer-debts'
     | '/_dashboard/customers'
     | '/_dashboard/inventory'
     | '/_dashboard/order'
@@ -244,10 +279,12 @@ export interface FileRouteTypes {
     | '/_dashboard/retail-pos'
     | '/_dashboard/settings'
     | '/_dashboard/stock-receipts'
+    | '/_dashboard/supplier-debts'
     | '/_dashboard/suppliers'
     | '/_dashboard/transactions'
     | '/_dashboard/users'
     | '/_dashboard/'
+    | '/_dashboard/stock-receipts/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -305,6 +342,13 @@ declare module '@tanstack/react-router' {
       path: '/activity-logs'
       fullPath: '/activity-logs'
       preLoaderRoute: typeof DashboardActivityLogsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/customer-debts': {
+      id: '/_dashboard/customer-debts'
+      path: '/customer-debts'
+      fullPath: '/customer-debts'
+      preLoaderRoute: typeof DashboardCustomerDebtsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/customers': {
@@ -370,6 +414,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardStockReceiptsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/supplier-debts': {
+      id: '/_dashboard/supplier-debts'
+      path: '/supplier-debts'
+      fullPath: '/supplier-debts'
+      preLoaderRoute: typeof DashboardSupplierDebtsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/suppliers': {
       id: '/_dashboard/suppliers'
       path: '/suppliers'
@@ -391,6 +442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/stock-receipts/new': {
+      id: '/_dashboard/stock-receipts/new'
+      path: '/new'
+      fullPath: '/stock-receipts/new'
+      preLoaderRoute: typeof DashboardStockReceiptsNewRouteImport
+      parentRoute: typeof DashboardStockReceiptsRoute
+    }
   }
 }
 
@@ -405,9 +463,24 @@ const LocaleRouteChildren: LocaleRouteChildren = {
 const LocaleRouteWithChildren =
   LocaleRoute._addFileChildren(LocaleRouteChildren)
 
+interface DashboardStockReceiptsRouteChildren {
+  DashboardStockReceiptsNewRoute: typeof DashboardStockReceiptsNewRoute
+}
+
+const DashboardStockReceiptsRouteChildren: DashboardStockReceiptsRouteChildren =
+  {
+    DashboardStockReceiptsNewRoute: DashboardStockReceiptsNewRoute,
+  }
+
+const DashboardStockReceiptsRouteWithChildren =
+  DashboardStockReceiptsRoute._addFileChildren(
+    DashboardStockReceiptsRouteChildren,
+  )
+
 interface DashboardRouteChildren {
   DashboardAccountRoute: typeof DashboardAccountRoute
   DashboardActivityLogsRoute: typeof DashboardActivityLogsRoute
+  DashboardCustomerDebtsRoute: typeof DashboardCustomerDebtsRoute
   DashboardCustomersRoute: typeof DashboardCustomersRoute
   DashboardInventoryRoute: typeof DashboardInventoryRoute
   DashboardOrderRoute: typeof DashboardOrderRoute
@@ -416,7 +489,8 @@ interface DashboardRouteChildren {
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardRetailPosRoute: typeof DashboardRetailPosRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
-  DashboardStockReceiptsRoute: typeof DashboardStockReceiptsRoute
+  DashboardStockReceiptsRoute: typeof DashboardStockReceiptsRouteWithChildren
+  DashboardSupplierDebtsRoute: typeof DashboardSupplierDebtsRoute
   DashboardSuppliersRoute: typeof DashboardSuppliersRoute
   DashboardTransactionsRoute: typeof DashboardTransactionsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
@@ -426,6 +500,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAccountRoute: DashboardAccountRoute,
   DashboardActivityLogsRoute: DashboardActivityLogsRoute,
+  DashboardCustomerDebtsRoute: DashboardCustomerDebtsRoute,
   DashboardCustomersRoute: DashboardCustomersRoute,
   DashboardInventoryRoute: DashboardInventoryRoute,
   DashboardOrderRoute: DashboardOrderRoute,
@@ -434,7 +509,8 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardRetailPosRoute: DashboardRetailPosRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
-  DashboardStockReceiptsRoute: DashboardStockReceiptsRoute,
+  DashboardStockReceiptsRoute: DashboardStockReceiptsRouteWithChildren,
+  DashboardSupplierDebtsRoute: DashboardSupplierDebtsRoute,
   DashboardSuppliersRoute: DashboardSuppliersRoute,
   DashboardTransactionsRoute: DashboardTransactionsRoute,
   DashboardUsersRoute: DashboardUsersRoute,

@@ -177,6 +177,26 @@ func SetupRoutes(app *App, container *AppContainer) {
 		supplierGroup.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SupplierHandler.DeleteSupplierHandler)
 	}
 
+	supplierDebtGroup := api.Group("/supplier-debts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
+	{
+		supplierDebtGroup.Get("/summary", container.SupplierDebtHandler.SummaryHandler)
+		supplierDebtGroup.Get("/", container.SupplierDebtHandler.ListHandler)
+		supplierDebtGroup.Post("/", container.SupplierDebtHandler.CreateHandler)
+		supplierDebtGroup.Get("/:id", container.SupplierDebtHandler.GetHandler)
+		supplierDebtGroup.Post("/:id/payments", container.SupplierDebtHandler.PaymentHandler)
+		supplierDebtGroup.Post("/:id/void", container.SupplierDebtHandler.VoidHandler)
+	}
+
+	customerDebtGroup := api.Group("/customer-debts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
+	{
+		customerDebtGroup.Get("/summary", container.CustomerDebtHandler.SummaryHandler)
+		customerDebtGroup.Get("/", container.CustomerDebtHandler.ListHandler)
+		customerDebtGroup.Post("/", container.CustomerDebtHandler.CreateHandler)
+		customerDebtGroup.Get("/:id", container.CustomerDebtHandler.GetHandler)
+		customerDebtGroup.Post("/:id/payments", container.CustomerDebtHandler.PaymentHandler)
+		customerDebtGroup.Post("/:id/void", container.CustomerDebtHandler.VoidHandler)
+	}
+
 	stockReceiptGroup := api.Group("/stock-receipts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{
 		stockReceiptGroup.Get("/", container.StockReceiptHandler.ListHandler)

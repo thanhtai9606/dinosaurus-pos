@@ -91,7 +91,83 @@
         "inventory": "Tồn kho",
         "suppliers": "Nhà cung cấp",
         "stock_receipts": "Nhập hàng",
+        "supplier_debts": "Công nợ NCC",
+        "customer_debts": "Công nợ khách",
         "retail_pos": "Bán hàng POS"
+    },
+    "debts": {
+        "detail_title": "Chi tiết công nợ",
+        "payment_history": "Lịch sử thanh toán",
+        "no_payments": "Chưa có khoản thu/trả",
+        "record_payment": "Ghi thanh toán",
+        "filters": {
+            "status": "Trạng thái",
+            "all_status": "Mọi trạng thái"
+        },
+        "fields": {
+            "reference": "Mã tham chiếu",
+            "status": "Trạng thái",
+            "total": "Tổng nợ",
+            "paid": "Đã trả",
+            "balance": "Còn lại",
+            "amount": "Số tiền",
+            "note": "Ghi chú",
+            "date": "Ngày"
+        },
+        "status": {
+            "open": "Mở",
+            "partial": "Trả một phần",
+            "settled": "Đã xong",
+            "void": "Đã hủy"
+        },
+        "actions": {
+            "pay": "Ghi thanh toán",
+            "void": "Hủy khoản nợ"
+        }
+    },
+    "supplierDebts": {
+        "title": "Công nợ nhà cung cấp",
+        "fields": {
+            "supplier": "Nhà cung cấp"
+        },
+        "filters": {
+            "supplier": "Nhà cung cấp",
+            "all_suppliers": "Tất cả NCC"
+        },
+        "actions": {
+            "add_manual": "Thêm khoản nợ",
+            "view_suppliers": "Danh sách NCC"
+        },
+        "messages": {
+            "create_success": "Đã tạo khoản nợ NCC",
+            "create_failed": "Không tạo được: {{message}}",
+            "payment_success": "Đã ghi thanh toán",
+            "payment_failed": "Ghi thanh toán thất bại",
+            "void_success": "Đã hủy khoản nợ",
+            "void_failed": "Không hủy được khoản nợ"
+        }
+    },
+    "customerDebts": {
+        "title": "Công nợ khách hàng",
+        "fields": {
+            "customer": "Khách hàng"
+        },
+        "filters": {
+            "customer": "Khách hàng",
+            "all_customers": "Tất cả khách"
+        },
+        "actions": {
+            "add_manual": "Thêm khoản nợ thủ công",
+            "view_customers": "Danh sách khách"
+        },
+        "messages": {
+            "create_success": "Đã tạo khoản phải thu",
+            "create_failed": "Không tạo được: {{message}}",
+            "payment_success": "Đã ghi thu",
+            "payment_failed": "Ghi thu thất bại",
+            "void_success": "Đã hủy khoản phải thu",
+            "void_failed": "Không hủy được khoản phải thu"
+        }
     },
     "retailPos": {
         "title": "Bán hàng — tạp hóa / bán lẻ",
@@ -1016,6 +1092,19 @@
             "add_line": "Thêm dòng",
             "complete": "Hoàn tất nhập"
         },
+        "checkout": {
+            "subtitle": "Quét hàng bên trái — tổng & thanh toán / công nợ NCC bên phải.",
+            "subtotal": "Tổng hàng",
+            "item_qty": "Tổng SL",
+            "grand_total": "Phải trả NCC",
+            "pay_cash": "Trả đủ / tiền mặt",
+            "pay_credit": "Ghi công nợ NCC",
+            "credit_requires_supplier": "Công nợ cần chọn nhà cung cấp",
+            "amount_paid": "Đã trả",
+            "pay_full": "Trả hết",
+            "debt": "Còn nợ",
+            "save_draft": "Lưu nháp"
+        },
         "bulk": {
             "select_all": "Chọn tất cả trên trang",
             "select_row": "Chọn phiếu",
@@ -1074,7 +1163,8 @@
             "print_failed": "In mã vạch thất bại",
             "export_success": "Đã tải file",
             "export_failed": "Xuất file thất bại",
-            "product_not_found": "Không tìm thấy hàng với mã/SKU/tên đó"
+            "product_not_found": "Không tìm thấy hàng với mã/SKU/tên đó",
+            "draft_failed": "Không lưu được phiếu nháp"
         }
     },
     "importPrices": {

@@ -28,6 +28,8 @@ export type StockReceipt = {
     status: 'draft' | 'completed' | 'cancelled'
     received_at: string
     note?: string | null
+    payment_mode?: 'cash' | 'credit'
+    amount_paid?: number
     total_amount: number
     items?: StockReceiptItem[]
     created_at: string

@@ -189,14 +189,11 @@ function StockReceiptsPage() {
                             </>
                         )}
                         {canCreate && (
-                            <Button
-                                onClick={() => {
-                                    setEditId(null)
-                                    setEditorOpen(true)
-                                }}
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                {t('stockReceipts.actions.add')}
+                            <Button asChild>
+                                <Link to="/stock-receipts/new">
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {t('stockReceipts.actions.add')}
+                                </Link>
                             </Button>
                         )}
                     </div>
@@ -289,7 +286,14 @@ function StockReceiptsPage() {
                     </Button>
                 </CardContent>
             </Card>
-            <StockReceiptEditorDialog open={editorOpen} onOpenChange={setEditorOpen} receiptId={editId} />
+            <StockReceiptEditorDialog
+                open={editorOpen}
+                onOpenChange={(open) => {
+                    setEditorOpen(open)
+                    if (!open) setEditId(null)
+                }}
+                receiptId={editId}
+            />
             <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>

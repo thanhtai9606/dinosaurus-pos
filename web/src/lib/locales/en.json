@@ -101,6 +101,13 @@
         "customer": "Customer",
         "walk_in": "Walk-in",
         "pay": "Pay",
+        "totals": {
+            "subtotal": "Subtotal",
+            "items": "Item qty",
+            "due": "Amount due",
+            "discount": "Discount",
+            "order_discount": "Order discount"
+        },
         "table": {
             "barcode": "Barcode",
             "name": "Product",
@@ -108,13 +115,33 @@
             "quantity": "Qty",
             "price": "Price",
             "subtotal": "Subtotal",
-            "hint": "Takeaway / retail sale."
+            "hint": "Click sell price to edit or discount.",
+            "edit_price": "Edit price"
         },
-        "totals": {
-            "subtotal": "Subtotal",
-            "items": "Item qty",
-            "due": "Amount due"
-        }
+        "price_edit": {
+            "title": "Edit sell price",
+            "catalog": "List price",
+            "new_price": "Sell price",
+            "discount_percent": "Discount %",
+            "apply_discount": "Apply %",
+            "save_retail": "Save as retail price (next time)",
+            "confirm": "Apply"
+        },
+        "cash": {
+            "received": "Cash received",
+            "change": "Change due",
+            "exact": "Exact amount",
+            "no_method": "No cash payment method configured"
+        },
+        "settlement": {
+            "change": "Give change",
+            "debt": "On credit (unpaid)",
+            "debt_requires_customer": "Credit sales require a customer"
+        },
+        "pay_cash": "Pay cash",
+        "pay_debt": "Record credit",
+        "other_payment": "Other payment…",
+        "debt_success": "Credit order created — collect payment in Transactions"
     },
     "user_menu": {
         "profile": "Profile",

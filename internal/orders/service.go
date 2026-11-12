@@ -1259,13 +1259,17 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			}
 
 			priceAtSale := product.Price
-
+			if itemReq.UnitPrice != nil {
+				priceAtSale = *itemReq.UnitPrice
+			}
 			for _, optReq := range itemReq.Options {
 				option, exists := optionMap[optReq.ProductOptionID]
 				if !exists {
 					return fmt.Errorf("option %s not found (or belongs to different product)", optReq.ProductOptionID)
 				}
-				priceAtSale += option.AdditionalPrice
+				if itemReq.UnitPrice == nil {
+					priceAtSale += option.AdditionalPrice
+				}
 			}
 
 			subtotal := priceAtSale * int64(itemReq.Quantity)
@@ -1365,17 +1369,25 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			}
 		}
 
-		taxAmount, serviceChargeAmount, taxErr := s.settingsService.ComputeOrderTaxAndService(ctx, grossTotal)
-		if taxErr != nil {
-			return fmt.Errorf("failed to compute tax: %w", taxErr)
+		orderDiscount := int64(0)
+		if req.DiscountAmount != nil {
+			orderDiscount = *req.DiscountAmount
 		}
-		netTotal := grossTotal + taxAmount + serviceChargeAmount
+		if orderDiscount > grossTotal {
+			return fmt.Errorf("discount cannot exceed subtotal")
+		}
+		taxableGross := grossTotal - orderDiscount
+		taxAmount, serviceChargeAmount, taxErr := s.settingsService.ComputeOrderTaxAndService(ctx, taxableGross)
+		if taxErr != nil {
+			return fmt.Errorf("failed to compute tax: %w", err)
+		}
+		netTotal := taxableGross + taxAmount + serviceChargeAmount
 
 		_, err = qtx.UpdateOrderTotals(ctx, orders_repo.UpdateOrderTotalsParams{
 			ID:                  newOrderID,
 			GrossTotal:          grossTotal,
 			NetTotal:            netTotal,
-			DiscountAmount:      0,
+			DiscountAmount:      orderDiscount,
 			TaxAmount:           taxAmount,
 			ServiceChargeAmount: serviceChargeAmount,
 			Version:             1,

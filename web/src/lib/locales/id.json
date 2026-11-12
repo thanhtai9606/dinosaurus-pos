@@ -103,6 +103,13 @@
         "customer": "Pelanggan",
         "walk_in": "Pelanggan umum",
         "pay": "Bayar",
+        "totals": {
+            "subtotal": "Subtotal",
+            "items": "Jumlah item",
+            "due": "Total tagihan",
+            "discount": "Diskon",
+            "order_discount": "Diskon order"
+        },
         "table": {
             "barcode": "Barcode",
             "name": "Produk",
@@ -110,13 +117,33 @@
             "quantity": "Qty",
             "price": "Harga",
             "subtotal": "Subtotal",
-            "hint": "Penjualan ritel / takeaway."
+            "hint": "Klik harga jual untuk ubah atau diskon.",
+            "edit_price": "Ubah harga"
         },
-        "totals": {
-            "subtotal": "Subtotal",
-            "items": "Jumlah item",
-            "due": "Total tagihan"
-        }
+        "price_edit": {
+            "title": "Ubah harga jual",
+            "catalog": "Harga daftar",
+            "new_price": "Harga jual",
+            "discount_percent": "Diskon %",
+            "apply_discount": "Terapkan %",
+            "save_retail": "Simpan sebagai harga ritel",
+            "confirm": "Terapkan"
+        },
+        "cash": {
+            "received": "Uang diterima",
+            "change": "Kembalian",
+            "exact": "Pas",
+            "no_method": "Metode tunai belum dikonfigurasi"
+        },
+        "settlement": {
+            "change": "Kembalikan uang",
+            "debt": "Piutang (belum bayar)",
+            "debt_requires_customer": "Piutang memerlukan pelanggan"
+        },
+        "pay_cash": "Bayar tunai",
+        "pay_debt": "Catat piutang",
+        "other_payment": "Pembayaran lain…",
+        "debt_success": "Order piutang dibuat — terima bayar di Transaksi"
     },
     "user_menu": {
         "profile": "Profil",

@@ -103,6 +103,13 @@
         "customer": "Khách hàng",
         "walk_in": "Khách lẻ",
         "pay": "Thanh toán",
+        "totals": {
+            "subtotal": "Tổng tiền hàng",
+            "items": "Số lượng SP",
+            "due": "Khách cần trả",
+            "discount": "Giảm giá",
+            "order_discount": "Giảm giá đơn"
+        },
         "table": {
             "barcode": "Mã vạch",
             "name": "Tên sản phẩm",
@@ -110,13 +117,33 @@
             "quantity": "Số lượng",
             "price": "Giá bán",
             "subtotal": "Thành tiền",
-            "hint": "Đơn lẻ — bán lẻ, không bàn."
+            "hint": "Bấm giá bán để sửa hoặc giảm giá.",
+            "edit_price": "Sửa giá"
         },
-        "totals": {
-            "subtotal": "Tổng tiền hàng",
-            "items": "Số lượng SP",
-            "due": "Khách cần trả"
-        }
+        "price_edit": {
+            "title": "Sửa giá bán",
+            "catalog": "Giá niêm yết",
+            "new_price": "Giá bán",
+            "discount_percent": "Giảm %",
+            "apply_discount": "Áp dụng %",
+            "save_retail": "Lưu làm giá bán lẻ (lần sau)",
+            "confirm": "Áp dụng"
+        },
+        "cash": {
+            "received": "Khách đưa",
+            "change": "Tiền thừa trả khách",
+            "exact": "Đúng tiền",
+            "no_method": "Chưa cấu hình hình thức tiền mặt"
+        },
+        "settlement": {
+            "change": "Trả lại khách",
+            "debt": "Tính vào công nợ (chưa thu tiền)",
+            "debt_requires_customer": "Công nợ cần chọn khách hàng"
+        },
+        "pay_cash": "Thanh toán tiền mặt",
+        "pay_debt": "Ghi nợ / chưa thu",
+        "other_payment": "Thanh toán khác…",
+        "debt_success": "Đã tạo đơn nợ — thu tiền sau tại Giao dịch"
     },
     "user_menu": {
         "profile": "Hồ sơ",

@@ -12,6 +12,8 @@ export interface CartItem {
     product: Product
     variant?: InternalProductsProductOptionResponse
     quantity: number
+    /** Overrides catalog sell price for this line (retail POS). */
+    unitPrice?: number
 }
 
 interface CartContentProps {

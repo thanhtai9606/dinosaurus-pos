@@ -13,14 +13,16 @@ Modern, multi-tenant Point of Sale for retail: inventory, checkout, shifts, supp
 | | |
 |---|---|
 | **GitHub (development)** | https://github.com/thanhtai9606/dinosaurus-pos |
-| **Upstream / showcase** | https://github.com/agpprastyo/dinosaurus-pos |
-| **Upstream demo** | https://pos-kasir.agprastyo.me |
+| **Lineage (Go + React POS)** | https://github.com/agpprastyo/dinosaurus-pos · https://github.com/agpprastyo/POS-kasir |
+| **Reference demo (upstream)** | https://pos-kasir.agprastyo.me |
 
 ---
 
 ## Overview
 
 **Dinosaurus POS** is a full-stack POS application: products and categories, retail checkout, payments (including Midtrans), cashier shifts, promotions, reports, thermal printing, and **PostgreSQL row-level security** per tenant.
+
+It evolved from **[POS-kasir](https://github.com/agpprastyo/POS-kasir)** / **[dinosaurus-pos](https://github.com/agpprastyo/dinosaurus-pos)** (Go + Fiber + React) and also draws on UX and architecture ideas from **[poinf-of-sales](https://github.com/madebyaris/poinf-of-sales)** (Go, React, TypeScript, PostgreSQL).
 
 Single-port deployment: build the SPA into `web/dist/` and the Go server serves `/api/v1/*`, Swagger, and static frontend assets.
 
@@ -210,7 +212,14 @@ GitHub Actions on push/PR to `master` and on semver tags. Typical flow: test →
 
 [MIT License](LICENSE).
 
-## Credits
+## Acknowledgments
 
-Originally by **Agung Prasetyo** ([agpprastyo/dinosaurus-pos](https://github.com/agpprastyo/dinosaurus-pos)).  
-This fork continues product work for **Dinosaurus POS** (internal GitLab + GitHub mirror for contributors).
+| Project | Author | What we reused / learned |
+|---------|--------|---------------------------|
+| [POS-kasir](https://github.com/agpprastyo/POS-kasir) | [Agung Prasetyo](https://github.com/agpprastyo) | Core POS domain: Go (Fiber) API, React SPA, inventory, orders, Midtrans, reports, single-port serving |
+| [dinosaurus-pos](https://github.com/agpprastyo/dinosaurus-pos) | Agung Prasetyo | Direct upstream fork base; module layout, sqlc, CI/CD, and feature set this repo extends |
+| [poinf-of-sales](https://github.com/madebyaris/poinf-of-sales) | [madebyaris](https://github.com/madebyaris) | Reference for admin tables, RBAC-oriented UI, and PostgreSQL-backed enterprise POS patterns |
+
+**This repository** ([thanhtai9606/dinosaurus-pos](https://github.com/thanhtai9606/dinosaurus-pos)) is maintained for continued development (GitLab `devops/dinosaurus-pos` + public GitHub). Additions here include multi-tenant RLS, stock receipts, supplier/customer debt ledgers, measurement units, market-based catalog seeding, and Vietnamese/English/Indonesian UI.
+
+Please star and support the upstream projects if you find them useful.

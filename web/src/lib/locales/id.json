@@ -1535,6 +1535,8 @@
             "body": "Hapus \"{{name}}\"? Tidak bisa jika produk memakai kode atau nama ini."
         },
         "messages": {
+            "duplicate_code": "Kode satuan sudah ada (tidak peka huruf besar/kecil).",
+            "duplicate_name": "Nama satuan sudah ada.",
             "create_success": "Satuan ditambahkan.",
             "create_failed": "Gagal menambah: {{message}}",
             "update_success": "Satuan diperbarui.",

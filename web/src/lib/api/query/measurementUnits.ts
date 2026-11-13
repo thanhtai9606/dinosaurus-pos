@@ -53,7 +53,16 @@ export const useCreateMeasurementUnitMutation = () => {
                 toast.success(t('measurementUnits.messages.create_success'))
             },
             onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
-                toast.error(t('measurementUnits.messages.create_failed', { message: error.response?.data?.message || '' }))
+                const msg = error.response?.data?.message || ''
+                if (error.response?.status === 409) {
+                    toast.error(
+                        msg.toLowerCase().includes('name')
+                            ? t('measurementUnits.messages.duplicate_name')
+                            : t('measurementUnits.messages.duplicate_code'),
+                    )
+                    return
+                }
+                toast.error(t('measurementUnits.messages.create_failed', { message: msg }))
             },
         }),
         isAllowed,
@@ -76,7 +85,16 @@ export const useUpdateMeasurementUnitMutation = () => {
                 toast.success(t('measurementUnits.messages.update_success'))
             },
             onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
-                toast.error(t('measurementUnits.messages.update_failed', { message: error.response?.data?.message || '' }))
+                const msg = error.response?.data?.message || ''
+                if (error.response?.status === 409) {
+                    toast.error(
+                        msg.toLowerCase().includes('name')
+                            ? t('measurementUnits.messages.duplicate_name')
+                            : t('measurementUnits.messages.duplicate_code'),
+                    )
+                    return
+                }
+                toast.error(t('measurementUnits.messages.update_failed', { message: msg }))
             },
         }),
         isAllowed,

@@ -1554,6 +1554,8 @@
             "body": "Xóa \"{{name}}\"? Không xóa được nếu sản phẩm đang dùng mã hoặc tên này."
         },
         "messages": {
+            "duplicate_code": "Mã đơn vị đã tồn tại (không phân biệt hoa thường).",
+            "duplicate_name": "Tên đơn vị đã tồn tại.",
             "create_success": "Đã thêm đơn vị.",
             "create_failed": "Không thêm được: {{message}}",
             "update_success": "Đã cập nhật đơn vị.",

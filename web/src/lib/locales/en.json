@@ -1547,6 +1547,8 @@
             "body": "Delete \"{{name}}\"? Cannot delete if products use this code or name."
         },
         "messages": {
+            "duplicate_code": "This unit code already exists (case-insensitive).",
+            "duplicate_name": "This unit name already exists.",
             "create_success": "Unit added.",
             "create_failed": "Could not add: {{message}}",
             "update_success": "Unit updated.",

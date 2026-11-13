@@ -19,7 +19,23 @@ import (
 var (
 	ErrInUse         = errors.New("measurement unit in use")
 	ErrDuplicateCode = errors.New("duplicate unit code")
+	ErrDuplicateName = errors.New("duplicate unit name")
 )
+
+func duplicateFromPg(err error) error {
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) || pgErr.Code != "23505" {
+		return nil
+	}
+	c := strings.ToLower(pgErr.ConstraintName)
+	if strings.Contains(c, "code") {
+		return ErrDuplicateCode
+	}
+	if strings.Contains(c, "name") {
+		return ErrDuplicateName
+	}
+	return ErrDuplicateCode
+}
 
 type IService interface {
 	Create(ctx context.Context, req CreateMeasurementUnitRequest) (*MeasurementUnitResponse, error)
@@ -79,9 +95,8 @@ func (s *Service) Create(ctx context.Context, req CreateMeasurementUnitRequest) 
 		Name: strings.TrimSpace(req.Name),
 	})
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return nil, ErrDuplicateCode
+		if dup := duplicateFromPg(err); dup != nil {
+			return nil, dup
 		}
 		s.log.Errorf("CreateMeasurementUnit failed: %v", err)
 		return nil, err
@@ -110,9 +125,8 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateMeasuremen
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, common.ErrNotFound
 		}
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return nil, ErrDuplicateCode
+		if dup := duplicateFromPg(err); dup != nil {
+			return nil, dup
 		}
 		s.log.Errorf("UpdateMeasurementUnit failed: %v", err)
 		return nil, err

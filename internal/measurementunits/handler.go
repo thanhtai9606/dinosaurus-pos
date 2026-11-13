@@ -62,6 +62,9 @@ func (h *Handler) CreateHandler(c fiber.Ctx) error {
 		if errors.Is(err, ErrDuplicateCode) {
 			return c.Status(fiber.StatusConflict).JSON(common.ErrorResponse{Message: "Unit code already exists"})
 		}
+		if errors.Is(err, ErrDuplicateName) {
+			return c.Status(fiber.StatusConflict).JSON(common.ErrorResponse{Message: "Unit name already exists"})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to create measurement unit"})
 	}
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{Message: "Measurement unit created", Data: resp})
@@ -106,6 +109,9 @@ func (h *Handler) UpdateHandler(c fiber.Ctx) error {
 		}
 		if errors.Is(err, ErrDuplicateCode) {
 			return c.Status(fiber.StatusConflict).JSON(common.ErrorResponse{Message: "Unit code already exists"})
+		}
+		if errors.Is(err, ErrDuplicateName) {
+			return c.Status(fiber.StatusConflict).JSON(common.ErrorResponse{Message: "Unit name already exists"})
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to update measurement unit"})
 	}

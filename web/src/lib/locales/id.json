@@ -541,6 +541,8 @@
         "title": "Ringkasan Dashboard",
         "welcome_subtitle": "Berikut ini ringkasan toko Anda hari ini.",
         "toggle_nav": "Buka menu navigasi",
+        "welcome_user": "Halo, {{name}}",
+        "platform_console": "Konsol platform",
         "widgets": {
             "quick_actions": "Aksi Cepat",
             "quick_actions_desc": "Kelola toko Anda dengan efisien",
@@ -676,6 +678,7 @@
         "title": "Pengaturan",
         "description": "Kelola pengaturan dan konfigurasi aplikasi.",
         "tabs": {
+            "preferences": "Preferensi",
             "cancellation": "Alasan Pembatalan",
             "category": "Kategori",
             "payment_methods": "Metode Pembayaran",
@@ -683,6 +686,13 @@
             "printer": "Printer",
             "financial": "Keuangan",
             "invoice": "Faktur / Struk"
+        },
+        "preferences": {
+            "title": "Tampilan & bahasa",
+            "description": "Bahasa antarmuka dan tema.",
+            "language": "Bahasa",
+            "theme": "Tema",
+            "theme_help": "Mode terang atau gelap."
         },
         "financial": {
             "title": "Pengaturan Keuangan",

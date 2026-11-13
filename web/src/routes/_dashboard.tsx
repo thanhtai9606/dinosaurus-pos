@@ -11,7 +11,7 @@ import { MoneyProvider } from '@/context/MoneyContext'
 import { useNavigationMenu } from '@/hooks/useNavigationMenu'
 import { isSuperAdminPlatformPath, SUPER_ADMIN_HOME } from '@/lib/auth/superAdminPaths'
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar"
-import { DashboardMobileNav } from "@/components/dashboard/DashboardMobileNav"
+import { DashboardTopBar } from "@/components/dashboard/DashboardTopBar"
 import { useAppWebSocket } from '@/hooks/useAppWebSocket'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -89,28 +89,22 @@ function DashboardLayout() {
                 isSidebarCollapsed={isSidebarCollapsed}
                 setIsSidebarCollapsed={setIsSidebarCollapsed}
                 filteredMenu={filteredMenu}
-                user={auth.user}
-                userRole={auth.user?.role}
-                handleLogout={handleLogout}
             />
 
-            <div className='min-w-0 overflow-hidden'>
+            <div className="min-w-0 overflow-hidden">
                 <div className="flex flex-col bg-card/50 backdrop-blur-sm overflow-hidden h-[calc(100vh)] shadow-sm">
-                    <main className="flex flex-1 flex-col gap-4 p-4 sm:p-5 lg:gap-6 lg:p-6 relative overflow-y-auto overflow-x-hidden min-w-0">
-                        <DashboardMobileNav
-                            t={t}
-                            branding={branding}
-                            filteredMenu={filteredMenu}
-                            user={auth.user}
-                            userRole={auth.user?.role}
-                            handleLogout={handleLogout}
-                        />
-
-                        <div className="mt-12 md:mt-0 flex-1 min-w-0">
-                            <MoneyProvider>
-                                <Outlet />
-                            </MoneyProvider>
-                        </div>
+                    <DashboardTopBar
+                        branding={branding}
+                        filteredMenu={filteredMenu}
+                        user={auth.user}
+                        userRole={auth.user?.role}
+                        isSuperAdmin={isSuperAdmin}
+                        handleLogout={handleLogout}
+                    />
+                    <main className="flex flex-1 flex-col gap-4 p-4 sm:p-5 lg:gap-6 lg:p-6 overflow-y-auto overflow-x-hidden min-w-0">
+                        <MoneyProvider>
+                            <Outlet />
+                        </MoneyProvider>
                     </main>
                 </div>
                 {!isSuperAdmin && (

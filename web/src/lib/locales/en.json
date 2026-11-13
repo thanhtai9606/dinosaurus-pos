@@ -535,6 +535,8 @@
         "title": "Dashboard Summary",
         "welcome_subtitle": "Here's what's happening with your store today.",
         "toggle_nav": "Toggle navigation menu",
+        "welcome_user": "Hello, {{name}}",
+        "platform_console": "Platform console",
         "widgets": {
             "quick_actions": "Quick Actions",
             "quick_actions_desc": "Manage your store efficiently",
@@ -670,6 +672,7 @@
         "title": "Settings",
         "description": "Manage application settings and configurations.",
         "tabs": {
+            "preferences": "Preferences",
             "cancellation": "Cancellation Reasons",
             "category": "Category",
             "payment_methods": "Payment Methods",
@@ -677,6 +680,13 @@
             "printer": "Printer",
             "financial": "Financial",
             "invoice": "Invoice / Receipt"
+        },
+        "preferences": {
+            "title": "Display & language",
+            "description": "Interface language and appearance.",
+            "language": "Language",
+            "theme": "Theme",
+            "theme_help": "Light or dark mode."
         },
         "financial": {
             "title": "Financial Settings",

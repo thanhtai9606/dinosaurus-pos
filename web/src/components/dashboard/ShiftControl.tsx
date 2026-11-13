@@ -2,16 +2,27 @@ import { Button } from '@/components/ui/button'
 import { useShiftContext } from '@/context/ShiftContext'
 import { Wallet, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 
-export function ShiftControl() {
+type ShiftControlProps = {
+  compact?: boolean
+}
+
+export function ShiftControl({ compact = false }: ShiftControlProps) {
     const { isShiftOpen, setOpenShiftModalOpen, setCloseShiftModalOpen, isLoading, shift } = useShiftContext()
     const { t } = useTranslation()
 
+    const layout = cn(
+        compact ? 'h-9 shrink-0 gap-1.5 px-2.5 sm:px-3' : 'w-full justify-start gap-2',
+    )
+
     if (isLoading) {
         return (
-            <Button variant="outline" className="w-full justify-start gap-2" disabled>
+            <Button variant="outline" className={cn(layout)} disabled>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="truncate">{t('shift.loading', 'Loading shift...')}</span>
+                <span className={cn('truncate', compact && 'hidden sm:inline')}>
+                    {t('shift.loading', 'Loading shift...')}
+                </span>
             </Button>
         )
     }
@@ -20,16 +31,32 @@ export function ShiftControl() {
         return (
             <Button
                 variant="outline"
-                className="w-full justify-between group hover:bg-destructive hover:text-destructive-foreground border-destructive/20"
+                className={cn(
+                    layout,
+                    compact ? 'justify-center sm:justify-between' : 'w-full justify-between',
+                    'group hover:bg-destructive hover:text-destructive-foreground border-destructive/20',
+                )}
                 onClick={() => setCloseShiftModalOpen(true)}
             >
-                <div className="flex items-center gap-2">
-                    <Wallet className="h-4 w-4" />
-                    <span className="truncate">{t('shift.register_open', 'Register Open')}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                    <Wallet className="h-4 w-4 shrink-0" />
+                    <span className={cn('truncate', compact && 'hidden md:inline')}>
+                        {t('shift.register_open', 'Register Open')}
+                    </span>
                 </div>
-                <span className="text-sm opacity-75 font-mono group-hover:text-destructive-foreground/90">
-                    {shift?.start_time ? new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                </span>
+                {shift?.start_time && (
+                    <span
+                        className={cn(
+                            'text-xs font-mono opacity-75 group-hover:text-destructive-foreground/90',
+                            compact && 'hidden sm:inline',
+                        )}
+                    >
+                        {new Date(shift.start_time).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}
+                    </span>
+                )}
             </Button>
         )
     }
@@ -37,11 +64,16 @@ export function ShiftControl() {
     return (
         <Button
             variant="default"
-            className="w-full justify-start gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+            className={cn(
+                layout,
+                'bg-primary hover:bg-primary/90 text-primary-foreground',
+            )}
             onClick={() => setOpenShiftModalOpen(true)}
         >
-            <Wallet className="h-4 w-4" />
-            <span className="truncate">{t('shift.open_register', 'Open Register')}</span>
+            <Wallet className="h-4 w-4 shrink-0" />
+            <span className={cn('truncate', compact && 'hidden sm:inline')}>
+                {t('shift.open_register', 'Open Register')}
+            </span>
         </Button>
     )
 }

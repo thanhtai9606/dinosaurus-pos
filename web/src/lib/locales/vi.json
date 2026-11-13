@@ -540,7 +540,9 @@
     "dashboard": {
         "title": "Tóm tắt trang tổng quan",
         "welcome_subtitle": "Dưới đây là những gì đang xảy ra với cửa hàng của bạn ngày hôm nay.",
-        "toggle_nav": "Chuyển đổi điều hướng thành",
+        "toggle_nav": "Mở/đóng menu",
+        "welcome_user": "Xin chào, {{name}}",
+        "platform_console": "Bảng điều khiển nền tảng",
         "widgets": {
             "quick_actions": "Tiện ích nhanh",
             "quick_actions_desc": "Quản lý cửa hàng của bạn hiệu quả",
@@ -676,6 +678,7 @@
         "title": "Cài đặt",
         "description": "Quản lý cài đặt và cấu hình ứng dụng.",
         "tabs": {
+            "preferences": "Tùy chọn",
             "cancellation": "Lý do hủy",
             "category": "Loại tài sản",
             "payment_methods": "Phương thức Thanh toán",
@@ -683,6 +686,13 @@
             "printer": "Máy in",
             "financial": "Tài chính",
             "invoice": "Hóa đơn / Biên lai"
+        },
+        "preferences": {
+            "title": "Hiển thị & ngôn ngữ",
+            "description": "Ngôn ngữ giao diện và giao diện sáng/tối.",
+            "language": "Ngôn ngữ",
+            "theme": "Giao diện",
+            "theme_help": "Chế độ sáng hoặc tối."
         },
         "financial": {
             "title": "Thiết lập tài chính",

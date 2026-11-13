@@ -26,6 +26,7 @@ interface DashboardUserMenuProps {
     isSidebarCollapsed?: boolean
     handleLogout: () => void
     isMobile?: boolean
+    variant?: 'sidebar' | 'header'
 }
 
 export function DashboardUserMenu({
@@ -35,7 +36,9 @@ export function DashboardUserMenu({
     isSidebarCollapsed,
     handleLogout,
     isMobile = false,
+    variant = 'sidebar',
 }: DashboardUserMenuProps) {
+    const isHeader = variant === 'header'
     const userName = user?.username ?? 'User'
     const userEmail = user?.email ?? ''
     const userAvatar = user?.avatar
@@ -53,18 +56,28 @@ export function DashboardUserMenu({
             type="button"
             variant="ghost"
             className={cn(
-                'h-auto w-full rounded-xl transition-colors hover:bg-muted/60',
-                isSidebarCollapsed && !isMobile ? 'justify-center p-2' : 'justify-start gap-3 p-2',
-                isMobile && 'justify-start gap-3 px-0 py-2'
+                'transition-colors hover:bg-muted/60',
+                isHeader && 'h-9 w-9 rounded-full p-0 justify-center',
+                !isHeader && 'h-auto w-full rounded-xl',
+                !isHeader && isSidebarCollapsed && !isMobile ? 'justify-center p-2' : '',
+                !isHeader && (!isSidebarCollapsed || isMobile) ? 'justify-start gap-3 p-2' : '',
+                !isHeader && isMobile && 'justify-start gap-3 px-0 py-2',
+                !isHeader && !isSidebarCollapsed && !isMobile && 'justify-start gap-3 p-2',
             )}
         >
-            <Avatar className={cn('h-9 w-9 shrink-0', isSidebarCollapsed && !isMobile && 'h-10 w-10')}>
+            <Avatar
+                className={cn(
+                    'shrink-0',
+                    isHeader ? 'h-9 w-9' : 'h-9 w-9',
+                    isSidebarCollapsed && !isMobile && !isHeader && 'h-10 w-10',
+                )}
+            >
                 <AvatarImage src={userAvatar || undefined} alt={userName} />
                 <AvatarFallback>
                     <UserIcon className="h-4 w-4" />
                 </AvatarFallback>
             </Avatar>
-            {(!isSidebarCollapsed || isMobile) && (
+            {!isHeader && (!isSidebarCollapsed || isMobile) && (
                 <div className="flex min-w-0 flex-1 items-center gap-2 text-left">
                     <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{userName}</p>
@@ -88,8 +101,8 @@ export function DashboardUserMenu({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
             <DropdownMenuContent
-                align={isSidebarCollapsed && !isMobile ? 'center' : 'end'}
-                side={isSidebarCollapsed && !isMobile ? 'right' : 'top'}
+                align="end"
+                side={isHeader ? 'bottom' : isSidebarCollapsed && !isMobile ? 'center' : 'top'}
                 className="w-56"
             >
                 <DropdownMenuLabel className="font-normal">
@@ -115,7 +128,7 @@ export function DashboardUserMenu({
                     <DropdownMenuItem asChild>
                         <Link
                             to="/settings"
-                            search={{ tab: 'cancellation' }}
+                            search={{ tab: 'preferences' }}
                             className="cursor-pointer"
                         >
                             <Settings className="mr-2 h-4 w-4" />

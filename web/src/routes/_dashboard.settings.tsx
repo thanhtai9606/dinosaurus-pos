@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Ban, Tag, CreditCard, Palette, Printer, DollarSign, FileText } from 'lucide-react'
+import { Ban, Tag, CreditCard, Palette, Printer, DollarSign, FileText, SlidersHorizontal } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CancellationReasonsCard } from "@/components/settings/CancellationReasonsCard.tsx";
 import { CategoriesCard } from "@/components/settings/CategoriesCard.tsx";
@@ -9,12 +9,13 @@ import { PrinterSettingsCard } from "@/components/settings/PrinterSettingsCard.t
 import { FinancialSettingsCard } from '@/components/settings/FinancialSettingsCard'
 import { InvoiceSettingsCard } from '@/components/settings/InvoiceSettingsCard'
 import { SettingsHeader } from "@/components/settings/SettingsHeader"
+import { PreferencesSettingsCard } from '@/components/settings/PreferencesSettingsCard'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { useRBAC } from '@/lib/auth/rbac'
 
 const searchSchema = z.object({
-    tab: z.string().optional().default('cancellation'),
+    tab: z.string().optional().default('preferences'),
 })
 
 export const Route = createFileRoute("/_dashboard/settings")({
@@ -46,6 +47,10 @@ function SettingsPage() {
                 className="space-y-4"
             >
                 <TabsList>
+                    <TabsTrigger value="preferences" className="flex items-center gap-2">
+                        <SlidersHorizontal className="h-4 w-4" />
+                        {t('settings.tabs.preferences')}
+                    </TabsTrigger>
                     {canViewCancellations && (
                         <TabsTrigger value="cancellation" className="flex items-center gap-2">
                             <Ban className="h-4 w-4" />
@@ -94,6 +99,11 @@ function SettingsPage() {
                     )}
                 </TabsList>
 
+                <TabsContent value="preferences">
+                    <div className="grid gap-6">
+                        <PreferencesSettingsCard />
+                    </div>
+                </TabsContent>
                 {canViewCancellations && (
                     <TabsContent value="cancellation">
                         <div className="grid gap-6">

@@ -1471,9 +1471,22 @@
     },
     "customerGroups": {
         "title": "Grup pelanggan",
+        "description": "Kelompokkan pelanggan untuk harga, laporan, dan filter daftar.",
         "search_placeholder": "Cari kode, nama…",
+        "table": {
+            "actions": "Tindakan",
+            "empty": "Tidak ada grup pelanggan."
+        },
         "actions": {
-            "add": "Tambah grup"
+            "add": "Tambah grup",
+            "open_menu": "Buka menu",
+            "edit": "Edit",
+            "delete": "Hapus",
+            "delete_title": "Hapus grup pelanggan",
+            "delete_desc": "Yakin ingin menghapus grup",
+            "delete_desc_2": " Tindakan ini tidak dapat dibatalkan.",
+            "delete_confirm": "Hapus",
+            "deleting": "Menghapus…"
         },
         "fields": {
             "code": "Kode",

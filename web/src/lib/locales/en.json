@@ -1483,9 +1483,22 @@
     },
     "customerGroups": {
         "title": "Customer groups",
+        "description": "Segment customers for pricing, reports, and list filters.",
         "search_placeholder": "Search by code, name…",
+        "table": {
+            "actions": "Actions",
+            "empty": "No customer groups found."
+        },
         "actions": {
-            "add": "Add group"
+            "add": "Add group",
+            "open_menu": "Open menu",
+            "edit": "Edit",
+            "delete": "Delete",
+            "delete_title": "Delete customer group",
+            "delete_desc": "Are you sure you want to delete",
+            "delete_desc_2": " This action cannot be undone.",
+            "delete_confirm": "Delete",
+            "deleting": "Deleting…"
         },
         "fields": {
             "code": "Code",

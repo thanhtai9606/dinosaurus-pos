@@ -1490,9 +1490,22 @@
     },
     "customerGroups": {
         "title": "Nhóm khách hàng",
+        "description": "Phân loại khách để giá, báo cáo và lọc danh sách.",
         "search_placeholder": "Tìm theo mã, tên…",
+        "table": {
+            "actions": "Hành động",
+            "empty": "Không tìm thấy nhóm khách."
+        },
         "actions": {
-            "add": "Thêm nhóm"
+            "add": "Thêm nhóm",
+            "open_menu": "Mở menu",
+            "edit": "Chỉnh sửa",
+            "delete": "Xóa",
+            "delete_title": "Xóa nhóm khách",
+            "delete_desc": "Bạn chắc chắn muốn xóa nhóm",
+            "delete_desc_2": " Hành động này không thể hoàn tác.",
+            "delete_confirm": "Xóa",
+            "deleting": "Đang xóa…"
         },
         "fields": {
             "code": "Mã",

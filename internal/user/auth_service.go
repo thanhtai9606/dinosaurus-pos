@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -79,8 +78,8 @@ func (s *AthService) jwtRole(ctx context.Context, user user_repo.User, tenantID 
 }
 
 func (s *AthService) resolveLoginTenant(ctx context.Context, user user_repo.User, tenantCode string) (tenants.Row, []TenantSummary, error) {
-	code := strings.ToLower(strings.TrimSpace(tenantCode))
-	if code == "" {
+	code, err := tenant.NormalizeCode(tenantCode)
+	if err != nil {
 		return tenants.Row{}, nil, common.ErrInvalidInput
 	}
 	if s.Tenants == nil {
@@ -93,7 +92,10 @@ func (s *AthService) resolveLoginTenant(ctx context.Context, user user_repo.User
 	if user.Role == user_repo.UserRoleSuperAdmin {
 		t, err := s.Tenants.GetByCode(ctx, code)
 		if err != nil {
-			return tenants.Row{}, nil, common.ErrForbidden
+			if errors.Is(err, pgx.ErrNoRows) {
+				return tenants.Row{}, nil, tenants.ErrTenantNotFound
+			}
+			return tenants.Row{}, nil, err
 		}
 		all, err := s.Tenants.ListAll(ctx)
 		if err != nil {
@@ -108,7 +110,10 @@ func (s *AthService) resolveLoginTenant(ctx context.Context, user user_repo.User
 	summaries := tenantSummaries(list)
 	t, err := s.Tenants.GetByCode(ctx, code)
 	if err != nil {
-		return tenants.Row{}, summaries, common.ErrForbidden
+		if errors.Is(err, pgx.ErrNoRows) {
+			return tenants.Row{}, summaries, tenants.ErrTenantNotFound
+		}
+		return tenants.Row{}, summaries, err
 	}
 	ok, err := s.Tenants.UserHasTenant(ctx, user.ID, t.ID)
 	if err != nil || !ok {
@@ -430,6 +435,12 @@ func (s *AthService) Register(ctx context.Context, req RegisterRequest) (*Profil
 }
 
 func (s *AthService) Login(ctx context.Context, req LoginRequest) (*LoginResponse, error) {
+	normalizedCode, err := tenant.NormalizeCode(req.TenantCode)
+	if err != nil {
+		return nil, common.ErrInvalidInput
+	}
+	req.TenantCode = normalizedCode
+
 	user, err := s.UserRepo.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		switch {

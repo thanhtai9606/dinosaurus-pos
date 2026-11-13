@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AppModal } from '@/components/common/AppModal'
 import type { TenantAdmin } from '@/lib/api/query/tenantsAdmin'
 import { TenantUsersTab } from '@/components/tenants/TenantUsersTab'
+import { isValidTenantCode, stripTenantCodeInput } from '@/lib/tenantCode'
 
 export type TenantFormValues = {
   code: string
@@ -50,6 +51,7 @@ export function TenantFormDialog({
   const [isActive, setIsActive] = useState(true)
   const [dataPlane, setDataPlane] = useState<'shared' | 'dedicated'>('shared')
   const [dsnKey, setDsnKey] = useState('')
+  const [codeError, setCodeError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -66,11 +68,17 @@ export function TenantFormDialog({
       setIsActive(true)
       setDataPlane('shared')
       setDsnKey('')
+      setCodeError(null)
     }
   }, [open, mode, tenant, defaultTab])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (mode === 'create' && !isValidTenantCode(code)) {
+      setCodeError(t('tenants_admin.code_invalid'))
+      return
+    }
+    setCodeError(null)
     onSubmit({
       code,
       name,
@@ -109,12 +117,20 @@ export function TenantFormDialog({
                 <Input
                   id="tenant-code"
                   value={code}
-                  onChange={(e) => setCode(e.target.value)}
+                  onChange={(e) => {
+                    setCode(stripTenantCodeInput(e.target.value))
+                    setCodeError(null)
+                  }}
                   placeholder={t('tenants_admin.code_placeholder')}
                   pattern="[a-z0-9_-]{2,32}"
                   required
                   autoComplete="off"
                 />
+                {codeError && (
+                  <p className="text-xs text-destructive" role="alert">
+                    {codeError}
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">{t('tenants_admin.code_help')}</p>
               </div>
             )}

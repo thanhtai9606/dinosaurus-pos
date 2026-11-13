@@ -5,10 +5,12 @@ import (
 
 	"POS-kasir/internal/common"
 	"POS-kasir/internal/platformaudit"
+	"POS-kasir/internal/tenant"
 	"POS-kasir/pkg/logger"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 type Handler struct {
@@ -33,6 +35,26 @@ func (h *Handler) recordPlatform(c fiber.Ctx, action, resourceType, resourceID s
 	if err := h.audit.Record(c.RequestCtx(), actor, action, resourceType, resourceID, details); err != nil {
 		h.log.Warnf("platform audit: %v", err)
 	}
+}
+
+// LookupByCode checks that an active tenant exists (public, for login).
+func (h *Handler) LookupByCode(c fiber.Ctx) error {
+	code, err := tenant.NormalizeCode(c.Query("code"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "invalid tenant code"})
+	}
+	row, err := h.repo.GetByCode(c.RequestCtx(), code)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "tenant not found"})
+		}
+		h.log.Errorf("LookupByCode: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "tenant lookup failed"})
+	}
+	return c.JSON(common.SuccessResponse{
+		Message: "ok",
+		Data:    map[string]string{"code": row.Code, "name": row.Name},
+	})
 }
 
 func (h *Handler) ListMine(c fiber.Ctx) error {

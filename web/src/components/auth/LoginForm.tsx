@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
     Card,
     CardHeader,
@@ -13,6 +13,12 @@ import { Label } from '@/components/ui/label'
 import { useForm } from '@tanstack/react-form'
 import * as z from 'zod'
 import { Zap } from 'lucide-react'
+import {
+    isValidTenantCode,
+    normalizeTenantCode,
+    stripTenantCodeInput,
+} from '@/lib/tenantCode'
+import { lookupTenantByCode } from '@/lib/api/tenantLookup'
 
 interface LoginFormProps {
     t: any
@@ -22,6 +28,44 @@ interface LoginFormProps {
 
 export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
     const [serverError, setServerError] = useState<string | null>(null)
+    const [tenantLookupError, setTenantLookupError] = useState<string | null>(null)
+    const [tenantLookupOk, setTenantLookupOk] = useState(false)
+
+    const tenantCodeSchema = z
+        .string()
+        .min(2)
+        .max(32)
+        .refine((v) => !/\s/.test(v), { message: t('auth.tenant_code_no_spaces') })
+        .refine((v) => isValidTenantCode(v), { message: t('auth.tenant_code_invalid') })
+
+    const verifyTenantExists = useCallback(
+        async (raw: string): Promise<boolean> => {
+            const code = normalizeTenantCode(raw)
+            if (!code) {
+                setTenantLookupError(t('auth.tenant_code_invalid'))
+                setTenantLookupOk(false)
+                return false
+            }
+            try {
+                await lookupTenantByCode(code)
+                setTenantLookupError(null)
+                setTenantLookupOk(true)
+                return true
+            } catch (error: any) {
+                const status = error?.response?.status
+                if (status === 404) {
+                    setTenantLookupError(t('auth.tenant_not_found'))
+                } else if (status === 400) {
+                    setTenantLookupError(t('auth.tenant_code_invalid'))
+                } else {
+                    setTenantLookupError(t('auth.tenant_lookup_failed'))
+                }
+                setTenantLookupOk(false)
+                return false
+            }
+        },
+        [t],
+    )
 
     const form = useForm({
         defaultValues: {
@@ -31,32 +75,49 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
         },
         validators: {
             onChange: z.object({
-                tenant_code: z.string().min(2).max(32),
+                tenant_code: tenantCodeSchema,
                 email: z.string().email(),
-                password: z.string().min(1)
-            })
+                password: z.string().min(1),
+            }),
         },
         onSubmit: async ({ value }) => {
             setServerError(null)
+            const code = normalizeTenantCode(value.tenant_code)
+            if (!code) {
+                setTenantLookupError(t('auth.tenant_code_invalid'))
+                return
+            }
+            const ok = await verifyTenantExists(code)
+            if (!ok) return
+
             try {
                 await auth.login({
-                    tenant_code: value.tenant_code.trim().toLowerCase(),
+                    tenant_code: code,
                     email: value.email,
                     password: value.password,
                 })
                 onSubmitSuccess()
             } catch (error: any) {
                 console.error('Login Failed:', error)
+                const status = error?.response?.status
+                if (status === 404 && error?.response?.data?.message === 'tenant not found') {
+                    setServerError(t('auth.tenant_not_found'))
+                    return
+                }
+                if (status === 400 && error?.response?.data?.message === 'invalid tenant code') {
+                    setServerError(t('auth.tenant_code_invalid'))
+                    return
+                }
                 const msg = error?.response?.data?.message ?? error?.message ?? t('auth.login_failed')
                 setServerError(msg)
             }
-        }
+        },
     })
 
     const demoAccount = {
         tenant_code: 'default',
         email: 'admin@example.com',
-        password: '1q2w3E*'
+        password: '1q2w3E*',
     }
 
     return (
@@ -71,11 +132,14 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
                 <CardDescription className="text-sm">{t('auth.sign_in_subtitle')}</CardDescription>
             </CardHeader>
             <CardContent className="px-8 pb-4">
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    form.handleSubmit();
-                }} className="space-y-5">
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        form.handleSubmit()
+                    }}
+                    className="space-y-5"
+                >
                     <form.Field
                         name="tenant_code"
                         children={(field) => (
@@ -87,16 +151,38 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
                                     id={field.name}
                                     name={field.name}
                                     value={field.state.value}
-                                    onBlur={field.handleBlur}
-                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    onBlur={() => {
+                                        field.handleBlur()
+                                        void verifyTenantExists(field.state.value)
+                                    }}
+                                    onChange={(e) => {
+                                        const next = stripTenantCodeInput(e.target.value)
+                                        field.handleChange(next)
+                                        setTenantLookupError(null)
+                                        setTenantLookupOk(false)
+                                    }}
                                     placeholder={t('auth.tenant_code_placeholder')}
                                     autoComplete="organization"
                                     className="h-12 rounded-xl"
                                 />
                                 {field.state.meta.errors.length > 0 && (
                                     <em role="alert" className="text-sm font-medium text-destructive">
-                                        {field.state.meta.errors.map(err => typeof err === 'object' ? ((err as any).message ?? JSON.stringify(err)) : String(err)).join(', ')}
+                                        {field.state.meta.errors
+                                            .map((err) =>
+                                                typeof err === 'object'
+                                                    ? ((err as any).message ?? JSON.stringify(err))
+                                                    : String(err),
+                                            )
+                                            .join(', ')}
                                     </em>
+                                )}
+                                {tenantLookupError && (
+                                    <em role="alert" className="text-sm font-medium text-destructive">
+                                        {tenantLookupError}
+                                    </em>
+                                )}
+                                {tenantLookupOk && !tenantLookupError && field.state.value.length >= 2 && (
+                                    <p className="text-xs text-muted-foreground">{t('auth.tenant_found')}</p>
                                 )}
                             </div>
                         )}
@@ -121,7 +207,13 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
                                 />
                                 {field.state.meta.errors.length > 0 && (
                                     <em role="alert" className="text-sm font-medium text-destructive">
-                                        {field.state.meta.errors.map(err => typeof err === 'object' ? ((err as any).message ?? JSON.stringify(err)) : String(err)).join(', ')}
+                                        {field.state.meta.errors
+                                            .map((err) =>
+                                                typeof err === 'object'
+                                                    ? ((err as any).message ?? JSON.stringify(err))
+                                                    : String(err),
+                                            )
+                                            .join(', ')}
                                     </em>
                                 )}
                             </div>
@@ -147,7 +239,13 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
                                 />
                                 {field.state.meta.errors.length > 0 && (
                                     <em role="alert" className="text-sm font-medium text-destructive">
-                                        {field.state.meta.errors.map(err => typeof err === 'object' ? ((err as any).message ?? JSON.stringify(err)) : String(err)).join(', ')}
+                                        {field.state.meta.errors
+                                            .map((err) =>
+                                                typeof err === 'object'
+                                                    ? ((err as any).message ?? JSON.stringify(err))
+                                                    : String(err),
+                                            )
+                                            .join(', ')}
                                     </em>
                                 )}
                             </div>
@@ -179,9 +277,18 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
             <CardFooter className="px-8 pb-8">
                 <div className="w-full text-center text-sm text-muted-foreground bg-muted/50 rounded-xl p-4">
                     <p className="font-medium mb-1">{t('auth.demo_account')}:</p>
-                    <p>{t('auth.tenant_code')}: <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.tenant_code}</code></p>
-                    <p>{t('auth.email')}: <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.email}</code></p>
-                    <p>{t('auth.password')}: <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.password}</code></p>
+                    <p>
+                        {t('auth.tenant_code')}:{' '}
+                        <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.tenant_code}</code>
+                    </p>
+                    <p>
+                        {t('auth.email')}:{' '}
+                        <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.email}</code>
+                    </p>
+                    <p>
+                        {t('auth.password')}:{' '}
+                        <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.password}</code>
+                    </p>
                 </div>
             </CardFooter>
         </Card>

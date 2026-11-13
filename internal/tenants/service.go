@@ -17,7 +17,10 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-var ErrTenantCodeExists = errors.New("tenant code already exists")
+var (
+	ErrTenantCodeExists = errors.New("tenant code already exists")
+	ErrTenantNotFound   = errors.New("tenant not found")
+)
 
 type Service struct {
 	repo  *Repository
@@ -50,7 +53,10 @@ func (s *Service) ListAll(ctx context.Context) ([]Summary, error) {
 }
 
 func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary, error) {
-	code := strings.ToLower(strings.TrimSpace(req.Code))
+	code, err := tenant.NormalizeCode(req.Code)
+	if err != nil {
+		return Summary{}, fmt.Errorf("%w: invalid tenant code format", common.ErrBadRequest)
+	}
 	name := strings.TrimSpace(req.Name)
 	id, err := uuid.NewV7()
 	if err != nil {

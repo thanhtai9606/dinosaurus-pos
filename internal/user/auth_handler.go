@@ -5,6 +5,7 @@ import (
 	"POS-kasir/internal/common"
 	"POS-kasir/internal/common/middleware"
 	"POS-kasir/internal/platformaudit"
+	"POS-kasir/internal/tenants"
 	"POS-kasir/pkg/logger"
 
 	"POS-kasir/pkg/validator"
@@ -163,6 +164,18 @@ func (h *AthHandler) LoginHandler(c fiber.Ctx) error {
 		case errors.Is(err, common.ErrInvalidCredentials):
 			return c.Status(fiber.StatusUnauthorized).JSON(common.ErrorResponse{
 				Message: "Invalid username or password",
+			})
+		case errors.Is(err, common.ErrInvalidInput):
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "invalid tenant code",
+			})
+		case errors.Is(err, tenants.ErrTenantNotFound):
+			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{
+				Message: "tenant not found",
+			})
+		case errors.Is(err, common.ErrForbidden):
+			return c.Status(fiber.StatusForbidden).JSON(common.ErrorResponse{
+				Message: "no access to this tenant",
 			})
 		default:
 			h.Log.Errorf("LoginHandler | Failed to login: %v", err)

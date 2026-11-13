@@ -34,6 +34,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 		client.ReadPump()
 	}))
 
+	api.Get("/tenants/lookup", container.TenantHandler.LookupByCode)
 	api.Post("/auth/login", container.AuthHandler.LoginHandler)
 	api.Post("/auth/refresh", container.AuthHandler.RefreshHandler)
 	api.Get("/auth/me", authMiddleware, container.AuthHandler.ProfileHandler)

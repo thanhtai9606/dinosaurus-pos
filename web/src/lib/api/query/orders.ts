@@ -156,7 +156,7 @@ export const useCancelOrderMutation = () => {
 export const useConfirmManualPaymentMutation = () => {
     const qc = useQueryClient()
     const { canAccessApi } = useRBAC()
-    const isAllowed = canAccessApi('POST', '/orders/{id}/pay-manual')
+    const isAllowed = canAccessApi('POST', '/orders/{id}/pay/manual')
 
     const mutation = useMutation<
         InternalOrdersOrderDetailResponse,
@@ -189,7 +189,7 @@ export const useConfirmManualPaymentMutation = () => {
 export const useInitiateMidtransPaymentMutation = () => {
     const qc = useQueryClient()
     const { canAccessApi } = useRBAC()
-    const isAllowed = canAccessApi('POST', '/orders/{id}/pay-midtrans')
+    const isAllowed = canAccessApi('POST', '/orders/{id}/pay/midtrans')
 
     const mutation = useMutation<
         InternalOrdersMidtransPaymentResponse,

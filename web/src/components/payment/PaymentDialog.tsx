@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import type { AxiosError } from 'axios'
+import type { POSKasirInternalCommonErrorResponse } from '@/lib/api/generated'
 import {
     Dialog,
     DialogContent,
@@ -146,7 +148,7 @@ function PaymentDialogForm({ open, onOpenChange, orderId, onPaymentSuccess, mode
         enabled: !!orderId && open
     })
 
-    const { data: paymentMethods } = usePaymentMethodsListQuery()
+    const { data: paymentMethods, isAllowed: canListPaymentMethods } = usePaymentMethodsListQuery()
     const confirmManualPaymentMutation = useConfirmManualPaymentMutation()
     const initiateMidtransPaymentMutation = useInitiateMidtransPaymentMutation()
     const { data: printerSettings } = usePrinterSettingsQuery()
@@ -154,6 +156,24 @@ function PaymentDialogForm({ open, onOpenChange, orderId, onPaymentSuccess, mode
 
     const { data: promotionsData } = usePromotionsListQuery({ limit: 100, trash: false })
     const activePromotions = promotionsData?.promotions?.filter(p => p.is_active) || []
+
+    useEffect(() => {
+        if (!open || !paymentMethods?.length) return
+        if (selectedPaymentMethod === undefined && paymentMethods[0]?.id != null) {
+            setSelectedPaymentMethod(paymentMethods[0].id)
+        }
+    }, [open, paymentMethods, selectedPaymentMethod])
+
+    const activeTabName = useMemo(() => {
+        const byId = paymentMethods?.find((m) => m.id === selectedPaymentMethod)
+        if (byId?.name) return byId.name
+        return paymentMethods?.[0]?.name ?? ''
+    }, [paymentMethods, selectedPaymentMethod])
+
+    const apiErrorMessage = (error: unknown, fallback: string) => {
+        const ax = error as AxiosError<POSKasirInternalCommonErrorResponse>
+        return ax.response?.data?.message || ax.response?.data?.error || fallback
+    }
 
     const handlePrint = async () => {
         if (!orderId) return
@@ -203,7 +223,10 @@ function PaymentDialogForm({ open, onOpenChange, orderId, onPaymentSuccess, mode
                 if (onPaymentSuccess) onPaymentSuccess()
                 onOpenChange(false)
                 toast.success(t('order.success.payment_complete'), { action: { label: t('common.print'), onClick: () => handlePrint() } })
-            } catch (error) { console.error(error) }
+            } catch (error) {
+                console.error(error)
+                toast.error(apiErrorMessage(error, t('order.errors.payment_failed')))
+            }
             return
         }
 
@@ -230,7 +253,10 @@ function PaymentDialogForm({ open, onOpenChange, orderId, onPaymentSuccess, mode
                     style: { background: '#10B981', color: 'white', border: 'none' },
                     action: { label: t('common.print'), onClick: () => handlePrint() }
                 })
-            } catch (error) { console.error(error) }
+            } catch (error) {
+                console.error(error)
+                toast.error(apiErrorMessage(error, t('order.errors.payment_failed')))
+            }
             return
         }
 
@@ -244,7 +270,26 @@ function PaymentDialogForm({ open, onOpenChange, orderId, onPaymentSuccess, mode
             } else {
                 toast.error(t('order.payment_dialog.generate_qris_failed'))
             }
-        } catch (error) { console.error(error) }
+        } catch (error) {
+            console.error(error)
+            toast.error(apiErrorMessage(error, t('order.errors.payment_failed')))
+        }
+    }
+
+    if (!canListPaymentMethods) {
+        return (
+            <p className="text-sm text-destructive py-4 text-center">
+                {t('order.errors.select_payment', 'No permission to load payment methods')}
+            </p>
+        )
+    }
+
+    if (paymentMethods && paymentMethods.length === 0) {
+        return (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+                {t('settings.payment_methods.empty', 'No payment methods configured.')}
+            </p>
+        )
     }
 
     if (isLoadingOrder) {
@@ -288,10 +333,15 @@ function PaymentDialogForm({ open, onOpenChange, orderId, onPaymentSuccess, mode
             </div>
 
             <div className="space-y-4">
-                <Tabs defaultValue={paymentMethods?.[0]?.name} onValueChange={(val) => {
-                    setSelectedPaymentMethod(paymentMethods?.find(m => m.name === val)?.id)
-                    setQrisUrl(null)
-                }} className="w-full">
+                <Tabs
+                    value={activeTabName}
+                    onValueChange={(val) => {
+                        const id = paymentMethods?.find((m) => m.name === val)?.id
+                        setSelectedPaymentMethod(id)
+                        setQrisUrl(null)
+                    }}
+                    className="w-full"
+                >
                     <TabsList className="grid w-full grid-cols-3">
                         {paymentMethods?.map((method) => (<TabsTrigger key={method.id} value={method.name || ''} className="text-sm">{method.name}</TabsTrigger>))}
                     </TabsList>

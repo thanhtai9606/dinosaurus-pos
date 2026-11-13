@@ -408,7 +408,10 @@ function RetailPosPage() {
                 queueCurrentSale('retail_cash', { payment_method_id: cashMethodId, cash_received: received })
                 return
             }
-            toast.error(t('order.errors.create_failed'))
+            const msg =
+                (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+                t('order.errors.payment_failed', t('order.errors.create_failed'))
+            toast.error(msg)
         }
     }
 

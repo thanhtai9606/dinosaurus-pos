@@ -19,6 +19,7 @@ type Props = {
     formatMoney: (amount: number) => string
     emptyMessage?: string
     onOrderClick?: (order: CustomerOrderRow) => void
+    storageKey?: string
     server?: {
         pagination?: POSKasirInternalCommonPaginationPagination
         onPageChange?: (page: number) => void
@@ -33,6 +34,7 @@ export function CustomerDetailOrdersGrid({
     formatMoney,
     emptyMessage,
     onOrderClick,
+    storageKey = 'customer-detail-orders-grid',
     server,
 }: Props) {
     const columns = useMemo<DataGridColumnDef<CustomerOrderRow>[]>(
@@ -103,7 +105,7 @@ export function CustomerDetailOrdersGrid({
 
     return (
         <DataGrid
-            storageKey="customer-detail-orders-grid"
+            storageKey={storageKey}
             columns={columns}
             data={orders}
             getRowId={(o) => o.id ?? `order-${o.created_at ?? ''}`}

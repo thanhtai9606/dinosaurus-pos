@@ -36,7 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCustomerGroupsListQuery } from '@/lib/api/query/customerGroups'
 import type { CustomerProfile } from '@/lib/api/query/customers'
 
-export type CustomerDialogTab = 'profile' | 'orders' | 'debts'
+export type CustomerDialogTab = 'profile' | 'orders' | 'returns' | 'debts'
 
 export function CustomerFormDialog({
     open,
@@ -60,6 +60,8 @@ export function CustomerFormDialog({
     const [activeTab, setActiveTab] = useState<CustomerDialogTab>(initialTab)
     const [ordersPage, setOrdersPage] = useState(1)
     const [ordersLimit, setOrdersLimit] = useState(10)
+    const [returnsPage, setReturnsPage] = useState(1)
+    const [returnsLimit, setReturnsLimit] = useState(10)
     const [debtsPage, setDebtsPage] = useState(1)
     const [debtsLimit, setDebtsLimit] = useState(10)
     const [orderDetailId, setOrderDetailId] = useState<string | null>(null)
@@ -75,6 +77,7 @@ export function CustomerFormDialog({
         if (open) {
             setActiveTab(isEdit ? initialTab : 'profile')
             setOrdersPage(1)
+            setReturnsPage(1)
             setDebtsPage(1)
         }
     }, [open, initialTab, isEdit, customerId])
@@ -82,6 +85,15 @@ export function CustomerFormDialog({
     const ordersQuery = useQuery({
         ...ordersListQueryOptions({ customerId, page: ordersPage, limit: ordersLimit }),
         enabled: open && isEdit && activeTab === 'orders' && !!customerId && canOrders,
+    })
+    const returnsQuery = useQuery({
+        ...ordersListQueryOptions({
+            customerId,
+            page: returnsPage,
+            limit: returnsLimit,
+            refundedOnly: true,
+        }),
+        enabled: open && isEdit && activeTab === 'returns' && !!customerId && canOrders,
     })
     const debtsQuery = useQuery({
         ...customerDebtsListQueryOptions({
@@ -94,6 +106,8 @@ export function CustomerFormDialog({
 
     const orders = ordersQuery.data?.orders ?? []
     const ordersPagination = ordersQuery.data?.pagination
+    const returns = returnsQuery.data?.orders ?? []
+    const returnsPagination = returnsQuery.data?.pagination
     const debts = debtsQuery.data?.debts ?? []
     const debtsPagination = debtsQuery.data?.pagination
     const totalDebtBalance = debts
@@ -300,6 +314,7 @@ export function CustomerFormDialog({
                         <TabsList className="w-full justify-start">
                             <TabsTrigger value="profile">{t('customers.detail.tab_profile')}</TabsTrigger>
                             <TabsTrigger value="orders">{t('customers.detail.tab_orders')}</TabsTrigger>
+                            <TabsTrigger value="returns">{t('customers.detail.tab_returns')}</TabsTrigger>
                             <TabsTrigger value="debts">{t('customers.detail.tab_debts')}</TabsTrigger>
                         </TabsList>
 
@@ -376,6 +391,53 @@ export function CustomerFormDialog({
                                             : undefined
                                     }
                                 />
+                            )}
+                        </TabsContent>
+
+                        <TabsContent
+                            value="returns"
+                            className="mt-0 min-h-0 max-h-[min(28rem,50vh)] flex-1 space-y-3 overflow-y-auto"
+                        >
+                            {!canOrders ? (
+                                <p className="py-8 text-center text-sm text-muted-foreground">
+                                    {t('customers.detail.returns_forbidden')}
+                                </p>
+                            ) : returnsQuery.isLoading ? (
+                                <div className="flex justify-center py-12">
+                                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                                </div>
+                            ) : (
+                                <>
+                                    <CustomerDetailOrdersGrid
+                                        orders={returns}
+                                        t={t}
+                                        formatMoney={formatMoney}
+                                        emptyMessage={t('customers.detail.returns_empty')}
+                                        storageKey="customer-detail-returns-grid"
+                                        onOrderClick={(order) => {
+                                            if (order.id) {
+                                                setOrderDetailId(order.id)
+                                                setOrderDetailOpen(true)
+                                            }
+                                        }}
+                                        server={
+                                            returnsPagination
+                                                ? {
+                                                      pagination: returnsPagination,
+                                                      onPageChange: setReturnsPage,
+                                                      onLimitChange: (limit) => {
+                                                          setReturnsLimit(limit)
+                                                          setReturnsPage(1)
+                                                      },
+                                                      isFetching: returnsQuery.isFetching,
+                                                  }
+                                                : undefined
+                                        }
+                                    />
+                                    <Button variant="outline" className="w-full" asChild>
+                                        <Link to="/sales-returns">{t('customers.detail.open_sales_returns')}</Link>
+                                    </Button>
+                                </>
                             )}
                         </TabsContent>
 

@@ -1106,19 +1106,25 @@ func (s *OrderService) ListOrders(ctx context.Context, req ListOrdersRequest) (*
 	if q := strings.TrimSpace(req.Search); q != "" {
 		searchPtr = &q
 	}
+	var refundedOnly *bool
+	if req.RefundedOnly != nil && *req.RefundedOnly {
+		refundedOnly = req.RefundedOnly
+	}
 	listParams := orders_repo.ListOrdersParams{
-		Limit:      int32(limit),
-		Offset:     int32(offset),
-		Statuses:   statusStrings,
-		UserID:     nullUserID,
-		CustomerID: nullCustomerID,
-		Search:     searchPtr,
+		Limit:        int32(limit),
+		Offset:       int32(offset),
+		Statuses:     statusStrings,
+		UserID:       nullUserID,
+		CustomerID:   nullCustomerID,
+		Search:       searchPtr,
+		RefundedOnly: refundedOnly,
 	}
 	countParams := orders_repo.CountOrdersParams{
-		Statuses:   statusStrings,
-		UserID:     nullUserID,
-		CustomerID: nullCustomerID,
-		Search:     searchPtr,
+		Statuses:     statusStrings,
+		UserID:       nullUserID,
+		CustomerID:   nullCustomerID,
+		Search:       searchPtr,
+		RefundedOnly: refundedOnly,
 	}
 	var wg sync.WaitGroup
 	var orders []orders_repo.ListOrdersRow

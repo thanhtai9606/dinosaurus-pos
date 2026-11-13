@@ -25,6 +25,7 @@ export type OrdersListParams = {
     userId?: string
     customerId?: string
     search?: string
+    refundedOnly?: boolean
 }
 
 export const ordersListQueryOptions = (params?: OrdersListParams) =>
@@ -34,7 +35,7 @@ export const ordersListQueryOptions = (params?: OrdersListParams) =>
     >({
         queryKey: ['orders', 'list', params],
         queryFn: async () => {
-            if (params?.customerId || params?.search) {
+            if (params?.customerId || params?.search || params?.refundedOnly) {
                 const res = await axiosInstance.get('/orders', {
                     params: {
                         page: params.page,
@@ -43,6 +44,7 @@ export const ordersListQueryOptions = (params?: OrdersListParams) =>
                         user_id: params.userId,
                         customer_id: params.customerId,
                         search: params.search,
+                        refunded_only: params.refundedOnly ? true : undefined,
                     },
                 })
                 return (res.data as { data: unknown }).data

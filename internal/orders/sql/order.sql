@@ -133,6 +133,17 @@ WHERE
         OR order_no ILIKE '%' || btrim(sqlc.narg(search)::text) || '%'
         OR id::text = btrim(sqlc.narg(search)::text)
     )
+  AND
+    (
+        sqlc.narg(refunded_only)::boolean IS NOT TRUE
+        OR EXISTS (
+            SELECT 1
+            FROM activity_logs al
+            WHERE al.entity_type = 'ORDER'
+              AND al.entity_id = orders.id::text
+              AND al.details->>'action' = 'refund'
+        )
+    )
 ORDER BY
     created_at DESC
 LIMIT $1 OFFSET $2;
@@ -152,6 +163,17 @@ WHERE
         OR btrim(sqlc.narg(search)::text) = ''
         OR order_no ILIKE '%' || btrim(sqlc.narg(search)::text) || '%'
         OR id::text = btrim(sqlc.narg(search)::text)
+    )
+  AND
+    (
+        sqlc.narg(refunded_only)::boolean IS NOT TRUE
+        OR EXISTS (
+            SELECT 1
+            FROM activity_logs al
+            WHERE al.entity_type = 'ORDER'
+              AND al.entity_id = orders.id::text
+              AND al.details->>'action' = 'refund'
+        )
     );
 
 

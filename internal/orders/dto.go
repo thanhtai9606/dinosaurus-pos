@@ -36,8 +36,9 @@ type ListOrdersRequest struct {
 	pagination.PaginationRequest
 	Statuses   []repository.OrderStatus `query:"statuses" validate:"dive,oneof=open in_progress served paid cancelled"`
 	UserID     *uuid.UUID               `query:"user_id"`
-	CustomerID *uuid.UUID               `query:"customer_id"`
-	Search     string                   `query:"search"`
+	CustomerID   *uuid.UUID               `query:"customer_id"`
+	Search       string                   `query:"search"`
+	RefundedOnly *bool                    `query:"refunded_only"`
 }
 
 type CancelOrderRequest struct {

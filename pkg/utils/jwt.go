@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"POS-kasir/config"
+	"dinosaurus-pos/config"
 	"errors"
 
 	"github.com/golang-jwt/jwt/v5"

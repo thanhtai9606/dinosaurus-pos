@@ -1,9 +1,9 @@
 package seeder
 
 import (
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/utils"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/utils"
 	"context"
 
 	"github.com/google/uuid"

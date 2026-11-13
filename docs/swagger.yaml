@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  POS-kasir_internal_activitylog_repository.LogActionType:
+  dinosaurus-pos_internal_activitylog_repository.LogActionType:
     enum:
     - CREATE
     - UPDATE
@@ -28,7 +28,7 @@ definitions:
     - LogActionTypeLOGINSUCCESS
     - LogActionTypeLOGINFAILED
     - LogActionTypeRESTORE
-  POS-kasir_internal_activitylog_repository.LogEntityType:
+  dinosaurus-pos_internal_activitylog_repository.LogEntityType:
     enum:
     - PRODUCT
     - CATEGORY
@@ -50,20 +50,20 @@ definitions:
     - LogEntityTypeSHIFT
     - LogEntityTypePAYMENTMETHOD
     - LogEntityTypeCANCELLATIONREASON
-  POS-kasir_internal_common.ErrorResponse:
+  dinosaurus-pos_internal_common.ErrorResponse:
     properties:
       data: {}
       error: {}
       message:
         type: string
     type: object
-  POS-kasir_internal_common.SuccessResponse:
+  dinosaurus-pos_internal_common.SuccessResponse:
     properties:
       data: {}
       message:
         type: string
     type: object
-  POS-kasir_internal_common_pagination.Pagination:
+  dinosaurus-pos_internal_common_pagination.Pagination:
     properties:
       current_page:
         type: integer
@@ -74,7 +74,7 @@ definitions:
       total_page:
         type: integer
     type: object
-  POS-kasir_internal_orders_repository.OrderStatus:
+  dinosaurus-pos_internal_orders_repository.OrderStatus:
     enum:
     - open
     - in_progress
@@ -88,7 +88,7 @@ definitions:
     - OrderStatusServed
     - OrderStatusPaid
     - OrderStatusCancelled
-  POS-kasir_internal_orders_repository.OrderType:
+  dinosaurus-pos_internal_orders_repository.OrderType:
     enum:
     - dine_in
     - takeaway
@@ -96,7 +96,7 @@ definitions:
     x-enum-varnames:
     - OrderTypeDineIn
     - OrderTypeTakeaway
-  POS-kasir_internal_promotions_repository.DiscountType:
+  dinosaurus-pos_internal_promotions_repository.DiscountType:
     enum:
     - percentage
     - fixed_amount
@@ -104,7 +104,7 @@ definitions:
     x-enum-varnames:
     - DiscountTypePercentage
     - DiscountTypeFixedAmount
-  POS-kasir_internal_promotions_repository.PromotionRuleType:
+  dinosaurus-pos_internal_promotions_repository.PromotionRuleType:
     enum:
     - MINIMUM_ORDER_AMOUNT
     - REQUIRED_PRODUCT
@@ -118,7 +118,7 @@ definitions:
     - PromotionRuleTypeREQUIREDCATEGORY
     - PromotionRuleTypeALLOWEDPAYMENTMETHOD
     - PromotionRuleTypeALLOWEDORDERTYPE
-  POS-kasir_internal_promotions_repository.PromotionScope:
+  dinosaurus-pos_internal_promotions_repository.PromotionScope:
     enum:
     - ORDER
     - ITEM
@@ -126,7 +126,7 @@ definitions:
     x-enum-varnames:
     - PromotionScopeORDER
     - PromotionScopeITEM
-  POS-kasir_internal_promotions_repository.PromotionTargetType:
+  dinosaurus-pos_internal_promotions_repository.PromotionTargetType:
     enum:
     - PRODUCT
     - CATEGORY
@@ -134,7 +134,7 @@ definitions:
     x-enum-varnames:
     - PromotionTargetTypePRODUCT
     - PromotionTargetTypeCATEGORY
-  POS-kasir_internal_shift_repository.CashTransactionType:
+  dinosaurus-pos_internal_shift_repository.CashTransactionType:
     enum:
     - cash_in
     - cash_out
@@ -142,7 +142,7 @@ definitions:
     x-enum-varnames:
     - CashTransactionTypeCashIn
     - CashTransactionTypeCashOut
-  POS-kasir_internal_shift_repository.ShiftStatus:
+  dinosaurus-pos_internal_shift_repository.ShiftStatus:
     enum:
     - open
     - closed
@@ -150,17 +150,19 @@ definitions:
     x-enum-varnames:
     - ShiftStatusOpen
     - ShiftStatusClosed
-  POS-kasir_internal_user_repository.UserRole:
+  dinosaurus-pos_internal_user_repository.UserRole:
     enum:
     - admin
     - cashier
     - manager
+    - super_admin
     type: string
     x-enum-varnames:
     - UserRoleAdmin
     - UserRoleCashier
     - UserRoleManager
-  POS-kasir_pkg_payment.MidtransNotificationPayload:
+    - UserRoleSuperAdmin
+  dinosaurus-pos_pkg_payment.MidtransNotificationPayload:
     properties:
       currency:
         type: string
@@ -208,7 +210,7 @@ definitions:
   internal_activitylog.ActivityLogResponse:
     properties:
       action_type:
-        $ref: '#/definitions/POS-kasir_internal_activitylog_repository.LogActionType'
+        $ref: '#/definitions/dinosaurus-pos_internal_activitylog_repository.LogActionType'
       created_at:
         type: string
       details:
@@ -217,7 +219,7 @@ definitions:
       entity_id:
         type: string
       entity_type:
-        $ref: '#/definitions/POS-kasir_internal_activitylog_repository.LogEntityType'
+        $ref: '#/definitions/dinosaurus-pos_internal_activitylog_repository.LogEntityType'
       id:
         type: string
       user_id:
@@ -275,6 +277,8 @@ definitions:
     properties:
       address:
         type: string
+      customer_group_id:
+        type: string
       email:
         maxLength: 255
         type: string
@@ -291,7 +295,13 @@ definitions:
     properties:
       address:
         type: string
+      code:
+        type: string
       created_at:
+        type: string
+      customer_group_id:
+        type: string
+      customer_group_name:
         type: string
       email:
         type: string
@@ -311,11 +321,13 @@ definitions:
           $ref: '#/definitions/internal_customers.CustomerResponse'
         type: array
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
     type: object
   internal_customers.UpdateCustomerRequest:
     properties:
       address:
+        type: string
+      customer_group_id:
         type: string
       email:
         maxLength: 255
@@ -374,7 +386,12 @@ definitions:
         type: array
       product_id:
         type: string
+      product_unit_id:
+        type: string
       quantity:
+        type: integer
+      unit_price:
+        minimum: 0
         type: integer
     required:
     - product_id
@@ -384,6 +401,9 @@ definitions:
     properties:
       customer_id:
         type: string
+      discount_amount:
+        minimum: 0
+        type: integer
       items:
         items:
           $ref: '#/definitions/internal_orders.CreateOrderItemRequest'
@@ -391,7 +411,7 @@ definitions:
         type: array
       type:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_orders_repository.OrderType'
+        - $ref: '#/definitions/dinosaurus-pos_internal_orders_repository.OrderType'
         enum:
         - dine_in
         - takeaway
@@ -440,6 +460,8 @@ definitions:
         type: array
       net_total:
         type: integer
+      order_no:
+        type: string
       payment_gateway_reference:
         type: string
       payment_method_id:
@@ -447,11 +469,11 @@ definitions:
       service_charge_amount:
         type: integer
       status:
-        $ref: '#/definitions/POS-kasir_internal_orders_repository.OrderStatus'
+        $ref: '#/definitions/dinosaurus-pos_internal_orders_repository.OrderStatus'
       tax_amount:
         type: integer
       type:
-        $ref: '#/definitions/POS-kasir_internal_orders_repository.OrderType'
+        $ref: '#/definitions/dinosaurus-pos_internal_orders_repository.OrderType'
       updated_at:
         type: string
       user_id:
@@ -470,20 +492,32 @@ definitions:
     type: object
   internal_orders.OrderItemResponse:
     properties:
+      barcode:
+        type: string
+      discount_amount:
+        type: integer
       id:
         type: string
+      net_subtotal:
+        type: integer
       options:
         items:
           $ref: '#/definitions/internal_orders.OrderItemOptionResponse'
         type: array
       price_at_sale:
         type: integer
+      product_code:
+        type: string
       product_id:
         type: string
       product_name:
         type: string
       quantity:
         type: integer
+      sale_unit_name:
+        type: string
+      sku:
+        type: string
       subtotal:
         type: integer
     type: object
@@ -501,12 +535,14 @@ definitions:
         type: array
       net_total:
         type: integer
+      order_no:
+        type: string
       queue_number:
         type: string
       status:
-        $ref: '#/definitions/POS-kasir_internal_orders_repository.OrderStatus'
+        $ref: '#/definitions/dinosaurus-pos_internal_orders_repository.OrderStatus'
       type:
-        $ref: '#/definitions/POS-kasir_internal_orders_repository.OrderType'
+        $ref: '#/definitions/dinosaurus-pos_internal_orders_repository.OrderType'
       user_id:
         type: string
     type: object
@@ -517,7 +553,7 @@ definitions:
           $ref: '#/definitions/internal_orders.OrderListResponse'
         type: array
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
     type: object
   internal_orders.PaymentAction:
     properties:
@@ -566,7 +602,7 @@ definitions:
     properties:
       status:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_orders_repository.OrderStatus'
+        - $ref: '#/definitions/dinosaurus-pos_internal_orders_repository.OrderStatus'
         enum:
         - open
         - in_progress
@@ -613,6 +649,9 @@ definitions:
     type: object
   internal_products.CreateProductRequest:
     properties:
+      barcode:
+        maxLength: 100
+        type: string
       category_ids:
         items:
           type: integer
@@ -620,6 +659,11 @@ definitions:
       cost_price:
         minimum: 0
         type: number
+      default_supplier_id:
+        type: string
+      min_stock:
+        minimum: 0
+        type: integer
       name:
         maxLength: 100
         minLength: 3
@@ -630,19 +674,41 @@ definitions:
         type: array
       price:
         type: number
+      sku:
+        maxLength: 50
+        type: string
       stock:
         minimum: 0
         type: integer
+      unit:
+        maxLength: 20
+        type: string
     required:
     - cost_price
     - name
     - price
     - stock
     type: object
+  internal_products.ImportPriceFailure:
+    properties:
+      message:
+        type: string
+      row:
+        type: integer
+    type: object
+  internal_products.ImportPricesResult:
+    properties:
+      failed:
+        items:
+          $ref: '#/definitions/internal_products.ImportPriceFailure'
+        type: array
+      updated:
+        type: integer
+    type: object
   internal_products.ListProductsResponse:
     properties:
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
       products:
         items:
           $ref: '#/definitions/internal_products.ProductListResponse'
@@ -655,7 +721,7 @@ definitions:
           $ref: '#/definitions/internal_products.StockHistoryResponse'
         type: array
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
     type: object
   internal_products.ProductCategoryResponse:
     properties:
@@ -666,22 +732,36 @@ definitions:
     type: object
   internal_products.ProductListResponse:
     properties:
+      barcode:
+        type: string
       categories:
         items:
           $ref: '#/definitions/internal_products.ProductCategoryResponse'
         type: array
+      code:
+        type: string
+      cost_price:
+        type: number
+      default_supplier_id:
+        type: string
       deleted_at:
         type: string
       id:
         type: string
       image_url:
         type: string
+      min_stock:
+        type: integer
       name:
         type: string
       price:
         type: number
+      sku:
+        type: string
       stock:
         type: integer
+      unit:
+        type: string
     type: object
   internal_products.ProductOptionResponse:
     properties:
@@ -696,13 +776,19 @@ definitions:
     type: object
   internal_products.ProductResponse:
     properties:
+      barcode:
+        type: string
       categories:
         items:
           $ref: '#/definitions/internal_products.ProductCategoryResponse'
         type: array
+      code:
+        type: string
       cost_price:
         type: number
       created_at:
+        type: string
+      default_supplier_id:
         type: string
       deleted_at:
         type: string
@@ -710,6 +796,10 @@ definitions:
         type: string
       image_url:
         type: string
+      matched_sale_unit_id:
+        type: string
+      min_stock:
+        type: integer
       name:
         type: string
       options:
@@ -718,10 +808,47 @@ definitions:
         type: array
       price:
         type: number
+      sale_units:
+        items:
+          $ref: '#/definitions/internal_products.ProductSaleUnitResponse'
+        type: array
+      sku:
+        type: string
       stock:
         type: integer
+      unit:
+        type: string
       updated_at:
         type: string
+    type: object
+  internal_products.ProductSaleUnitResponse:
+    properties:
+      barcode:
+        type: string
+      factor_to_base:
+        type: number
+      id:
+        type: string
+      is_base:
+        type: boolean
+      name:
+        type: string
+      sell_price:
+        type: number
+      sku:
+        type: string
+      sort_order:
+        type: integer
+    type: object
+  internal_products.ReplaceSaleUnitsRequest:
+    properties:
+      units:
+        items:
+          $ref: '#/definitions/internal_products.SaleUnitInput'
+        minItems: 1
+        type: array
+    required:
+    - units
     type: object
   internal_products.RestoreBulkRequest:
     properties:
@@ -732,6 +859,34 @@ definitions:
         type: array
     required:
     - product_ids
+    type: object
+  internal_products.SaleUnitInput:
+    properties:
+      barcode:
+        maxLength: 100
+        type: string
+      factor_to_base:
+        type: number
+      id:
+        type: string
+      is_base:
+        type: boolean
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+      sell_price:
+        minimum: 0
+        type: number
+      sku:
+        maxLength: 50
+        type: string
+      sort_order:
+        type: integer
+    required:
+    - factor_to_base
+    - name
+    - sell_price
     type: object
   internal_products.StockHistoryResponse:
     properties:
@@ -768,6 +923,9 @@ definitions:
     type: object
   internal_products.UpdateProductRequest:
     properties:
+      barcode:
+        maxLength: 100
+        type: string
       category_ids:
         items:
           type: integer
@@ -783,6 +941,11 @@ definitions:
       cost_price:
         minimum: 0
         type: number
+      default_supplier_id:
+        type: string
+      min_stock:
+        minimum: 0
+        type: integer
       name:
         maxLength: 100
         minLength: 3
@@ -792,9 +955,15 @@ definitions:
         type: string
       price:
         type: number
+      sku:
+        maxLength: 50
+        type: string
       stock:
         minimum: 0
         type: integer
+      unit:
+        maxLength: 20
+        type: string
     type: object
   internal_promotions.CreatePromotionRequest:
     properties:
@@ -802,7 +971,7 @@ definitions:
         type: string
       discount_type:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_promotions_repository.DiscountType'
+        - $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.DiscountType'
         enum:
         - percentage
         - fixed_amount
@@ -823,7 +992,7 @@ definitions:
         type: array
       scope:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_promotions_repository.PromotionScope'
+        - $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionScope'
         enum:
         - ORDER
         - ITEM
@@ -847,7 +1016,7 @@ definitions:
         type: string
       rule_type:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_promotions_repository.PromotionRuleType'
+        - $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionRuleType'
         enum:
         - MINIMUM_ORDER_AMOUNT
         - REQUIRED_PRODUCT
@@ -866,7 +1035,7 @@ definitions:
         type: string
       target_type:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_promotions_repository.PromotionTargetType'
+        - $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionTargetType'
         enum:
         - PRODUCT
         - CATEGORY
@@ -877,7 +1046,7 @@ definitions:
   internal_promotions.PagedPromotionResponse:
     properties:
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
       promotions:
         items:
           $ref: '#/definitions/internal_promotions.PromotionResponse'
@@ -892,7 +1061,7 @@ definitions:
       description:
         type: string
       discount_type:
-        $ref: '#/definitions/POS-kasir_internal_promotions_repository.DiscountType'
+        $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.DiscountType'
       discount_value:
         type: integer
       end_date:
@@ -910,7 +1079,7 @@ definitions:
           $ref: '#/definitions/internal_promotions.PromotionRuleResponse'
         type: array
       scope:
-        $ref: '#/definitions/POS-kasir_internal_promotions_repository.PromotionScope'
+        $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionScope'
       start_date:
         type: string
       targets:
@@ -927,7 +1096,7 @@ definitions:
       id:
         type: string
       rule_type:
-        $ref: '#/definitions/POS-kasir_internal_promotions_repository.PromotionRuleType'
+        $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionRuleType'
       rule_value:
         type: string
     type: object
@@ -938,7 +1107,7 @@ definitions:
       target_id:
         type: string
       target_type:
-        $ref: '#/definitions/POS-kasir_internal_promotions_repository.PromotionTargetType'
+        $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionTargetType'
     type: object
   internal_promotions.UpdatePromotionRequest:
     properties:
@@ -946,7 +1115,7 @@ definitions:
         type: string
       discount_type:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_promotions_repository.DiscountType'
+        - $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.DiscountType'
         enum:
         - percentage
         - fixed_amount
@@ -967,7 +1136,7 @@ definitions:
         type: array
       scope:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_promotions_repository.PromotionScope'
+        - $ref: '#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionScope'
         enum:
         - ORDER
         - ITEM
@@ -1018,9 +1187,13 @@ definitions:
     type: object
   internal_report.LowStockProductResponse:
     properties:
+      min_stock:
+        type: integer
       product_id:
         type: string
       product_name:
+        type: string
+      sku:
         type: string
       stock:
         type: integer
@@ -1039,7 +1212,7 @@ definitions:
   internal_report.ProductPerformanceResponse:
     properties:
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
       products:
         items:
           $ref: '#/definitions/internal_report.ProductPerformanceRow'
@@ -1059,7 +1232,7 @@ definitions:
   internal_report.ProductProfitResponse:
     properties:
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
       products:
         items:
           $ref: '#/definitions/internal_report.ProductProfitRow'
@@ -1143,6 +1316,53 @@ definitions:
       footer_text:
         type: string
     type: object
+  internal_settings.CurrencyOption:
+    properties:
+      code:
+        type: string
+      fraction_digits:
+        maximum: 4
+        minimum: 0
+        type: integer
+      label:
+        maxLength: 64
+        type: string
+      locale:
+        maxLength: 16
+        type: string
+    required:
+    - code
+    - label
+    - locale
+    type: object
+  internal_settings.FinancialSettingsResponse:
+    properties:
+      available_currencies:
+        items:
+          $ref: '#/definitions/internal_settings.CurrencyOption'
+        type: array
+      currency:
+        type: string
+      service_charge_rate:
+        type: number
+      tax_enabled:
+        type: boolean
+      tax_rate:
+        type: number
+    type: object
+  internal_settings.InvoiceSettingsResponse:
+    properties:
+      invoice_prefix:
+        type: string
+      legal_text:
+        type: string
+      receipt_footer:
+        type: string
+      receipt_header:
+        type: string
+      show_tax_on_receipt:
+        type: boolean
+    type: object
   internal_settings.PrinterSettingsResponse:
     properties:
       auto_print:
@@ -1168,6 +1388,43 @@ definitions:
     required:
     - app_name
     type: object
+  internal_settings.UpdateFinancialSettingsRequest:
+    properties:
+      currency:
+        type: string
+      service_charge_rate:
+        maximum: 100
+        minimum: 0
+        type: number
+      tax_enabled:
+        type: boolean
+      tax_rate:
+        maximum: 100
+        minimum: 0
+        type: number
+    required:
+    - currency
+    - tax_enabled
+    type: object
+  internal_settings.UpdateInvoiceSettingsRequest:
+    properties:
+      invoice_prefix:
+        maxLength: 20
+        type: string
+      legal_text:
+        maxLength: 1000
+        type: string
+      receipt_footer:
+        maxLength: 500
+        type: string
+      receipt_header:
+        maxLength: 500
+        type: string
+      show_tax_on_receipt:
+        type: boolean
+    required:
+    - show_tax_on_receipt
+    type: object
   internal_settings.UpdatePrinterSettingsRequest:
     properties:
       auto_print:
@@ -1190,6 +1447,16 @@ definitions:
     - paper_width
     - print_method
     type: object
+  internal_settings.UpdateSupportedCurrenciesRequest:
+    properties:
+      currencies:
+        items:
+          $ref: '#/definitions/internal_settings.CurrencyOption'
+        minItems: 1
+        type: array
+    required:
+    - currencies
+    type: object
   internal_shift.CashTransactionRequest:
     properties:
       amount:
@@ -1201,7 +1468,7 @@ definitions:
         type: string
       type:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_shift_repository.CashTransactionType'
+        - $ref: '#/definitions/dinosaurus-pos_internal_shift_repository.CashTransactionType'
         enum:
         - cash_in
         - cash_out
@@ -1225,7 +1492,7 @@ definitions:
       shift_id:
         type: string
       type:
-        $ref: '#/definitions/POS-kasir_internal_shift_repository.CashTransactionType'
+        $ref: '#/definitions/dinosaurus-pos_internal_shift_repository.CashTransactionType'
       user_id:
         type: string
     type: object
@@ -1257,7 +1524,7 @@ definitions:
       start_time:
         type: string
       status:
-        $ref: '#/definitions/POS-kasir_internal_shift_repository.ShiftStatus'
+        $ref: '#/definitions/dinosaurus-pos_internal_shift_repository.ShiftStatus'
       user_id:
         type: string
     type: object
@@ -1270,6 +1537,215 @@ definitions:
         type: integer
     required:
     - password
+    type: object
+  internal_stockreceipts.CreateStockReceiptRequest:
+    properties:
+      amount_paid:
+        minimum: 0
+        type: number
+      items:
+        items:
+          $ref: '#/definitions/internal_stockreceipts.ReceiptItemInput'
+        type: array
+      note:
+        maxLength: 500
+        type: string
+      payment_mode:
+        enum:
+        - cash
+        - credit
+        type: string
+      received_at:
+        type: string
+      supplier_id:
+        type: string
+    type: object
+  internal_stockreceipts.PagedStockReceiptResponse:
+    properties:
+      pagination:
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
+      receipts:
+        items:
+          $ref: '#/definitions/internal_stockreceipts.StockReceiptListItem'
+        type: array
+    type: object
+  internal_stockreceipts.ReceiptItemInput:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+      unit_cost:
+        minimum: 0
+        type: number
+      unit_sell_price:
+        minimum: 0
+        type: number
+    required:
+    - product_id
+    - quantity
+    - unit_cost
+    type: object
+  internal_stockreceipts.StockReceiptItemResponse:
+    properties:
+      id:
+        type: string
+      line_total:
+        type: number
+      product_barcode:
+        type: string
+      product_cost_price:
+        type: number
+      product_id:
+        type: string
+      product_name:
+        type: string
+      product_sell_price:
+        type: number
+      product_sku:
+        type: string
+      quantity:
+        type: integer
+      unit_cost:
+        type: number
+      unit_sell_price:
+        type: number
+    type: object
+  internal_stockreceipts.StockReceiptListItem:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      receipt_no:
+        type: string
+      received_at:
+        type: string
+      status:
+        type: string
+      supplier_id:
+        type: string
+      supplier_name:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  internal_stockreceipts.StockReceiptResponse:
+    properties:
+      amount_paid:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/internal_stockreceipts.StockReceiptItemResponse'
+        type: array
+      note:
+        type: string
+      payment_mode:
+        type: string
+      receipt_no:
+        type: string
+      received_at:
+        type: string
+      status:
+        type: string
+      supplier_id:
+        type: string
+      supplier_name:
+        type: string
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  internal_suppliers.CreateSupplierRequest:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        type: string
+      email:
+        maxLength: 255
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 150
+        type: string
+      notes:
+        type: string
+      phone:
+        maxLength: 30
+        type: string
+      tax_id:
+        maxLength: 50
+        type: string
+    required:
+    - name
+    type: object
+  internal_suppliers.PagedSupplierResponse:
+    properties:
+      pagination:
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
+      suppliers:
+        items:
+          $ref: '#/definitions/internal_suppliers.SupplierResponse'
+        type: array
+    type: object
+  internal_suppliers.SupplierResponse:
+    properties:
+      address:
+        type: string
+      code:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      notes:
+        type: string
+      phone:
+        type: string
+      tax_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_suppliers.UpdateSupplierRequest:
+    properties:
+      address:
+        type: string
+      code:
+        maxLength: 50
+        type: string
+      email:
+        maxLength: 255
+        type: string
+      is_active:
+        type: boolean
+      name:
+        maxLength: 150
+        type: string
+      notes:
+        type: string
+      phone:
+        maxLength: 30
+        type: string
+      tax_id:
+        maxLength: 50
+        type: string
+    required:
+    - name
     type: object
   internal_user.CreateUserRequest:
     properties:
@@ -1284,7 +1760,7 @@ definitions:
         type: string
       role:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_user_repository.UserRole'
+        - $ref: '#/definitions/dinosaurus-pos_internal_user_repository.UserRole'
         enum:
         - admin
         - manager
@@ -1305,9 +1781,14 @@ definitions:
         type: string
       password:
         type: string
+      tenant_code:
+        maxLength: 32
+        minLength: 2
+        type: string
     required:
     - email
     - password
+    - tenant_code
     type: object
   internal_user.LoginResponse:
     properties:
@@ -1319,6 +1800,12 @@ definitions:
         $ref: '#/definitions/internal_user.ProfileResponse'
       refresh_token:
         type: string
+      tenant:
+        $ref: '#/definitions/internal_user.TenantSummary'
+      tenants:
+        items:
+          $ref: '#/definitions/internal_user.TenantSummary'
+        type: array
     type: object
   internal_user.ProfileResponse:
     properties:
@@ -1335,7 +1822,13 @@ definitions:
       is_active:
         type: boolean
       role:
-        $ref: '#/definitions/POS-kasir_internal_user_repository.UserRole'
+        $ref: '#/definitions/dinosaurus-pos_internal_user_repository.UserRole'
+      tenant:
+        $ref: '#/definitions/internal_user.TenantSummary'
+      tenants:
+        items:
+          $ref: '#/definitions/internal_user.TenantSummary'
+        type: array
       updated_at:
         type: string
       username:
@@ -1350,7 +1843,7 @@ definitions:
         minLength: 8
         type: string
       role:
-        $ref: '#/definitions/POS-kasir_internal_user_repository.UserRole'
+        $ref: '#/definitions/dinosaurus-pos_internal_user_repository.UserRole'
       username:
         maxLength: 32
         minLength: 3
@@ -1360,6 +1853,22 @@ definitions:
     - password
     - role
     - username
+    type: object
+  internal_user.SwitchTenantRequest:
+    properties:
+      tenant_id:
+        type: string
+    required:
+    - tenant_id
+    type: object
+  internal_user.TenantSummary:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
     type: object
   internal_user.UpdatePasswordRequest:
     properties:
@@ -1384,7 +1893,7 @@ definitions:
         type: boolean
       role:
         allOf:
-        - $ref: '#/definitions/POS-kasir_internal_user_repository.UserRole'
+        - $ref: '#/definitions/dinosaurus-pos_internal_user_repository.UserRole'
         enum:
         - admin
         - manager
@@ -1397,7 +1906,7 @@ definitions:
   internal_user.UsersResponse:
     properties:
       pagination:
-        $ref: '#/definitions/POS-kasir_internal_common_pagination.Pagination'
+        $ref: '#/definitions/dinosaurus-pos_internal_common_pagination.Pagination'
       users:
         items:
           $ref: '#/definitions/internal_user.ProfileResponse'
@@ -1406,8 +1915,8 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: POS Kasir API
-  title: POS Kasir API
+  description: Dinosaurus POS API
+  title: Dinosaurus POS API
   version: "1.0"
 paths:
   /activity-logs:
@@ -1477,7 +1986,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_activitylog.ActivityLogListResponse'
@@ -1485,11 +1994,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get activity logs
       tags:
       - ActivityLogs
@@ -1514,7 +2023,7 @@ paths:
           description: User added successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.ProfileResponse'
@@ -1522,19 +2031,19 @@ paths:
         "400":
           description: Invalid request body or validation failed
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "403":
           description: Forbidden - higher role assignment attempt
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: User, username, or email already exists
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Add new user
       tags:
       - Auth
@@ -1560,7 +2069,7 @@ paths:
           description: Authenticated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.LoginResponse'
@@ -1568,15 +2077,15 @@ paths:
         "400":
           description: Invalid request body or validation failed
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "401":
           description: Invalid username or password
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Login
       tags:
       - Auth
@@ -1591,15 +2100,15 @@ paths:
         "200":
           description: Successfully logged out
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Logout
       tags:
       - Auth
@@ -1620,7 +2129,7 @@ paths:
           description: Profile retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.ProfileResponse'
@@ -1628,11 +2137,11 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get current profile
       tags:
       - Auth
@@ -1659,7 +2168,7 @@ paths:
           description: Avatar updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.ProfileResponse'
@@ -1667,15 +2176,15 @@ paths:
         "400":
           description: Invalid file or dimensions
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update avatar
       tags:
       - Auth
@@ -1701,19 +2210,19 @@ paths:
         "200":
           description: Password updated successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid request body or validation failed
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update password
       tags:
       - Auth
@@ -1734,7 +2243,7 @@ paths:
           description: Token refreshed successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/fiber.Map'
@@ -1742,14 +2251,43 @@ paths:
         "401":
           description: Invalid or expired session
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Refresh token
       tags:
       - Auth
+  /auth/switch-tenant:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Target tenant
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_user.SwitchTenantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
+      summary: Switch tenant
+      tags:
+      - Auth
+      x-roles:
+      - admin
+      - manager
+      - cashier
   /cancellation-reasons:
     get:
       consumes:
@@ -1762,7 +2300,7 @@ paths:
           description: List of cancellation reasons
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -1772,7 +2310,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: List cancellation reasons
       tags:
       - Cancellation Reasons
@@ -1802,7 +2340,7 @@ paths:
           description: Categories retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -1812,11 +2350,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve categories
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get all categories
       tags:
       - Categories
@@ -1842,7 +2380,7 @@ paths:
           description: Category created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_categories.CategoryResponse'
@@ -1850,15 +2388,15 @@ paths:
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Category with this name already exists
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to create category
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create a new category
       tags:
       - Categories
@@ -1882,23 +2420,23 @@ paths:
         "200":
           description: Category deleted successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid category ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Category not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Category cannot be deleted because it is in use
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to delete category
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Delete category by ID
       tags:
       - Categories
@@ -1922,7 +2460,7 @@ paths:
           description: Category retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_categories.CategoryResponse'
@@ -1930,15 +2468,15 @@ paths:
         "400":
           description: Invalid category ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Category not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve category
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get category by ID
       tags:
       - Categories
@@ -1968,7 +2506,7 @@ paths:
           description: Category updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_categories.CategoryResponse'
@@ -1976,19 +2514,19 @@ paths:
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Category not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Category with this name already exists
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to update category
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update category by ID
       tags:
       - Categories
@@ -2008,7 +2546,7 @@ paths:
           description: Category count retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -2018,7 +2556,7 @@ paths:
         "500":
           description: Failed to retrieve category count
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get total number of categories
       tags:
       - Categories
@@ -2026,6 +2564,50 @@ paths:
       - admin
       - manager
       - cashier
+  /customer-groups:
+    get:
+      responses: {}
+      summary: List customer groups
+      tags:
+      - CustomerGroups
+      x-roles:
+      - admin
+      - manager
+      - cashier
+    post:
+      responses: {}
+      summary: Create customer group
+      tags:
+      - CustomerGroups
+      x-roles:
+      - admin
+      - manager
+  /customer-groups/{id}:
+    delete:
+      responses: {}
+      summary: Delete customer group
+      tags:
+      - CustomerGroups
+      x-roles:
+      - admin
+      - manager
+    get:
+      responses: {}
+      summary: Get customer group
+      tags:
+      - CustomerGroups
+      x-roles:
+      - admin
+      - manager
+      - cashier
+    put:
+      responses: {}
+      summary: Update customer group
+      tags:
+      - CustomerGroups
+      x-roles:
+      - admin
+      - manager
   /customers:
     get:
       consumes:
@@ -2051,7 +2633,7 @@ paths:
           description: Customers retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_customers.PagedCustomerResponse'
@@ -2059,11 +2641,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: List customers
       tags:
       - Customers
@@ -2089,7 +2671,7 @@ paths:
           description: Customer created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_customers.CustomerResponse'
@@ -2097,11 +2679,11 @@ paths:
         "400":
           description: Invalid request
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create a customer
       tags:
       - Customers
@@ -2126,19 +2708,19 @@ paths:
         "200":
           description: Customer deleted successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Customer not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Delete a customer
       tags:
       - Customers
@@ -2162,7 +2744,7 @@ paths:
           description: Customer retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_customers.CustomerResponse'
@@ -2170,15 +2752,15 @@ paths:
         "400":
           description: Invalid ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Customer not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get a customer
       tags:
       - Customers
@@ -2209,7 +2791,7 @@ paths:
           description: Customer updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_customers.CustomerResponse'
@@ -2217,15 +2799,15 @@ paths:
         "400":
           description: Invalid request
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Customer not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update a customer
       tags:
       - Customers
@@ -2272,7 +2854,7 @@ paths:
           description: Orders retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.PagedOrderResponse'
@@ -2280,11 +2862,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve orders
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: List orders
       tags:
       - Orders
@@ -2311,7 +2893,7 @@ paths:
           description: Order created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.OrderDetailResponse'
@@ -2319,11 +2901,11 @@ paths:
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to create order
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create an order
       tags:
       - Orders
@@ -2351,7 +2933,7 @@ paths:
           description: Order retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.OrderDetailResponse'
@@ -2359,15 +2941,15 @@ paths:
         "400":
           description: Invalid order ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Order not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve order
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get an order by ID
       tags:
       - Orders
@@ -2401,7 +2983,7 @@ paths:
           description: Promotion applied successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.OrderDetailResponse'
@@ -2409,15 +2991,15 @@ paths:
         "400":
           description: Invalid order ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Order or Promotion not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to apply promotion
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Apply promotion to an order
       tags:
       - Orders
@@ -2450,23 +3032,23 @@ paths:
         "200":
           description: Order cancelled successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid order ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Order not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Order cannot be cancelled
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to cancel order
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Cancel an order
       tags:
       - Orders
@@ -2500,7 +3082,7 @@ paths:
           description: Order items updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.OrderDetailResponse'
@@ -2508,19 +3090,19 @@ paths:
         "400":
           description: Invalid order ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Order not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Order version conflict
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to update order items
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update items in an order
       tags:
       - Orders
@@ -2554,7 +3136,7 @@ paths:
           description: Payment completed successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.OrderDetailResponse'
@@ -2562,19 +3144,19 @@ paths:
         "400":
           description: Invalid order ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Order not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Order might have been paid, cancelled, or version conflict
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to complete payment
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Confirm manual payment for an order
       tags:
       - Orders
@@ -2602,7 +3184,7 @@ paths:
           description: QRIS payment initiated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.MidtransPaymentResponse'
@@ -2610,15 +3192,15 @@ paths:
         "400":
           description: Invalid order ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Order not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to process payment
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Initiate Midtrans payment for an order
       tags:
       - Orders
@@ -2645,15 +3227,15 @@ paths:
         "200":
           description: Invoice sent to printer
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid order ID
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to print invoice
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Print invoice for an order
       tags:
       - Printer
@@ -2680,15 +3262,15 @@ paths:
         "200":
           description: Invoice print data
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid order ID
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to generate print data
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get invoice print data
       tags:
       - Printer
@@ -2720,7 +3302,7 @@ paths:
           description: OK
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.OrderDetailResponse'
@@ -2728,15 +3310,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Refund a paid order
       tags:
       - orders
@@ -2766,7 +3348,7 @@ paths:
           description: Order status updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_orders.OrderDetailResponse'
@@ -2774,19 +3356,19 @@ paths:
         "400":
           description: Invalid order ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Order not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Invalid status transition
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to update order status
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update order operational status
       tags:
       - Orders
@@ -2805,22 +3387,22 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/POS-kasir_pkg_payment.MidtransNotificationPayload'
+          $ref: '#/definitions/dinosaurus-pos_pkg_payment.MidtransNotificationPayload'
       produces:
       - application/json
       responses:
         "200":
           description: Notification received successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid notification format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to handle notification
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Midtrans Payment Notification Callback
       tags:
       - Orders
@@ -2836,7 +3418,7 @@ paths:
           description: List of payment methods retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -2846,7 +3428,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: List payment methods
       tags:
       - Payment Methods
@@ -2884,7 +3466,7 @@ paths:
           description: Products retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ListProductsResponse'
@@ -2892,11 +3474,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve products
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: List products
       tags:
       - Products
@@ -2922,7 +3504,7 @@ paths:
           description: Product created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductResponse'
@@ -2930,15 +3512,15 @@ paths:
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Product with same name already exists
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to create product
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create a new product
       tags:
       - Products
@@ -2963,19 +3545,19 @@ paths:
         "200":
           description: Product deleted successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid product ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to delete product
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Delete a product
       tags:
       - Products
@@ -3000,7 +3582,7 @@ paths:
           description: Product retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductResponse'
@@ -3008,15 +3590,15 @@ paths:
         "400":
           description: Invalid product ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve product
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get a product by ID
       tags:
       - Products
@@ -3049,7 +3631,7 @@ paths:
           description: Product updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductResponse'
@@ -3057,15 +3639,15 @@ paths:
         "400":
           description: Invalid ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to update product
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update a product
       tags:
       - Products
@@ -3096,7 +3678,7 @@ paths:
           description: Product image uploaded successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductResponse'
@@ -3104,16 +3686,51 @@ paths:
         "400":
           description: Invalid ID format or image file is missing
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to upload image
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Upload an image for a product
+      tags:
+      - Products
+      x-roles:
+      - admin
+      - manager
+  /products/{id}/sale-units:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Product ID
+        format: uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Sale units
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_products.ReplaceSaleUnitsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_products.ProductResponse'
+              type: object
+      summary: Replace product sale units
       tags:
       - Products
       x-roles:
@@ -3147,7 +3764,7 @@ paths:
           description: Stock history retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.PagedStockHistoryResponse'
@@ -3155,15 +3772,15 @@ paths:
         "400":
           description: Invalid ID format or query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve stock history
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get stock history for a product
       tags:
       - Products
@@ -3196,7 +3813,7 @@ paths:
           description: Product option created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductOptionResponse'
@@ -3204,15 +3821,15 @@ paths:
         "400":
           description: Invalid product ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Parent product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to create product option
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create a product option
       tags:
       - Products
@@ -3251,7 +3868,7 @@ paths:
           description: Product option updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductOptionResponse'
@@ -3259,15 +3876,15 @@ paths:
         "400":
           description: Invalid ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product or option not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to update product option
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update a product option
       tags:
       - Products
@@ -3304,7 +3921,7 @@ paths:
           description: Product option image uploaded successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductOptionResponse'
@@ -3312,21 +3929,124 @@ paths:
         "400":
           description: Invalid ID format or missing file
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product or option not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to upload product option image
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Upload product option image
       tags:
       - Products
       x-roles:
       - admin
       - manager
+  /products/export-prices:
+    get:
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: Excel export
+          schema:
+            type: file
+      summary: Export product prices
+      tags:
+      - Products
+      x-roles:
+      - admin
+      - manager
+  /products/import-prices:
+    post:
+      consumes:
+      - multipart/form-data
+      - application/json
+      parameters:
+      - description: CSV file (sku/product_id, cost_price, price)
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_products.ImportPricesResult'
+              type: object
+      summary: Import product prices
+      tags:
+      - Products
+      x-roles:
+      - admin
+      - manager
+  /products/import-prices/template:
+    get:
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: Excel template
+          schema:
+            type: file
+      summary: Download import prices template
+      tags:
+      - Products
+      x-roles:
+      - admin
+      - manager
+  /products/lookup:
+    get:
+      parameters:
+      - description: Barcode or SKU
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_products.ProductResponse'
+              type: object
+      summary: Lookup product by barcode or SKU
+      tags:
+      - Products
+      x-roles:
+      - admin
+      - manager
+      - cashier
+  /products/search:
+    get:
+      produces:
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      responses:
+        "200":
+          description: Excel export
+          schema:
+            type: file
+      summary: Export product prices
+      tags:
+      - Products
+      x-roles:
+      - admin
+      - manager
+  /products/search/reindex:
+    post:
+      responses: {}
   /products/trash:
     get:
       consumes:
@@ -3357,7 +4077,7 @@ paths:
           description: Deleted products retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ListProductsResponse'
@@ -3365,11 +4085,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve deleted products
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: List deleted products
       tags:
       - Products
@@ -3395,7 +4115,7 @@ paths:
           description: Deleted product retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_products.ProductResponse'
@@ -3403,15 +4123,15 @@ paths:
         "400":
           description: Invalid product ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to retrieve deleted product
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get a deleted product
       tags:
       - Products
@@ -3435,19 +4155,19 @@ paths:
         "200":
           description: Product restored successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid product ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to restore product
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Restore a deleted product
       tags:
       - Products
@@ -3471,15 +4191,15 @@ paths:
         "200":
           description: Products restored successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Failed to restore products
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Bulk restore deleted products
       tags:
       - Products
@@ -3511,7 +4231,7 @@ paths:
           description: Promotions retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_promotions.PagedPromotionResponse'
@@ -3519,11 +4239,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: List all promotions
       tags:
       - Promotions
@@ -3549,7 +4269,7 @@ paths:
           description: Promotion created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_promotions.PromotionResponse'
@@ -3557,11 +4277,11 @@ paths:
         "400":
           description: Invalid request body or validation failed
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create a new promotion
       tags:
       - Promotions
@@ -3586,15 +4306,15 @@ paths:
         "200":
           description: Promotion deleted successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid promotion ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Delete (deactivate) a promotion
       tags:
       - Promotions
@@ -3620,7 +4340,7 @@ paths:
           description: Promotion retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_promotions.PromotionResponse'
@@ -3628,15 +4348,15 @@ paths:
         "400":
           description: Invalid promotion ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Promotion not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get a promotion by ID
       tags:
       - Promotions
@@ -3669,7 +4389,7 @@ paths:
           description: Promotion updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_promotions.PromotionResponse'
@@ -3677,15 +4397,15 @@ paths:
         "400":
           description: Invalid project ID format or request body
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: Promotion not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update a promotion
       tags:
       - Promotions
@@ -3710,15 +4430,15 @@ paths:
         "200":
           description: Promotion restored successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid promotion ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Restore a deleted promotion
       tags:
       - Promotions
@@ -3749,7 +4469,7 @@ paths:
           description: Cancellation reports retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -3759,11 +4479,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get cancellation reports
       tags:
       - Reports
@@ -3795,7 +4515,7 @@ paths:
           description: Cashier performance data retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -3805,11 +4525,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get cashier performance
       tags:
       - Reports
@@ -3841,7 +4561,7 @@ paths:
           description: Dashboard summary retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_report.DashboardSummaryResponse'
@@ -3849,11 +4569,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get dashboard summary
       tags:
       - Reports
@@ -3882,7 +4602,7 @@ paths:
           description: Low stock products retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -3892,7 +4612,7 @@ paths:
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get low stock products
       tags:
       - Reports
@@ -3923,7 +4643,7 @@ paths:
           description: Payment method performance data retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -3933,11 +4653,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get payment method performance
       tags:
       - Reports
@@ -3969,7 +4689,7 @@ paths:
           description: Product performance data retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -3979,11 +4699,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get product performance
       tags:
       - Reports
@@ -4015,7 +4735,7 @@ paths:
           description: Product profit reports retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -4025,11 +4745,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get product profit reports
       tags:
       - Reports
@@ -4061,7 +4781,7 @@ paths:
           description: Profit summary retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -4071,11 +4791,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get profit summary
       tags:
       - Reports
@@ -4110,7 +4830,7 @@ paths:
           description: Promotion performance retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -4120,11 +4840,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get promotion performance
       tags:
       - Reports
@@ -4155,7 +4875,7 @@ paths:
           description: Sales reports retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -4165,11 +4885,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get sales reports
       tags:
       - Reports
@@ -4204,7 +4924,7 @@ paths:
           description: Shift summary retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   items:
@@ -4214,11 +4934,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get shift summary records
       tags:
       - Reports
@@ -4238,7 +4958,7 @@ paths:
           description: Branding settings fetched successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_settings.BrandingSettingsResponse'
@@ -4246,7 +4966,7 @@ paths:
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get branding settings
       tags:
       - Settings
@@ -4272,7 +4992,7 @@ paths:
           description: Branding settings updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_settings.BrandingSettingsResponse'
@@ -4280,11 +5000,11 @@ paths:
         "400":
           description: Invalid request body or validation failure
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update branding settings
       tags:
       - Settings
@@ -4308,7 +5028,7 @@ paths:
           description: Logo updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   additionalProperties:
@@ -4318,12 +5038,141 @@ paths:
         "400":
           description: Logo file is required or file size exceeds limit
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update app logo
+      tags:
+      - Settings
+      x-roles:
+      - admin
+  /settings/financial:
+    get:
+      description: 'Currency, tax rate, and service charge (Roles: authenticated)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_settings.FinancialSettingsResponse'
+              type: object
+      summary: Get financial settings
+      tags:
+      - Settings
+      x-roles:
+      - admin
+      - manager
+      - cashier
+    put:
+      consumes:
+      - application/json
+      description: 'Update currency, tax, and service charge (Roles: admin)'
+      parameters:
+      - description: Financial settings
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_settings.UpdateFinancialSettingsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_settings.FinancialSettingsResponse'
+              type: object
+      summary: Update financial settings
+      tags:
+      - Settings
+      x-roles:
+      - admin
+  /settings/financial/currencies:
+    put:
+      consumes:
+      - application/json
+      description: 'JSON list of currencies for multi-region deployments (Roles: admin)'
+      parameters:
+      - description: Currency list
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_settings.UpdateSupportedCurrenciesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_settings.FinancialSettingsResponse'
+              type: object
+      summary: Update supported currencies
+      tags:
+      - Settings
+      x-roles:
+      - admin
+  /settings/invoice:
+    get:
+      description: 'Receipt headers, footers, and legal text (Roles: authenticated)'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_settings.InvoiceSettingsResponse'
+              type: object
+      summary: Get invoice settings
+      tags:
+      - Settings
+      x-roles:
+      - admin
+      - manager
+      - cashier
+    put:
+      consumes:
+      - application/json
+      description: 'Customize printed invoices (Roles: admin)'
+      parameters:
+      - description: Invoice settings
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_settings.UpdateInvoiceSettingsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_settings.InvoiceSettingsResponse'
+              type: object
+      summary: Update invoice settings
       tags:
       - Settings
       x-roles:
@@ -4341,7 +5190,7 @@ paths:
           description: Printer settings fetched successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_settings.PrinterSettingsResponse'
@@ -4349,7 +5198,7 @@ paths:
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get printer settings
       tags:
       - Settings
@@ -4375,7 +5224,7 @@ paths:
           description: Printer settings updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_settings.PrinterSettingsResponse'
@@ -4383,11 +5232,11 @@ paths:
         "400":
           description: Invalid request body or validation failure
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update printer settings
       tags:
       - Settings
@@ -4404,11 +5253,11 @@ paths:
         "200":
           description: List of discovered printers
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "500":
           description: Failed to discover printers
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Discover network printers
       tags:
       - Printer
@@ -4425,11 +5274,11 @@ paths:
         "200":
           description: Test print command sent associated with configured printer
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "500":
           description: Failed to send test print
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Test printer connection
       tags:
       - Printer
@@ -4455,7 +5304,7 @@ paths:
           description: Cash transaction created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_shift.CashTransactionResponse'
@@ -4463,15 +5312,15 @@ paths:
         "400":
           description: Invalid request body or validation failure
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: No open shift found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create a cash transaction (Drop/Expense/In)
       tags:
       - Shifts
@@ -4492,7 +5341,7 @@ paths:
           description: Open shift retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_shift.ShiftResponse'
@@ -4500,11 +5349,11 @@ paths:
         "404":
           description: No open shift found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get current open shift
       tags:
       - Shifts
@@ -4532,7 +5381,7 @@ paths:
           description: Shift ended successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_shift.ShiftResponse'
@@ -4540,15 +5389,15 @@ paths:
         "400":
           description: Invalid request body or validation failure
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: No open shift found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: End current shift
       tags:
       - Shifts
@@ -4576,7 +5425,7 @@ paths:
           description: Shift started successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_shift.ShiftResponse'
@@ -4584,15 +5433,15 @@ paths:
         "400":
           description: Invalid request body or validation failure
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: User already has an open shift
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Start a new shift
       tags:
       - Shifts
@@ -4600,6 +5449,290 @@ paths:
       - admin
       - manager
       - cashier
+  /stock-receipts:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_stockreceipts.PagedStockReceiptResponse'
+              type: object
+      summary: List stock receipts
+      tags:
+      - StockReceipts
+      x-roles:
+      - admin
+      - manager
+    post:
+      parameters:
+      - description: Receipt
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_stockreceipts.CreateStockReceiptRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_stockreceipts.StockReceiptResponse'
+              type: object
+      summary: Create stock receipt draft
+      tags:
+      - StockReceipts
+      x-roles:
+      - admin
+      - manager
+  /stock-receipts/{id}:
+    delete:
+      parameters:
+      - description: Receipt ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+      summary: Delete draft or cancelled stock receipt
+      tags:
+      - StockReceipts
+      x-roles:
+      - admin
+      - manager
+    get:
+      parameters:
+      - description: Receipt ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_stockreceipts.StockReceiptResponse'
+              type: object
+      summary: Get stock receipt
+      tags:
+      - StockReceipts
+      x-roles:
+      - admin
+      - manager
+    put:
+      parameters:
+      - description: Receipt ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_stockreceipts.StockReceiptResponse'
+              type: object
+      summary: Update draft stock receipt
+      tags:
+      - StockReceipts
+      x-roles:
+      - admin
+      - manager
+  /stock-receipts/{id}/cancel:
+    post:
+      parameters:
+      - description: Receipt ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_stockreceipts.StockReceiptResponse'
+              type: object
+      summary: Cancel draft stock receipt
+      tags:
+      - StockReceipts
+      x-roles:
+      - admin
+      - manager
+  /stock-receipts/{id}/complete:
+    post:
+      parameters:
+      - description: Receipt ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_stockreceipts.StockReceiptResponse'
+              type: object
+      summary: Complete stock receipt
+      tags:
+      - StockReceipts
+      x-roles:
+      - admin
+      - manager
+  /suppliers:
+    get:
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Search
+        in: query
+        name: search
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_suppliers.PagedSupplierResponse'
+              type: object
+      summary: List suppliers
+      tags:
+      - Suppliers
+      x-roles:
+      - admin
+      - manager
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Supplier details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_suppliers.CreateSupplierRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_suppliers.SupplierResponse'
+              type: object
+      summary: Create a supplier
+      tags:
+      - Suppliers
+      x-roles:
+      - admin
+      - manager
+  /suppliers/{id}:
+    delete:
+      parameters:
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+      summary: Delete a supplier
+      tags:
+      - Suppliers
+      x-roles:
+      - admin
+    get:
+      parameters:
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_suppliers.SupplierResponse'
+              type: object
+      summary: Get a supplier
+      tags:
+      - Suppliers
+      x-roles:
+      - admin
+      - manager
+    put:
+      parameters:
+      - description: Supplier ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Supplier details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_suppliers.UpdateSupplierRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/internal_suppliers.SupplierResponse'
+              type: object
+      summary: Update a supplier
+      tags:
+      - Suppliers
+      x-roles:
+      - admin
+      - manager
   /users:
     get:
       consumes:
@@ -4662,7 +5795,7 @@ paths:
           description: Users retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.UsersResponse'
@@ -4670,11 +5803,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get all users
       tags:
       - Users
@@ -4700,7 +5833,7 @@ paths:
           description: User created successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.ProfileResponse'
@@ -4708,15 +5841,15 @@ paths:
         "400":
           description: Invalid request body or validation failed
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: User, username, or email already exists
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Create user
       tags:
       - Users
@@ -4740,19 +5873,19 @@ paths:
         "200":
           description: User deleted successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid user ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Delete user
       tags:
       - Users
@@ -4777,7 +5910,7 @@ paths:
           description: User retrieved successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.ProfileResponse'
@@ -4785,15 +5918,15 @@ paths:
         "400":
           description: Invalid user ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Get user by ID
       tags:
       - Users
@@ -4824,7 +5957,7 @@ paths:
           description: User updated successfully
           schema:
             allOf:
-            - $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            - $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
             - properties:
                 data:
                   $ref: '#/definitions/internal_user.ProfileResponse'
@@ -4832,23 +5965,23 @@ paths:
         "400":
           description: Invalid request body or validation failed
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "403":
           description: Forbidden - higher role assignment attempt
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "409":
           description: Username or email already exists
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Update user
       tags:
       - Users
@@ -4872,19 +6005,19 @@ paths:
         "200":
           description: User status toggled successfully
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.SuccessResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.SuccessResponse'
         "400":
           description: Invalid user ID format
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "404":
           description: User not found
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/POS-kasir_internal_common.ErrorResponse'
+            $ref: '#/definitions/dinosaurus-pos_internal_common.ErrorResponse'
       summary: Toggle user status
       tags:
       - Users

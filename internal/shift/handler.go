@@ -1,9 +1,9 @@
 package shift
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/validator"
 	"errors"
 
 	"github.com/gofiber/fiber/v3"

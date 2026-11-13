@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { z } from 'zod'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
 import { useTranslation } from 'react-i18next'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 
 import {
     promotionsListQueryOptions,
@@ -21,38 +22,28 @@ import { PromotionsFilters } from '@/components/promotions/PromotionsFilters'
 import { PromotionsTable } from '@/components/promotions/PromotionsTable'
 import { PromotionsActionDialogs } from '@/components/promotions/PromotionsActionDialogs'
 
-const promotionsSearchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().min(1).catch(10),
-})
-
 export const Route = createFileRoute('/_dashboard/promotions')({
-    validateSearch: (search) => promotionsSearchSchema.parse(search),
-    loaderDeps: ({ search }) => ({
-        page: search.page,
-        limit: search.limit,
-    }),
-    loader: ({ context: { queryClient }, deps }) => {
-        return queryClient.ensureQueryData(promotionsListQueryOptions({
-            limit: deps.limit,
-            page: deps.page,
-        }))
-    },
     component: PromotionsPage,
 })
 
 function PromotionsPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch()
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({
+        scope: LIST_SCOPES.promotions,
+    })
+    const [activeTab, setActiveTab] = useState('active')
 
-    const [activeTab, setActiveTab] = useState("active")
+    useEffect(() => {
+        resetPage()
+    }, [activeTab, resetPage])
 
-    const promotionsQuery = useQuery(promotionsListQueryOptions({
-        limit: searchParams.limit,
-        page: searchParams.page,
-        trash: activeTab === "trash"
-    }))
+    const promotionsQuery = useQuery(
+        promotionsListQueryOptions({
+            limit,
+            page,
+            trash: activeTab === 'trash',
+        }),
+    )
 
     const promotions = promotionsQuery.data?.promotions || []
     const pagination = promotionsQuery.data?.pagination || {}
@@ -79,14 +70,6 @@ function PromotionsPage() {
     const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null)
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [restoreId, setRestoreId] = useState<string | null>(null)
-
-    const handlePageChange = (newPage: number) => {
-        navigate({ search: (prev) => ({ ...prev, page: newPage }) })
-    }
-
-    const handleLimitChange = (limit: number) => {
-        navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
-    }
 
     const openCreateModal = () => {
         setSelectedPromotion(null)
@@ -170,8 +153,8 @@ function PromotionsPage() {
 
             <ListPagination
                 pagination={pagination}
-                onPageChange={handlePageChange}
-                onLimitChange={handleLimitChange}
+                onPageChange={onPageChange}
+                onLimitChange={onLimitChange}
                 isFetching={promotionsQuery.isFetching}
             />
 

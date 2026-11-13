@@ -1,7 +1,7 @@
 package printer
 
 import (
-	"POS-kasir/internal/common"
+	"dinosaurus-pos/internal/common"
 	"net/http"
 
 	"github.com/gofiber/fiber/v3"

@@ -3,7 +3,7 @@ package tenant
 import (
 	"context"
 
-	"POS-kasir/internal/common"
+	"dinosaurus-pos/internal/common"
 
 	"github.com/google/uuid"
 )

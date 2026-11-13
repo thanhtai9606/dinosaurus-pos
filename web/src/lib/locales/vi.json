@@ -113,7 +113,9 @@
         "settings": "Cài đặt",
         "account": "Tài khoản",
         "activity_logs": "Nhật ký hoạt động",
-        "customers": "Khách hàng",
+        "customers": "Danh sách khách",
+        "customers_menu": "Khách hàng",
+        "customer_groups": "Nhóm khách",
         "inventory": "Tồn kho",
         "suppliers": "Nhà cung cấp",
         "stock_receipts": "Nhập hàng",
@@ -1413,8 +1415,13 @@
         "description": "Quản lý thông tin và lịch sử khách hàng.",
         "add_button": "Thêm khách hàng mới",
         "search_placeholder": "CUS-000001, tên, SĐT…",
+        "filters": {
+            "group": "Nhóm khách",
+            "all_groups": "Tất cả nhóm"
+        },
         "table": {
             "code": "Mã KH",
+            "group": "Nhóm",
             "name": "Tên",
             "phone": "Điện thoại",
             "email": "Email",
@@ -1431,6 +1438,9 @@
             "email": "Email",
             "phone": "Điện thoại",
             "address": "Địa chỉ",
+            "group": "Nhóm khách",
+            "group_placeholder": "Chọn nhóm…",
+            "group_none": "Không gán nhóm",
             "save_changes": "Lưu Thay Đổi",
             "create_customer": "Tạo khách hàng"
         },
@@ -1468,6 +1478,30 @@
             "cancel": "Hủy",
             "deleting": "Đang xóa...",
             "delete_confirm": "Delete (Xóa)"
+        }
+    },
+    "customerGroups": {
+        "title": "Nhóm khách hàng",
+        "search_placeholder": "Tìm theo mã, tên…",
+        "actions": {
+            "add": "Thêm nhóm"
+        },
+        "fields": {
+            "code": "Mã",
+            "name": "Tên nhóm",
+            "description": "Mô tả"
+        },
+        "form": {
+            "create_title": "Thêm nhóm khách",
+            "edit_title": "Sửa nhóm khách"
+        },
+        "messages": {
+            "create_success": "Đã tạo nhóm khách",
+            "create_failed": "Không tạo được nhóm: {{message}}",
+            "update_success": "Đã cập nhật nhóm khách",
+            "update_failed": "Không cập nhật được: {{message}}",
+            "delete_success": "Đã xóa nhóm khách",
+            "delete_failed": "Không xóa được: {{message}}"
         }
     },
     "shift": {

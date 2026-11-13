@@ -1,12 +1,12 @@
 package user_test
 
 import (
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/user"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/mocks"
-	"POS-kasir/pkg/utils"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/user"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/mocks"
+	"dinosaurus-pos/pkg/utils"
 	"bytes"
 	"context"
 	"errors"

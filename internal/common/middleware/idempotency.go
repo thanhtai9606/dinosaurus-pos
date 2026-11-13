@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"POS-kasir/internal/common"
+	"dinosaurus-pos/internal/common"
 	"time"
 
-	"POS-kasir/pkg/cache"
+	"dinosaurus-pos/pkg/cache"
 
 	"github.com/gofiber/fiber/v3"
 )

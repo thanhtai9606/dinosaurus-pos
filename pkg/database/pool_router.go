@@ -6,8 +6,8 @@ import (
 	"os"
 	"sync"
 
-	"POS-kasir/internal/tenant"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/pkg/logger"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"

@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { z } from 'zod'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
@@ -35,26 +36,21 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 
-const searchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().catch(10),
-    status: z.string().optional(),
-})
-
 export const Route = createFileRoute('/_dashboard/stock-receipts')({
-    validateSearch: (search) => searchSchema.parse(search),
-    loaderDeps: ({ search }) => search,
-    loader: ({ context: { queryClient }, deps }) =>
-        queryClient.ensureQueryData(stockReceiptsListQueryOptions(deps as StockReceiptsListParams)),
     component: StockReceiptsPage,
 })
 
 function StockReceiptsPage() {
     const { t } = useTranslation()
     const formatMoney = useFormatMoney()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch() as StockReceiptsListParams
-    const { data } = useSuspenseQuery(stockReceiptsListQueryOptions(searchParams))
+    const { page, limit, onPageChange, onLimitChange } = useServerListState({
+        scope: LIST_SCOPES.stockReceipts,
+    })
+    const listParams = useMemo(
+        (): StockReceiptsListParams => ({ page, limit }),
+        [page, limit],
+    )
+    const { data } = useQuery(stockReceiptsListQueryOptions(listParams))
     const { isAllowed: canCreate } = useCreateStockReceiptMutation()
     const completeMutation = useCompleteStockReceiptMutation()
     const cancelMutation = useCancelStockReceiptMutation()
@@ -66,7 +62,7 @@ function StockReceiptsPage() {
     const [bulkBusy, setBulkBusy] = useState(false)
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
-    const receipts = data.receipts || []
+    const receipts = data?.receipts || []
     const pageIds = useMemo(() => receipts.map((r) => r.id), [receipts])
     const allSelected = pageIds.length > 0 && pageIds.every((id) => selected.has(id))
     const someSelected = pageIds.some((id) => selected.has(id))
@@ -268,19 +264,21 @@ function StockReceiptsPage() {
                             ))}
                         </TableBody>
                     </Table>
-                    <ListPagination
-                        pagination={data.pagination}
-                        onPageChange={(page) => {
-                            setSelected(new Set())
-                            navigate({ search: (prev) => ({ ...prev, page }) })
-                        }}
-                        onLimitChange={(limit) => {
-                            setSelected(new Set())
-                            navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
-                        }}
-                    />
+                    {data?.pagination ? (
+                        <ListPagination
+                            pagination={data.pagination}
+                            onPageChange={(p) => {
+                                setSelected(new Set())
+                                onPageChange(p)
+                            }}
+                            onLimitChange={(l) => {
+                                setSelected(new Set())
+                                onLimitChange(l)
+                            }}
+                        />
+                    ) : null}
                     <Button variant="link" asChild className="px-0">
-                        <Link to="/inventory" search={{}}>
+                        <Link to="/inventory">
                             {t('inventory.link_from_receipts')}
                         </Link>
                     </Button>

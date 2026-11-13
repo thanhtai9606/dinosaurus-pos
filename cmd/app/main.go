@@ -1,8 +1,8 @@
 package main
 
 import (
-	_ "POS-kasir/docs"
-	"POS-kasir/server"
+	_ "dinosaurus-pos/docs"
+	"dinosaurus-pos/server"
 )
 
 // @title Dinosaurus POS API

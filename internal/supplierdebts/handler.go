@@ -3,9 +3,9 @@ package supplierdebts
 import (
 	"errors"
 
-	"POS-kasir/internal/common"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/validator"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"

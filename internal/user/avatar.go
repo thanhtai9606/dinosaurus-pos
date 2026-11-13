@@ -1,9 +1,9 @@
 package user
 
 import (
-	"POS-kasir/internal/common"
-	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/common"
+	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
+	"dinosaurus-pos/pkg/logger"
 
 	"context"
 

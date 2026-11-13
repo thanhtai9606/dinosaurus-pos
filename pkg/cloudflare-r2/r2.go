@@ -1,8 +1,8 @@
 package cloudflarer2
 
 import (
-	"POS-kasir/config"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/pkg/logger"
 	"bytes"
 	"context"
 	"fmt"

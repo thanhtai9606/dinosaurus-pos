@@ -1,53 +1,55 @@
 package server
 
 import (
-	"POS-kasir/config"
-	"POS-kasir/internal/activitylog"
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/cancellation_reasons"
-	cancellation_reasons_repo "POS-kasir/internal/cancellation_reasons/repository"
-	"POS-kasir/internal/categories"
-	categories_repo "POS-kasir/internal/categories/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/store"
-	"POS-kasir/internal/customers"
-	customers_repo "POS-kasir/internal/customers/repository"
-	"POS-kasir/internal/stockreceipts"
-	sr_repo "POS-kasir/internal/stockreceipts/repository"
-	"POS-kasir/internal/suppliers"
-	suppliers_repo "POS-kasir/internal/suppliers/repository"
-	"POS-kasir/internal/supplierdebts"
-	sd_debts_repo "POS-kasir/internal/supplierdebts/repository"
-	"POS-kasir/internal/customerdebts"
-	cd_debts_repo "POS-kasir/internal/customerdebts/repository"
-	"POS-kasir/internal/orders"
-	orders_repo "POS-kasir/internal/orders/repository"
-	"POS-kasir/internal/payment_methods"
-	payment_methods_repo "POS-kasir/internal/payment_methods/repository"
-	"POS-kasir/internal/printer"
-	"POS-kasir/internal/products"
-	products_repo "POS-kasir/internal/products/repository"
-	"POS-kasir/internal/platform"
-	"POS-kasir/internal/promotions"
-	promotions_repo "POS-kasir/internal/promotions/repository"
-	"POS-kasir/internal/report"
-	report_repo "POS-kasir/internal/report/repository"
-	"POS-kasir/internal/settings"
-	settings_repo "POS-kasir/internal/settings/repository"
-	"POS-kasir/internal/shift"
-	shift_repo "POS-kasir/internal/shift/repository"
-	"POS-kasir/internal/tenants"
-	"POS-kasir/internal/user"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/cache"
-	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
-	"POS-kasir/pkg/database"
-	"POS-kasir/pkg/escpos"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/payment"
-	"POS-kasir/pkg/productsearch"
-	"POS-kasir/pkg/utils"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/internal/activitylog"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/cancellation_reasons"
+	cancellation_reasons_repo "dinosaurus-pos/internal/cancellation_reasons/repository"
+	"dinosaurus-pos/internal/categories"
+	categories_repo "dinosaurus-pos/internal/categories/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/store"
+	"dinosaurus-pos/internal/customers"
+	customers_repo "dinosaurus-pos/internal/customers/repository"
+	"dinosaurus-pos/internal/customergroups"
+	customergroups_repo "dinosaurus-pos/internal/customergroups/repository"
+	"dinosaurus-pos/internal/stockreceipts"
+	sr_repo "dinosaurus-pos/internal/stockreceipts/repository"
+	"dinosaurus-pos/internal/suppliers"
+	suppliers_repo "dinosaurus-pos/internal/suppliers/repository"
+	"dinosaurus-pos/internal/supplierdebts"
+	sd_debts_repo "dinosaurus-pos/internal/supplierdebts/repository"
+	"dinosaurus-pos/internal/customerdebts"
+	cd_debts_repo "dinosaurus-pos/internal/customerdebts/repository"
+	"dinosaurus-pos/internal/orders"
+	orders_repo "dinosaurus-pos/internal/orders/repository"
+	"dinosaurus-pos/internal/payment_methods"
+	payment_methods_repo "dinosaurus-pos/internal/payment_methods/repository"
+	"dinosaurus-pos/internal/printer"
+	"dinosaurus-pos/internal/products"
+	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/internal/platform"
+	"dinosaurus-pos/internal/promotions"
+	promotions_repo "dinosaurus-pos/internal/promotions/repository"
+	"dinosaurus-pos/internal/report"
+	report_repo "dinosaurus-pos/internal/report/repository"
+	"dinosaurus-pos/internal/settings"
+	settings_repo "dinosaurus-pos/internal/settings/repository"
+	"dinosaurus-pos/internal/shift"
+	shift_repo "dinosaurus-pos/internal/shift/repository"
+	"dinosaurus-pos/internal/tenants"
+	"dinosaurus-pos/internal/user"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/cache"
+	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
+	"dinosaurus-pos/pkg/database"
+	"dinosaurus-pos/pkg/escpos"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/payment"
+	"dinosaurus-pos/pkg/productsearch"
+	"dinosaurus-pos/pkg/utils"
+	"dinosaurus-pos/pkg/validator"
 	"context"
 	"errors"
 	"log"
@@ -57,8 +59,8 @@ import (
 	"syscall"
 	"time"
 
-	"POS-kasir/internal/common/middleware"
-	ws "POS-kasir/internal/websocket"
+	"dinosaurus-pos/internal/common/middleware"
+	ws "dinosaurus-pos/internal/websocket"
 
 	swagger "github.com/gofiber/contrib/v3/swaggo"
 	"github.com/gofiber/fiber/v3"
@@ -70,7 +72,7 @@ import (
 	_ "embed"
 	"html/template"
 
-	"POS-kasir/sqlc/migrations"
+	"dinosaurus-pos/sqlc/migrations"
 
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
@@ -100,6 +102,7 @@ type AppContainer struct {
 	UserHandler               user.IUsrHandler
 	CategoryHandler           categories.ICtgHandler
 	CustomerHandler           customers.ICustomerHandler
+	CustomerGroupHandler      customergroups.ICustomerGroupHandler
 	SupplierHandler           suppliers.ISupplierHandler
 	StockReceiptHandler       stockreceipts.IStockReceiptHandler
 	SupplierDebtHandler       supplierdebts.ISupplierDebtHandler
@@ -212,7 +215,11 @@ func BuildAppContainer(app *App) *AppContainer {
 	// User Module
 	userAvatarRepo := user.NewAuthRepo(app.Logger, app.R2)
 	userRepo := user_repo.New(pool)
-	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger)
+	customerGroupRepo := customergroups_repo.New(tenantDB)
+	customerGroupService := customergroups.NewService(customerGroupRepo, app.Logger)
+	customerGroupHandler := customergroups.NewHandler(customerGroupService, app.Logger)
+
+	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger, customerGroupService)
 	tenantLookupCache := tenants.NewLookupCache(app.RedisCache)
 	tenantHandler := tenants.NewHandler(tenantRepo, tenantService, app.Logger, platformAudit, tenantLookupCache, platformOverviewCache)
 	userService := user.NewUsrService(userRepo, tenantRepo, app.Logger, activityService, userAvatarRepo)
@@ -250,6 +257,8 @@ func BuildAppContainer(app *App) *AppContainer {
 	customerDebtService := customerdebts.NewCustomerDebtService(customerDebtRepo, app.Store, app.Logger)
 	customerDebtHandler := customerdebts.NewCustomerDebtHandler(customerDebtService, app.Logger)
 
+	productListCache := products.NewListCache(app.RedisCache)
+
 	// Product search (Meilisearch)
 	var productIndexer productsearch.Indexer = productsearch.NoopIndexer{}
 	if app.Config.Meili.Enabled {
@@ -275,7 +284,7 @@ func BuildAppContainer(app *App) *AppContainer {
 						tenantIDs = append(tenantIDs, t.ID)
 					}
 				}
-				svc := products.NewPrdService(app.Store, products_repo.New(tenantDB), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer)
+				svc := products.NewPrdService(app.Store, products_repo.New(tenantDB), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer, productListCache)
 				if n, err := svc.ReindexProductSearchAllTenants(reindexCtx, tenantIDs); err != nil {
 					app.Logger.Warnf("Meilisearch auto-reindex failed: %v", err)
 				} else {
@@ -288,7 +297,7 @@ func BuildAppContainer(app *App) *AppContainer {
 	// Product Module
 	prdRepo := products.NewProductImageRepository(app.R2, app.Logger)
 	productsRepo := products_repo.New(tenantDB)
-	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService, productIndexer)
+	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService, productIndexer, productListCache)
 	prdHandler := products.NewPrdHandler(prdService, app.Logger)
 
 	// Shift Module Repo
@@ -337,6 +346,7 @@ func BuildAppContainer(app *App) *AppContainer {
 		UserHandler:               userHandler,
 		CategoryHandler:           categoryHandler,
 		CustomerHandler:           customerHandler,
+		CustomerGroupHandler:      customerGroupHandler,
 		SupplierHandler:           supplierHandler,
 		StockReceiptHandler:       stockReceiptHandler,
 		SupplierDebtHandler:       supplierDebtHandler,

@@ -1,13 +1,13 @@
 package user_test
 
 import (
-	"POS-kasir/config"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/middleware"
-	"POS-kasir/internal/user"
-	user_repo "POS-kasir/internal/user/repository"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/middleware"
+	"dinosaurus-pos/internal/user"
+	user_repo "dinosaurus-pos/internal/user/repository"
 
-	"POS-kasir/mocks"
+	"dinosaurus-pos/mocks"
 	"bytes"
 	"encoding/json"
 	"errors"

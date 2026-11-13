@@ -12,7 +12,7 @@ import (
 const createCancellationReason = `-- name: CreateCancellationReason :one
 INSERT INTO cancellation_reasons (reason, description)
 VALUES ($1, $2)
-RETURNING id, reason, description, is_active, created_at, updated_at
+RETURNING id, reason, description, is_active, created_at, updated_at, tenant_id
 `
 
 type CreateCancellationReasonParams struct {
@@ -31,12 +31,13 @@ func (q *Queries) CreateCancellationReason(ctx context.Context, arg CreateCancel
 		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
 
 const getCancellationReasonByReason = `-- name: GetCancellationReasonByReason :one
-SELECT id, reason, description, is_active, created_at, updated_at
+SELECT id, reason, description, is_active, created_at, updated_at, tenant_id
 FROM cancellation_reasons
 WHERE reason = $1
 LIMIT 1
@@ -53,12 +54,13 @@ func (q *Queries) GetCancellationReasonByReason(ctx context.Context, reason stri
 		&i.IsActive,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
 
 const listCancellationReasons = `-- name: ListCancellationReasons :many
-SELECT id, reason, description, is_active, created_at, updated_at
+SELECT id, reason, description, is_active, created_at, updated_at, tenant_id
 FROM cancellation_reasons
 WHERE is_active = true
 ORDER BY reason
@@ -81,6 +83,7 @@ func (q *Queries) ListCancellationReasons(ctx context.Context) ([]CancellationRe
 			&i.IsActive,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}

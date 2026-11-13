@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"POS-kasir/pkg/cache"
+	"dinosaurus-pos/pkg/cache"
 )
 
 const overviewCacheTTL = 45 * time.Second

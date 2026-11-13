@@ -10,7 +10,7 @@
 package mocks
 
 import (
-	repository "POS-kasir/internal/user/repository"
+	repository "dinosaurus-pos/internal/user/repository"
 	context "context"
 	reflect "reflect"
 

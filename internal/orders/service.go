@@ -1,25 +1,25 @@
 package orders
 
 import (
-	"POS-kasir/internal/activitylog"
-	activity_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/common/store"
-	"POS-kasir/internal/customerdebts"
-	"POS-kasir/internal/docno"
-	cd_repo "POS-kasir/internal/customerdebts/repository"
-	orders_repo "POS-kasir/internal/orders/repository"
-	prdunits "POS-kasir/internal/products"
-	products_repo "POS-kasir/internal/products/repository"
-	"POS-kasir/internal/settings"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/activitylog"
+	activity_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/common/store"
+	"dinosaurus-pos/internal/customerdebts"
+	"dinosaurus-pos/internal/docno"
+	cd_repo "dinosaurus-pos/internal/customerdebts/repository"
+	orders_repo "dinosaurus-pos/internal/orders/repository"
+	prdunits "dinosaurus-pos/internal/products"
+	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/internal/settings"
+	"dinosaurus-pos/pkg/logger"
 	"strconv"
 	"strings"
 	"time"
 
-	"POS-kasir/pkg/payment"
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/pkg/payment"
+	"dinosaurus-pos/pkg/utils"
 	"context"
 	"encoding/json"
 	"errors"
@@ -30,7 +30,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 
-	ws "POS-kasir/internal/websocket"
+	ws "dinosaurus-pos/internal/websocket"
 )
 
 type IOrderService interface {

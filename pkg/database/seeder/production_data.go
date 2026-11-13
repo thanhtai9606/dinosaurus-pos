@@ -1,9 +1,9 @@
 package seeder
 
 import (
-	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
-	"POS-kasir/pkg/database"
-	"POS-kasir/pkg/logger"
+	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
+	"dinosaurus-pos/pkg/database"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"fmt"
 	"io"

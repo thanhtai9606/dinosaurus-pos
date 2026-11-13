@@ -1,8 +1,8 @@
 package payment_methods
 
 import (
-	"POS-kasir/internal/payment_methods/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/payment_methods/repository"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 )
 

@@ -11,22 +11,16 @@ import { InvoiceSettingsCard } from '@/components/settings/InvoiceSettingsCard'
 import { SettingsHeader } from "@/components/settings/SettingsHeader"
 import { PreferencesSettingsCard } from '@/components/settings/PreferencesSettingsCard'
 import { useTranslation } from 'react-i18next'
-import { z } from 'zod'
+import { useState } from 'react'
 import { useRBAC } from '@/lib/auth/rbac'
 
-const searchSchema = z.object({
-    tab: z.string().optional().default('preferences'),
-})
-
-export const Route = createFileRoute("/_dashboard/settings")({
-    validateSearch: (search) => searchSchema.parse(search),
+export const Route = createFileRoute('/_dashboard/settings')({
     component: SettingsPage,
 })
 
 function SettingsPage() {
     const { t } = useTranslation()
-    const { tab } = Route.useSearch()
-    const navigate = Route.useNavigate()
+    const [tab, setTab] = useState('preferences')
     
     const { canAccessApi } = useRBAC()
     const canViewCancellations = canAccessApi('GET', '/cancellation-reasons')
@@ -41,11 +35,7 @@ function SettingsPage() {
         <div className="flex flex-col gap-6">
             <SettingsHeader t={t} />
 
-            <Tabs
-                value={tab}
-                onValueChange={(val) => navigate({ search: (old) => ({ ...old, tab: val }), replace: true })}
-                className="space-y-4"
-            >
+            <Tabs value={tab} onValueChange={setTab} className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="preferences" className="flex items-center gap-2">
                         <SlidersHorizontal className="h-4 w-4" />

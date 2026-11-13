@@ -1,10 +1,10 @@
 package user
 
 import (
-	"POS-kasir/internal/common"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/common"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/validator"
 	"errors"
 
 	"github.com/gofiber/fiber/v3"

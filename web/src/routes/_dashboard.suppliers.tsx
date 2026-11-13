@@ -1,12 +1,12 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { useTranslation } from 'react-i18next'
 import {
     suppliersListQueryOptions,
-    SuppliersListParams,
     useCreateSupplierMutation,
     useDeleteSupplierMutation,
     Supplier,
@@ -19,38 +19,35 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 
-const searchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().catch(10),
-    search: z.string().optional(),
-})
-
 export const Route = createFileRoute('/_dashboard/suppliers')({
-    validateSearch: (search) => searchSchema.parse(search),
-    loaderDeps: ({ search }) => search,
-    loader: ({ context: { queryClient }, deps }) =>
-        queryClient.ensureQueryData(suppliersListQueryOptions(deps as SuppliersListParams)),
     component: SuppliersPage,
 })
 
 function SuppliersPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch() as SuppliersListParams
-    const { data } = useSuspenseQuery(suppliersListQueryOptions(searchParams))
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({ scope: LIST_SCOPES.suppliers })
+    const [searchTerm, setSearchTerm] = useState('')
+    const debouncedSearch = useDebounce(searchTerm, 400)
+
+    useEffect(() => {
+        resetPage()
+    }, [debouncedSearch, resetPage])
+
+    const listParams = useMemo(
+        () => ({
+            page,
+            limit,
+            search: debouncedSearch || undefined,
+        }),
+        [page, limit, debouncedSearch],
+    )
+
+    const { data, isFetching } = useQuery(suppliersListQueryOptions(listParams))
     const { isAllowed: canCreate } = useCreateSupplierMutation()
     const deleteMutation = useDeleteSupplierMutation()
 
     const [dialogOpen, setDialogOpen] = useState(false)
     const [selected, setSelected] = useState<Supplier | null>(null)
-    const [searchTerm, setSearchTerm] = useState(searchParams.search || '')
-    const debouncedSearch = useDebounce(searchTerm, 400)
-
-    useEffect(() => {
-        if (debouncedSearch !== (searchParams.search || '')) {
-            navigate({ search: (prev) => ({ ...prev, search: debouncedSearch || undefined, page: 1 }), replace: true })
-        }
-    }, [debouncedSearch, navigate, searchParams.search])
 
     return (
         <div className="space-y-4 p-4">
@@ -86,7 +83,7 @@ function SuppliersPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {(data.suppliers || []).map((s) => (
+                            {(data?.suppliers || []).map((s) => (
                                 <TableRow key={s.id}>
                                     <TableCell>{s.code || '—'}</TableCell>
                                     <TableCell className="font-medium">{s.name}</TableCell>
@@ -116,11 +113,14 @@ function SuppliersPage() {
                             ))}
                         </TableBody>
                     </Table>
-                    <ListPagination
-                        pagination={data.pagination}
-                        onPageChange={(page) => navigate({ search: (prev) => ({ ...prev, page }) })}
-                        onLimitChange={(limit) => navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })}
-                    />
+                    {data?.pagination && (
+                        <ListPagination
+                            pagination={data.pagination}
+                            onPageChange={onPageChange}
+                            onLimitChange={onLimitChange}
+                            isFetching={isFetching}
+                        />
+                    )}
                 </CardContent>
             </Card>
             <SupplierFormDialog open={dialogOpen} onOpenChange={setDialogOpen} supplierToEdit={selected} />

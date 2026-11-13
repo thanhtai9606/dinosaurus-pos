@@ -1,22 +1,23 @@
 package user
 
 import (
-	"POS-kasir/internal/activitylog"
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/tenant"
-	"POS-kasir/internal/tenants"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/activitylog"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/internal/tenants"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/logger"
 
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/pkg/utils"
 	"context"
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type IUsrService interface {
@@ -412,7 +413,7 @@ func (s *UsrService) GetAllUsers(ctx context.Context, req UsersRequest) (*UsersR
 	}
 	if s.tenants != nil {
 		if tid, ok := tenant.IDFromContext(ctx); ok {
-			listParams.TenantID = &tid
+			listParams.TenantID = pgtype.UUID{Bytes: tid, Valid: true}
 		}
 	}
 

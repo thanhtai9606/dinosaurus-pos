@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"math"
 
-	"POS-kasir/internal/common"
-	products_repo "POS-kasir/internal/products/repository"
+	"dinosaurus-pos/internal/common"
+	products_repo "dinosaurus-pos/internal/products/repository"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"

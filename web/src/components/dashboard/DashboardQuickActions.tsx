@@ -16,7 +16,6 @@ export function DashboardQuickActions({ t }: DashboardQuickActionsProps) {
             <CardContent className="grid gap-4 md:grid-cols-2">
                 <Link
                     to="/product"
-                    search={{ page: 1, limit: 10, tab: 'active' }}
                     className="group h-28 flex flex-col gap-3 items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 transition-all duration-300 hover:border-primary/40 hover:bg-primary/5 hover:shadow-md"
                 >
                     <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">

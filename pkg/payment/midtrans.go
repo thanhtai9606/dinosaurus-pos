@@ -1,9 +1,9 @@
 package payment
 
 import (
-	"POS-kasir/config"
+	"dinosaurus-pos/config"
 
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/pkg/logger"
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"

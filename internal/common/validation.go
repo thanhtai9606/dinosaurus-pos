@@ -5,8 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	"POS-kasir/pkg/logger"
-	validatorpkg "POS-kasir/pkg/validator"
+	"dinosaurus-pos/pkg/logger"
+	validatorpkg "dinosaurus-pos/pkg/validator"
 )
 
 func ValidateAndRespond(c fiber.Ctx, v validatorpkg.Validator, log logger.ILogger, req interface{}) (bool, error) {

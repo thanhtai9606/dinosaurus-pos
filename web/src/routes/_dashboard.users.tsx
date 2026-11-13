@@ -1,10 +1,11 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { usersListQueryOptions, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation, useToggleUserStatusMutation } from '@/lib/api/query/user'
-import { InternalUserProfileResponse, UsersGetRoleEnum, UsersGetStatusEnum } from '@/lib/api/generated'
+import { InternalUserProfileResponse, UsersGetRoleEnum } from '@/lib/api/generated'
 import { ListPagination } from '@/components/pagination'
 import { useTranslation } from 'react-i18next'
 import { UsersHeader } from '@/components/users/UsersHeader'
@@ -17,58 +18,37 @@ import { UserGridSkeleton } from '@/components/ui/list-skeletons'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutGrid, LayoutList } from 'lucide-react'
 
-const usersSearchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().catch(10),
-    search: z.string().optional(),
-    role: z.enum(UsersGetRoleEnum).optional(),
-    status: z.enum(UsersGetStatusEnum).optional(),
-    is_active: z.boolean().optional(),
-})
-
 export const Route = createFileRoute('/_dashboard/users')({
-    validateSearch: (search) => usersSearchSchema.parse(search),
-
-    loaderDeps: ({ search }) => ({
-        page: search.page,
-        limit: search.limit,
-        search: search.search,
-        role: search.role,
-        status: search.status,
-        is_active: search.is_active,
-    }),
-
-    loader: ({ context: { queryClient }, deps }) => {
-        return queryClient.ensureQueryData(usersListQueryOptions({
-            page: deps.page,
-            limit: deps.limit,
-            search: deps.search,
-            role: deps.role,
-            status: deps.status,
-            isActive: deps.is_active,
-        }))
-    },
-
     component: UsersPage,
 })
 
 function UsersPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch()
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({ scope: LIST_SCOPES.users })
+    const [role, setRole] = useState<UsersGetRoleEnum | undefined>()
+    const [isActive, setIsActive] = useState<boolean | undefined>()
+    const [searchTerm, setSearchTerm] = useState('')
+    const debouncedSearch = useDebounce(searchTerm, 500)
+    const isSearchPending = searchTerm !== debouncedSearch
 
-    const listParams = {
-        page: searchParams.page,
-        limit: searchParams.limit,
-        search: searchParams.search,
-        role: searchParams.role,
-        status: searchParams.status,
-        isActive: searchParams.is_active,
-    }
-    const usersQuery = useSuspenseQuery(usersListQueryOptions(listParams))
+    useEffect(() => {
+        resetPage()
+    }, [debouncedSearch, role, isActive, resetPage])
 
-    const users = usersQuery.data.users || []
-    const pagination = usersQuery.data.pagination
+    const listParams = useMemo(
+        () => ({
+            page,
+            limit,
+            search: debouncedSearch || undefined,
+            role,
+            isActive,
+        }),
+        [page, limit, debouncedSearch, role, isActive],
+    )
+    const usersQuery = useQuery(usersListQueryOptions(listParams))
+
+    const users = usersQuery.data?.users || []
+    const pagination = usersQuery.data?.pagination
 
     const { isAllowed: canCreate } = useCreateUserMutation()
     const { isAllowed: canEdit } = useUpdateUserMutation()
@@ -79,44 +59,15 @@ function UsersPage() {
     const [selectedUser, setSelectedUser] = useState<InternalUserProfileResponse | null>(null)
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
 
-    const [searchTerm, setSearchTerm] = useState(searchParams.search || '')
-    const debouncedSearch = useDebounce(searchTerm, 500)
-    const isSearchPending = searchTerm !== debouncedSearch
-
-    useEffect(() => {
-        if (debouncedSearch !== (searchParams.search || '')) {
-            navigate({
-                search: (prev) => ({ ...prev, search: debouncedSearch || undefined, page: 1 }),
-                replace: true,
-            })
-        }
-    }, [debouncedSearch, navigate, searchParams.search])
-
     const activeFilter: 'all' | 'active' | 'inactive' =
-        searchParams.is_active === true ? 'active' : searchParams.is_active === false ? 'inactive' : 'all'
+        isActive === true ? 'active' : isActive === false ? 'inactive' : 'all'
 
-    const handleFilterRole = (role: string) => {
-        navigate({
-            search: (prev) => ({ ...prev, role: role === 'all' ? undefined : role as UsersGetRoleEnum, page: 1 }),
-        })
+    const handleFilterRole = (value: string) => {
+        setRole(value === 'all' ? undefined : (value as UsersGetRoleEnum))
     }
 
     const handleActiveFilter = (value: 'all' | 'active' | 'inactive') => {
-        navigate({
-            search: (prev) => ({
-                ...prev,
-                is_active: value === 'all' ? undefined : value === 'active',
-                page: 1,
-            }),
-        })
-    }
-
-    const handlePageChange = (newPage: number) => {
-        navigate({ search: (prev) => ({ ...prev, page: newPage }) })
-    }
-
-    const handleLimitChange = (limit: number) => {
-        navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
+        setIsActive(value === 'all' ? undefined : value === 'active')
     }
 
     const openCreateModal = () => {
@@ -151,7 +102,7 @@ function UsersPage() {
                     t={t}
                     search={searchTerm}
                     onSearchChange={setSearchTerm}
-                    role={searchParams.role}
+                    role={role}
                     onRoleChange={handleFilterRole}
                     activeFilter={activeFilter}
                     onActiveFilterChange={handleActiveFilter}
@@ -178,8 +129,8 @@ function UsersPage() {
                     renderActions={renderActions}
                     server={{
                         pagination,
-                        onPageChange: handlePageChange,
-                        onLimitChange: handleLimitChange,
+                        onPageChange,
+                        onLimitChange,
                         isFetching: usersQuery.isFetching,
                     }}
                 />
@@ -195,8 +146,8 @@ function UsersPage() {
             {viewMode === 'grid' ? (
                 <ListPagination
                     pagination={pagination}
-                    onPageChange={handlePageChange}
-                    onLimitChange={handleLimitChange}
+                    onPageChange={onPageChange}
+                    onLimitChange={onLimitChange}
                     isFetching={usersQuery.isFetching}
                 />
             ) : null}

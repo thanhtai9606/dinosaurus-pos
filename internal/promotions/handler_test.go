@@ -1,11 +1,11 @@
 package promotions_test
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/promotions"
-	promo_repo "POS-kasir/internal/promotions/repository"
-	"POS-kasir/mocks"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/promotions"
+	promo_repo "dinosaurus-pos/internal/promotions/repository"
+	"dinosaurus-pos/mocks"
 	"bytes"
 	"encoding/json"
 	"errors"

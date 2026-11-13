@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/suppliers/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/suppliers/repository"
+	"dinosaurus-pos/pkg/logger"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"

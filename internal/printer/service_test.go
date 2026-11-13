@@ -1,14 +1,14 @@
 package printer_test
 
 import (
-	"POS-kasir/internal/orders"
-	orders_repo "POS-kasir/internal/orders/repository"
-	"POS-kasir/internal/payment_methods"
-	"POS-kasir/internal/printer"
-	"POS-kasir/internal/settings"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/mocks"
-	"POS-kasir/pkg/escpos"
+	"dinosaurus-pos/internal/orders"
+	orders_repo "dinosaurus-pos/internal/orders/repository"
+	"dinosaurus-pos/internal/payment_methods"
+	"dinosaurus-pos/internal/printer"
+	"dinosaurus-pos/internal/settings"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/mocks"
+	"dinosaurus-pos/pkg/escpos"
 	"context"
 	"errors"
 	"testing"

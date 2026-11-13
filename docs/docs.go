@@ -107,7 +107,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -123,13 +123,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -168,7 +168,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -184,25 +184,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failed",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - higher role assignment attempt",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "User, username, or email already exists",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -241,7 +241,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -257,19 +257,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failed",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid username or password",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 }
@@ -292,19 +292,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Successfully logged out",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -334,7 +334,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -350,13 +350,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -395,7 +395,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -411,19 +411,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid file or dimensions",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -462,25 +462,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Password updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body or validation failed",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -510,7 +510,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -526,16 +526,60 @@ const docTemplate = `{
                     "401": {
                         "description": "Invalid or expired session",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 }
+            }
+        },
+        "/auth/switch-tenant": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Switch tenant",
+                "parameters": [
+                    {
+                        "description": "Target tenant",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_user.SwitchTenantRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
             }
         },
         "/cancellation-reasons": {
@@ -557,7 +601,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -576,7 +620,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -620,7 +664,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -639,13 +683,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve categories",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -684,7 +728,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -700,19 +744,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Category with this name already exists",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to create category",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -741,7 +785,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -760,7 +804,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Failed to retrieve category count",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -799,7 +843,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -815,19 +859,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid category ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Category not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve category",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -872,7 +916,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -888,25 +932,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Category not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Category with this name already exists",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to update category",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -940,34 +984,95 @@ const docTemplate = `{
                     "200": {
                         "description": "Category deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid category ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Category not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Category cannot be deleted because it is in use",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to delete category",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/customer-groups": {
+            "get": {
+                "tags": [
+                    "CustomerGroups"
+                ],
+                "summary": "List customer groups",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "CustomerGroups"
+                ],
+                "summary": "Create customer group",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/customer-groups/{id}": {
+            "get": {
+                "tags": [
+                    "CustomerGroups"
+                ],
+                "summary": "Get customer group",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "CustomerGroups"
+                ],
+                "summary": "Update customer group",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "CustomerGroups"
+                ],
+                "summary": "Delete customer group",
+                "responses": {},
                 "x-roles": [
                     "admin",
                     "manager"
@@ -1013,7 +1118,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1029,13 +1134,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1074,7 +1179,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1090,13 +1195,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1135,7 +1240,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1151,19 +1256,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Customer not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1209,7 +1314,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1225,19 +1330,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Customer not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1271,25 +1376,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Customer deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Customer not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1356,7 +1461,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1372,13 +1477,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve orders",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1417,7 +1522,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1433,13 +1538,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to create order",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1470,7 +1575,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_pkg_payment.MidtransNotificationPayload"
+                            "$ref": "#/definitions/dinosaurus-pos_pkg_payment.MidtransNotificationPayload"
                         }
                     }
                 ],
@@ -1478,19 +1583,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Notification received successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid notification format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to handle notification",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 }
@@ -1525,7 +1630,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1541,19 +1646,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid order ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve order",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1602,7 +1707,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1618,19 +1723,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid order ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Order or Promotion not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to apply promotion",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1677,31 +1782,31 @@ const docTemplate = `{
                     "200": {
                         "description": "Order cancelled successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid order ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Order cannot be cancelled",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to cancel order",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1750,7 +1855,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1766,25 +1871,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid order ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Order version conflict",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to update order items",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1833,7 +1938,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1849,25 +1954,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid order ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Order might have been paid, cancelled, or version conflict",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to complete payment",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1907,7 +2012,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -1923,19 +2028,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid order ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to process payment",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -1973,19 +2078,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Invoice sent to printer",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid order ID",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to print invoice",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2023,19 +2128,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Invoice print data",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid order ID",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to generate print data",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2083,7 +2188,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2099,19 +2204,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 }
@@ -2155,7 +2260,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2171,25 +2276,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid order ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Order not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Invalid status transition",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to update order status",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2219,7 +2324,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2238,7 +2343,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2294,7 +2399,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2310,13 +2415,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve products",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2355,7 +2460,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2371,19 +2476,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Product with same name already exists",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to create product",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2391,6 +2496,172 @@ const docTemplate = `{
                     "admin",
                     "manager"
                 ]
+            }
+        },
+        "/products/export-prices": {
+            "get": {
+                "produces": [
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Export product prices",
+                "responses": {
+                    "200": {
+                        "description": "Excel export",
+                        "schema": {
+                            "type": "file"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/products/import-prices": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Import product prices",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file (sku/product_id, cost_price, price)",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_products.ImportPricesResult"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/products/import-prices/template": {
+            "get": {
+                "produces": [
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Download import prices template",
+                "responses": {
+                    "200": {
+                        "description": "Excel template",
+                        "schema": {
+                            "type": "file"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/products/lookup": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Lookup product by barcode or SKU",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Barcode or SKU",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_products.ProductResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            }
+        },
+        "/products/search": {
+            "get": {
+                "produces": [
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Export product prices",
+                "responses": {
+                    "200": {
+                        "description": "Excel export",
+                        "schema": {
+                            "type": "file"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/products/search/reindex": {
+            "post": {
+                "responses": {}
             }
         },
         "/products/trash": {
@@ -2438,7 +2709,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2454,13 +2725,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve deleted products",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2497,19 +2768,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Products restored successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to restore products",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2547,7 +2818,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2563,19 +2834,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid product ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve deleted product",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2611,25 +2882,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Product restored successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid product ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to restore product",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2667,7 +2938,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2683,19 +2954,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid product ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve product",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2731,25 +3002,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Product deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid product ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to delete product",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2794,7 +3065,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2810,19 +3081,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to update product",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -2868,7 +3139,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2884,19 +3155,76 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID format or image file is missing",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to upload image",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/products/{id}/sale-units": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Replace product sale units",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Product ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Sale units",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_products.ReplaceSaleUnitsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_products.ProductResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -2947,7 +3275,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -2963,19 +3291,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID format or query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to retrieve stock history",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3023,7 +3351,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3039,19 +3367,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid product ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Parent product not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to create product option",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3107,7 +3435,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3123,19 +3451,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product or option not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to update product option",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3189,7 +3517,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3205,19 +3533,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID format or missing file",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Product or option not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to upload product option image",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3266,7 +3594,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3282,13 +3610,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3327,7 +3655,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3343,13 +3671,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failed",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3388,7 +3716,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3404,19 +3732,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid promotion ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Promotion not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3463,7 +3791,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3479,19 +3807,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid project ID format or request body",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Promotion not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3526,19 +3854,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Promotion deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid promotion ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3575,19 +3903,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Promotion restored successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid promotion ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3632,7 +3960,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3651,13 +3979,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3703,7 +4031,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3722,13 +4050,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3774,7 +4102,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3790,13 +4118,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3840,7 +4168,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3859,7 +4187,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3904,7 +4232,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3923,13 +4251,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -3975,7 +4303,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -3994,13 +4322,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4046,7 +4374,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4065,13 +4393,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4117,7 +4445,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4136,13 +4464,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4194,7 +4522,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4213,13 +4541,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4264,7 +4592,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4283,13 +4611,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4341,7 +4669,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4360,13 +4688,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4395,7 +4723,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4411,7 +4739,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4450,7 +4778,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4466,13 +4794,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failure",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4509,7 +4837,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4528,13 +4856,230 @@ const docTemplate = `{
                     "400": {
                         "description": "Logo file is required or file size exceeds limit",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/settings/financial": {
+            "get": {
+                "description": "Currency, tax rate, and service charge (Roles: authenticated)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Get financial settings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_settings.FinancialSettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "put": {
+                "description": "Update currency, tax, and service charge (Roles: admin)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Update financial settings",
+                "parameters": [
+                    {
+                        "description": "Financial settings",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_settings.UpdateFinancialSettingsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_settings.FinancialSettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/settings/financial/currencies": {
+            "put": {
+                "description": "JSON list of currencies for multi-region deployments (Roles: admin)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Update supported currencies",
+                "parameters": [
+                    {
+                        "description": "Currency list",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_settings.UpdateSupportedCurrenciesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_settings.FinancialSettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/settings/invoice": {
+            "get": {
+                "description": "Receipt headers, footers, and legal text (Roles: authenticated)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Get invoice settings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_settings.InvoiceSettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "put": {
+                "description": "Customize printed invoices (Roles: admin)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Update invoice settings",
+                "parameters": [
+                    {
+                        "description": "Invoice settings",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_settings.UpdateInvoiceSettingsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_settings.InvoiceSettingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 },
@@ -4562,7 +5107,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4578,7 +5123,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4617,7 +5162,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4633,13 +5178,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failure",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4665,13 +5210,13 @@ const docTemplate = `{
                     "200": {
                         "description": "List of discovered printers",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to discover printers",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4697,13 +5242,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Test print command sent associated with configured printer",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "500": {
                         "description": "Failed to send test print",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4742,7 +5287,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4758,19 +5303,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failure",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "No open shift found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4800,7 +5345,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4816,13 +5361,13 @@ const docTemplate = `{
                     "404": {
                         "description": "No open shift found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4863,7 +5408,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4879,19 +5424,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failure",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "No open shift found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4932,7 +5477,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -4948,19 +5493,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failure",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "User already has an open shift",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -4968,6 +5513,482 @@ const docTemplate = `{
                     "admin",
                     "manager",
                     "cashier"
+                ]
+            }
+        },
+        "/stock-receipts": {
+            "get": {
+                "tags": [
+                    "StockReceipts"
+                ],
+                "summary": "List stock receipts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_stockreceipts.PagedStockReceiptResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "StockReceipts"
+                ],
+                "summary": "Create stock receipt draft",
+                "parameters": [
+                    {
+                        "description": "Receipt",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_stockreceipts.CreateStockReceiptRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-receipts/{id}": {
+            "get": {
+                "tags": [
+                    "StockReceipts"
+                ],
+                "summary": "Get stock receipt",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Receipt ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "StockReceipts"
+                ],
+                "summary": "Update draft stock receipt",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Receipt ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "StockReceipts"
+                ],
+                "summary": "Delete draft or cancelled stock receipt",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Receipt ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-receipts/{id}/cancel": {
+            "post": {
+                "tags": [
+                    "StockReceipts"
+                ],
+                "summary": "Cancel draft stock receipt",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Receipt ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-receipts/{id}/complete": {
+            "post": {
+                "tags": [
+                    "StockReceipts"
+                ],
+                "summary": "Complete stock receipt",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Receipt ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/suppliers": {
+            "get": {
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "List suppliers",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_suppliers.PagedSupplierResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "Create a supplier",
+                "parameters": [
+                    {
+                        "description": "Supplier details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_suppliers.CreateSupplierRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_suppliers.SupplierResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/suppliers/{id}": {
+            "get": {
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "Get a supplier",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Supplier ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_suppliers.SupplierResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "Update a supplier",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Supplier ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Supplier details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_suppliers.UpdateSupplierRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_suppliers.SupplierResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Suppliers"
+                ],
+                "summary": "Delete a supplier",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Supplier ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
                 ]
             }
         },
@@ -5060,7 +6081,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -5076,13 +6097,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -5121,7 +6142,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -5137,19 +6158,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failed",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "User, username, or email already exists",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -5187,7 +6208,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -5203,19 +6224,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid user ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -5261,7 +6282,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                                 },
                                 {
                                     "type": "object",
@@ -5277,31 +6298,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation failed",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - higher role assignment attempt",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Username or email already exists",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -5335,25 +6356,25 @@ const docTemplate = `{
                     "200": {
                         "description": "User deleted successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid user ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -5389,25 +6410,25 @@ const docTemplate = `{
                     "200": {
                         "description": "User status toggled successfully",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.SuccessResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid user ID format",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "User not found",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/POS-kasir_internal_common.ErrorResponse"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.ErrorResponse"
                         }
                     }
                 },
@@ -5418,7 +6439,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "POS-kasir_internal_activitylog_repository.LogActionType": {
+        "dinosaurus-pos_internal_activitylog_repository.LogActionType": {
             "type": "string",
             "enum": [
                 "CREATE",
@@ -5449,7 +6470,7 @@ const docTemplate = `{
                 "LogActionTypeRESTORE"
             ]
         },
-        "POS-kasir_internal_activitylog_repository.LogEntityType": {
+        "dinosaurus-pos_internal_activitylog_repository.LogEntityType": {
             "type": "string",
             "enum": [
                 "PRODUCT",
@@ -5474,7 +6495,7 @@ const docTemplate = `{
                 "LogEntityTypeCANCELLATIONREASON"
             ]
         },
-        "POS-kasir_internal_common.ErrorResponse": {
+        "dinosaurus-pos_internal_common.ErrorResponse": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -5484,7 +6505,7 @@ const docTemplate = `{
                 }
             }
         },
-        "POS-kasir_internal_common.SuccessResponse": {
+        "dinosaurus-pos_internal_common.SuccessResponse": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -5493,7 +6514,7 @@ const docTemplate = `{
                 }
             }
         },
-        "POS-kasir_internal_common_pagination.Pagination": {
+        "dinosaurus-pos_internal_common_pagination.Pagination": {
             "type": "object",
             "properties": {
                 "current_page": {
@@ -5510,7 +6531,7 @@ const docTemplate = `{
                 }
             }
         },
-        "POS-kasir_internal_orders_repository.OrderStatus": {
+        "dinosaurus-pos_internal_orders_repository.OrderStatus": {
             "type": "string",
             "enum": [
                 "open",
@@ -5527,7 +6548,7 @@ const docTemplate = `{
                 "OrderStatusCancelled"
             ]
         },
-        "POS-kasir_internal_orders_repository.OrderType": {
+        "dinosaurus-pos_internal_orders_repository.OrderType": {
             "type": "string",
             "enum": [
                 "dine_in",
@@ -5538,7 +6559,7 @@ const docTemplate = `{
                 "OrderTypeTakeaway"
             ]
         },
-        "POS-kasir_internal_promotions_repository.DiscountType": {
+        "dinosaurus-pos_internal_promotions_repository.DiscountType": {
             "type": "string",
             "enum": [
                 "percentage",
@@ -5549,7 +6570,7 @@ const docTemplate = `{
                 "DiscountTypeFixedAmount"
             ]
         },
-        "POS-kasir_internal_promotions_repository.PromotionRuleType": {
+        "dinosaurus-pos_internal_promotions_repository.PromotionRuleType": {
             "type": "string",
             "enum": [
                 "MINIMUM_ORDER_AMOUNT",
@@ -5566,7 +6587,7 @@ const docTemplate = `{
                 "PromotionRuleTypeALLOWEDORDERTYPE"
             ]
         },
-        "POS-kasir_internal_promotions_repository.PromotionScope": {
+        "dinosaurus-pos_internal_promotions_repository.PromotionScope": {
             "type": "string",
             "enum": [
                 "ORDER",
@@ -5577,7 +6598,7 @@ const docTemplate = `{
                 "PromotionScopeITEM"
             ]
         },
-        "POS-kasir_internal_promotions_repository.PromotionTargetType": {
+        "dinosaurus-pos_internal_promotions_repository.PromotionTargetType": {
             "type": "string",
             "enum": [
                 "PRODUCT",
@@ -5588,7 +6609,7 @@ const docTemplate = `{
                 "PromotionTargetTypeCATEGORY"
             ]
         },
-        "POS-kasir_internal_shift_repository.CashTransactionType": {
+        "dinosaurus-pos_internal_shift_repository.CashTransactionType": {
             "type": "string",
             "enum": [
                 "cash_in",
@@ -5599,7 +6620,7 @@ const docTemplate = `{
                 "CashTransactionTypeCashOut"
             ]
         },
-        "POS-kasir_internal_shift_repository.ShiftStatus": {
+        "dinosaurus-pos_internal_shift_repository.ShiftStatus": {
             "type": "string",
             "enum": [
                 "open",
@@ -5610,20 +6631,22 @@ const docTemplate = `{
                 "ShiftStatusClosed"
             ]
         },
-        "POS-kasir_internal_user_repository.UserRole": {
+        "dinosaurus-pos_internal_user_repository.UserRole": {
             "type": "string",
             "enum": [
                 "admin",
                 "cashier",
-                "manager"
+                "manager",
+                "super_admin"
             ],
             "x-enum-varnames": [
                 "UserRoleAdmin",
                 "UserRoleCashier",
-                "UserRoleManager"
+                "UserRoleManager",
+                "UserRoleSuperAdmin"
             ]
         },
-        "POS-kasir_pkg_payment.MidtransNotificationPayload": {
+        "dinosaurus-pos_pkg_payment.MidtransNotificationPayload": {
             "type": "object",
             "properties": {
                 "currency": {
@@ -5695,7 +6718,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "action_type": {
-                    "$ref": "#/definitions/POS-kasir_internal_activitylog_repository.LogActionType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_activitylog_repository.LogActionType"
                 },
                 "created_at": {
                     "type": "string"
@@ -5708,7 +6731,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "entity_type": {
-                    "$ref": "#/definitions/POS-kasir_internal_activitylog_repository.LogEntityType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_activitylog_repository.LogEntityType"
                 },
                 "id": {
                     "type": "string"
@@ -5800,6 +6823,9 @@ const docTemplate = `{
                 "address": {
                     "type": "string"
                 },
+                "customer_group_id": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string",
                     "maxLength": 255
@@ -5820,7 +6846,16 @@ const docTemplate = `{
                 "address": {
                     "type": "string"
                 },
+                "code": {
+                    "type": "string"
+                },
                 "created_at": {
+                    "type": "string"
+                },
+                "customer_group_id": {
+                    "type": "string"
+                },
+                "customer_group_name": {
                     "type": "string"
                 },
                 "email": {
@@ -5850,7 +6885,7 @@ const docTemplate = `{
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 }
             }
         },
@@ -5861,6 +6896,9 @@ const docTemplate = `{
             ],
             "properties": {
                 "address": {
+                    "type": "string"
+                },
+                "customer_group_id": {
                     "type": "string"
                 },
                 "email": {
@@ -5949,8 +6987,15 @@ const docTemplate = `{
                 "product_id": {
                     "type": "string"
                 },
+                "product_unit_id": {
+                    "type": "string"
+                },
                 "quantity": {
                     "type": "integer"
+                },
+                "unit_price": {
+                    "type": "integer",
+                    "minimum": 0
                 }
             }
         },
@@ -5963,6 +7008,10 @@ const docTemplate = `{
             "properties": {
                 "customer_id": {
                     "type": "string"
+                },
+                "discount_amount": {
+                    "type": "integer",
+                    "minimum": 0
                 },
                 "items": {
                     "type": "array",
@@ -5978,7 +7027,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_orders_repository.OrderType"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_orders_repository.OrderType"
                         }
                     ]
                 }
@@ -6046,6 +7095,9 @@ const docTemplate = `{
                 "net_total": {
                     "type": "integer"
                 },
+                "order_no": {
+                    "type": "string"
+                },
                 "payment_gateway_reference": {
                     "type": "string"
                 },
@@ -6056,13 +7108,13 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "status": {
-                    "$ref": "#/definitions/POS-kasir_internal_orders_repository.OrderStatus"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_orders_repository.OrderStatus"
                 },
                 "tax_amount": {
                     "type": "integer"
                 },
                 "type": {
-                    "$ref": "#/definitions/POS-kasir_internal_orders_repository.OrderType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_orders_repository.OrderType"
                 },
                 "updated_at": {
                     "type": "string"
@@ -6092,8 +7144,17 @@ const docTemplate = `{
         "internal_orders.OrderItemResponse": {
             "type": "object",
             "properties": {
+                "barcode": {
+                    "type": "string"
+                },
+                "discount_amount": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "string"
+                },
+                "net_subtotal": {
+                    "type": "integer"
                 },
                 "options": {
                     "type": "array",
@@ -6104,6 +7165,9 @@ const docTemplate = `{
                 "price_at_sale": {
                     "type": "integer"
                 },
+                "product_code": {
+                    "type": "string"
+                },
                 "product_id": {
                     "type": "string"
                 },
@@ -6112,6 +7176,12 @@ const docTemplate = `{
                 },
                 "quantity": {
                     "type": "integer"
+                },
+                "sale_unit_name": {
+                    "type": "string"
+                },
+                "sku": {
+                    "type": "string"
                 },
                 "subtotal": {
                     "type": "integer"
@@ -6139,14 +7209,17 @@ const docTemplate = `{
                 "net_total": {
                     "type": "integer"
                 },
+                "order_no": {
+                    "type": "string"
+                },
                 "queue_number": {
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/POS-kasir_internal_orders_repository.OrderStatus"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_orders_repository.OrderStatus"
                 },
                 "type": {
-                    "$ref": "#/definitions/POS-kasir_internal_orders_repository.OrderType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_orders_repository.OrderType"
                 },
                 "user_id": {
                     "type": "string"
@@ -6163,7 +7236,7 @@ const docTemplate = `{
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 }
             }
         },
@@ -6248,7 +7321,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_orders_repository.OrderStatus"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_orders_repository.OrderStatus"
                         }
                     ]
                 }
@@ -6314,6 +7387,10 @@ const docTemplate = `{
                 "stock"
             ],
             "properties": {
+                "barcode": {
+                    "type": "string",
+                    "maxLength": 100
+                },
                 "category_ids": {
                     "type": "array",
                     "items": {
@@ -6322,6 +7399,13 @@ const docTemplate = `{
                 },
                 "cost_price": {
                     "type": "number",
+                    "minimum": 0
+                },
+                "default_supplier_id": {
+                    "type": "string"
+                },
+                "min_stock": {
+                    "type": "integer",
                     "minimum": 0
                 },
                 "name": {
@@ -6338,9 +7422,42 @@ const docTemplate = `{
                 "price": {
                     "type": "number"
                 },
+                "sku": {
+                    "type": "string",
+                    "maxLength": 50
+                },
                 "stock": {
                     "type": "integer",
                     "minimum": 0
+                },
+                "unit": {
+                    "type": "string",
+                    "maxLength": 20
+                }
+            }
+        },
+        "internal_products.ImportPriceFailure": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "row": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_products.ImportPricesResult": {
+            "type": "object",
+            "properties": {
+                "failed": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_products.ImportPriceFailure"
+                    }
+                },
+                "updated": {
+                    "type": "integer"
                 }
             }
         },
@@ -6348,7 +7465,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 },
                 "products": {
                     "type": "array",
@@ -6368,7 +7485,7 @@ const docTemplate = `{
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 }
             }
         },
@@ -6386,11 +7503,23 @@ const docTemplate = `{
         "internal_products.ProductListResponse": {
             "type": "object",
             "properties": {
+                "barcode": {
+                    "type": "string"
+                },
                 "categories": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/internal_products.ProductCategoryResponse"
                     }
+                },
+                "code": {
+                    "type": "string"
+                },
+                "cost_price": {
+                    "type": "number"
+                },
+                "default_supplier_id": {
+                    "type": "string"
                 },
                 "deleted_at": {
                     "type": "string"
@@ -6401,14 +7530,23 @@ const docTemplate = `{
                 "image_url": {
                     "type": "string"
                 },
+                "min_stock": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
                 "price": {
                     "type": "number"
                 },
+                "sku": {
+                    "type": "string"
+                },
                 "stock": {
                     "type": "integer"
+                },
+                "unit": {
+                    "type": "string"
                 }
             }
         },
@@ -6432,16 +7570,25 @@ const docTemplate = `{
         "internal_products.ProductResponse": {
             "type": "object",
             "properties": {
+                "barcode": {
+                    "type": "string"
+                },
                 "categories": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/internal_products.ProductCategoryResponse"
                     }
                 },
+                "code": {
+                    "type": "string"
+                },
                 "cost_price": {
                     "type": "number"
                 },
                 "created_at": {
+                    "type": "string"
+                },
+                "default_supplier_id": {
                     "type": "string"
                 },
                 "deleted_at": {
@@ -6452,6 +7599,12 @@ const docTemplate = `{
                 },
                 "image_url": {
                     "type": "string"
+                },
+                "matched_sale_unit_id": {
+                    "type": "string"
+                },
+                "min_stock": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -6465,11 +7618,67 @@ const docTemplate = `{
                 "price": {
                     "type": "number"
                 },
+                "sale_units": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_products.ProductSaleUnitResponse"
+                    }
+                },
+                "sku": {
+                    "type": "string"
+                },
                 "stock": {
                     "type": "integer"
                 },
+                "unit": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_products.ProductSaleUnitResponse": {
+            "type": "object",
+            "properties": {
+                "barcode": {
+                    "type": "string"
+                },
+                "factor_to_base": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_base": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sell_price": {
+                    "type": "number"
+                },
+                "sku": {
+                    "type": "string"
+                },
+                "sort_order": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_products.ReplaceSaleUnitsRequest": {
+            "type": "object",
+            "required": [
+                "units"
+            ],
+            "properties": {
+                "units": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/internal_products.SaleUnitInput"
+                    }
                 }
             }
         },
@@ -6485,6 +7694,45 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "internal_products.SaleUnitInput": {
+            "type": "object",
+            "required": [
+                "factor_to_base",
+                "name",
+                "sell_price"
+            ],
+            "properties": {
+                "barcode": {
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "factor_to_base": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_base": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 1
+                },
+                "sell_price": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "sku": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "sort_order": {
+                    "type": "integer"
                 }
             }
         },
@@ -6540,6 +7788,10 @@ const docTemplate = `{
         "internal_products.UpdateProductRequest": {
             "type": "object",
             "properties": {
+                "barcode": {
+                    "type": "string",
+                    "maxLength": 100
+                },
                 "category_ids": {
                     "type": "array",
                     "items": {
@@ -6560,6 +7812,13 @@ const docTemplate = `{
                     "type": "number",
                     "minimum": 0
                 },
+                "default_supplier_id": {
+                    "type": "string"
+                },
+                "min_stock": {
+                    "type": "integer",
+                    "minimum": 0
+                },
                 "name": {
                     "type": "string",
                     "maxLength": 100,
@@ -6572,9 +7831,17 @@ const docTemplate = `{
                 "price": {
                     "type": "number"
                 },
+                "sku": {
+                    "type": "string",
+                    "maxLength": 50
+                },
                 "stock": {
                     "type": "integer",
                     "minimum": 0
+                },
+                "unit": {
+                    "type": "string",
+                    "maxLength": 20
                 }
             }
         },
@@ -6599,7 +7866,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_promotions_repository.DiscountType"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.DiscountType"
                         }
                     ]
                 },
@@ -6632,7 +7899,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_promotions_repository.PromotionScope"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionScope"
                         }
                     ]
                 },
@@ -6667,7 +7934,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_promotions_repository.PromotionRuleType"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionRuleType"
                         }
                     ]
                 },
@@ -6693,7 +7960,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_promotions_repository.PromotionTargetType"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionTargetType"
                         }
                     ]
                 }
@@ -6703,7 +7970,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 },
                 "promotions": {
                     "type": "array",
@@ -6726,7 +7993,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "discount_type": {
-                    "$ref": "#/definitions/POS-kasir_internal_promotions_repository.DiscountType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.DiscountType"
                 },
                 "discount_value": {
                     "type": "integer"
@@ -6753,7 +8020,7 @@ const docTemplate = `{
                     }
                 },
                 "scope": {
-                    "$ref": "#/definitions/POS-kasir_internal_promotions_repository.PromotionScope"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionScope"
                 },
                 "start_date": {
                     "type": "string"
@@ -6779,7 +8046,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "rule_type": {
-                    "$ref": "#/definitions/POS-kasir_internal_promotions_repository.PromotionRuleType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionRuleType"
                 },
                 "rule_value": {
                     "type": "string"
@@ -6796,7 +8063,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "target_type": {
-                    "$ref": "#/definitions/POS-kasir_internal_promotions_repository.PromotionTargetType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionTargetType"
                 }
             }
         },
@@ -6821,7 +8088,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_promotions_repository.DiscountType"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.DiscountType"
                         }
                     ]
                 },
@@ -6854,7 +8121,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_promotions_repository.PromotionScope"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_promotions_repository.PromotionScope"
                         }
                     ]
                 },
@@ -6920,10 +8187,16 @@ const docTemplate = `{
         "internal_report.LowStockProductResponse": {
             "type": "object",
             "properties": {
+                "min_stock": {
+                    "type": "integer"
+                },
                 "product_id": {
                     "type": "string"
                 },
                 "product_name": {
+                    "type": "string"
+                },
+                "sku": {
                     "type": "string"
                 },
                 "stock": {
@@ -6952,7 +8225,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 },
                 "products": {
                     "type": "array",
@@ -6983,7 +8256,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 },
                 "products": {
                     "type": "array",
@@ -7113,6 +8386,75 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_settings.CurrencyOption": {
+            "type": "object",
+            "required": [
+                "code",
+                "label",
+                "locale"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "fraction_digits": {
+                    "type": "integer",
+                    "maximum": 4,
+                    "minimum": 0
+                },
+                "label": {
+                    "type": "string",
+                    "maxLength": 64
+                },
+                "locale": {
+                    "type": "string",
+                    "maxLength": 16
+                }
+            }
+        },
+        "internal_settings.FinancialSettingsResponse": {
+            "type": "object",
+            "properties": {
+                "available_currencies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_settings.CurrencyOption"
+                    }
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "service_charge_rate": {
+                    "type": "number"
+                },
+                "tax_enabled": {
+                    "type": "boolean"
+                },
+                "tax_rate": {
+                    "type": "number"
+                }
+            }
+        },
+        "internal_settings.InvoiceSettingsResponse": {
+            "type": "object",
+            "properties": {
+                "invoice_prefix": {
+                    "type": "string"
+                },
+                "legal_text": {
+                    "type": "string"
+                },
+                "receipt_footer": {
+                    "type": "string"
+                },
+                "receipt_header": {
+                    "type": "string"
+                },
+                "show_tax_on_receipt": {
+                    "type": "boolean"
+                }
+            }
+        },
         "internal_settings.PrinterSettingsResponse": {
             "type": "object",
             "properties": {
@@ -7150,6 +8492,58 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_settings.UpdateFinancialSettingsRequest": {
+            "type": "object",
+            "required": [
+                "currency",
+                "tax_enabled"
+            ],
+            "properties": {
+                "currency": {
+                    "type": "string"
+                },
+                "service_charge_rate": {
+                    "type": "number",
+                    "maximum": 100,
+                    "minimum": 0
+                },
+                "tax_enabled": {
+                    "type": "boolean"
+                },
+                "tax_rate": {
+                    "type": "number",
+                    "maximum": 100,
+                    "minimum": 0
+                }
+            }
+        },
+        "internal_settings.UpdateInvoiceSettingsRequest": {
+            "type": "object",
+            "required": [
+                "show_tax_on_receipt"
+            ],
+            "properties": {
+                "invoice_prefix": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "legal_text": {
+                    "type": "string",
+                    "maxLength": 1000
+                },
+                "receipt_footer": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "receipt_header": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "show_tax_on_receipt": {
+                    "type": "boolean"
+                }
+            }
+        },
         "internal_settings.UpdatePrinterSettingsRequest": {
             "type": "object",
             "required": [
@@ -7181,6 +8575,21 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_settings.UpdateSupportedCurrenciesRequest": {
+            "type": "object",
+            "required": [
+                "currencies"
+            ],
+            "properties": {
+                "currencies": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/internal_settings.CurrencyOption"
+                    }
+                }
+            }
+        },
         "internal_shift.CashTransactionRequest": {
             "type": "object",
             "required": [
@@ -7206,7 +8615,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_shift_repository.CashTransactionType"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_shift_repository.CashTransactionType"
                         }
                     ]
                 }
@@ -7234,7 +8643,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/POS-kasir_internal_shift_repository.CashTransactionType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_shift_repository.CashTransactionType"
                 },
                 "user_id": {
                     "type": "string"
@@ -7282,7 +8691,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/POS-kasir_internal_shift_repository.ShiftStatus"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_shift_repository.ShiftStatus"
                 },
                 "user_id": {
                     "type": "string"
@@ -7301,6 +8710,316 @@ const docTemplate = `{
                 "start_cash": {
                     "type": "integer",
                     "minimum": 0
+                }
+            }
+        },
+        "internal_stockreceipts.CreateStockReceiptRequest": {
+            "type": "object",
+            "properties": {
+                "amount_paid": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_stockreceipts.ReceiptItemInput"
+                    }
+                },
+                "note": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "payment_mode": {
+                    "type": "string",
+                    "enum": [
+                        "cash",
+                        "credit"
+                    ]
+                },
+                "received_at": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_stockreceipts.PagedStockReceiptResponse": {
+            "type": "object",
+            "properties": {
+                "pagination": {
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
+                },
+                "receipts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_stockreceipts.StockReceiptListItem"
+                    }
+                }
+            }
+        },
+        "internal_stockreceipts.ReceiptItemInput": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity",
+                "unit_cost"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "unit_cost": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "unit_sell_price": {
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "internal_stockreceipts.StockReceiptItemResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "line_total": {
+                    "type": "number"
+                },
+                "product_barcode": {
+                    "type": "string"
+                },
+                "product_cost_price": {
+                    "type": "number"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "product_name": {
+                    "type": "string"
+                },
+                "product_sell_price": {
+                    "type": "number"
+                },
+                "product_sku": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "unit_cost": {
+                    "type": "number"
+                },
+                "unit_sell_price": {
+                    "type": "number"
+                }
+            }
+        },
+        "internal_stockreceipts.StockReceiptListItem": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "receipt_no": {
+                    "type": "string"
+                },
+                "received_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "string"
+                },
+                "supplier_name": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "internal_stockreceipts.StockReceiptResponse": {
+            "type": "object",
+            "properties": {
+                "amount_paid": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_stockreceipts.StockReceiptItemResponse"
+                    }
+                },
+                "note": {
+                    "type": "string"
+                },
+                "payment_mode": {
+                    "type": "string"
+                },
+                "receipt_no": {
+                    "type": "string"
+                },
+                "received_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "supplier_id": {
+                    "type": "string"
+                },
+                "supplier_name": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_suppliers.CreateSupplierRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 150
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "tax_id": {
+                    "type": "string",
+                    "maxLength": 50
+                }
+            }
+        },
+        "internal_suppliers.PagedSupplierResponse": {
+            "type": "object",
+            "properties": {
+                "pagination": {
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
+                },
+                "suppliers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_suppliers.SupplierResponse"
+                    }
+                }
+            }
+        },
+        "internal_suppliers.SupplierResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "tax_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_suppliers.UpdateSupplierRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 150
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string",
+                    "maxLength": 30
+                },
+                "tax_id": {
+                    "type": "string",
+                    "maxLength": 50
                 }
             }
         },
@@ -7333,7 +9052,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_user_repository.UserRole"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_user_repository.UserRole"
                         }
                     ]
                 },
@@ -7348,7 +9067,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "password"
+                "password",
+                "tenant_code"
             ],
             "properties": {
                 "email": {
@@ -7356,6 +9076,11 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "tenant_code": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 2
                 }
             }
         },
@@ -7373,6 +9098,15 @@ const docTemplate = `{
                 },
                 "refresh_token": {
                     "type": "string"
+                },
+                "tenant": {
+                    "$ref": "#/definitions/internal_user.TenantSummary"
+                },
+                "tenants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_user.TenantSummary"
+                    }
                 }
             }
         },
@@ -7398,7 +9132,16 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "role": {
-                    "$ref": "#/definitions/POS-kasir_internal_user_repository.UserRole"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_user_repository.UserRole"
+                },
+                "tenant": {
+                    "$ref": "#/definitions/internal_user.TenantSummary"
+                },
+                "tenants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_user.TenantSummary"
+                    }
                 },
                 "updated_at": {
                     "type": "string"
@@ -7426,12 +9169,37 @@ const docTemplate = `{
                     "minLength": 8
                 },
                 "role": {
-                    "$ref": "#/definitions/POS-kasir_internal_user_repository.UserRole"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_user_repository.UserRole"
                 },
                 "username": {
                     "type": "string",
                     "maxLength": 32,
                     "minLength": 3
+                }
+            }
+        },
+        "internal_user.SwitchTenantRequest": {
+            "type": "object",
+            "required": [
+                "tenant_id"
+            ],
+            "properties": {
+                "tenant_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_user.TenantSummary": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -7472,7 +9240,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/POS-kasir_internal_user_repository.UserRole"
+                            "$ref": "#/definitions/dinosaurus-pos_internal_user_repository.UserRole"
                         }
                     ]
                 },
@@ -7487,7 +9255,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "pagination": {
-                    "$ref": "#/definitions/POS-kasir_internal_common_pagination.Pagination"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_common_pagination.Pagination"
                 },
                 "users": {
                     "type": "array",
@@ -7506,8 +9274,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "POS Kasir API",
-	Description:      "POS Kasir API",
+	Title:            "Dinosaurus POS API",
+	Description:      "Dinosaurus POS API",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

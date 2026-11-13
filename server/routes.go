@@ -1,8 +1,8 @@
 package server
 
 import (
-	"POS-kasir/internal/common/middleware"
-	ws "POS-kasir/internal/websocket"
+	"dinosaurus-pos/internal/common/middleware"
+	ws "dinosaurus-pos/internal/websocket"
 
 	"github.com/gofiber/contrib/v3/websocket"
 	"github.com/gofiber/fiber/v3"
@@ -181,6 +181,15 @@ func SetupRoutes(app *App, container *AppContainer) {
 		customerGroup.Get("/:id", container.CustomerHandler.GetCustomerHandler)
 		customerGroup.Put("/:id", middleware.RoleMiddleware(middleware.UserRoleManager), container.CustomerHandler.UpdateCustomerHandler)
 		customerGroup.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.CustomerHandler.DeleteCustomerHandler)
+	}
+
+	customerGroupsRoute := api.Group("/customer-groups", authMiddleware)
+	{
+		customerGroupsRoute.Get("/", container.CustomerGroupHandler.ListHandler)
+		customerGroupsRoute.Post("/", middleware.RoleMiddleware(middleware.UserRoleManager), container.CustomerGroupHandler.CreateHandler)
+		customerGroupsRoute.Get("/:id", container.CustomerGroupHandler.GetHandler)
+		customerGroupsRoute.Put("/:id", middleware.RoleMiddleware(middleware.UserRoleManager), container.CustomerGroupHandler.UpdateHandler)
+		customerGroupsRoute.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleManager), container.CustomerGroupHandler.DeleteHandler)
 	}
 
 	supplierGroup := api.Group("/suppliers", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))

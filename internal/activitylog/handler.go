@@ -1,11 +1,11 @@
 package activitylog
 
 import (
-	"POS-kasir/internal/common"
+	"dinosaurus-pos/internal/common"
 	"errors"
 
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/validator"
 
 	"github.com/gofiber/fiber/v3"
 )

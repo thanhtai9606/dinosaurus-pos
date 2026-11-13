@@ -1,8 +1,8 @@
 package user
 
 import (
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/user/repository"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/user/repository"
 	"time"
 
 	"github.com/google/uuid"

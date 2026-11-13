@@ -1,7 +1,7 @@
 package shift
 
 import (
-	"POS-kasir/pkg/cache"
+	"dinosaurus-pos/pkg/cache"
 	"fmt"
 
 	"github.com/google/uuid"

@@ -1,8 +1,8 @@
 package database
 
 import (
-	"POS-kasir/config"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"database/sql"
 	"errors"

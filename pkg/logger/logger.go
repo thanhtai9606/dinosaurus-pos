@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"POS-kasir/config"
+	"dinosaurus-pos/config"
 	"fmt"
 	"io"
 	"log/slog"

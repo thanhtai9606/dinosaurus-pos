@@ -56,7 +56,7 @@ INSERT INTO shifts (
     user_id, start_cash, status
 ) VALUES (
     $1, $2, 'open'
-) RETURNING id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at
+) RETURNING id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at, tenant_id
 `
 
 type CreateShiftParams struct {
@@ -78,6 +78,7 @@ func (q *Queries) CreateShift(ctx context.Context, arg CreateShiftParams) (Shift
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -91,7 +92,7 @@ SET
     status = 'closed',
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at
+RETURNING id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at, tenant_id
 `
 
 type EndShiftParams struct {
@@ -114,6 +115,7 @@ func (q *Queries) EndShift(ctx context.Context, arg EndShiftParams) (Shift, erro
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -171,7 +173,7 @@ func (q *Queries) GetCashTransactionsByShiftID(ctx context.Context, shiftID uuid
 }
 
 const getOpenShiftByUserID = `-- name: GetOpenShiftByUserID :one
-SELECT id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at FROM shifts
+SELECT id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at, tenant_id FROM shifts
 WHERE user_id = $1 AND status = 'open'
 LIMIT 1
 `
@@ -190,12 +192,13 @@ func (q *Queries) GetOpenShiftByUserID(ctx context.Context, userID uuid.UUID) (S
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
 
 const getOpenShifts = `-- name: GetOpenShifts :many
-SELECT id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at FROM shifts
+SELECT id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at, tenant_id FROM shifts
 WHERE status = 'open'
 `
 
@@ -219,6 +222,7 @@ func (q *Queries) GetOpenShifts(ctx context.Context) ([]Shift, error) {
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}
@@ -231,7 +235,7 @@ func (q *Queries) GetOpenShifts(ctx context.Context) ([]Shift, error) {
 }
 
 const getShiftByID = `-- name: GetShiftByID :one
-SELECT id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at FROM shifts
+SELECT id, user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at, tenant_id FROM shifts
 WHERE id = $1 LIMIT 1
 `
 
@@ -249,6 +253,7 @@ func (q *Queries) GetShiftByID(ctx context.Context, id uuid.UUID) (Shift, error)
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }

@@ -1,8 +1,8 @@
 package printer_test
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/printer"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/printer"
 	"context"
 	"encoding/json"
 	"errors"

@@ -7,6 +7,8 @@ package repository
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getSettingByKey = `-- name: GetSettingByKey :one
@@ -15,9 +17,16 @@ FROM settings
 WHERE key = $1
 `
 
-func (q *Queries) GetSettingByKey(ctx context.Context, key string) (Setting, error) {
+type GetSettingByKeyRow struct {
+	Key         string           `json:"key"`
+	Value       string           `json:"value"`
+	Description *string          `json:"description"`
+	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
+}
+
+func (q *Queries) GetSettingByKey(ctx context.Context, key string) (GetSettingByKeyRow, error) {
 	row := q.db.QueryRow(ctx, getSettingByKey, key)
-	var i Setting
+	var i GetSettingByKeyRow
 	err := row.Scan(
 		&i.Key,
 		&i.Value,
@@ -33,15 +42,22 @@ FROM settings
 ORDER BY key
 `
 
-func (q *Queries) GetSettings(ctx context.Context) ([]Setting, error) {
+type GetSettingsRow struct {
+	Key         string           `json:"key"`
+	Value       string           `json:"value"`
+	Description *string          `json:"description"`
+	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
+}
+
+func (q *Queries) GetSettings(ctx context.Context) ([]GetSettingsRow, error) {
 	rows, err := q.db.Query(ctx, getSettings)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Setting{}
+	items := []GetSettingsRow{}
 	for rows.Next() {
-		var i Setting
+		var i GetSettingsRow
 		if err := rows.Scan(
 			&i.Key,
 			&i.Value,
@@ -70,9 +86,16 @@ type UpdateSettingParams struct {
 	Value string `json:"value"`
 }
 
-func (q *Queries) UpdateSetting(ctx context.Context, arg UpdateSettingParams) (Setting, error) {
+type UpdateSettingRow struct {
+	Key         string           `json:"key"`
+	Value       string           `json:"value"`
+	Description *string          `json:"description"`
+	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
+}
+
+func (q *Queries) UpdateSetting(ctx context.Context, arg UpdateSettingParams) (UpdateSettingRow, error) {
 	row := q.db.QueryRow(ctx, updateSetting, arg.Key, arg.Value)
-	var i Setting
+	var i UpdateSettingRow
 	err := row.Scan(
 		&i.Key,
 		&i.Value,
@@ -103,9 +126,16 @@ type UpsertSettingParams struct {
 	Value string `json:"value"`
 }
 
-func (q *Queries) UpsertSetting(ctx context.Context, arg UpsertSettingParams) (Setting, error) {
+type UpsertSettingRow struct {
+	Key         string           `json:"key"`
+	Value       string           `json:"value"`
+	Description *string          `json:"description"`
+	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
+}
+
+func (q *Queries) UpsertSetting(ctx context.Context, arg UpsertSettingParams) (UpsertSettingRow, error) {
 	row := q.db.QueryRow(ctx, upsertSetting, arg.Key, arg.Value)
-	var i Setting
+	var i UpsertSettingRow
 	err := row.Scan(
 		&i.Key,
 		&i.Value,

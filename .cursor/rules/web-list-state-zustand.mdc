@@ -1,0 +1,26 @@
+---
+description: FE list pages — Zustand UI state, TanStack Query, clean routes (no ?page=)
+globs: web/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# List pages (dashboard)
+
+## Stack
+
+- **Route:** path only (`/customers`) — no `validateSearch` for pagination/filter.
+- **Server data:** `@tanstack/react-query` — params in `queryKey` + REST.
+- **UI state:** **Zustand** via `web/src/stores/create-list-store.ts` + `LIST_SCOPES` in `list-scopes.ts`.
+
+## Patterns
+
+1. Pagination / filters: `useServerListState({ scope: LIST_SCOPES.* })` or `useListStore` / feature store (`stores/customers-list.ts`).
+2. Cross-page preset (e.g. debts filter): `primeListFilters` / `primeCustomerDebtsFilter` — not URL `search` or `location.state`.
+3. Debounced text search: keep raw term in store (`setFilter(..., { resetPage: false })`); `useDebounce` for API; `useResetPageOnChange(resetPage, [debounced, …])` from `hooks/use-reset-page-on-change.ts`.
+4. New list screen: add `LIST_SCOPES` entry, scoped store if filters > pagination only, wire `queryOptions({ page, limit, …filters })`.
+
+## Avoid
+
+- `useState` scattered per page for page/limit without scope.
+- `navigate({ search: { page, limit, … } })`.
+- Inline arrow functions inside Zustand `useShallow` selectors (causes render loops).

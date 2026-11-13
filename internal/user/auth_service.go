@@ -1,14 +1,14 @@
 package user
 
 import (
-	"POS-kasir/internal/activitylog"
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/tenant"
-	"POS-kasir/internal/tenants"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/internal/activitylog"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/internal/tenants"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/utils"
 	"bytes"
 	"context"
 	"errors"

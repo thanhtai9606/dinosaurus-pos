@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/tenant"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/tenant"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/utils"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -22,14 +22,20 @@ var (
 	ErrTenantNotFound   = errors.New("tenant not found")
 )
 
-type Service struct {
-	repo  *Repository
-	users user_repo.Querier
-	log   logger.ILogger
+// CustomerGroupSeeder seeds default customer groups when a tenant is created.
+type CustomerGroupSeeder interface {
+	SeedDefaults(ctx context.Context, tenantID uuid.UUID) error
 }
 
-func NewService(repo *Repository, users user_repo.Querier, log logger.ILogger) *Service {
-	return &Service{repo: repo, users: users, log: log}
+type Service struct {
+	repo          *Repository
+	users         user_repo.Querier
+	log           logger.ILogger
+	groupSeeder   CustomerGroupSeeder
+}
+
+func NewService(repo *Repository, users user_repo.Querier, log logger.ILogger, groupSeeder CustomerGroupSeeder) *Service {
+	return &Service{repo: repo, users: users, log: log, groupSeeder: groupSeeder}
 }
 
 type CreateTenantRequest struct {
@@ -84,6 +90,11 @@ func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary,
 		}
 		s.log.Errorf("Create tenant: %v", err)
 		return Summary{}, common.ErrInternal
+	}
+	if s.groupSeeder != nil {
+		if err := s.groupSeeder.SeedDefaults(ctx, row.ID); err != nil {
+			s.log.Warnf("seed customer groups for tenant %s: %v", row.ID, err)
+		}
 	}
 	return Summary{
 		ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive,

@@ -1,9 +1,9 @@
 package cancellation_reasons_test
 
 import (
-	"POS-kasir/internal/cancellation_reasons"
-	"POS-kasir/internal/common"
-	"POS-kasir/mocks"
+	"dinosaurus-pos/internal/cancellation_reasons"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/mocks"
 	"encoding/json"
 	"errors"
 	"net/http"

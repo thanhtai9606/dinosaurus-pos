@@ -3,7 +3,7 @@ package supplierdebts
 import (
 	"time"
 
-	"POS-kasir/internal/common/pagination"
+	"dinosaurus-pos/internal/common/pagination"
 
 	"github.com/google/uuid"
 )

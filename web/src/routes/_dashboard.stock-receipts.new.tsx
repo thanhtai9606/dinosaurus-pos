@@ -104,7 +104,7 @@ function StockReceiptNewPage() {
         <div className="flex h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-xl border bg-background">
             <header className="flex shrink-0 items-center gap-2 border-b bg-muted/30 px-4 py-3">
                 <Button variant="ghost" size="icon" asChild>
-                    <Link to="/stock-receipts" search={{}}>
+                    <Link to="/stock-receipts">
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                 </Button>

@@ -1,12 +1,12 @@
 package categories
 
 import (
-	"POS-kasir/internal/activitylog"
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	categories_repo "POS-kasir/internal/categories/repository"
-	"POS-kasir/internal/common"
+	"dinosaurus-pos/internal/activitylog"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	categories_repo "dinosaurus-pos/internal/categories/repository"
+	"dinosaurus-pos/internal/common"
 
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"errors"
 	"strconv"

@@ -27,7 +27,7 @@ func (q *Queries) CountSuppliers(ctx context.Context, search *string) (int64, er
 const createSupplier = `-- name: CreateSupplier :one
 INSERT INTO suppliers (code, name, phone, email, address, tax_id, notes, is_active)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at
+RETURNING id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at, tenant_id
 `
 
 type CreateSupplierParams struct {
@@ -66,6 +66,7 @@ func (q *Queries) CreateSupplier(ctx context.Context, arg CreateSupplierParams) 
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -80,7 +81,7 @@ func (q *Queries) DeleteSupplier(ctx context.Context, id uuid.UUID) error {
 }
 
 const getSupplierByID = `-- name: GetSupplierByID :one
-SELECT id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at FROM suppliers WHERE id = $1 AND deleted_at IS NULL
+SELECT id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at, tenant_id FROM suppliers WHERE id = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) GetSupplierByID(ctx context.Context, id uuid.UUID) (Supplier, error) {
@@ -99,12 +100,13 @@ func (q *Queries) GetSupplierByID(ctx context.Context, id uuid.UUID) (Supplier, 
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
 
 const listSuppliers = `-- name: ListSuppliers :many
-SELECT id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at FROM suppliers
+SELECT id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at, tenant_id FROM suppliers
 WHERE deleted_at IS NULL
   AND ($3::text IS NULL OR name ILIKE '%' || $3 || '%' OR code ILIKE '%' || $3 || '%')
 ORDER BY name ASC
@@ -139,6 +141,7 @@ func (q *Queries) ListSuppliers(ctx context.Context, arg ListSuppliersParams) ([
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}
@@ -162,7 +165,7 @@ SET code = $2,
     is_active = $9,
     updated_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at
+RETURNING id, code, name, phone, email, address, tax_id, notes, is_active, created_at, updated_at, deleted_at, tenant_id
 `
 
 type UpdateSupplierParams struct {
@@ -203,6 +206,7 @@ func (q *Queries) UpdateSupplier(ctx context.Context, arg UpdateSupplierParams) 
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.TenantID,
 	)
 	return i, err
 }

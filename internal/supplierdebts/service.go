@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/common/store"
-	sd_repo "POS-kasir/internal/supplierdebts/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/common/store"
+	sd_repo "dinosaurus-pos/internal/supplierdebts/repository"
+	"dinosaurus-pos/pkg/logger"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"

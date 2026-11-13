@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/pkg/utils"
 )
 
 func main() {

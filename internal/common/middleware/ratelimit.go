@@ -3,7 +3,7 @@ package middleware
 import (
 	"time"
 
-	"POS-kasir/pkg/cache"
+	"dinosaurus-pos/pkg/cache"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/limiter"

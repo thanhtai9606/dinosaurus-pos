@@ -1,0 +1,27 @@
+---
+description: Go GET handlers — short-TTL read cache (Redis), tenant-scoped, invalidate on writes
+globs: internal/**/*.go
+alwaysApply: false
+---
+
+# Read cache for GET APIs
+
+## When
+
+- Hot read paths: product list/search, platform overview, tenant lookup — not for money/stock truth as sole source (TTL + invalidate on writes).
+
+## Pattern
+
+1. Wrapper in package: `*Cache` using `pkg/cache.Cache`, JSON marshal DTO, **tenant-scoped keys** (`products:list:v1:{tenant}:{ver}:{hash}`).
+2. **Version bump** per tenant on mutations (`BumpTenant`) instead of wildcard delete.
+3. TTL: ~30–60s lists; longer only for rarely changing reads.
+4. Nil cache = no-op (dev without Redis).
+
+## Products (reference)
+
+- `internal/products/list_cache.go` — list + `/products/search` cache.
+- Invalidate via `invalidateProductListCache` from product create/update/delete/restore and search index sync.
+
+## Search
+
+- **Meilisearch** remains primary for product text search; list/read cache complements SQL/Meili round-trips under load.

@@ -1,4 +1,4 @@
-# POS Kasir - Development Makefile
+# Dinosaurus POS - Development Makefile
 # Usage: make <command>
 # Pattern aligned with go-pos; adapted for infra compose + local Go/web dev.
 
@@ -35,7 +35,7 @@ DB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?
 
 ## Help
 help:
-	@echo "$(BLUE)POS Kasir — Available Make Commands$(NC)"
+	@echo "$(BLUE)Dinosaurus POS — Available Make Commands$(NC)"
 	@echo ""
 	@echo "$(GREEN)Local development (no app Docker image):$(NC)"
 	@echo "  make dev-setup      - First run: infra + migrate + seed"

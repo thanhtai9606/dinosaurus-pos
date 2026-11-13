@@ -1,14 +1,14 @@
 package promotions
 
 import (
-	"POS-kasir/internal/activitylog"
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/common/store"
-	"POS-kasir/internal/promotions/repository"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/internal/activitylog"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/common/store"
+	"dinosaurus-pos/internal/promotions/repository"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/utils"
 	"context"
 
 	"github.com/google/uuid"

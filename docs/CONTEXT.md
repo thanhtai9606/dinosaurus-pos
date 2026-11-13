@@ -6,16 +6,16 @@ Tài liệu này gom **quyết định sản phẩm, luồng nghiệp vụ và �
 
 | Mục | Giá trị |
 |-----|---------|
-| Module Go | `POS-kasir` |
+| Module Go | `dinosaurus-pos` |
 | API + SPA | Go Fiber phục vụ API và build `web/dist` (thường cổng **8080**) |
 | DB | PostgreSQL 15, migrate trong `sqlc/migrations/` — `000001`–`000005` (multitenant, super admin, branding, `data_plane`). Reset sạch: `make db-reset` |
 | Multi-tenant ops | `docs/MULTITENANT_OPS.md` — RLS audit, backup, `migrate-all-databases`, provision dedicated |
-| FE | `web/` — React 19, TanStack Router (file routes), TanStack Query, pnpm |
+| FE | `web/` — React 19, TanStack Router (file routes), TanStack Query, **Zustand** (list/filter state, không sync URL), pnpm |
 | i18n | `web/src/lib/locales/{vi,en,id}.json` — thêm key đủ 3 ngôn ngữ |
 | RBAC FE | `web/src/lib/auth/rbacRules.ts` (map method + path → role) |
 | RBAC BE | middleware role trên `server/routes.go` |
 
-Remote hiện tại: GitLab `devops/dinosaurus-pos` (fork/tùy biến từ POS-kasir gốc).
+Remote hiện tại: GitLab `devops/dinosaurus-pos` (fork/tùy biến từ POS-kasir gốc; module Go: `dinosaurus-pos`).
 
 ### Mã nghiệp vụ (UUID vẫn là khóa chính)
 
@@ -41,8 +41,15 @@ Schema mã nghiệp vụ (`order_no`, `customers.code`, `products.code`) nằm t
 - `POST /auth/switch-tenant` (API còn, FE không switch — user làm việc trên tenant đã chọn lúc login).
 - Tenant mặc định: UUID `00000000-0000-0000-0000-000000000001`, code `default` — seed + backfill migration.
 - FE chrome: `DashboardTopBar` — welcome + ca + theme + profile; ngôn ngữ trong Settings → Preferences.
-- **Redis:** `tenant:lookup:v1:{code}` (login lookup, TTL 15m / miss 2m); `platform:overview:v1` (~45s); báo cáo & shift như cũ.
+- **Redis:** `tenant:lookup:v1:{code}` (login lookup, TTL 15m / miss 2m); `platform:overview:v1` (~45s); **`products:list:v1:*` / `products:search:v1:*`** (list + search GET, TTL ~30–45s, bump version khi CRUD SP); báo cáo & shift như cũ.
 - **Meilisearch:** field `tenant_id` filterable; search sản phẩm theo tenant JWT; auto-reindex mọi tenant active khi `MEILI_AUTO_REINDEX=true`.
+
+### FE list & DataGrid (chuẩn)
+
+- Route chỉ path; pagination/filter trong Zustand (`stores/create-list-store.ts`, `LIST_SCOPES`).
+- Dữ liệu: TanStack Query + REST; debounce search + `useResetPageOnChange`.
+- Bảng: `DataGrid` **server-side** pagination khi có API `pagination`; client filter/sort chỉ cho tập nhỏ.
+- Chi tiết: `.cursor/rules/web-list-state-zustand.mdc`, `web-data-grid.mdc`.
 
 ---
 
@@ -123,7 +130,7 @@ Package Go mirror: `internal/supplierdebts`, `internal/customerdebts` — wire t
 | `/customer-debts` | `_dashboard.customer-debts.tsx` |
 | Query | `web/src/lib/api/query/supplierDebts.ts`, `customerDebts.ts` |
 | Chi tiết + ghi trả | `web/src/components/debts/PartnerDebtDetailSheet.tsx` |
-| Menu | `web/src/hooks/useNavigationMenu.ts` — mục công nợ NCC / khách |
+| Menu | Sidebar nhóm **Khách hàng** → danh sách, **nhóm khách** (`/customer-groups`), công nợ; NCC tách riêng (`useNavigationMenu.ts`) |
 
 ---
 

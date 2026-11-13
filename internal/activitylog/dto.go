@@ -1,7 +1,7 @@
 package activitylog
 
 import (
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
 	"time"
 
 	"github.com/google/uuid"

@@ -3,8 +3,8 @@
 package database
 
 import (
-	"POS-kasir/config"
-	"POS-kasir/mocks"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/mocks"
 	"testing"
 	"testing/fstest"
 

@@ -1,13 +1,13 @@
 package orders_test
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/middleware"
-	"POS-kasir/internal/orders"
-	orders_repo "POS-kasir/internal/orders/repository"
-	"POS-kasir/mocks"
-	"POS-kasir/pkg/payment"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/middleware"
+	"dinosaurus-pos/internal/orders"
+	orders_repo "dinosaurus-pos/internal/orders/repository"
+	"dinosaurus-pos/mocks"
+	"dinosaurus-pos/pkg/payment"
+	"dinosaurus-pos/pkg/validator"
 	"bytes"
 	"encoding/json"
 	"errors"

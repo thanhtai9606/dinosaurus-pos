@@ -1,10 +1,10 @@
 package shift
 
 import (
-	"POS-kasir/internal/common"
-	repository "POS-kasir/internal/shift/repository"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/internal/common"
+	repository "dinosaurus-pos/internal/shift/repository"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/utils"
 	"context"
 	"errors"
 	"time"

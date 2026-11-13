@@ -1,0 +1,22 @@
+---
+description: DataGrid — prefer server-side pagination/sort/filter; shared table UX
+globs: web/src/components/data-table/**/*
+alwaysApply: false
+---
+
+# DataGrid
+
+## Server-side first
+
+- Lists backed by API pagination: pass `server={{ pagination, onPageChange, onLimitChange, isFetching }}` on `DataGrid`.
+- Do not rely on client-only pagination for large datasets; client filters/sort are for small in-memory sets only.
+- When adding server sort/filter: extend API + query params, then `server.onSortChange` / `server.onColumnFiltersChange` (see `DataGridProps`).
+
+## Stability
+
+- Use `EMPTY_COLUMN_FILTERS` (or stable empty object) — never `?? {}` per render on shared deps.
+- Skip client `resetPage` effect when `useServerPagination` is true.
+
+## Reuse
+
+- Column defs in `*Table.tsx` next to route; shared behavior in `DataGrid`, `ListPagination`, `applyClientFilters`.

@@ -1,0 +1,15 @@
+export const LIST_SCOPES = {
+    customers: 'customers',
+    customerGroups: 'customer-groups',
+    suppliers: 'suppliers',
+    users: 'users',
+    customerDebts: 'customer-debts',
+    supplierDebts: 'supplier-debts',
+    transactions: 'transactions',
+    promotions: 'promotions',
+    products: 'products',
+    salesOrders: 'sales-orders',
+    inventory: 'inventory',
+    activityLogs: 'activity-logs',
+    stockReceipts: 'stock-receipts',
+} as const

@@ -9,10 +9,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"POS-kasir/config"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/user"
-	"POS-kasir/mocks"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/user"
+	"dinosaurus-pos/mocks"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"

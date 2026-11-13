@@ -1,11 +1,11 @@
 package report
 
 import (
-	"POS-kasir/internal/activitylog"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/common/store"
-	"POS-kasir/internal/report/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/activitylog"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/common/store"
+	"dinosaurus-pos/internal/report/repository"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -13,7 +13,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 
-	"POS-kasir/pkg/cache"
+	"dinosaurus-pos/pkg/cache"
 )
 
 type IRptService interface {

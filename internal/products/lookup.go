@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"POS-kasir/internal/common"
+	"dinosaurus-pos/internal/common"
 
 	"github.com/jackc/pgx/v5"
 )

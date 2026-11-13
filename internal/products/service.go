@@ -1,15 +1,16 @@
 package products
 
 import (
-	"POS-kasir/internal/activitylog"
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/docno"
-	"POS-kasir/internal/common/store"
-	products_repo "POS-kasir/internal/products/repository"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/productsearch"
+	"dinosaurus-pos/internal/activitylog"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/docno"
+	"dinosaurus-pos/internal/common/store"
+	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/productsearch"
 
 	"context"
 	"encoding/json"
@@ -61,9 +62,10 @@ type PrdService struct {
 	prdRepo         IProductImageRepository
 	activityService activitylog.IActivityService
 	search          productsearch.Indexer
+	listCache       *ListCache
 }
 
-func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activitylog.IActivityService, search productsearch.Indexer) IPrdService {
+func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activitylog.IActivityService, search productsearch.Indexer, listCache *ListCache) IPrdService {
 	return &PrdService{
 		store:           store,
 		repo:            repo,
@@ -71,6 +73,7 @@ func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILo
 		prdRepo:         prdRepo,
 		activityService: activityService,
 		search:          search,
+		listCache:       listCache,
 	}
 }
 
@@ -646,6 +649,12 @@ func (s *PrdService) buildProductResponse(ctx context.Context, fullProduct produ
 func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) (*ListProductsResponse, error) {
 	req.SetDefaults()
 
+	if tid, ok := tenant.IDFromContext(ctx); ok && s.listCache != nil {
+		if cached, hit := s.listCache.GetList(ctx, tid.String(), req); hit {
+			return cached, nil
+		}
+	}
+
 	page := req.Page
 	limit := req.Limit
 	offset := (page - 1) * limit
@@ -745,6 +754,10 @@ func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) 
 			int(totalData),
 			limit,
 		),
+	}
+
+	if tid, ok := tenant.IDFromContext(ctx); ok && s.listCache != nil {
+		s.listCache.SetList(ctx, tid.String(), req, response)
 	}
 
 	return response, nil

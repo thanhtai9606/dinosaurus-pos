@@ -1,7 +1,7 @@
 package suppliers
 
 import (
-	"POS-kasir/internal/common/pagination"
+	"dinosaurus-pos/internal/common/pagination"
 	"time"
 
 	"github.com/google/uuid"

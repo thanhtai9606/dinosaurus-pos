@@ -59,14 +59,14 @@ export function DashboardUserMenu({ t, user, userRole, handleLogout }: Dashboard
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link to="/account" search={{ tab: 'account' }} className="cursor-pointer">
+                    <Link to="/account" className="cursor-pointer">
                         <UserIcon className="mr-2 h-4 w-4" />
                         {t('user_menu.profile')}
                     </Link>
                 </DropdownMenuItem>
                 {canSettings && (
                     <DropdownMenuItem asChild>
-                        <Link to="/settings" search={{ tab: 'preferences' }} className="cursor-pointer">
+                        <Link to="/settings" className="cursor-pointer">
                             <Settings className="mr-2 h-4 w-4" />
                             {t('user_menu.settings')}
                         </Link>
@@ -74,11 +74,7 @@ export function DashboardUserMenu({ t, user, userRole, handleLogout }: Dashboard
                 )}
                 {canActivityLogs && (
                     <DropdownMenuItem asChild>
-                        <Link
-                            to="/activity-logs"
-                            search={{ page: 1, limit: 10 }}
-                            className="cursor-pointer"
-                        >
+                        <Link to="/activity-logs" className="cursor-pointer">
                             <Activity className="mr-2 h-4 w-4" />
                             {t('user_menu.activity_logs')}
                         </Link>

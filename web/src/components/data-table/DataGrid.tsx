@@ -35,6 +35,8 @@ import { cn } from '@/lib/utils'
 import { applyClientFilters } from '@/components/data-table/applyClientFilters'
 import type { DataGridProps } from '@/components/data-table/types'
 
+const EMPTY_COLUMN_FILTERS: Record<string, string> = {}
+
 export function DataGrid<T>({
   columns,
   data,
@@ -47,13 +49,14 @@ export function DataGrid<T>({
   defaultPageSize = 10,
   className,
   toolbarExtra,
+  onRowClick,
 }: DataGridProps<T>) {
   const { t } = useTranslation()
   const useServerPagination = Boolean(server?.pagination && server.onPageChange)
   const useServerFilters = Boolean(server?.onColumnFiltersChange)
 
   const [clientFilters, setClientFilters] = useState<Record<string, string>>({})
-  const columnFilters = useServerFilters ? (server?.columnFilters ?? {}) : clientFilters
+  const columnFilters = useServerFilters ? (server?.columnFilters ?? EMPTY_COLUMN_FILTERS) : clientFilters
 
   const setColumnFilters = (next: Record<string, string>) => {
     if (useServerFilters && server?.onColumnFiltersChange) {
@@ -101,8 +104,9 @@ export function DataGrid<T>({
 
   const { resetPage } = clientPage
   useEffect(() => {
+    if (useServerPagination) return
     resetPage()
-  }, [columnFilters, resetPage])
+  }, [columnFilters, resetPage, useServerPagination])
 
   const displayData = useMemo(() => {
     if (useServerPagination) return sortedData
@@ -240,11 +244,16 @@ export function DataGrid<T>({
               </TableRow>
             ) : (
               displayData.map((row) => (
-                <TableRow key={getRowId(row)}>
+                <TableRow
+                  key={getRowId(row)}
+                  className={cn(onRowClick && 'cursor-pointer hover:bg-muted/50')}
+                  onClick={() => onRowClick?.(row)}
+                >
                   {activeColumns.map((col) => (
                     <TableCell
                       key={col.id}
                       className={cn(col.align === 'right' && 'text-right', col.className)}
+                      onClick={col.id === 'actions' ? (e) => e.stopPropagation() : undefined}
                     >
                       {col.cell(row)}
                     </TableCell>

@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"POS-kasir/internal/common"
-	shift_repo "POS-kasir/internal/shift/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/common"
+	shift_repo "dinosaurus-pos/internal/shift/repository"
+	"dinosaurus-pos/pkg/logger"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"

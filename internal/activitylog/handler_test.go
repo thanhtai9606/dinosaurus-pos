@@ -1,9 +1,9 @@
 package activitylog_test
 
 import (
-	"POS-kasir/internal/activitylog"
-	"POS-kasir/mocks"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/activitylog"
+	"dinosaurus-pos/mocks"
+	"dinosaurus-pos/pkg/validator"
 	"errors"
 	"net/http"
 	"net/http/httptest"

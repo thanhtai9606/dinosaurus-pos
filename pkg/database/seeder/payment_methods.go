@@ -1,8 +1,8 @@
 package seeder
 
 import (
-	payment_methods_repo "POS-kasir/internal/payment_methods/repository"
-	"POS-kasir/pkg/logger"
+	payment_methods_repo "dinosaurus-pos/internal/payment_methods/repository"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"errors"
 

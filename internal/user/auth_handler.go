@@ -1,14 +1,14 @@
 package user
 
 import (
-	"POS-kasir/config"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/middleware"
-	"POS-kasir/internal/platformaudit"
-	"POS-kasir/internal/tenants"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/middleware"
+	"dinosaurus-pos/internal/platformaudit"
+	"dinosaurus-pos/internal/tenants"
+	"dinosaurus-pos/pkg/logger"
 
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/pkg/validator"
 	"errors"
 	"io"
 	"mime/multipart"

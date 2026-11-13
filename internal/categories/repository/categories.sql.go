@@ -37,7 +37,7 @@ func (q *Queries) CountProductsInCategory(ctx context.Context, categoryID int32)
 const createCategory = `-- name: CreateCategory :one
 INSERT INTO categories (name)
 VALUES ($1)
-RETURNING id, name, created_at, updated_at
+RETURNING id, name, created_at, updated_at, tenant_id
 `
 
 // Membuat kategori baru dan mengembalikan data lengkapnya.
@@ -49,6 +49,7 @@ func (q *Queries) CreateCategory(ctx context.Context, name string) (Category, er
 		&i.Name,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -82,7 +83,7 @@ func (q *Queries) ExistsCategory(ctx context.Context, id int32) (bool, error) {
 }
 
 const getCategory = `-- name: GetCategory :one
-SELECT id, name, created_at, updated_at
+SELECT id, name, created_at, updated_at, tenant_id
 FROM categories
 WHERE id = $1
 LIMIT 1
@@ -97,12 +98,13 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (Category, error) {
 		&i.Name,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
 
 const listCategories = `-- name: ListCategories :many
-SELECT id, name, created_at, updated_at
+SELECT id, name, created_at, updated_at, tenant_id
 FROM categories
 ORDER BY name ASC
 LIMIT $1 OFFSET $2
@@ -128,6 +130,7 @@ func (q *Queries) ListCategories(ctx context.Context, arg ListCategoriesParams) 
 			&i.Name,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}
@@ -192,7 +195,7 @@ const updateCategory = `-- name: UpdateCategory :one
 UPDATE categories
 SET name = $2
 WHERE id = $1
-RETURNING id, name, created_at, updated_at
+RETURNING id, name, created_at, updated_at, tenant_id
 `
 
 type UpdateCategoryParams struct {
@@ -209,6 +212,7 @@ func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) 
 		&i.Name,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TenantID,
 	)
 	return i, err
 }

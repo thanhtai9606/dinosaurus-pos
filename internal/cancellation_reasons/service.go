@@ -1,8 +1,8 @@
 package cancellation_reasons
 
 import (
-	"POS-kasir/internal/cancellation_reasons/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/cancellation_reasons/repository"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 )
 

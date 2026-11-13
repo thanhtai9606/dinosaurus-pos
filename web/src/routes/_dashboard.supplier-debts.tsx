@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { z } from 'zod'
-import { useState } from 'react'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect, useMemo } from 'react'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { useTranslation } from 'react-i18next'
 import {
     supplierDebtsListQueryOptions,
@@ -26,27 +27,35 @@ import { Badge } from '@/components/ui/badge'
 import { Plus } from 'lucide-react'
 import { useFormatMoney } from '@/context/MoneyContext'
 
-const searchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().catch(15),
-    supplier_id: z.string().optional(),
-    status: z.enum(['open', 'partial', 'settled', 'void']).optional(),
-})
-
 export const Route = createFileRoute('/_dashboard/supplier-debts')({
-    validateSearch: (search) => searchSchema.parse(search),
-    loaderDeps: ({ search }) => search,
-    loader: ({ context: { queryClient }, deps }) =>
-        queryClient.ensureQueryData(supplierDebtsListQueryOptions(deps as SupplierDebtsListParams)),
     component: SupplierDebtsPage,
 })
 
 function SupplierDebtsPage() {
     const { t } = useTranslation()
     const formatMoney = useFormatMoney()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch() as SupplierDebtsListParams
-    const { data } = useSuspenseQuery(supplierDebtsListQueryOptions(searchParams))
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({
+        scope: LIST_SCOPES.supplierDebts,
+        limit: 15,
+    })
+    const [supplierId, setSupplierId] = useState<string | undefined>()
+    const [status, setStatus] = useState<DebtStatus | undefined>()
+
+    useEffect(() => {
+        resetPage()
+    }, [supplierId, status, resetPage])
+
+    const listParams = useMemo(
+        (): SupplierDebtsListParams => ({
+            page,
+            limit,
+            supplier_id: supplierId,
+            status,
+        }),
+        [page, limit, supplierId, status],
+    )
+
+    const { data } = useQuery(supplierDebtsListQueryOptions(listParams))
     const { data: suppliersData } = useSuppliersListQuery({ limit: 200 })
     const createMutation = useCreateSupplierDebtMutation()
     const payMutation = usePaySupplierDebtMutation()
@@ -60,7 +69,7 @@ function SupplierDebtsPage() {
 
     const { data: detail, isFetching } = useSupplierDebtDetailQuery(selectedId || '')
 
-    const statusFilter = searchParams.status || 'all'
+    const statusFilter = status || 'all'
 
     return (
         <div className="space-y-4 p-4">
@@ -75,7 +84,7 @@ function SupplierDebtsPage() {
                             </Button>
                         )}
                         <Button variant="outline" asChild>
-                            <Link to="/suppliers" search={{ page: 1, limit: 10 }}>
+                            <Link to="/suppliers">
                                 {t('supplierDebts.actions.view_suppliers')}
                             </Link>
                         </Button>
@@ -84,16 +93,8 @@ function SupplierDebtsPage() {
                 <CardContent className="space-y-4">
                     <div className="flex flex-wrap gap-3">
                         <Select
-                            value={searchParams.supplier_id || 'all'}
-                            onValueChange={(v) =>
-                                navigate({
-                                    search: (prev) => ({
-                                        ...prev,
-                                        supplier_id: v === 'all' ? undefined : v,
-                                        page: 1,
-                                    }),
-                                })
-                            }
+                            value={supplierId || 'all'}
+                            onValueChange={(v) => setSupplierId(v === 'all' ? undefined : v)}
                         >
                             <SelectTrigger className="w-[220px]">
                                 <SelectValue placeholder={t('supplierDebts.filters.supplier')} />
@@ -109,15 +110,7 @@ function SupplierDebtsPage() {
                         </Select>
                         <Select
                             value={statusFilter}
-                            onValueChange={(v) =>
-                                navigate({
-                                    search: (prev) => ({
-                                        ...prev,
-                                        status: v === 'all' ? undefined : (v as DebtStatus),
-                                        page: 1,
-                                    }),
-                                })
-                            }
+                            onValueChange={(v) => setStatus(v === 'all' ? undefined : (v as DebtStatus))}
                         >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder={t('debts.filters.status')} />
@@ -142,7 +135,7 @@ function SupplierDebtsPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {(data.debts || []).map((d) => (
+                            {(data?.debts || []).map((d) => (
                                 <TableRow
                                     key={d.id}
                                     className="cursor-pointer hover:bg-muted/50"
@@ -159,11 +152,13 @@ function SupplierDebtsPage() {
                             ))}
                         </TableBody>
                     </Table>
-                    <ListPagination
-                        pagination={data.pagination}
-                        onPageChange={(page) => navigate({ search: (prev) => ({ ...prev, page }) })}
-                        onLimitChange={(limit) => navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })}
-                    />
+                    {data?.pagination && (
+                        <ListPagination
+                            pagination={data.pagination}
+                            onPageChange={onPageChange}
+                            onLimitChange={onLimitChange}
+                        />
+                    )}
                 </CardContent>
             </Card>
 

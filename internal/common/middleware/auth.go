@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/tenant"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/pkg/logger"
 
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/pkg/utils"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"

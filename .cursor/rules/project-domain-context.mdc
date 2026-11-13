@@ -9,8 +9,9 @@ alwaysApply: true
 
 ## Stack nhanh
 
-- Go `POS-kasir`, Fiber, sqlc/PostgreSQL, migrations `sqlc/migrations/` → `make migrate-up` on deploy.
-- React 19 in `web/`, TanStack Router + Query, i18n vi/en/id, RBAC `web/src/lib/auth/rbacRules.ts`.
+- Go `dinosaurus-pos`, Fiber, sqlc/PostgreSQL, migrations `sqlc/migrations/` → `make migrate-up` on deploy.
+- React 19 in `web/`, TanStack Router + Query, **Zustand** list UI state (`web/src/stores/`), i18n vi/en/id, RBAC `web/src/lib/auth/rbacRules.ts`.
+- List/grid rules: `.cursor/rules/web-list-state-zustand.mdc`, `web-data-grid.mdc`; BE read cache: `go-get-read-cache.mdc`.
 
 ## Stock receipts
 

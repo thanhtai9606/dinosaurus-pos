@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"POS-kasir/internal/tenant"
-	"POS-kasir/pkg/database"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/pkg/database"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"

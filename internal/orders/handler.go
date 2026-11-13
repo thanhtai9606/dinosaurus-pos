@@ -1,11 +1,11 @@
 package orders
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/middleware"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/payment"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/middleware"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/payment"
+	"dinosaurus-pos/pkg/validator"
 	"errors"
 
 	"github.com/gofiber/fiber/v3"

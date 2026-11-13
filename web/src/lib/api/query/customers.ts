@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient, queryOptions, keepPreviousData } from '@tanstack/react-query'
 import { useTranslation } from "react-i18next";
-import { customersApi } from "../../api/client.ts"
+import { axiosInstance, customersApi } from "../../api/client.ts"
 import {
     InternalCustomersCreateCustomerRequest,
     InternalCustomersUpdateCustomerRequest,
@@ -16,6 +16,12 @@ export type CustomersListParams = {
     page?: number
     limit?: number
     search?: string
+    group_id?: string
+}
+
+export type CustomerProfile = InternalCustomersCustomerResponse & {
+    customer_group_id?: string
+    customer_group_name?: string
 }
 
 // --- QUERY: Get All Customers (/api/v1/customers) ---
@@ -26,12 +32,8 @@ export const customersListQueryOptions = (params?: CustomersListParams) =>
     >({
         queryKey: ['customers', 'list', params],
         queryFn: async () => {
-            const res = await customersApi.customersGet(
-                params?.page,
-                params?.limit,
-                params?.search
-            )
-            return (res.data as any).data;
+            const res = await axiosInstance.get('/customers', { params })
+            return (res.data as { data: InternalCustomersPagedCustomerResponse }).data
         },
         placeholderData: keepPreviousData,
     })
@@ -80,9 +82,9 @@ export const useCreateCustomerMutation = () => {
     return {
         ...useMutation({
             mutationKey: ['customers', 'create'],
-            mutationFn: async (body: InternalCustomersCreateCustomerRequest) => {
-                const res = await customersApi.customersPost(body)
-                return (res.data as any).data as InternalCustomersCustomerResponse;
+            mutationFn: async (body: InternalCustomersCreateCustomerRequest & { customer_group_id?: string }) => {
+                const res = await axiosInstance.post('/customers', body)
+                return (res.data as { data: CustomerProfile }).data
             },
             onSuccess: async () => {
                 await qc.invalidateQueries({ queryKey: ['customers', 'list'] })
@@ -105,9 +107,15 @@ export const useUpdateCustomerMutation = () => {
     return {
         ...useMutation({
             mutationKey: ['customers', 'update'],
-            mutationFn: async ({ id, body }: { id: string; body: InternalCustomersUpdateCustomerRequest }) => {
-                const res = await customersApi.customersIdPut(id, body)
-                return (res.data as any).data as InternalCustomersCustomerResponse;
+            mutationFn: async ({
+                id,
+                body,
+            }: {
+                id: string
+                body: InternalCustomersUpdateCustomerRequest & { customer_group_id?: string | null }
+            }) => {
+                const res = await axiosInstance.put(`/customers/${id}`, body)
+                return (res.data as { data: CustomerProfile }).data
             },
             onSuccess: async (variables) => {
                 await qc.invalidateQueries({ queryKey: ['customers', 'list'] })

@@ -10,7 +10,7 @@
 package mocks
 
 import (
-	user "POS-kasir/internal/user"
+	user "dinosaurus-pos/internal/user"
 	context "context"
 	reflect "reflect"
 

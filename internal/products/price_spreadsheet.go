@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	products_repo "POS-kasir/internal/products/repository"
+	products_repo "dinosaurus-pos/internal/products/repository"
 
 	"github.com/xuri/excelize/v2"
 )

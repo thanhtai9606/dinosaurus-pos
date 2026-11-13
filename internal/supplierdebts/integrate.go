@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	sd_repo "POS-kasir/internal/supplierdebts/repository"
+	sd_repo "dinosaurus-pos/internal/supplierdebts/repository"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"

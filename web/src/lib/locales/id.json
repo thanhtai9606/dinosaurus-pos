@@ -113,7 +113,9 @@
         "settings": "Pengaturan",
         "account": "Akun",
         "activity_logs": "Log Aktivitas",
-        "customers": "Pelanggan",
+        "customers": "Daftar pelanggan",
+        "customers_menu": "Pelanggan",
+        "customer_groups": "Grup pelanggan",
         "inventory": "Inventaris",
         "suppliers": "Supplier",
         "stock_receipts": "Penerimaan stok",
@@ -1394,8 +1396,13 @@
         "description": "Kelola informasi dan riwayat pelanggan.",
         "add_button": "Tambah Pelanggan",
         "search_placeholder": "CUS-000001, nama, telepon…",
+        "filters": {
+            "group": "Grup pelanggan",
+            "all_groups": "Semua grup"
+        },
         "table": {
             "code": "Kode",
+            "group": "Grup",
             "name": "Nama",
             "phone": "Telepon",
             "email": "Email",
@@ -1412,6 +1419,9 @@
             "email": "Email",
             "phone": "Telepon",
             "address": "Alamat",
+            "group": "Grup pelanggan",
+            "group_placeholder": "Pilih grup…",
+            "group_none": "Tanpa grup",
             "save_changes": "Simpan Perubahan",
             "create_customer": "Tambah Pelanggan"
         },
@@ -1449,6 +1459,30 @@
             "cancel": "Batal",
             "deleting": "Menghapus...",
             "delete_confirm": "Hapus"
+        }
+    },
+    "customerGroups": {
+        "title": "Grup pelanggan",
+        "search_placeholder": "Cari kode, nama…",
+        "actions": {
+            "add": "Tambah grup"
+        },
+        "fields": {
+            "code": "Kode",
+            "name": "Nama grup",
+            "description": "Deskripsi"
+        },
+        "form": {
+            "create_title": "Tambah grup pelanggan",
+            "edit_title": "Edit grup pelanggan"
+        },
+        "messages": {
+            "create_success": "Grup pelanggan dibuat",
+            "create_failed": "Gagal membuat grup: {{message}}",
+            "update_success": "Grup pelanggan diperbarui",
+            "update_failed": "Gagal memperbarui: {{message}}",
+            "delete_success": "Grup pelanggan dihapus",
+            "delete_failed": "Gagal menghapus: {{message}}"
         }
     },
     "shift": {

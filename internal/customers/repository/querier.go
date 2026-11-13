@@ -11,12 +11,12 @@ import (
 )
 
 type Querier interface {
-	CountCustomers(ctx context.Context, search *string) (int64, error)
+	CountCustomers(ctx context.Context, arg CountCustomersParams) (int64, error)
 	CountCustomersForCode(ctx context.Context) (int64, error)
 	CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error)
 	DeleteCustomer(ctx context.Context, id uuid.UUID) error
-	GetCustomerByID(ctx context.Context, id uuid.UUID) (Customer, error)
-	ListCustomers(ctx context.Context, arg ListCustomersParams) ([]Customer, error)
+	GetCustomerByID(ctx context.Context, id uuid.UUID) (GetCustomerByIDRow, error)
+	ListCustomers(ctx context.Context, arg ListCustomersParams) ([]ListCustomersRow, error)
 	UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (Customer, error)
 }
 

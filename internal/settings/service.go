@@ -1,13 +1,13 @@
 package settings
 
 import (
-	"POS-kasir/internal/activitylog"
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/store"
-	"POS-kasir/internal/settings/repository"
-	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/activitylog"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/store"
+	"dinosaurus-pos/internal/settings/repository"
+	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"fmt"
 	"path/filepath"

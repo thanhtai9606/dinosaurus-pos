@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	"POS-kasir/internal/tenants"
-	"POS-kasir/pkg/database"
+	"dinosaurus-pos/internal/tenants"
+	"dinosaurus-pos/pkg/database"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )

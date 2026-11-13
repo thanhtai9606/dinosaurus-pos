@@ -1,6 +1,6 @@
 # **Dinosaurus POS**
 
-[![CI/CD](https://github.com/agpprastyo/POS-kasir/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/agpprastyo/POS-kasir/actions/workflows/ci-cd.yml)
+[![CI/CD](https://github.com/agpprastyo/dinosaurus-pos/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/agpprastyo/dinosaurus-pos/actions/workflows/ci-cd.yml)
 ![Go](https://img.shields.io/badge/Go-1.25-00ADD8?logo=go&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)
@@ -64,7 +64,7 @@ Migrate nằm trong `sqlc/migrations/` (baseline, multitenant, super admin, defa
 
 ### Liên kết repo
 
-- Fork / triển khai nội bộ: GitLab `devops/dinosaurus-pos` (module Go vẫn là `POS-kasir` — tên sản phẩm hiển thị: **Dinosaurus POS**).
+- Fork / triển khai nội bộ: GitLab `devops/dinosaurus-pos` (module Go vẫn là `dinosaurus-pos` — tên sản phẩm hiển thị: **Dinosaurus POS**).
 
 ## Overview
 
@@ -166,8 +166,8 @@ Frontend (React SPA)
 Cara tercepat menjalankan seluruh aplikasi:
 
 ```bash
-git clone https://github.com/agpprastyo/POS-kasir.git
-cd POS-kasir
+git clone https://github.com/agpprastyo/dinosaurus-pos.git
+cd dinosaurus-pos
 
 # 1. Copy dan edit environment
 cp .env.example .env

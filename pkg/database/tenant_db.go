@@ -1,7 +1,7 @@
 package database
 
 import (
-	"POS-kasir/internal/tenant"
+	"dinosaurus-pos/internal/tenant"
 	"context"
 
 	"github.com/jackc/pgx/v5"

@@ -84,11 +84,11 @@ WHERE
 `
 
 type CountUsersParams struct {
-	SearchText *string    `json:"search_text"`
-	Role       *UserRole  `json:"role"`
-	IsActive   *bool      `json:"is_active"`
-	Status     *string    `json:"status"`
-	TenantID   *uuid.UUID `json:"tenant_id"`
+	SearchText *string     `json:"search_text"`
+	Role       *UserRole   `json:"role"`
+	IsActive   *bool       `json:"is_active"`
+	Status     *string     `json:"status"`
+	TenantID   pgtype.UUID `json:"tenant_id"`
 }
 
 // Menghitung pengguna dengan filter status.
@@ -261,16 +261,16 @@ WHERE
         END
     )
   AND (
-    $9::uuid IS NULL
-    OR id IN (SELECT user_id FROM tenant_users WHERE tenant_id = $9::uuid)
+    $7::uuid IS NULL
+    OR id IN (SELECT user_id FROM tenant_users WHERE tenant_id = $7::uuid)
   )
 ORDER BY
-    CASE WHEN $7::user_order_column = 'username' AND $8::sort_order = 'asc'  THEN username END ASC,
-    CASE WHEN $7::user_order_column = 'username' AND $8::sort_order = 'desc' THEN username END DESC,
-    CASE WHEN $7::user_order_column = 'email' AND $8::sort_order = 'asc' THEN email END ASC,
-    CASE WHEN $7::user_order_column = 'email' AND $8::sort_order = 'desc' THEN email END DESC,
-    CASE WHEN $7::user_order_column = 'created_at' AND $8::sort_order = 'asc' THEN created_at END ASC,
-    CASE WHEN $7::user_order_column = 'created_at' AND $8::sort_order = 'desc' THEN created_at END DESC,
+    CASE WHEN $8::user_order_column = 'username' AND $9::sort_order = 'asc'  THEN username END ASC,
+    CASE WHEN $8::user_order_column = 'username' AND $9::sort_order = 'desc' THEN username END DESC,
+    CASE WHEN $8::user_order_column = 'email' AND $9::sort_order = 'asc' THEN email END ASC,
+    CASE WHEN $8::user_order_column = 'email' AND $9::sort_order = 'desc' THEN email END DESC,
+    CASE WHEN $8::user_order_column = 'created_at' AND $9::sort_order = 'asc' THEN created_at END ASC,
+    CASE WHEN $8::user_order_column = 'created_at' AND $9::sort_order = 'desc' THEN created_at END DESC,
     created_at ASC
 LIMIT $1 OFFSET $2
 `
@@ -282,9 +282,9 @@ type ListUsersParams struct {
 	Role       *UserRole       `json:"role"`
 	IsActive   *bool           `json:"is_active"`
 	Status     *string         `json:"status"`
+	TenantID   pgtype.UUID     `json:"tenant_id"`
 	OrderBy    UserOrderColumn `json:"order_by"`
 	SortOrder  SortOrder       `json:"sort_order"`
-	TenantID   *uuid.UUID      `json:"tenant_id"`
 }
 
 type ListUsersRow struct {
@@ -308,9 +308,9 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUse
 		arg.Role,
 		arg.IsActive,
 		arg.Status,
+		arg.TenantID,
 		arg.OrderBy,
 		arg.SortOrder,
-		arg.TenantID,
 	)
 	if err != nil {
 		return nil, err

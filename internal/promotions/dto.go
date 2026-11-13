@@ -1,8 +1,8 @@
 package promotions
 
 import (
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/promotions/repository"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/promotions/repository"
 
 	"time"
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"POS-kasir/internal/platformaudit"
+	"dinosaurus-pos/internal/platformaudit"
 
 	"github.com/google/uuid"
 )

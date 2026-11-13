@@ -3,10 +3,10 @@ package products
 import (
 	"context"
 
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/tenant"
-	products_repo "POS-kasir/internal/products/repository"
-	"POS-kasir/pkg/productsearch"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/tenant"
+	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/pkg/productsearch"
 
 	"github.com/google/uuid"
 )
@@ -37,6 +37,7 @@ func docFromListRow(p products_repo.ListProductsForSearchIndexRow) productsearch
 }
 
 func (s *PrdService) syncProductToSearch(ctx context.Context, productID uuid.UUID) {
+	defer s.invalidateProductListCache(ctx)
 	if s.search == nil || !s.search.Enabled() {
 		return
 	}
@@ -77,6 +78,7 @@ func (s *PrdService) syncProductToSearch(ctx context.Context, productID uuid.UUI
 }
 
 func (s *PrdService) removeProductFromSearch(ctx context.Context, productID uuid.UUID) {
+	defer s.invalidateProductListCache(ctx)
 	if s.search == nil || !s.search.Enabled() {
 		return
 	}
@@ -127,6 +129,19 @@ func (s *PrdService) SearchProducts(ctx context.Context, query string, limit int
 	if limit <= 0 {
 		limit = 20
 	}
+	if tid, ok := tenant.IDFromContext(ctx); ok && s.listCache != nil {
+		if cached, hit := s.listCache.GetSearch(ctx, tid.String(), query, limit); hit {
+			return cached, nil
+		}
+	}
+	cacheSearch := func(out *ListProductsResponse) {
+		if out == nil {
+			return
+		}
+		if tid, ok := tenant.IDFromContext(ctx); ok && s.listCache != nil {
+			s.listCache.SetSearch(ctx, tid.String(), query, limit, out)
+		}
+	}
 	fallback := func() (*ListProductsResponse, error) {
 		return s.ListProducts(ctx, ListProductsRequest{
 			PaginationRequest: pagination.PaginationRequest{Page: 1, Limit: limit, Search: query},
@@ -145,10 +160,12 @@ func (s *PrdService) SearchProducts(ctx context.Context, query string, limit int
 		return fallback()
 	}
 	if len(ids) == 0 {
-		return &ListProductsResponse{
+		empty := &ListProductsResponse{
 			Products:   []ProductListResponse{},
 			Pagination: pagination.BuildPagination(1, 0, limit),
-		}, nil
+		}
+		cacheSearch(empty)
+		return empty, nil
 	}
 	products, err := s.repo.GetProductsByIDs(ctx, ids)
 	if err != nil {
@@ -182,8 +199,10 @@ func (s *PrdService) SearchProducts(ctx context.Context, query string, limit int
 			MinStock:  p.MinStock,
 		})
 	}
-	return &ListProductsResponse{
+	out := &ListProductsResponse{
 		Products:   list,
 		Pagination: pagination.BuildPagination(1, len(list), limit),
-	}, nil
+	}
+	cacheSearch(out)
+	return out, nil
 }

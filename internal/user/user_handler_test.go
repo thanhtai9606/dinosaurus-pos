@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/user"
-	"POS-kasir/mocks"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/user"
+	"dinosaurus-pos/mocks"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
-	user_repo "POS-kasir/internal/user/repository"
+	user_repo "dinosaurus-pos/internal/user/repository"
 )
 
 func setupUserHandlerTest(t *testing.T) (*mocks.MockIUsrService, *mocks.MockILogger, *mocks.MockValidator, user.IUsrHandler, *fiber.App) {

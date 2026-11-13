@@ -1,15 +1,15 @@
 package orders_test
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/orders"
-	orders_repo "POS-kasir/internal/orders/repository"
-	products_repo "POS-kasir/internal/products/repository"
-	"POS-kasir/internal/settings"
-	"POS-kasir/mocks"
-	"POS-kasir/pkg/payment"
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/orders"
+	orders_repo "dinosaurus-pos/internal/orders/repository"
+	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/internal/settings"
+	"dinosaurus-pos/mocks"
+	"dinosaurus-pos/pkg/payment"
+	"dinosaurus-pos/pkg/utils"
 	"context"
 	"encoding/json"
 	"errors"
@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"

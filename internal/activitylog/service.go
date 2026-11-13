@@ -1,9 +1,9 @@
 package activitylog
 
 import (
-	"POS-kasir/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activitylog/repository"
 
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"encoding/json"
 	"math"

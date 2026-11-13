@@ -22,6 +22,7 @@ import {
     Layers,
     Server,
     ScrollText,
+    Tags,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
@@ -194,11 +195,30 @@ export function useNavigationMenu(userRole?: string) {
             allowedRoles: managerRoles,
         },
         {
-            type: 'link',
-            label: t('sidebar.customer_debts'),
-            icon: HandCoins,
-            to: '/customer-debts',
-            allowedRoles: managerRoles,
+            type: 'group',
+            label: t('sidebar.customers_menu'),
+            icon: Users,
+            allowedRoles: cashierRoles,
+            children: [
+                {
+                    label: t('sidebar.customers'),
+                    icon: Users,
+                    to: '/customers',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.customer_groups'),
+                    icon: Tags,
+                    to: '/customer-groups',
+                    allowedRoles: managerRoles,
+                },
+                {
+                    label: t('sidebar.customer_debts'),
+                    icon: HandCoins,
+                    to: '/customer-debts',
+                    allowedRoles: managerRoles,
+                },
+            ],
         },
         {
             type: 'link',
@@ -213,13 +233,6 @@ export function useNavigationMenu(userRole?: string) {
             icon: FileText,
             to: '/reports',
             allowedRoles: [POSKasirInternalUserRepositoryUserRole.UserRoleAdmin],
-        },
-        {
-            type: 'link',
-            label: t('sidebar.customers', 'Customers'),
-            icon: Users,
-            to: '/customers',
-            allowedRoles: cashierRoles,
         },
         {
             type: 'link',

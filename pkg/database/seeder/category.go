@@ -1,8 +1,8 @@
 package seeder
 
 import (
-	categories_repo "POS-kasir/internal/categories/repository"
-	"POS-kasir/pkg/logger"
+	categories_repo "dinosaurus-pos/internal/categories/repository"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 )
 

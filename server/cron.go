@@ -1,10 +1,10 @@
 package server
 
 import (
-	"POS-kasir/internal/tenant"
-	"POS-kasir/internal/tenants"
-	"POS-kasir/pkg/database"
-	"POS-kasir/pkg/database/seeder"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/internal/tenants"
+	"dinosaurus-pos/pkg/database"
+	"dinosaurus-pos/pkg/database/seeder"
 	"context"
 
 	"github.com/robfig/cron/v3"

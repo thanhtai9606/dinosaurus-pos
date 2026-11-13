@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { useForm } from '@tanstack/react-form'
 import * as z from 'zod'
 import { Link } from '@tanstack/react-router'
+import { primeCustomerDebtsFilter } from '@/stores/customer-debts-list'
 import { useQuery } from '@tanstack/react-query'
 import {
     Dialog,
@@ -31,6 +32,9 @@ import { customerDebtsListQueryOptions } from '@/lib/api/query/customerDebts'
 import { useFormatMoney } from '@/context/MoneyContext'
 import { useRBAC } from '@/lib/auth/rbac'
 import { ListPagination } from '@/components/pagination'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useCustomerGroupsListQuery } from '@/lib/api/query/customerGroups'
+import type { CustomerProfile } from '@/lib/api/query/customers'
 
 export type CustomerDialogTab = 'profile' | 'orders' | 'debts'
 
@@ -42,7 +46,7 @@ export function CustomerFormDialog({
 }: {
     open: boolean
     onOpenChange: (open: boolean) => void
-    customerToEdit: InternalCustomersCustomerResponse | null
+    customerToEdit: CustomerProfile | null
     initialTab?: CustomerDialogTab
 }) {
     const { t } = useTranslation()
@@ -58,6 +62,8 @@ export function CustomerFormDialog({
     const { canAccessApi } = useRBAC()
     const canOrders = canAccessApi('GET', '/orders')
     const canDebts = canAccessApi('GET', '/customer-debts')
+    const { data: groupsData } = useCustomerGroupsListQuery({ limit: 100, page: 1 })
+    const customerGroups = groupsData?.groups ?? []
 
     useEffect(() => {
         if (open) {
@@ -88,6 +94,7 @@ export function CustomerFormDialog({
             email: '',
             phone: '',
             address: '',
+            customer_group_id: '',
         },
         validators: {
             onChange: z.object({
@@ -95,24 +102,28 @@ export function CustomerFormDialog({
                 email: z.string().email('Invalid email format').or(z.literal('')),
                 phone: z.string(),
                 address: z.string(),
+                customer_group_id: z.string(),
             }),
         },
         onSubmit: async ({ value }) => {
             try {
+                const groupId = value.customer_group_id?.trim() || undefined
                 if (customerToEdit) {
-                    const payload: InternalCustomersUpdateCustomerRequest = {
+                    const payload: InternalCustomersUpdateCustomerRequest & { customer_group_id?: string | null } = {
                         name: value.name,
                         email: value.email || undefined,
                         phone: value.phone || undefined,
                         address: value.address || undefined,
+                        customer_group_id: groupId ?? null,
                     }
                     await updateMutation.mutateAsync({ id: customerToEdit.id!, body: payload })
                 } else {
-                    const payload: InternalCustomersCreateCustomerRequest = {
+                    const payload: InternalCustomersCreateCustomerRequest & { customer_group_id?: string } = {
                         name: value.name,
                         email: value.email || undefined,
                         phone: value.phone || undefined,
                         address: value.address || undefined,
+                        customer_group_id: groupId,
                     }
                     await createMutation.mutateAsync(payload)
                 }
@@ -134,6 +145,7 @@ export function CustomerFormDialog({
                 form.setFieldValue('email', customerToEdit.email || '')
                 form.setFieldValue('phone', customerToEdit.phone || '')
                 form.setFieldValue('address', customerToEdit.address || '')
+                form.setFieldValue('customer_group_id', customerToEdit.customer_group_id || '')
             } else {
                 form.reset()
             }
@@ -186,6 +198,27 @@ export function CustomerFormDialog({
                             onBlur={field.handleBlur}
                             onChange={(e) => field.handleChange(e.target.value)}
                         />
+                    </div>
+                )}
+            />
+            <form.Field
+                name="customer_group_id"
+                children={(field) => (
+                    <div className="space-y-2 sm:col-span-2">
+                        <Label>{t('customers.form.group', 'Customer group')}</Label>
+                        <Select value={field.state.value || 'none'} onValueChange={(v) => field.handleChange(v === 'none' ? '' : v)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('customers.form.group_placeholder', 'Select group…')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">{t('customers.form.group_none', 'No group')}</SelectItem>
+                                {customerGroups.map((g) => (
+                                    <SelectItem key={g.id} value={g.id}>
+                                        {g.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 )}
             />
@@ -421,7 +454,7 @@ export function CustomerFormDialog({
                                         <Button variant="outline" className="w-full" asChild>
                                             <Link
                                                 to="/customer-debts"
-                                                search={{ page: 1, limit: 15, customer_id: customerId }}
+                                                onClick={() => primeCustomerDebtsFilter(customerId)}
                                             >
                                                 {t('customers.detail.view_all_debts')}
                                             </Link>

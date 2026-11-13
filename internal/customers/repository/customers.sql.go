@@ -9,23 +9,33 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countCustomers = `-- name: CountCustomers :one
-SELECT COUNT(*) FROM customers
-WHERE deleted_at IS NULL
+SELECT COUNT(*) FROM customers c
+WHERE c.deleted_at IS NULL
   AND (
     $1::text IS NULL
     OR btrim($1::text) = ''
-    OR name ILIKE '%' || btrim($1::text) || '%'
-    OR phone ILIKE '%' || btrim($1::text) || '%'
-    OR code ILIKE '%' || btrim($1::text) || '%'
-    OR id::text = btrim($1::text)
+    OR c.name ILIKE '%' || btrim($1::text) || '%'
+    OR c.phone ILIKE '%' || btrim($1::text) || '%'
+    OR c.code ILIKE '%' || btrim($1::text) || '%'
+    OR c.id::text = btrim($1::text)
+  )
+  AND (
+    $2::uuid IS NULL
+    OR c.customer_group_id = $2::uuid
   )
 `
 
-func (q *Queries) CountCustomers(ctx context.Context, search *string) (int64, error) {
-	row := q.db.QueryRow(ctx, countCustomers, search)
+type CountCustomersParams struct {
+	Search  *string     `json:"search"`
+	GroupID pgtype.UUID `json:"group_id"`
+}
+
+func (q *Queries) CountCustomers(ctx context.Context, arg CountCustomersParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countCustomers, arg.Search, arg.GroupID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -43,17 +53,18 @@ func (q *Queries) CountCustomersForCode(ctx context.Context) (int64, error) {
 }
 
 const createCustomer = `-- name: CreateCustomer :one
-INSERT INTO customers (name, phone, email, address, code)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, name, phone, email, address, created_at, updated_at, deleted_at, code
+INSERT INTO customers (name, phone, email, address, code, customer_group_id)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, name, phone, email, address, created_at, updated_at, deleted_at, code, tenant_id, customer_group_id
 `
 
 type CreateCustomerParams struct {
-	Name    string  `json:"name"`
-	Phone   *string `json:"phone"`
-	Email   *string `json:"email"`
-	Address *string `json:"address"`
-	Code    string  `json:"code"`
+	Name            string      `json:"name"`
+	Phone           *string     `json:"phone"`
+	Email           *string     `json:"email"`
+	Address         *string     `json:"address"`
+	Code            string      `json:"code"`
+	CustomerGroupID pgtype.UUID `json:"customer_group_id"`
 }
 
 func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error) {
@@ -63,6 +74,7 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		arg.Email,
 		arg.Address,
 		arg.Code,
+		arg.CustomerGroupID,
 	)
 	var i Customer
 	err := row.Scan(
@@ -75,6 +87,8 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Code,
+		&i.TenantID,
+		&i.CustomerGroupID,
 	)
 	return i, err
 }
@@ -89,12 +103,40 @@ func (q *Queries) DeleteCustomer(ctx context.Context, id uuid.UUID) error {
 }
 
 const getCustomerByID = `-- name: GetCustomerByID :one
-SELECT id, name, phone, email, address, created_at, updated_at, deleted_at, code FROM customers WHERE id = $1 AND deleted_at IS NULL
+SELECT
+    c.id,
+    c.name,
+    c.phone,
+    c.email,
+    c.address,
+    c.created_at,
+    c.updated_at,
+    c.deleted_at,
+    c.code,
+    c.customer_group_id,
+    cg.name AS customer_group_name
+FROM customers c
+LEFT JOIN customer_groups cg ON cg.id = c.customer_group_id AND cg.deleted_at IS NULL
+WHERE c.id = $1 AND c.deleted_at IS NULL
 `
 
-func (q *Queries) GetCustomerByID(ctx context.Context, id uuid.UUID) (Customer, error) {
+type GetCustomerByIDRow struct {
+	ID                uuid.UUID          `json:"id"`
+	Name              string             `json:"name"`
+	Phone             *string            `json:"phone"`
+	Email             *string            `json:"email"`
+	Address           *string            `json:"address"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt         pgtype.Timestamptz `json:"deleted_at"`
+	Code              string             `json:"code"`
+	CustomerGroupID   pgtype.UUID        `json:"customer_group_id"`
+	CustomerGroupName *string            `json:"customer_group_name"`
+}
+
+func (q *Queries) GetCustomerByID(ctx context.Context, id uuid.UUID) (GetCustomerByIDRow, error) {
 	row := q.db.QueryRow(ctx, getCustomerByID, id)
-	var i Customer
+	var i GetCustomerByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -105,40 +147,79 @@ func (q *Queries) GetCustomerByID(ctx context.Context, id uuid.UUID) (Customer, 
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Code,
+		&i.CustomerGroupID,
+		&i.CustomerGroupName,
 	)
 	return i, err
 }
 
 const listCustomers = `-- name: ListCustomers :many
-SELECT id, name, phone, email, address, created_at, updated_at, deleted_at, code FROM customers
-WHERE deleted_at IS NULL
+SELECT
+    c.id,
+    c.name,
+    c.phone,
+    c.email,
+    c.address,
+    c.created_at,
+    c.updated_at,
+    c.deleted_at,
+    c.code,
+    c.customer_group_id,
+    cg.name AS customer_group_name
+FROM customers c
+LEFT JOIN customer_groups cg ON cg.id = c.customer_group_id AND cg.deleted_at IS NULL
+WHERE c.deleted_at IS NULL
   AND (
     $3::text IS NULL
     OR btrim($3::text) = ''
-    OR name ILIKE '%' || btrim($3::text) || '%'
-    OR phone ILIKE '%' || btrim($3::text) || '%'
-    OR code ILIKE '%' || btrim($3::text) || '%'
-    OR id::text = btrim($3::text)
+    OR c.name ILIKE '%' || btrim($3::text) || '%'
+    OR c.phone ILIKE '%' || btrim($3::text) || '%'
+    OR c.code ILIKE '%' || btrim($3::text) || '%'
+    OR c.id::text = btrim($3::text)
   )
-ORDER BY created_at DESC
+  AND (
+    $4::uuid IS NULL
+    OR c.customer_group_id = $4::uuid
+  )
+ORDER BY c.created_at DESC
 LIMIT $1 OFFSET $2
 `
 
 type ListCustomersParams struct {
-	Limit  int32   `json:"limit"`
-	Offset int32   `json:"offset"`
-	Search *string `json:"search"`
+	Limit   int32       `json:"limit"`
+	Offset  int32       `json:"offset"`
+	Search  *string     `json:"search"`
+	GroupID pgtype.UUID `json:"group_id"`
 }
 
-func (q *Queries) ListCustomers(ctx context.Context, arg ListCustomersParams) ([]Customer, error) {
-	rows, err := q.db.Query(ctx, listCustomers, arg.Limit, arg.Offset, arg.Search)
+type ListCustomersRow struct {
+	ID                uuid.UUID          `json:"id"`
+	Name              string             `json:"name"`
+	Phone             *string            `json:"phone"`
+	Email             *string            `json:"email"`
+	Address           *string            `json:"address"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt         pgtype.Timestamptz `json:"deleted_at"`
+	Code              string             `json:"code"`
+	CustomerGroupID   pgtype.UUID        `json:"customer_group_id"`
+	CustomerGroupName *string            `json:"customer_group_name"`
+}
+
+func (q *Queries) ListCustomers(ctx context.Context, arg ListCustomersParams) ([]ListCustomersRow, error) {
+	rows, err := q.db.Query(ctx, listCustomers,
+		arg.Limit,
+		arg.Offset,
+		arg.Search,
+		arg.GroupID,
+	)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Customer{}
+	items := []ListCustomersRow{}
 	for rows.Next() {
-		var i Customer
+		var i ListCustomersRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -149,6 +230,8 @@ func (q *Queries) ListCustomers(ctx context.Context, arg ListCustomersParams) ([
 			&i.UpdatedAt,
 			&i.DeletedAt,
 			&i.Code,
+			&i.CustomerGroupID,
+			&i.CustomerGroupName,
 		); err != nil {
 			return nil, err
 		}
@@ -162,17 +245,23 @@ func (q *Queries) ListCustomers(ctx context.Context, arg ListCustomersParams) ([
 
 const updateCustomer = `-- name: UpdateCustomer :one
 UPDATE customers
-SET name = $2, phone = $3, email = $4, address = $5, updated_at = NOW()
+SET name = $2,
+    phone = $3,
+    email = $4,
+    address = $5,
+    customer_group_id = $6,
+    updated_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, name, phone, email, address, created_at, updated_at, deleted_at, code
+RETURNING id, name, phone, email, address, created_at, updated_at, deleted_at, code, tenant_id, customer_group_id
 `
 
 type UpdateCustomerParams struct {
-	ID      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	Phone   *string   `json:"phone"`
-	Email   *string   `json:"email"`
-	Address *string   `json:"address"`
+	ID              uuid.UUID   `json:"id"`
+	Name            string      `json:"name"`
+	Phone           *string     `json:"phone"`
+	Email           *string     `json:"email"`
+	Address         *string     `json:"address"`
+	CustomerGroupID pgtype.UUID `json:"customer_group_id"`
 }
 
 func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (Customer, error) {
@@ -182,6 +271,7 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		arg.Phone,
 		arg.Email,
 		arg.Address,
+		arg.CustomerGroupID,
 	)
 	var i Customer
 	err := row.Scan(
@@ -194,6 +284,8 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		&i.UpdatedAt,
 		&i.DeletedAt,
 		&i.Code,
+		&i.TenantID,
+		&i.CustomerGroupID,
 	)
 	return i, err
 }

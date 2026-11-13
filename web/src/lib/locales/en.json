@@ -111,7 +111,9 @@
         "settings": "Settings",
         "account": "Account",
         "activity_logs": "Activity Logs",
-        "customers": "Customers",
+        "customers": "Customer list",
+        "customers_menu": "Customers",
+        "customer_groups": "Customer groups",
         "inventory": "Inventory",
         "suppliers": "Suppliers",
         "stock_receipts": "Stock receipts",
@@ -1406,8 +1408,13 @@
         "description": "Manage customer information and history.",
         "add_button": "Add Customer",
         "search_placeholder": "CUS-000001, name, phone…",
+        "filters": {
+            "group": "Customer group",
+            "all_groups": "All groups"
+        },
         "table": {
             "code": "Code",
+            "group": "Group",
             "name": "Name",
             "phone": "Phone",
             "email": "Email",
@@ -1424,6 +1431,9 @@
             "email": "Email",
             "phone": "Phone",
             "address": "Address",
+            "group": "Customer group",
+            "group_placeholder": "Select group…",
+            "group_none": "No group",
             "save_changes": "Save Changes",
             "create_customer": "Create Customer"
         },
@@ -1461,6 +1471,30 @@
             "cancel": "Cancel",
             "deleting": "Deleting...",
             "delete_confirm": "Delete"
+        }
+    },
+    "customerGroups": {
+        "title": "Customer groups",
+        "search_placeholder": "Search by code, name…",
+        "actions": {
+            "add": "Add group"
+        },
+        "fields": {
+            "code": "Code",
+            "name": "Group name",
+            "description": "Description"
+        },
+        "form": {
+            "create_title": "Add customer group",
+            "edit_title": "Edit customer group"
+        },
+        "messages": {
+            "create_success": "Customer group created",
+            "create_failed": "Could not create group: {{message}}",
+            "update_success": "Customer group updated",
+            "update_failed": "Could not update: {{message}}",
+            "delete_success": "Customer group deleted",
+            "delete_failed": "Could not delete: {{message}}"
         }
     },
     "shift": {

@@ -1,8 +1,8 @@
 package payment_methods
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/pkg/logger"
 
 	"github.com/gofiber/fiber/v3"
 )

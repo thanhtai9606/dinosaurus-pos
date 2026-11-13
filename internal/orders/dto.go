@@ -1,8 +1,8 @@
 package orders
 
 import (
-	"POS-kasir/internal/common/pagination"
-	"POS-kasir/internal/orders/repository"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/orders/repository"
 
 	"time"
 

@@ -1,10 +1,10 @@
 package categories_test
 
 import (
-	"POS-kasir/internal/categories"
-	"POS-kasir/internal/common"
-	"POS-kasir/mocks"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/categories"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/mocks"
+	"dinosaurus-pos/pkg/validator"
 	"bytes"
 	"encoding/json"
 	"errors"

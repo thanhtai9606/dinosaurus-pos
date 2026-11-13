@@ -82,6 +82,28 @@ export const RBAC_RULES: Record<string, string[]> = {
         "admin",
         "manager"
     ],
+    "GET /customer-groups": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "POST /customer-groups": [
+        "admin",
+        "manager"
+    ],
+    "GET /customer-groups/{id}": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PUT /customer-groups/{id}": [
+        "admin",
+        "manager"
+    ],
+    "DELETE /customer-groups/{id}": [
+        "admin",
+        "manager"
+    ],
     "GET /orders": [
         "admin",
         "manager",

@@ -1,10 +1,10 @@
 package products
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/common/pagination"
-	products_repo "POS-kasir/internal/products/repository"
-	"POS-kasir/pkg/utils"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/pkg/utils"
 	"context"
 	"errors"
 	"fmt"

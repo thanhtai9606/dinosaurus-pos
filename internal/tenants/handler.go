@@ -3,10 +3,10 @@ package tenants
 import (
 	"errors"
 
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/platformaudit"
-	"POS-kasir/internal/tenant"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/platformaudit"
+	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/pkg/logger"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"

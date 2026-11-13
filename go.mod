@@ -1,4 +1,4 @@
-module POS-kasir
+module dinosaurus-pos
 
 go 1.26.0
 

@@ -1,12 +1,12 @@
 package printer
 
 import (
-	"POS-kasir/internal/orders"
-	"POS-kasir/internal/payment_methods"
-	"POS-kasir/internal/settings"
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/escpos"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/orders"
+	"dinosaurus-pos/internal/payment_methods"
+	"dinosaurus-pos/internal/settings"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/escpos"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"fmt"
 	"strings"

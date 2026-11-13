@@ -1,8 +1,7 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo, useRef } from 'react'
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useDebounce } from '@/hooks/use-debounce'
-import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
 import { useProductsListQuery, Product } from '@/lib/api/query/products'
 import { productsApi } from '@/lib/api/client'
@@ -21,21 +20,13 @@ import { ProductGrid } from '@/components/orders/ProductGrid'
 import { CategorySidebar } from '@/components/orders/CategorySidebar'
 import { useCategoriesListQuery } from '@/lib/api/query/categories'
 
-const orderSearchSchema = z.object({
-    category: z.string().optional().catch('all'),
-})
-
 export const Route = createFileRoute('/_dashboard/order')({
-    validateSearch: (search) => orderSearchSchema.parse(search),
-    loaderDeps: ({ search }) => ({ category: search.category }),
     component: OrderPage,
 })
 
 function OrderPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch()
-    const selectedCategory = searchParams.category || 'all'
+    const [selectedCategory, setSelectedCategory] = useState('all')
 
     const searchInputRef = useRef<HTMLInputElement>(null)
     const [searchTerm, setSearchTerm] = useState('')
@@ -206,7 +197,7 @@ function OrderPage() {
                 <CategorySidebar
                     categories={categories}
                     selectedCategory={selectedCategory}
-                    onCategorySelect={(v) => navigate({ search: (prev) => ({ ...prev, category: v }) })}
+                    onCategorySelect={setSelectedCategory}
                     isLoading={categoriesLoading}
                     allLabel={t('order.all_categories')}
                     title={t('order.categories_title')}
@@ -223,7 +214,7 @@ function OrderPage() {
                     categoryLabel={categoryTitle}
                     itemsAvailable={inStockProducts.length}
                     selectedCategory={selectedCategory}
-                    onCategoryChange={(v) => navigate({ search: (prev) => ({ ...prev, category: v }) })}
+                    onCategoryChange={setSelectedCategory}
                     categories={categories}
                 />
 

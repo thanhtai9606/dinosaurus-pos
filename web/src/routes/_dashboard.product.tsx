@@ -1,8 +1,9 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery, useQuery } from '@tanstack/react-query'
-import { z } from 'zod'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { type Product, productsListQueryOptions, useTrashProductsListQuery, useRestoreProductMutation, useCreateProductMutation, useUpdateProductMutation, useDeleteProductMutation } from '@/lib/api/query/products'
 import { categoriesListQueryOptions } from '@/lib/api/query/categories'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
@@ -14,49 +15,36 @@ import { ProductTable } from '@/components/products/ProductTable'
 import { ProductGridView } from '@/components/products/ProductGridView'
 import { ProductFormDialog } from '@/components/products/ProductFormDialog'
 
-const productsSearchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().min(1).catch(10),
-    search: z.string().optional(),
-    category: z.number().optional(),
-    tab: z.enum(['active', 'trash']).catch('active'),
-})
-
 export const Route = createFileRoute('/_dashboard/product')({
-    validateSearch: (search) => productsSearchSchema.parse(search),
-
-    loaderDeps: ({ search }) => ({
-        page: search.page,
-        limit: search.limit,
-        search: search.search,
-        category: search.category,
-        tab: search.tab,
-    }),
-
-    loader: ({ context: { queryClient }, deps }) => {
-        return queryClient.ensureQueryData(productsListQueryOptions({
-            limit: deps.limit,
-            page: deps.page,
-            search: deps.search,
-            category: deps.category
-        }))
-    },
-
     component: ProductsPage,
 })
 
 function ProductsPage() {
     const { t } = useTranslation();
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch()
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({ scope: LIST_SCOPES.products })
+    const [category, setCategory] = useState<number | undefined>()
+    const [currentTab, setCurrentTab] = useState<'active' | 'trash'>('active')
+    const [searchTerm, setSearchTerm] = useState('')
+    const debouncedSearch = useDebounce(searchTerm, 500)
+    const isSearchPending = searchTerm !== debouncedSearch
+
+    useEffect(() => {
+        resetPage()
+    }, [debouncedSearch, category, currentTab, resetPage])
+
+    const listParams = useMemo(
+        () => ({
+            page,
+            limit,
+            search: debouncedSearch || undefined,
+            category,
+        }),
+        [page, limit, debouncedSearch, category],
+    )
+
     const createMutation = useCreateProductMutation()
 
-    const productsQuery = useQuery(productsListQueryOptions({
-        limit: searchParams.limit,
-        page: searchParams.page,
-        search: searchParams.search,
-        category: searchParams.category,
-    }))
+    const productsQuery = useQuery(productsListQueryOptions(listParams))
 
 
     const { data: categoriesData } = useSuspenseQuery(categoriesListQueryOptions())
@@ -65,56 +53,19 @@ function ProductsPage() {
     const products = productsQuery.data?.products || []
     const pagination = productsQuery.data?.pagination || {}
 
-    const trashProductsQuery = useTrashProductsListQuery({
-        limit: searchParams.limit,
-        page: searchParams.page,
-        search: searchParams.search,
-        category: searchParams.category,
-    })
+    const trashProductsQuery = useTrashProductsListQuery(listParams)
     const canReadTrash = trashProductsQuery.isAllowed
     const trashProducts = trashProductsQuery.data?.products || []
     const trashPagination = trashProductsQuery.data?.pagination || {}
 
     const restoreMutation = useRestoreProductMutation()
 
-    const currentTab = searchParams.tab || 'active'
-
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid')
 
-    const [searchTerm, setSearchTerm] = useState(searchParams.search || '')
-    const debouncedSearch = useDebounce(searchTerm, 500)
-    const isSearchPending = searchTerm !== debouncedSearch
-
-    useEffect(() => {
-        if (debouncedSearch !== (searchParams.search || '')) {
-            navigate({
-                to: '.',
-                search: (prev) => ({ ...prev, search: debouncedSearch || undefined, page: 1 }),
-                replace: true
-            })
-        }
-    }, [debouncedSearch, navigate, searchParams.search])
-
-
     const handleFilterCategory = (value: string) => {
-        navigate({
-            to: '.',
-            search: (prev) => ({
-                ...prev,
-                category: value === 'all' ? undefined : Number(value),
-                page: 1
-            })
-        })
-    }
-
-    const handlePageChange = (newPage: number) => {
-        navigate({ to: '.', search: (prev) => ({ ...prev, page: newPage }) })
-    }
-
-    const handleLimitChange = (limit: number) => {
-        navigate({ to: '.', search: (prev) => ({ ...prev, limit, page: 1 }) })
+        setCategory(value === 'all' ? undefined : Number(value))
     }
 
     const openCreateModal = () => {
@@ -144,16 +95,14 @@ function ProductsPage() {
                 t={t}
             />
 
-            <Tabs value={currentTab} onValueChange={(v) => {
-                navigate({ search: (prev) => ({ ...prev, tab: v as 'active' | 'trash', page: 1 }) })
-            }} className="w-full">
+            <Tabs value={currentTab} onValueChange={(v) => setCurrentTab(v as 'active' | 'trash')} className="w-full">
                 <ProductFilters 
                 trashCount={trashPagination.total_data || 0}
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
-                category={searchParams.category}
+                category={category}
                 categories={categories}
                 onCategoryChange={handleFilterCategory}
                 t={t}
@@ -182,8 +131,8 @@ function ProductsPage() {
 
                 <ListPagination
                     pagination={pagination}
-                    onPageChange={handlePageChange}
-                    onLimitChange={handleLimitChange}
+                    onPageChange={onPageChange}
+                    onLimitChange={onLimitChange}
                     isFetching={productsQuery.isFetching}
                 />
             </TabsContent>
@@ -210,8 +159,8 @@ function ProductsPage() {
 
                     <ListPagination
                         pagination={trashPagination}
-                        onPageChange={handlePageChange}
-                        onLimitChange={handleLimitChange}
+                        onPageChange={onPageChange}
+                        onLimitChange={onLimitChange}
                         isFetching={trashProductsQuery.isFetching}
                     />
                 </TabsContent>

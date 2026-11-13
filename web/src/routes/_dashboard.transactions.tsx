@@ -1,11 +1,12 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { z } from 'zod'
 import { ordersListQueryOptions, useUpdateOrderStatusMutation, useCancelOrderMutation, useRefundOrderMutation, useConfirmManualPaymentMutation, useInitiateMidtransPaymentMutation } from '@/lib/api/query/orders'
 import { usersListQueryOptions } from '@/lib/api/query/user'
 import { useCancellationReasonsListQuery } from '@/lib/api/query/cancel-reason'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { toast } from 'sonner'
 import { InternalOrdersOrderListResponse, POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 import { useTranslation } from 'react-i18next'
@@ -17,21 +18,7 @@ import { TransactionTable } from '@/components/transactions/TransactionTable'
 import { CancellationDialog } from '@/components/transactions/CancellationDialog'
 import { RefundDialog } from '@/components/transactions/RefundDialog'
 
-const transactionsSearchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().min(1).catch(10),
-    status: z.enum(['active', 'paid', 'cancelled', 'all']).catch('active'),
-    user_id: z.string().optional(),
-})
-
 export const Route = createFileRoute('/_dashboard/transactions')({
-    validateSearch: (search) => transactionsSearchSchema.parse(search),
-    loaderDeps: ({ search }) => ({
-        page: search.page,
-        limit: search.limit,
-        status: search.status,
-        user_id: search.user_id,
-    }),
     component: TransactionsPage,
 })
 
@@ -49,14 +36,15 @@ type OrderWithItems = InternalOrdersOrderListResponse & {
 
 function TransactionsPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch()
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({
+        scope: LIST_SCOPES.transactions,
+    })
+    const [selectedTab, setSelectedTab] = useState<'active' | 'paid' | 'cancelled' | 'all'>('active')
+    const [selectedUserId, setSelectedUserId] = useState('all')
 
-    // Derived state from search params
-    const selectedTab = searchParams.status || 'active'
-    const selectedUserId = searchParams.user_id || 'all'
-    const page = searchParams.page
-    const limit = searchParams.limit
+    useEffect(() => {
+        resetPage()
+    }, [selectedTab, selectedUserId, resetPage])
 
     // Fetch Users for Filter
     const { data: usersData } = useQuery(usersListQueryOptions({ page: 1, limit: 100 }))
@@ -223,25 +211,11 @@ function TransactionsPage() {
 
 
     const handleTabChange = (value: string) => {
-        navigate({
-            search: (prev) => ({ ...prev, status: value as any, page: 1 })
-        })
+        setSelectedTab(value as typeof selectedTab)
     }
 
     const handleUserChange = (value: string) => {
-        navigate({
-            search: (prev) => ({ ...prev, user_id: value === 'all' ? undefined : value, page: 1 })
-        })
-    }
-
-    const handlePageChange = (newPage: number) => {
-        navigate({
-            search: (prev) => ({ ...prev, page: newPage })
-        })
-    }
-
-    const handleLimitChange = (limit: number) => {
-        navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })
+        setSelectedUserId(value)
     }
 
     return (
@@ -287,8 +261,8 @@ function TransactionsPage() {
 
                 <ListPagination
                     pagination={pagination}
-                    onPageChange={handlePageChange}
-                    onLimitChange={handleLimitChange}
+                    onPageChange={onPageChange}
+                    onLimitChange={onLimitChange}
                     isFetching={isFetching && !isLoading}
                 />
             </div>

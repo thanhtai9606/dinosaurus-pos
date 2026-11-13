@@ -671,6 +671,48 @@ func (ns NullStockReceiptStatus) Value() (driver.Value, error) {
 	return string(ns.StockReceiptStatus), nil
 }
 
+type TenantDataPlane string
+
+const (
+	TenantDataPlaneShared    TenantDataPlane = "shared"
+	TenantDataPlaneDedicated TenantDataPlane = "dedicated"
+)
+
+func (e *TenantDataPlane) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TenantDataPlane(s)
+	case string:
+		*e = TenantDataPlane(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TenantDataPlane: %T", src)
+	}
+	return nil
+}
+
+type NullTenantDataPlane struct {
+	TenantDataPlane TenantDataPlane `json:"tenant_data_plane"`
+	Valid           bool            `json:"valid"` // Valid is true if TenantDataPlane is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTenantDataPlane) Scan(value interface{}) error {
+	if value == nil {
+		ns.TenantDataPlane, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TenantDataPlane.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTenantDataPlane) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.TenantDataPlane), nil
+}
+
 type UserOrderColumn string
 
 const (
@@ -717,10 +759,10 @@ func (ns NullUserOrderColumn) Value() (driver.Value, error) {
 type UserRole string
 
 const (
-	UserRoleAdmin       UserRole = "admin"
-	UserRoleCashier     UserRole = "cashier"
-	UserRoleManager     UserRole = "manager"
-	UserRoleSuperAdmin  UserRole = "super_admin"
+	UserRoleAdmin      UserRole = "admin"
+	UserRoleCashier    UserRole = "cashier"
+	UserRoleManager    UserRole = "manager"
+	UserRoleSuperAdmin UserRole = "super_admin"
 )
 
 func (e *UserRole) Scan(src interface{}) error {
@@ -766,6 +808,7 @@ type ActivityLog struct {
 	EntityID   string             `json:"entity_id"`
 	Details    []byte             `json:"details"`
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	TenantID   uuid.UUID          `json:"tenant_id"`
 }
 
 type CancellationReason struct {
@@ -775,6 +818,7 @@ type CancellationReason struct {
 	IsActive    bool               `json:"is_active"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	TenantID    uuid.UUID          `json:"tenant_id"`
 }
 
 type CashTransaction struct {
@@ -793,18 +837,21 @@ type Category struct {
 	Name      string             `json:"name"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
 }
 
 type Customer struct {
-	ID        uuid.UUID          `json:"id"`
-	Name      string             `json:"name"`
-	Phone     *string            `json:"phone"`
-	Email     *string            `json:"email"`
-	Address   *string            `json:"address"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
-	Code      string             `json:"code"`
+	ID              uuid.UUID          `json:"id"`
+	Name            string             `json:"name"`
+	Phone           *string            `json:"phone"`
+	Email           *string            `json:"email"`
+	Address         *string            `json:"address"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt       pgtype.Timestamptz `json:"deleted_at"`
+	Code            string             `json:"code"`
+	TenantID        uuid.UUID          `json:"tenant_id"`
+	CustomerGroupID pgtype.UUID        `json:"customer_group_id"`
 }
 
 type CustomerDebt struct {
@@ -820,6 +867,7 @@ type CustomerDebt struct {
 	CreatedBy   pgtype.UUID        `json:"created_by"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	TenantID    uuid.UUID          `json:"tenant_id"`
 }
 
 type CustomerDebtPayment struct {
@@ -830,6 +878,17 @@ type CustomerDebtPayment struct {
 	Note           *string            `json:"note"`
 	CreatedBy      pgtype.UUID        `json:"created_by"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+}
+
+type CustomerGroup struct {
+	ID          uuid.UUID          `json:"id"`
+	TenantID    uuid.UUID          `json:"tenant_id"`
+	Code        string             `json:"code"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
 }
 
 type Order struct {
@@ -856,6 +915,7 @@ type Order struct {
 	ServiceChargeAmount     int64              `json:"service_charge_amount"`
 	CustomerID              pgtype.UUID        `json:"customer_id"`
 	OrderNo                 string             `json:"order_no"`
+	TenantID                uuid.UUID          `json:"tenant_id"`
 }
 
 type OrderItem struct {
@@ -886,6 +946,17 @@ type PaymentMethod struct {
 	IsActive  bool               `json:"is_active"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
+}
+
+type PlatformAuditLog struct {
+	ID           uuid.UUID          `json:"id"`
+	ActorUserID  pgtype.UUID        `json:"actor_user_id"`
+	Action       string             `json:"action"`
+	ResourceType string             `json:"resource_type"`
+	ResourceID   *string            `json:"resource_id"`
+	Details      []byte             `json:"details"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
 }
 
 type Product struct {
@@ -904,6 +975,7 @@ type Product struct {
 	MinStock          int32              `json:"min_stock"`
 	DefaultSupplierID pgtype.UUID        `json:"default_supplier_id"`
 	Code              *string            `json:"code"`
+	TenantID          uuid.UUID          `json:"tenant_id"`
 }
 
 type ProductCategory struct {
@@ -952,6 +1024,7 @@ type Promotion struct {
 	CreatedAt         pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
 	DeletedAt         pgtype.Timestamptz `json:"deleted_at"`
+	TenantID          uuid.UUID          `json:"tenant_id"`
 }
 
 type PromotionRule struct {
@@ -978,6 +1051,7 @@ type Setting struct {
 	Value       string           `json:"value"`
 	Description *string          `json:"description"`
 	UpdatedAt   pgtype.Timestamp `json:"updated_at"`
+	TenantID    uuid.UUID        `json:"tenant_id"`
 }
 
 type Shift struct {
@@ -991,6 +1065,7 @@ type Shift struct {
 	Status          ShiftStatus        `json:"status"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+	TenantID        uuid.UUID          `json:"tenant_id"`
 }
 
 type StockHistory struct {
@@ -1018,6 +1093,7 @@ type StockReceipt struct {
 	UpdatedAt   pgtype.Timestamptz      `json:"updated_at"`
 	PaymentMode StockReceiptPaymentMode `json:"payment_mode"`
 	AmountPaid  pgtype.Numeric          `json:"amount_paid"`
+	TenantID    uuid.UUID               `json:"tenant_id"`
 }
 
 type StockReceiptItem struct {
@@ -1044,6 +1120,7 @@ type Supplier struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
 }
 
 type SupplierDebt struct {
@@ -1059,6 +1136,7 @@ type SupplierDebt struct {
 	CreatedBy      pgtype.UUID        `json:"created_by"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+	TenantID       uuid.UUID          `json:"tenant_id"`
 }
 
 type SupplierDebtPayment struct {
@@ -1069,6 +1147,25 @@ type SupplierDebtPayment struct {
 	Note           *string            `json:"note"`
 	CreatedBy      pgtype.UUID        `json:"created_by"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+}
+
+type Tenant struct {
+	ID        uuid.UUID          `json:"id"`
+	Code      string             `json:"code"`
+	Name      string             `json:"name"`
+	IsActive  bool               `json:"is_active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	DataPlane TenantDataPlane    `json:"data_plane"`
+	// Name of env var holding DSN for dedicated DB, e.g. TENANT_DSN_ACME. Never store password in this table.
+	DatabaseDsnKey *string `json:"database_dsn_key"`
+}
+
+type TenantUser struct {
+	TenantID  uuid.UUID          `json:"tenant_id"`
+	UserID    uuid.UUID          `json:"user_id"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	Role      *UserRole          `json:"role"`
 }
 
 type User struct {

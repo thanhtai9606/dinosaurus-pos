@@ -1,10 +1,10 @@
 package report
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/pkg/logger"
-	"POS-kasir/pkg/utils"
-	"POS-kasir/pkg/validator"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/utils"
+	"dinosaurus-pos/pkg/validator"
 	"errors"
 	"time"
 

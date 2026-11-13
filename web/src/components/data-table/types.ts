@@ -56,4 +56,5 @@ export type DataGridProps<T> = {
   defaultPageSize?: number
   className?: string
   toolbarExtra?: ReactNode
+  onRowClick?: (row: T) => void
 }

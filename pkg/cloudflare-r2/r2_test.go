@@ -1,9 +1,9 @@
 package cloudflarer2_test
 
 import (
-	"POS-kasir/config"
-	"POS-kasir/mocks"
-	r2 "POS-kasir/pkg/cloudflare-r2"
+	"dinosaurus-pos/config"
+	"dinosaurus-pos/mocks"
+	r2 "dinosaurus-pos/pkg/cloudflare-r2"
 	"context"
 	"errors"
 	"net/url"

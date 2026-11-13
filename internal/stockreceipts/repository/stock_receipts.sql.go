@@ -54,7 +54,7 @@ func (q *Queries) CountStockReceiptsOnDate(ctx context.Context, dollar_1 pgtype.
 const createStockReceipt = `-- name: CreateStockReceipt :one
 INSERT INTO stock_receipts (receipt_no, supplier_id, status, received_at, note, created_by)
 VALUES ($1, $2, 'draft', $3, $4, $5)
-RETURNING id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid
+RETURNING id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid, tenant_id
 `
 
 type CreateStockReceiptParams struct {
@@ -86,6 +86,7 @@ func (q *Queries) CreateStockReceipt(ctx context.Context, arg CreateStockReceipt
 		&i.UpdatedAt,
 		&i.PaymentMode,
 		&i.AmountPaid,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -110,7 +111,7 @@ func (q *Queries) DeleteStockReceiptItems(ctx context.Context, receiptID uuid.UU
 }
 
 const getStockReceiptByID = `-- name: GetStockReceiptByID :one
-SELECT id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid FROM stock_receipts WHERE id = $1
+SELECT id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid, tenant_id FROM stock_receipts WHERE id = $1
 `
 
 func (q *Queries) GetStockReceiptByID(ctx context.Context, id uuid.UUID) (StockReceipt, error) {
@@ -128,6 +129,7 @@ func (q *Queries) GetStockReceiptByID(ctx context.Context, id uuid.UUID) (StockR
 		&i.UpdatedAt,
 		&i.PaymentMode,
 		&i.AmountPaid,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -233,7 +235,7 @@ func (q *Queries) ListStockReceiptItems(ctx context.Context, receiptID uuid.UUID
 }
 
 const listStockReceipts = `-- name: ListStockReceipts :many
-SELECT sr.id, sr.receipt_no, sr.supplier_id, sr.status, sr.received_at, sr.note, sr.created_by, sr.created_at, sr.updated_at, sr.payment_mode, sr.amount_paid, s.name AS supplier_name
+SELECT sr.id, sr.receipt_no, sr.supplier_id, sr.status, sr.received_at, sr.note, sr.created_by, sr.created_at, sr.updated_at, sr.payment_mode, sr.amount_paid, sr.tenant_id, s.name AS supplier_name
 FROM stock_receipts sr
 LEFT JOIN suppliers s ON s.id = sr.supplier_id AND s.deleted_at IS NULL
 WHERE ($3::stock_receipt_status IS NULL OR sr.status = $3)
@@ -265,6 +267,7 @@ type ListStockReceiptsRow struct {
 	UpdatedAt    pgtype.Timestamptz      `json:"updated_at"`
 	PaymentMode  StockReceiptPaymentMode `json:"payment_mode"`
 	AmountPaid   pgtype.Numeric          `json:"amount_paid"`
+	TenantID     uuid.UUID               `json:"tenant_id"`
 	SupplierName *string                 `json:"supplier_name"`
 }
 
@@ -296,6 +299,7 @@ func (q *Queries) ListStockReceipts(ctx context.Context, arg ListStockReceiptsPa
 			&i.UpdatedAt,
 			&i.PaymentMode,
 			&i.AmountPaid,
+			&i.TenantID,
 			&i.SupplierName,
 		); err != nil {
 			return nil, err
@@ -312,7 +316,7 @@ const setStockReceiptStatus = `-- name: SetStockReceiptStatus :one
 UPDATE stock_receipts
 SET status = $2, updated_at = NOW()
 WHERE id = $1
-RETURNING id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid
+RETURNING id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid, tenant_id
 `
 
 type SetStockReceiptStatusParams struct {
@@ -335,6 +339,7 @@ func (q *Queries) SetStockReceiptStatus(ctx context.Context, arg SetStockReceipt
 		&i.UpdatedAt,
 		&i.PaymentMode,
 		&i.AmountPaid,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -359,7 +364,7 @@ SET supplier_id = $2,
     note = $4,
     updated_at = NOW()
 WHERE id = $1 AND status = 'draft'
-RETURNING id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid
+RETURNING id, receipt_no, supplier_id, status, received_at, note, created_by, created_at, updated_at, payment_mode, amount_paid, tenant_id
 `
 
 type UpdateStockReceiptDraftParams struct {
@@ -389,6 +394,7 @@ func (q *Queries) UpdateStockReceiptDraft(ctx context.Context, arg UpdateStockRe
 		&i.UpdatedAt,
 		&i.PaymentMode,
 		&i.AmountPaid,
+		&i.TenantID,
 	)
 	return i, err
 }

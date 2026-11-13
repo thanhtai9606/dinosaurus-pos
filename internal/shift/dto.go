@@ -1,7 +1,7 @@
 package shift
 
 import (
-	"POS-kasir/internal/shift/repository"
+	"dinosaurus-pos/internal/shift/repository"
 	"time"
 
 	"github.com/google/uuid"

@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"POS-kasir/internal/common"
-	"POS-kasir/internal/user"
-	"POS-kasir/mocks"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/user"
+	"dinosaurus-pos/mocks"
 	"context"
 	"errors"
 	"testing"

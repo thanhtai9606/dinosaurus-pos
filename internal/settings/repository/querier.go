@@ -9,10 +9,10 @@ import (
 )
 
 type Querier interface {
-	GetSettingByKey(ctx context.Context, key string) (Setting, error)
-	GetSettings(ctx context.Context) ([]Setting, error)
-	UpdateSetting(ctx context.Context, arg UpdateSettingParams) (Setting, error)
-	UpsertSetting(ctx context.Context, arg UpsertSettingParams) (Setting, error)
+	GetSettingByKey(ctx context.Context, key string) (GetSettingByKeyRow, error)
+	GetSettings(ctx context.Context) ([]GetSettingsRow, error)
+	UpdateSetting(ctx context.Context, arg UpdateSettingParams) (UpdateSettingRow, error)
+	UpsertSetting(ctx context.Context, arg UpsertSettingParams) (UpsertSettingRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

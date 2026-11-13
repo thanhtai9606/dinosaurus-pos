@@ -24,7 +24,7 @@ Backend Engineer with a strong foundation in **Go (Golang)** and **PostgreSQL**,
 
 ## ---
 
-**POS Kasir – Full Stack Point of Sales | Personal Project** | [Source Code](https://github.com/agpprastyo/POS-kasir) | [Live Demo](https://pos-kasir.agprastyo.me)  
+**POS Kasir – Full Stack Point of Sales | Personal Project** | [Source Code](https://github.com/agpprastyo/dinosaurus-pos) | [Live Demo](https://pos-kasir.agprastyo.me)  
 *June 2025 – Present*  
 **Tech Stack:** Go (Fiber v3), React 19, PostgreSQL (sqlc), Redis, WebSocket, Sentry, Cloudflare R2, Docker, GitHub Actions  
 Engineered a production-ready POS system with a focus on real-time state synchronization, high-performance analytics, and observability.

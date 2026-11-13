@@ -17,6 +17,7 @@ import { Route as DashboardIndexRouteImport } from './routes/_dashboard.index'
 import { Route as DashboardAccountRouteImport } from './routes/_dashboard.account'
 import { Route as DashboardActivityLogsRouteImport } from './routes/_dashboard.activity-logs'
 import { Route as DashboardCustomerDebtsRouteImport } from './routes/_dashboard.customer-debts'
+import { Route as DashboardCustomerGroupsRouteImport } from './routes/_dashboard.customer-groups'
 import { Route as DashboardCustomersRouteImport } from './routes/_dashboard.customers'
 import { Route as DashboardInventoryRouteImport } from './routes/_dashboard.inventory'
 import { Route as DashboardOrderRouteImport } from './routes/_dashboard.order'
@@ -76,6 +77,11 @@ const DashboardActivityLogsRoute = DashboardActivityLogsRouteImport.update({
 const DashboardCustomerDebtsRoute = DashboardCustomerDebtsRouteImport.update({
   id: '/customer-debts',
   path: '/customer-debts',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCustomerGroupsRoute = DashboardCustomerGroupsRouteImport.update({
+  id: '/customer-groups',
+  path: '/customer-groups',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardCustomersRoute = DashboardCustomersRouteImport.update({
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof DashboardAccountRoute
   '/activity-logs': typeof DashboardActivityLogsRoute
   '/customer-debts': typeof DashboardCustomerDebtsRoute
+  '/customer-groups': typeof DashboardCustomerGroupsRoute
   '/customers': typeof DashboardCustomersRoute
   '/inventory': typeof DashboardInventoryRoute
   '/order': typeof DashboardOrderRoute
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/account': typeof DashboardAccountRoute
   '/activity-logs': typeof DashboardActivityLogsRoute
   '/customer-debts': typeof DashboardCustomerDebtsRoute
+  '/customer-groups': typeof DashboardCustomerGroupsRoute
   '/customers': typeof DashboardCustomersRoute
   '/inventory': typeof DashboardInventoryRoute
   '/order': typeof DashboardOrderRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/_dashboard/account': typeof DashboardAccountRoute
   '/_dashboard/activity-logs': typeof DashboardActivityLogsRoute
   '/_dashboard/customer-debts': typeof DashboardCustomerDebtsRoute
+  '/_dashboard/customer-groups': typeof DashboardCustomerGroupsRoute
   '/_dashboard/customers': typeof DashboardCustomersRoute
   '/_dashboard/inventory': typeof DashboardInventoryRoute
   '/_dashboard/order': typeof DashboardOrderRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/activity-logs'
     | '/customer-debts'
+    | '/customer-groups'
     | '/customers'
     | '/inventory'
     | '/order'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/activity-logs'
     | '/customer-debts'
+    | '/customer-groups'
     | '/customers'
     | '/inventory'
     | '/order'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/_dashboard/account'
     | '/_dashboard/activity-logs'
     | '/_dashboard/customer-debts'
+    | '/_dashboard/customer-groups'
     | '/_dashboard/customers'
     | '/_dashboard/inventory'
     | '/_dashboard/order'
@@ -434,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/customer-debts'
       fullPath: '/customer-debts'
       preLoaderRoute: typeof DashboardCustomerDebtsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/customer-groups': {
+      id: '/_dashboard/customer-groups'
+      path: '/customer-groups'
+      fullPath: '/customer-groups'
+      preLoaderRoute: typeof DashboardCustomerGroupsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/customers': {
@@ -615,6 +634,7 @@ interface DashboardRouteChildren {
   DashboardAccountRoute: typeof DashboardAccountRoute
   DashboardActivityLogsRoute: typeof DashboardActivityLogsRoute
   DashboardCustomerDebtsRoute: typeof DashboardCustomerDebtsRoute
+  DashboardCustomerGroupsRoute: typeof DashboardCustomerGroupsRoute
   DashboardCustomersRoute: typeof DashboardCustomersRoute
   DashboardInventoryRoute: typeof DashboardInventoryRoute
   DashboardOrderRoute: typeof DashboardOrderRoute
@@ -642,6 +662,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAccountRoute: DashboardAccountRoute,
   DashboardActivityLogsRoute: DashboardActivityLogsRoute,
   DashboardCustomerDebtsRoute: DashboardCustomerDebtsRoute,
+  DashboardCustomerGroupsRoute: DashboardCustomerGroupsRoute,
   DashboardCustomersRoute: DashboardCustomersRoute,
   DashboardInventoryRoute: DashboardInventoryRoute,
   DashboardOrderRoute: DashboardOrderRoute,

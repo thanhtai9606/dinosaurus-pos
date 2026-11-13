@@ -10,7 +10,7 @@
 package mocks
 
 import (
-	promotions "POS-kasir/internal/promotions"
+	promotions "dinosaurus-pos/internal/promotions"
 	context "context"
 	reflect "reflect"
 

@@ -3,7 +3,7 @@ package store
 import (
 	"context"
 
-	"POS-kasir/internal/tenant"
+	"dinosaurus-pos/internal/tenant"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"

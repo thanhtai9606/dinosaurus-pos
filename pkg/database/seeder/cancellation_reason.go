@@ -1,9 +1,9 @@
 package seeder
 
 import (
-	"POS-kasir/internal/cancellation_reasons/repository"
-	cancellation_reasons_repo "POS-kasir/internal/cancellation_reasons/repository"
-	"POS-kasir/pkg/logger"
+	"dinosaurus-pos/internal/cancellation_reasons/repository"
+	cancellation_reasons_repo "dinosaurus-pos/internal/cancellation_reasons/repository"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 	"errors"
 

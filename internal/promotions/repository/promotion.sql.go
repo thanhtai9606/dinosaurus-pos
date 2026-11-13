@@ -47,7 +47,7 @@ INSERT INTO promotions (
     is_active
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9
-) RETURNING id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at
+) RETURNING id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at, tenant_id
 `
 
 type CreatePromotionParams struct {
@@ -89,6 +89,7 @@ func (q *Queries) CreatePromotion(ctx context.Context, arg CreatePromotionParams
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -193,7 +194,7 @@ func (q *Queries) DeletePromotionTargetsByPromotionID(ctx context.Context, promo
 }
 
 const getActivePromotionByID = `-- name: GetActivePromotionByID :one
-SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at FROM promotions
+SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at, tenant_id FROM promotions
 WHERE id = $1 AND is_active = true AND deleted_at IS NULL AND start_date <= NOW() AND end_date >= NOW()
 LIMIT 1
 `
@@ -215,12 +216,13 @@ func (q *Queries) GetActivePromotionByID(ctx context.Context, id uuid.UUID) (Pro
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
 
 const getPromotionByID = `-- name: GetPromotionByID :one
-SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at FROM promotions
+SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at, tenant_id FROM promotions
 WHERE id = $1
 LIMIT 1
 `
@@ -243,6 +245,7 @@ func (q *Queries) GetPromotionByID(ctx context.Context, id uuid.UUID) (Promotion
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -315,7 +318,7 @@ func (q *Queries) GetPromotionTargets(ctx context.Context, promotionID uuid.UUID
 }
 
 const listPromotions = `-- name: ListPromotions :many
-SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at FROM promotions
+SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at, tenant_id FROM promotions
 WHERE deleted_at IS NULL
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
@@ -349,6 +352,7 @@ func (q *Queries) ListPromotions(ctx context.Context, arg ListPromotionsParams) 
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}
@@ -361,7 +365,7 @@ func (q *Queries) ListPromotions(ctx context.Context, arg ListPromotionsParams) 
 }
 
 const listTrashPromotions = `-- name: ListTrashPromotions :many
-SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at FROM promotions
+SELECT id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at, tenant_id FROM promotions
 WHERE deleted_at IS NOT NULL
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
@@ -395,6 +399,7 @@ func (q *Queries) ListTrashPromotions(ctx context.Context, arg ListTrashPromotio
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.DeletedAt,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}
@@ -431,7 +436,7 @@ SET
     is_active = $10,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at
+RETURNING id, name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active, created_at, updated_at, deleted_at, tenant_id
 `
 
 type UpdatePromotionParams struct {
@@ -475,6 +480,7 @@ func (q *Queries) UpdatePromotion(ctx context.Context, arg UpdatePromotionParams
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.DeletedAt,
+		&i.TenantID,
 	)
 	return i, err
 }

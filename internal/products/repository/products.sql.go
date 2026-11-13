@@ -16,7 +16,7 @@ const addProductStock = `-- name: AddProductStock :one
 UPDATE products
 SET stock = stock + $1, updated_at = NOW()
 WHERE id = $2 AND deleted_at IS NULL
-RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
 `
 
 type AddProductStockParams struct {
@@ -43,6 +43,7 @@ func (q *Queries) AddProductStock(ctx context.Context, arg AddProductStockParams
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -154,7 +155,7 @@ INSERT INTO products (
     code
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
-) RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code
+) RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
 `
 
 type CreateProductParams struct {
@@ -205,6 +206,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -255,7 +257,7 @@ const decreaseProductStock = `-- name: DecreaseProductStock :one
 UPDATE products
 SET stock = stock - $1
 WHERE id = $2
-RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
 `
 
 type DecreaseProductStockParams struct {
@@ -282,6 +284,7 @@ func (q *Queries) DecreaseProductStock(ctx context.Context, arg DecreaseProductS
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -299,7 +302,7 @@ func (q *Queries) DeleteProduct(ctx context.Context, id uuid.UUID) error {
 
 const getDeletedProduct = `-- name: GetDeletedProduct :one
 SELECT
-    p.id, p.name, p.image_url, p.price, p.stock, p.created_at, p.updated_at, p.deleted_at, p.cost_price, p.sku, p.barcode, p.unit, p.min_stock, p.default_supplier_id, p.code,
+    p.id, p.name, p.image_url, p.price, p.stock, p.created_at, p.updated_at, p.deleted_at, p.cost_price, p.sku, p.barcode, p.unit, p.min_stock, p.default_supplier_id, p.code, p.tenant_id,
     COALESCE(
             (SELECT json_agg(po.*)
              FROM product_options po
@@ -330,6 +333,7 @@ type GetDeletedProductRow struct {
 	MinStock          int32              `json:"min_stock"`
 	DefaultSupplierID pgtype.UUID        `json:"default_supplier_id"`
 	Code              *string            `json:"code"`
+	TenantID          uuid.UUID          `json:"tenant_id"`
 	Options           interface{}        `json:"options"`
 }
 
@@ -352,13 +356,14 @@ func (q *Queries) GetDeletedProduct(ctx context.Context, id uuid.UUID) (GetDelet
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 		&i.Options,
 	)
 	return i, err
 }
 
 const getProductByBarcode = `-- name: GetProductByBarcode :one
-SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code FROM products
+SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id FROM products
 WHERE barcode = $1 AND deleted_at IS NULL
 LIMIT 1
 `
@@ -382,13 +387,14 @@ func (q *Queries) GetProductByBarcode(ctx context.Context, barcode *string) (Pro
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }
 
 const getProductByID = `-- name: GetProductByID :one
 SELECT
-    p.id, p.name, p.image_url, p.price, p.stock, p.created_at, p.updated_at, p.deleted_at, p.cost_price, p.sku, p.barcode, p.unit, p.min_stock, p.default_supplier_id, p.code,
+    p.id, p.name, p.image_url, p.price, p.stock, p.created_at, p.updated_at, p.deleted_at, p.cost_price, p.sku, p.barcode, p.unit, p.min_stock, p.default_supplier_id, p.code, p.tenant_id,
     COALESCE(
             (SELECT json_agg(po.*)
              FROM product_options po
@@ -426,6 +432,7 @@ type GetProductByIDRow struct {
 	MinStock          int32              `json:"min_stock"`
 	DefaultSupplierID pgtype.UUID        `json:"default_supplier_id"`
 	Code              *string            `json:"code"`
+	TenantID          uuid.UUID          `json:"tenant_id"`
 	Options           interface{}        `json:"options"`
 	Categories        interface{}        `json:"categories"`
 }
@@ -450,6 +457,7 @@ func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (GetProductB
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 		&i.Options,
 		&i.Categories,
 	)
@@ -457,7 +465,7 @@ func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (GetProductB
 }
 
 const getProductBySku = `-- name: GetProductBySku :one
-SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code FROM products
+SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id FROM products
 WHERE sku = $1 AND deleted_at IS NULL
 LIMIT 1
 `
@@ -481,6 +489,7 @@ func (q *Queries) GetProductBySku(ctx context.Context, sku *string) (Product, er
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -605,7 +614,7 @@ func (q *Queries) GetProductOptionsByIDs(ctx context.Context, dollar_1 []uuid.UU
 
 const getProductWithOptions = `-- name: GetProductWithOptions :one
 SELECT
-    p.id, p.name, p.image_url, p.price, p.stock, p.created_at, p.updated_at, p.deleted_at, p.cost_price, p.sku, p.barcode, p.unit, p.min_stock, p.default_supplier_id, p.code,
+    p.id, p.name, p.image_url, p.price, p.stock, p.created_at, p.updated_at, p.deleted_at, p.cost_price, p.sku, p.barcode, p.unit, p.min_stock, p.default_supplier_id, p.code, p.tenant_id,
     COALESCE(
             (SELECT json_agg(po.*)
              FROM product_options po
@@ -636,6 +645,7 @@ type GetProductWithOptionsRow struct {
 	MinStock          int32              `json:"min_stock"`
 	DefaultSupplierID pgtype.UUID        `json:"default_supplier_id"`
 	Code              *string            `json:"code"`
+	TenantID          uuid.UUID          `json:"tenant_id"`
 	Options           interface{}        `json:"options"`
 }
 
@@ -661,13 +671,14 @@ func (q *Queries) GetProductWithOptions(ctx context.Context, id uuid.UUID) (GetP
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 		&i.Options,
 	)
 	return i, err
 }
 
 const getProductsByIDs = `-- name: GetProductsByIDs :many
-SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code FROM products
+SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id FROM products
 WHERE id = ANY($1::uuid[])
 `
 
@@ -696,6 +707,7 @@ func (q *Queries) GetProductsByIDs(ctx context.Context, dollar_1 []uuid.UUID) ([
 			&i.MinStock,
 			&i.DefaultSupplierID,
 			&i.Code,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}
@@ -708,7 +720,7 @@ func (q *Queries) GetProductsByIDs(ctx context.Context, dollar_1 []uuid.UUID) ([
 }
 
 const getProductsForUpdate = `-- name: GetProductsForUpdate :many
-SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code FROM products
+SELECT id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id FROM products
 WHERE id = ANY($1::uuid[])
 FOR UPDATE
 `
@@ -738,6 +750,7 @@ func (q *Queries) GetProductsForUpdate(ctx context.Context, dollar_1 []uuid.UUID
 			&i.MinStock,
 			&i.DefaultSupplierID,
 			&i.Code,
+			&i.TenantID,
 		); err != nil {
 			return nil, err
 		}
@@ -1099,7 +1112,7 @@ const setProductCostPrice = `-- name: SetProductCostPrice :one
 UPDATE products
 SET cost_price = $2, updated_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
 `
 
 type SetProductCostPriceParams struct {
@@ -1126,6 +1139,7 @@ func (q *Queries) SetProductCostPrice(ctx context.Context, arg SetProductCostPri
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -1134,7 +1148,7 @@ const setProductSellPrice = `-- name: SetProductSellPrice :one
 UPDATE products
 SET price = $2, updated_at = NOW()
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
 `
 
 type SetProductSellPriceParams struct {
@@ -1161,6 +1175,7 @@ func (q *Queries) SetProductSellPrice(ctx context.Context, arg SetProductSellPri
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }
@@ -1204,7 +1219,7 @@ SET
     updated_at = NOW()
 WHERE
     id = $11
-RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
 `
 
 type UpdateProductParams struct {
@@ -1253,6 +1268,7 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (P
 		&i.MinStock,
 		&i.DefaultSupplierID,
 		&i.Code,
+		&i.TenantID,
 	)
 	return i, err
 }

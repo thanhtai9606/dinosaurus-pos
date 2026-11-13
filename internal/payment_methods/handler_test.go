@@ -1,8 +1,8 @@
 package payment_methods_test
 
 import (
-	"POS-kasir/internal/payment_methods"
-	"POS-kasir/mocks"
+	"dinosaurus-pos/internal/payment_methods"
+	"dinosaurus-pos/mocks"
 	"encoding/json"
 	"errors"
 	"net/http"

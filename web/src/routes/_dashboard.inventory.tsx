@@ -1,7 +1,9 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useSuspenseQuery, queryOptions } from '@tanstack/react-query'
-import { z } from 'zod'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { useQuery, queryOptions } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { axiosInstance } from '@/lib/api/client'
 import { ListPagination } from '@/components/pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -10,17 +12,10 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Download, Loader2, PackagePlus, Upload } from 'lucide-react'
-import { useState } from 'react'
 import { ProductPriceImportDialog } from '@/components/inventory/ProductPriceImportDialog'
 import { downloadAuthenticatedFile } from '@/lib/api/downloadBlob'
 import { toast } from 'sonner'
 import { useRBAC } from '@/lib/auth/rbac'
-
-const searchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().catch(20),
-    low_stock_only: z.boolean().optional(),
-})
 
 type InventoryList = {
     products: Array<{
@@ -51,17 +46,25 @@ const inventoryQueryOptions = (params: { page?: number; limit?: number; low_stoc
     })
 
 export const Route = createFileRoute('/_dashboard/inventory')({
-    validateSearch: (search) => searchSchema.parse(search),
-    loaderDeps: ({ search }) => search,
-    loader: ({ context: { queryClient }, deps }) => queryClient.ensureQueryData(inventoryQueryOptions(deps)),
     component: InventoryPage,
 })
 
 function InventoryPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const search = Route.useSearch()
-    const { data } = useSuspenseQuery(inventoryQueryOptions(search))
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({
+        scope: LIST_SCOPES.inventory,
+        limit: 20,
+    })
+    const [lowStockOnly, setLowStockOnly] = useState(false)
+
+    useEffect(() => {
+        resetPage()
+    }, [lowStockOnly, resetPage])
+    const listParams = useMemo(
+        () => ({ page, limit, low_stock_only: lowStockOnly || undefined }),
+        [page, limit, lowStockOnly],
+    )
+    const { data } = useQuery(inventoryQueryOptions(listParams))
     const [importOpen, setImportOpen] = useState(false)
     const [exporting, setExporting] = useState(false)
     const { canAccessApi } = useRBAC()
@@ -114,12 +117,7 @@ function InventoryPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center gap-2">
-                        <Switch
-                            checked={!!search.low_stock_only}
-                            onCheckedChange={(v) =>
-                                navigate({ search: (prev) => ({ ...prev, low_stock_only: v || undefined, page: 1 }) })
-                            }
-                        />
+                        <Switch checked={lowStockOnly} onCheckedChange={setLowStockOnly} />
                         <Label>{t('inventory.low_stock_only')}</Label>
                     </div>
                     <Table>
@@ -134,7 +132,7 @@ function InventoryPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {(data.products || []).map((p) => (
+                            {(data?.products || []).map((p) => (
                                 <TableRow key={p.id}>
                                     <TableCell className="font-mono text-xs">{p.code || '—'}</TableCell>
                                     <TableCell>{p.sku || '—'}</TableCell>
@@ -150,11 +148,13 @@ function InventoryPage() {
                             ))}
                         </TableBody>
                     </Table>
-                    <ListPagination
-                        pagination={data.pagination}
-                        onPageChange={(page) => navigate({ search: (prev) => ({ ...prev, page }) })}
-                        onLimitChange={(limit) => navigate({ search: (prev) => ({ ...prev, limit, page: 1 }) })}
-                    />
+                    {data?.pagination ? (
+                        <ListPagination
+                            pagination={data.pagination}
+                            onPageChange={onPageChange}
+                            onLimitChange={onLimitChange}
+                        />
+                    ) : null}
                 </CardContent>
             </Card>
             <ProductPriceImportDialog open={importOpen} onOpenChange={setImportOpen} />

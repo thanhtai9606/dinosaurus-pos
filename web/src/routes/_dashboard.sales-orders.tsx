@@ -1,7 +1,8 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { z } from 'zod'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
+import { useServerListState } from '@/hooks/use-server-list-state'
+import { LIST_SCOPES } from '@/stores/list-scopes'
 import { useDebounce } from '@/hooks/use-debounce'
 import { useTranslation } from 'react-i18next'
 import { ordersListQueryOptions } from '@/lib/api/query/orders'
@@ -22,28 +23,23 @@ import {
     type SalesOrdersListView,
 } from '@/lib/ui/viewPreferences'
 
-const searchSchema = z.object({
-    page: z.number().catch(1),
-    limit: z.number().min(1).catch(15),
-    status: z.enum(['paid', 'all', 'active', 'cancelled']).catch('paid'),
-    user_id: z.string().optional(),
-})
-
 export const Route = createFileRoute('/_dashboard/sales-orders')({
-    validateSearch: (search) => searchSchema.parse(search),
     component: SalesOrdersPage,
 })
 
 function SalesOrdersPage() {
     const { t } = useTranslation()
     const queryClient = useQueryClient()
-    const navigate = useNavigate({ from: Route.fullPath })
-    const searchParams = Route.useSearch()
+    const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({
+        scope: LIST_SCOPES.salesOrders,
+        limit: 15,
+    })
+    const [selectedTab, setSelectedTab] = useState<'paid' | 'all' | 'active' | 'cancelled'>('paid')
+    const [selectedUserId, setSelectedUserId] = useState('all')
 
-    const selectedTab = searchParams.status || 'paid'
-    const page = searchParams.page
-    const limit = searchParams.limit
-    const selectedUserId = searchParams.user_id || 'all'
+    useEffect(() => {
+        resetPage()
+    }, [selectedTab, selectedUserId, resetPage])
 
     const { data: usersData } = useQuery(usersListQueryOptions({ page: 1, limit: 100 }))
     const users = usersData?.users || []
@@ -104,7 +100,7 @@ function SalesOrdersPage() {
                         <CardDescription>{t('salesOrders.subtitle')}</CardDescription>
                     </div>
                     <Button variant="outline" asChild className="shrink-0">
-                        <Link to="/transactions" search={{ page: 1, limit: 10, status: 'active' }}>
+                        <Link to="/transactions">
                             {t('salesOrders.open_transactions')}
                         </Link>
                     </Button>
@@ -120,15 +116,7 @@ function SalesOrdersPage() {
                         />
                         <Select
                             value={selectedUserId}
-                            onValueChange={(v) =>
-                                navigate({
-                                    search: (prev) => ({
-                                        ...prev,
-                                        user_id: v === 'all' ? undefined : v,
-                                        page: 1,
-                                    }),
-                                })
-                            }
+                            onValueChange={(v) => setSelectedUserId(v)}
                         >
                             <SelectTrigger className="w-full sm:w-[200px]">
                                 <SelectValue placeholder={t('transactions.filter_user')} />
@@ -152,15 +140,7 @@ function SalesOrdersPage() {
 
                     <Tabs
                         value={selectedTab}
-                        onValueChange={(value) =>
-                            navigate({
-                                search: (prev) => ({
-                                    ...prev,
-                                    status: value as z.infer<typeof searchSchema>['status'],
-                                    page: 1,
-                                }),
-                            })
-                        }
+                        onValueChange={(value) => setSelectedTab(value as typeof selectedTab)}
                     >
                         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 bg-muted/30 p-1">
                             <TabsTrigger value="paid">{t('salesOrders.tabs.sold')}</TabsTrigger>
@@ -200,8 +180,8 @@ function SalesOrdersPage() {
 
                     <ListPagination
                         pagination={pagination}
-                        onPageChange={(p) => navigate({ search: (prev) => ({ ...prev, page: p }) })}
-                        onLimitChange={(l) => navigate({ search: (prev) => ({ ...prev, limit: l, page: 1 }) })}
+                        onPageChange={onPageChange}
+                        onLimitChange={onLimitChange}
                         isFetching={isFetching && !isLoading}
                     />
                 </CardContent>

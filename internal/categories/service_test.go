@@ -1,11 +1,11 @@
 package categories_test
 
 import (
-	activitylog_repo "POS-kasir/internal/activitylog/repository"
-	"POS-kasir/internal/categories"
-	categories_repo "POS-kasir/internal/categories/repository"
-	"POS-kasir/internal/common"
-	"POS-kasir/mocks"
+	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/categories"
+	categories_repo "dinosaurus-pos/internal/categories/repository"
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/mocks"
 	"context"
 	"errors"
 	"testing"

@@ -1,14 +1,14 @@
 package seeder
 
 import (
-	cancellation_reasons_repo "POS-kasir/internal/cancellation_reasons/repository"
-	categories_repo "POS-kasir/internal/categories/repository"
-	payment_methods_repo "POS-kasir/internal/payment_methods/repository"
-	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
+	cancellation_reasons_repo "dinosaurus-pos/internal/cancellation_reasons/repository"
+	categories_repo "dinosaurus-pos/internal/categories/repository"
+	payment_methods_repo "dinosaurus-pos/internal/payment_methods/repository"
+	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
 
-	user_repo "POS-kasir/internal/user/repository"
-	"POS-kasir/pkg/database"
-	"POS-kasir/pkg/logger"
+	user_repo "dinosaurus-pos/internal/user/repository"
+	"dinosaurus-pos/pkg/database"
+	"dinosaurus-pos/pkg/logger"
 	"context"
 )
 

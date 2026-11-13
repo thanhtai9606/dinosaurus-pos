@@ -395,7 +395,12 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent size="lg" dismissible scrollable className="h-[80vh] flex flex-col p-0">
+                <DialogContent
+                    size="full"
+                    dismissible
+                    scrollable={false}
+                    className="flex h-[min(92vh,920px)] max-h-[92vh] flex-col gap-0 overflow-hidden p-0"
+                >
                     <DialogHeader className="p-6 pb-2">
                         <DialogTitle>{productToEdit ? t('products.form.title_edit') : t('products.form.title_create')}</DialogTitle>
                         <DialogDescription>
@@ -404,7 +409,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     </DialogHeader>
 
                     {/* Scrollable Content Area */}
-                    <div className="flex-1 overflow-y-auto px-6 py-2">
+                    <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-6 py-2">
                         {productToEdit && isLoadingDetail ? (
                             <div className="h-full flex items-center justify-center">
                                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -713,20 +718,6 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                             </div>
                                         </div>
                                     </form>
-                                    <DialogFooter className="pt-2">
-                                        <form.Subscribe
-                                            selector={(state) => [state.canSubmit, state.isSubmitting]}
-                                            children={([canSubmit, isSubmittingForm]) => (
-                                                <Button type="submit" form="product-form" disabled={!canSubmit || isSubmittingForm || isSubmitting || (!!productToEdit && isLoadingDetail)}>
-                                                    {isSubmitting || isSubmittingForm ? (
-                                                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('products.form.saving')}</>
-                                                    ) : (
-                                                        t('products.form.save')
-                                                    )}
-                                                </Button>
-                                            )}
-                                        />
-                                    </DialogFooter>
                                 </TabsContent>
                                 <TabsContent value="history" className="mt-4">
                                     {productToEdit && <StockHistoryTable productId={productToEdit.id!} />}
@@ -734,6 +725,33 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                             </Tabs>
                         )}
                     </div>
+                    {(!productToEdit || (!isLoadingDetail && !isDetailError)) && (
+                        <DialogFooter className="shrink-0 border-t bg-background px-6 py-4">
+                            <form.Subscribe
+                                selector={(state) => [state.canSubmit, state.isSubmitting]}
+                                children={([canSubmit, isSubmittingForm]) => (
+                                    <Button
+                                        type="submit"
+                                        form="product-form"
+                                        disabled={
+                                            !canSubmit ||
+                                            isSubmittingForm ||
+                                            isSubmitting ||
+                                            (!!productToEdit && isLoadingDetail)
+                                        }
+                                    >
+                                        {isSubmitting || isSubmittingForm ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('products.form.saving')}
+                                            </>
+                                        ) : (
+                                            t('products.form.save')
+                                        )}
+                                    </Button>
+                                )}
+                            />
+                        </DialogFooter>
+                    )}
                 </DialogContent>
             </Dialog >
 

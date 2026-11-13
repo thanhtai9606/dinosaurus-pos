@@ -145,7 +145,8 @@ export function ProductSaleUnitsEditor({ units, onChange, catalog, t, currencySy
                 <p className="text-xs text-muted-foreground">{t('products.sale_units.hint')}</p>
             </div>
 
-            <Table>
+            <div className="overflow-x-auto rounded-md border">
+                <Table className="min-w-[52rem]">
                 <TableHeader>
                     <TableRow>
                         <TableHead className="min-w-[9rem]">{t('products.sale_units.measurement_unit')}</TableHead>
@@ -153,7 +154,7 @@ export function ProductSaleUnitsEditor({ units, onChange, catalog, t, currencySy
                         <TableHead className="min-w-[7.5rem]">{t('products.sale_units.retail_price')}</TableHead>
                         <TableHead className="min-w-[7.5rem]">{t('products.sale_units.wholesale_price')}</TableHead>
                         <TableHead className="min-w-[10rem]">{t('products.fields.barcode')}</TableHead>
-                        <TableHead className="w-[7rem] text-right">{t('common.actions')}</TableHead>
+                        <TableHead className="min-w-[9rem] text-right">{t('common.actions')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -259,6 +260,7 @@ export function ProductSaleUnitsEditor({ units, onChange, catalog, t, currencySy
                     ))}
                 </TableBody>
             </Table>
+            </div>
 
             <Button
                 type="button"

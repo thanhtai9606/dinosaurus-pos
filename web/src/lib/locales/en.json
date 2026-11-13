@@ -2,7 +2,10 @@
     "data_grid": {
         "columns": "Columns",
         "toggle_columns": "Show / hide columns",
-        "empty": "No rows"
+        "empty": "No rows",
+        "filter_placeholder": "Filter…",
+        "filter_all": "All",
+        "clear_filters": "Clear filters"
     },
     "common": {
         "loading": "Loading...",

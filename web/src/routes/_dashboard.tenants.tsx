@@ -113,6 +113,7 @@ function TenantsAdminPage() {
         header: t('tenants_admin.code'),
         icon: Hash,
         sortable: true,
+        filterable: true,
         accessor: (r) => r.code,
         cell: (tnt) => <span className="font-mono text-sm">{tnt.code}</span>,
       },
@@ -121,6 +122,7 @@ function TenantsAdminPage() {
         header: t('tenants_admin.name'),
         icon: Building2,
         sortable: true,
+        filterable: true,
         accessor: (r) => r.name,
         cell: (tnt) => tnt.name,
       },
@@ -128,6 +130,13 @@ function TenantsAdminPage() {
         id: 'data_plane',
         header: t('tenants_admin.data_plane'),
         icon: Layers,
+        filterable: true,
+        filterType: 'select',
+        filterAccessor: (r) => r.data_plane,
+        filterOptions: [
+          { value: 'dedicated', label: t('tenants_admin.data_plane_dedicated') },
+          { value: 'shared', label: t('tenants_admin.data_plane_shared') },
+        ],
         cell: (tnt) => (
           <Badge variant={tnt.data_plane === 'dedicated' ? 'outline' : 'secondary'}>
             {tnt.data_plane === 'dedicated'
@@ -141,6 +150,13 @@ function TenantsAdminPage() {
         header: t('tenants_admin.status'),
         icon: ToggleLeft,
         sortable: true,
+        filterable: true,
+        filterType: 'select',
+        filterAccessor: (r) => (r.is_active ? 'active' : 'inactive'),
+        filterOptions: [
+          { value: 'active', label: t('tenants_admin.active') },
+          { value: 'inactive', label: t('tenants_admin.inactive') },
+        ],
         accessor: (r) => (r.is_active ? 1 : 0),
         cell: (tnt) => (
           <Badge variant={tnt.is_active ? 'default' : 'secondary'}>

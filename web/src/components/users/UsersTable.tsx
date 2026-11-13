@@ -32,6 +32,8 @@ export function UsersTable({ users, t, renderActions, server }: UsersTableProps)
                 header: t('users.table.user'),
                 icon: Mail,
                 sortable: true,
+                filterable: true,
+                filterAccessor: (u) => `${u.username ?? ''} ${u.email ?? ''}`,
                 accessor: (u) => u.username ?? '',
                 cell: (user) => (
                     <div className="flex flex-col">
@@ -45,6 +47,15 @@ export function UsersTable({ users, t, renderActions, server }: UsersTableProps)
                 header: t('users.table.role'),
                 icon: Shield,
                 sortable: true,
+                filterable: true,
+                filterType: 'select',
+                filterAccessor: (u) => u.role ?? '',
+                filterOptions: [
+                    { value: 'admin', label: 'admin' },
+                    { value: 'manager', label: 'manager' },
+                    { value: 'cashier', label: 'cashier' },
+                    { value: 'owner', label: 'owner' },
+                ],
                 accessor: (u) => u.role ?? '',
                 cell: (user) => <Badge variant="secondary">{user.role}</Badge>,
             },
@@ -52,6 +63,13 @@ export function UsersTable({ users, t, renderActions, server }: UsersTableProps)
                 id: 'status',
                 header: t('users.table.status'),
                 icon: CircleDot,
+                filterable: true,
+                filterType: 'select',
+                filterAccessor: (u) => (u.is_active ? 'active' : 'inactive'),
+                filterOptions: [
+                    { value: 'active', label: t('users.table.active') },
+                    { value: 'inactive', label: t('users.table.inactive') },
+                ],
                 cell: (user) => (
                     <Badge variant={user.is_active ? 'default' : 'secondary'}>
                         {user.is_active ? t('users.table.active') : t('users.table.inactive')}

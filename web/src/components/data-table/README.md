@@ -12,6 +12,8 @@ Use `size` and `dismissible` on any raw `Dialog` instead of hand-rolled `max-w-*
 
 - Column icons + sort (client or server via `server.onSortChange`)
 - Show/hide columns (optional `storageKey` for localStorage)
-- Server pagination via `server.pagination` + `ListPagination`
+- **Client pagination** (default `enableClientPagination`, `defaultPageSize`) via `ListPagination`
+- **Server pagination** via `server.pagination` + `onPageChange` (client pagination disabled for slicing; column filters still apply to the current page rows)
+- **Per-column quick filters**: set `filterable: true` on a column; optional `filterType` (`text` | `select`), `filterOptions`, `filterAccessor` (when the cell value differs from the filter string)
 
 Example server mode is on the Users list page.

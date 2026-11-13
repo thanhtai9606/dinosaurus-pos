@@ -2,7 +2,10 @@
     "data_grid": {
         "columns": "Kolom",
         "toggle_columns": "Tampilkan / sembunyikan kolom",
-        "empty": "Tidak ada data"
+        "empty": "Tidak ada data",
+        "filter_placeholder": "Filter…",
+        "filter_all": "Semua",
+        "clear_filters": "Hapus filter"
     },
     "common": {
         "loading": "Memuat...",

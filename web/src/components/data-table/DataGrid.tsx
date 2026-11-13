@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { Columns3 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Columns3, FilterX } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Table,
@@ -10,6 +10,14 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -22,8 +30,29 @@ import { ListPagination } from '@/components/pagination'
 import { TableColumnHeader, type SortDirection } from '@/components/data-table/TableColumnHeader'
 import { useClientSort } from '@/hooks/use-client-sort'
 import { useDataGridColumnVisibility } from '@/hooks/useDataGridColumnVisibility'
+import { useDataGridClientPagination } from '@/hooks/useDataGridClientPagination'
 import { cn } from '@/lib/utils'
 import type { DataGridProps } from '@/components/data-table/types'
+
+function applyClientFilters<T>(
+  rows: T[],
+  columns: DataGridProps<T>['columns'],
+  filters: Record<string, string>,
+): T[] {
+  const active = Object.entries(filters).filter(([, v]) => v.trim() !== '' && v !== '__all__')
+  if (active.length === 0) return rows
+
+  return rows.filter((row) =>
+    active.every(([colId, raw]) => {
+      const col = columns.find((c) => c.id === colId)
+      if (!col) return true
+      const hay = (col.filterAccessor?.(row) ?? (col.accessor ? String(col.accessor(row)) : '')).toLowerCase()
+      const needle = raw.trim().toLowerCase()
+      if (col.filterType === 'select') return hay === needle
+      return hay.includes(needle)
+    }),
+  )
+}
 
 export function DataGrid<T>({
   columns,
@@ -33,14 +62,28 @@ export function DataGrid<T>({
   storageKey,
   server,
   enableClientSort = true,
+  enableClientPagination = true,
+  defaultPageSize = 10,
   className,
   toolbarExtra,
 }: DataGridProps<T>) {
   const { t } = useTranslation()
+  const useServerPagination = Boolean(server?.pagination && server.onPageChange)
+  const useServerFilters = Boolean(server?.onColumnFiltersChange)
+
+  const [clientFilters, setClientFilters] = useState<Record<string, string>>({})
+  const columnFilters = useServerFilters ? (server?.columnFilters ?? {}) : clientFilters
+
+  const setColumnFilters = (next: Record<string, string>) => {
+    if (useServerFilters && server?.onColumnFiltersChange) {
+      server.onColumnFiltersChange(next)
+    } else {
+      setClientFilters(next)
+    }
+  }
 
   const defaultVisible = useMemo(
-    () =>
-      Object.fromEntries(columns.map((c) => [c.id, c.defaultVisible !== false])),
+    () => Object.fromEntries(columns.map((c) => [c.id, c.defaultVisible !== false])),
     [columns],
   )
 
@@ -58,15 +101,34 @@ export function DataGrid<T>({
     return g
   }, [columns])
 
-  const clientSort = useClientSort(data, clientGetters as Record<string, (row: T) => string | number>)
+  const filteredData = useMemo(
+    () => applyClientFilters(data, columns, columnFilters),
+    [data, columns, columnFilters],
+  )
+
+  const clientSort = useClientSort(filteredData, clientGetters as Record<string, (row: T) => string | number>)
   const useServerSort = Boolean(server?.onSortChange)
 
-  const displayData = useMemo(() => {
+  const sortedData = useMemo(() => {
     if (useServerSort || !enableClientSort || Object.keys(clientGetters).length === 0) {
-      return data
+      return filteredData
     }
     return clientSort.sorted
-  }, [data, clientSort.sorted, clientGetters, enableClientSort, useServerSort])
+  }, [filteredData, clientSort.sorted, clientGetters, enableClientSort, useServerSort])
+
+  const clientPage = useDataGridClientPagination(sortedData.length, defaultPageSize)
+
+  const { resetPage } = clientPage
+  useEffect(() => {
+    resetPage()
+  }, [columnFilters, resetPage])
+
+  const displayData = useMemo(() => {
+    if (useServerPagination) return sortedData
+    if (!enableClientPagination) return sortedData
+    const { start, end } = clientPage.sliceRange
+    return sortedData.slice(start, end)
+  }, [sortedData, useServerPagination, enableClientPagination, clientPage.sliceRange])
 
   const getSortDirection = (colId: string): SortDirection => {
     if (useServerSort) {
@@ -78,7 +140,7 @@ export function DataGrid<T>({
 
   const handleSort = (col: (typeof columns)[0]) => {
     if (!col.sortable) return
-  if (useServerSort && server?.onSortChange) {
+    if (useServerSort && server?.onSortChange) {
       const current = getSortDirection(col.id)
       let next: SortDirection = 'asc'
       if (current === 'asc') next = 'desc'
@@ -92,11 +154,25 @@ export function DataGrid<T>({
   }
 
   const activeColumns = columns.filter((c) => visibleIds.includes(c.id))
+  const hasFilters = columns.some((c) => c.filterable)
+  const anyFilterActive = Object.values(columnFilters).some((v) => v.trim() !== '' && v !== '__all__')
+
+  const updateFilter = (colId: string, value: string) => {
+    setColumnFilters({ ...columnFilters, [colId]: value })
+  }
+
+  const clearFilters = () => setColumnFilters({})
 
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex flex-wrap items-center justify-end gap-2">
         {toolbarExtra}
+        {hasFilters && anyFilterActive && (
+          <Button variant="ghost" size="sm" className="gap-2" onClick={clearFilters}>
+            <FilterX className="h-4 w-4" />
+            {t('data_grid.clear_filters')}
+          </Button>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
@@ -140,6 +216,39 @@ export function DataGrid<T>({
                 </TableHead>
               ))}
             </TableRow>
+            {hasFilters && (
+              <TableRow className="bg-muted/40 hover:bg-muted/40">
+                {activeColumns.map((col) => (
+                  <TableHead key={`${col.id}-filter`} className="py-2">
+                    {!col.filterable ? null : col.filterType === 'select' && col.filterOptions ? (
+                      <Select
+                        value={columnFilters[col.id] || '__all__'}
+                        onValueChange={(v) => updateFilter(col.id, v === '__all__' ? '' : v)}
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder={t('data_grid.filter_all')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="__all__">{t('data_grid.filter_all')}</SelectItem>
+                          {col.filterOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        className="h-8 text-xs"
+                        placeholder={col.filterPlaceholder ?? t('data_grid.filter_placeholder')}
+                        value={columnFilters[col.id] ?? ''}
+                        onChange={(e) => updateFilter(col.id, e.target.value)}
+                      />
+                    )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            )}
           </TableHeader>
           <TableBody>
             {displayData.length === 0 ? (
@@ -166,12 +275,18 @@ export function DataGrid<T>({
         </Table>
       </div>
 
-      {server?.pagination && server.onPageChange ? (
+      {useServerPagination && server?.pagination && server.onPageChange ? (
         <ListPagination
           pagination={server.pagination}
           onPageChange={server.onPageChange}
           onLimitChange={server.onLimitChange}
           isFetching={server.isFetching}
+        />
+      ) : enableClientPagination && (sortedData.length > 0 || anyFilterActive) ? (
+        <ListPagination
+          pagination={clientPage.pagination}
+          onPageChange={clientPage.setPage}
+          onLimitChange={clientPage.setPageSize}
         />
       ) : null}
     </div>

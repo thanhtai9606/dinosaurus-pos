@@ -2,7 +2,10 @@
     "data_grid": {
         "columns": "Cột",
         "toggle_columns": "Ẩn / hiện cột",
-        "empty": "Không có dòng dữ liệu"
+        "empty": "Không có dòng dữ liệu",
+        "filter_placeholder": "Lọc…",
+        "filter_all": "Tất cả",
+        "clear_filters": "Xóa bộ lọc"
     },
     "common": {
         "loading": "Đang tải...",

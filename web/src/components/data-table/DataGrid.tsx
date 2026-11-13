@@ -10,6 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -50,6 +51,7 @@ export function DataGrid<T>({
   className,
   toolbarExtra,
   onRowClick,
+  rowSelection,
 }: DataGridProps<T>) {
   const { t } = useTranslation()
   const useServerPagination = Boolean(server?.pagination && server.onPageChange)
@@ -186,6 +188,15 @@ export function DataGrid<T>({
         <Table>
           <TableHeader>
             <TableRow>
+              {rowSelection && (
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={rowSelection.allSelected ? true : rowSelection.someSelected ? 'indeterminate' : false}
+                    onCheckedChange={(v) => rowSelection.onSelectAll(v === true)}
+                    aria-label={t('data_grid.select_all')}
+                  />
+                </TableHead>
+              )}
               {activeColumns.map((col) => (
                 <TableHead
                   key={col.id}
@@ -203,6 +214,7 @@ export function DataGrid<T>({
             </TableRow>
             {hasFilters && (
               <TableRow className="bg-muted/40 hover:bg-muted/40">
+                {rowSelection && <TableHead className="w-10" />}
                 {activeColumns.map((col) => (
                   <TableHead key={`${col.id}-filter`} className="py-2">
                     {!col.filterable ? null : col.filterType === 'select' && col.filterOptions ? (
@@ -238,7 +250,10 @@ export function DataGrid<T>({
           <TableBody>
             {displayData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={activeColumns.length} className="h-32 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={activeColumns.length + (rowSelection ? 1 : 0)}
+                  className="h-32 text-center text-muted-foreground"
+                >
                   {emptyMessage ?? t('data_grid.empty')}
                 </TableCell>
               </TableRow>
@@ -249,6 +264,15 @@ export function DataGrid<T>({
                   className={cn(onRowClick && 'cursor-pointer hover:bg-muted/50')}
                   onClick={() => onRowClick?.(row)}
                 >
+                  {rowSelection && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={rowSelection.selectedIds.has(getRowId(row))}
+                        onCheckedChange={(v) => rowSelection.onSelectRow(getRowId(row), v === true)}
+                        aria-label={t('data_grid.select_row')}
+                      />
+                    </TableCell>
+                  )}
                   {activeColumns.map((col) => (
                     <TableCell
                       key={col.id}

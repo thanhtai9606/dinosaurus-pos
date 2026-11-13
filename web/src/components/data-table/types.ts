@@ -57,4 +57,12 @@ export type DataGridProps<T> = {
   className?: string
   toolbarExtra?: ReactNode
   onRowClick?: (row: T) => void
+  /** Optional row checkboxes for bulk actions */
+  rowSelection?: {
+    selectedIds: Set<string>
+    onSelectRow: (id: string, selected: boolean) => void
+    onSelectAll: (selected: boolean) => void
+    allSelected: boolean
+    someSelected: boolean
+  }
 }

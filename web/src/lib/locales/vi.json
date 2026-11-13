@@ -5,7 +5,9 @@
         "empty": "Không có dòng dữ liệu",
         "filter_placeholder": "Lọc…",
         "filter_all": "Tất cả",
-        "clear_filters": "Xóa bộ lọc"
+        "clear_filters": "Xóa bộ lọc",
+        "select_all": "Chọn tất cả",
+        "select_row": "Chọn dòng"
     },
     "common": {
         "loading": "Đang tải...",
@@ -1512,7 +1514,15 @@
     },
     "product_groups": {
         "title": "Nhóm sản phẩm",
-        "description": "Danh mục / nhóm để phân loại sản phẩm trên POS và báo cáo."
+        "description": "Danh mục / nhóm để phân loại sản phẩm trên POS và báo cáo.",
+        "bulk": {
+            "selected": "Đã chọn {{count}}",
+            "delete": "Xóa nhóm",
+            "delete_confirm_title": "Xóa các nhóm đã chọn?",
+            "delete_confirm_body": "Sẽ xóa {{count}} nhóm. Thao tác không hoàn tác.",
+            "delete_success": "Đã xóa {{count}} nhóm.",
+            "delete_partial": "Không xóa được {{failed}}/{{total}} nhóm (có thể đang được sản phẩm dùng)."
+        }
     },
     "price_lists": {
         "title": "Bảng giá",

@@ -1,12 +1,28 @@
 import { InternalCategoriesCreateCategoryRequest } from "@/lib/api/generated"
-import { Category, useCreateCategoryMutation, useUpdateCategoryMutation } from "@/lib/api/query/categories"
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@radix-ui/react-dialog"
-import { Loader2 } from "lucide-react"
+import { Category, useCreateCategoryMutation, useUpdateCategoryMutation, useDeleteCategoryMutation } from "@/lib/api/query/categories"
+import { Loader2, Trash2 } from "lucide-react"
 import { useForm } from '@tanstack/react-form'
 import * as z from 'zod'
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { DialogFooter, DialogHeader } from "../ui/dialog"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Label } from "../ui/label"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
@@ -14,14 +30,23 @@ import { Button } from "../ui/button"
 
 
 
-export function CategoryFormDialog({ open, onOpenChange, categoryToEdit }: {
-    open: boolean,
-    onOpenChange: (open: boolean) => void,
+export function CategoryFormDialog({
+    open,
+    onOpenChange,
+    categoryToEdit,
+    onDeleted,
+}: {
+    open: boolean
+    onOpenChange: (open: boolean) => void
     categoryToEdit: Category | null
+    onDeleted?: () => void
 }) {
     const { t } = useTranslation()
     const createMutation = useCreateCategoryMutation()
     const updateMutation = useUpdateCategoryMutation()
+    const deleteMutation = useDeleteCategoryMutation()
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+    const canDelete = deleteMutation.isAllowed && categoryToEdit?.id
 
     const form = useForm({
         defaultValues: {
@@ -61,9 +86,22 @@ export function CategoryFormDialog({ open, onOpenChange, categoryToEdit }: {
         }
     }, [open, categoryToEdit])
 
+    const handleDelete = async () => {
+        if (!categoryToEdit?.id) return
+        try {
+            await deleteMutation.mutateAsync(categoryToEdit.id)
+            setDeleteConfirmOpen(false)
+            onOpenChange(false)
+            onDeleted?.()
+        } catch {
+            /* toast from mutation */
+        }
+    }
+
     return (
+        <>
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent size="md" dismissible>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>{categoryToEdit ? t('settings.category.form.title_edit') : t('settings.category.form.title_add')}</DialogTitle>
                     <DialogDescription>
@@ -98,7 +136,20 @@ export function CategoryFormDialog({ open, onOpenChange, categoryToEdit }: {
                             )}
                         />
                     </div>
-                    <DialogFooter>
+                    <DialogFooter className="gap-2 sm:justify-between">
+                        {canDelete ? (
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                disabled={deleteMutation.isPending}
+                                onClick={() => setDeleteConfirmOpen(true)}
+                            >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                {t('settings.category.actions.delete')}
+                            </Button>
+                        ) : (
+                            <span />
+                        )}
                         <form.Subscribe
                             selector={(state) => [state.canSubmit, state.isSubmitting]}
                             children={([canSubmit, isSubmitting]) => (
@@ -115,5 +166,36 @@ export function CategoryFormDialog({ open, onOpenChange, categoryToEdit }: {
                 </form>
             </DialogContent>
         </Dialog>
+
+        <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{t('settings.category.actions.delete_title')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t('settings.category.actions.delete_confirm')}{' '}
+                        <span className="font-semibold text-foreground">&quot;{categoryToEdit?.name}&quot;</span>?
+                        {t('settings.category.actions.delete_warning')}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel disabled={deleteMutation.isPending}>{t('settings.category.actions.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction
+                        className="bg-destructive hover:bg-destructive/90"
+                        disabled={deleteMutation.isPending}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            void handleDelete()
+                        }}
+                    >
+                        {deleteMutation.isPending ? (
+                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('settings.category.actions.deleting')}</>
+                        ) : (
+                            t('settings.category.actions.delete_button')
+                        )}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+        </>
     )
 }

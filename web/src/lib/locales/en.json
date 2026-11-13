@@ -5,7 +5,9 @@
         "empty": "No rows",
         "filter_placeholder": "Filter…",
         "filter_all": "All",
-        "clear_filters": "Clear filters"
+        "clear_filters": "Clear filters",
+        "select_all": "Select all",
+        "select_row": "Select row"
     },
     "common": {
         "loading": "Loading...",
@@ -1505,7 +1507,15 @@
     },
     "product_groups": {
         "title": "Product groups",
-        "description": "Categories to organize products for POS and reports."
+        "description": "Categories to organize products for POS and reports.",
+        "bulk": {
+            "selected": "{{count}} selected",
+            "delete": "Delete groups",
+            "delete_confirm_title": "Delete selected groups?",
+            "delete_confirm_body": "This will delete {{count}} group(s). This cannot be undone.",
+            "delete_success": "Deleted {{count}} group(s).",
+            "delete_partial": "Could not delete {{failed}} of {{total}} (may be in use by products)."
+        }
     },
     "price_lists": {
         "title": "Price lists",

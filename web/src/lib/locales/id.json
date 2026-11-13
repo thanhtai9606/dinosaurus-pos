@@ -5,7 +5,9 @@
         "empty": "Tidak ada data",
         "filter_placeholder": "Filter…",
         "filter_all": "Semua",
-        "clear_filters": "Hapus filter"
+        "clear_filters": "Hapus filter",
+        "select_all": "Pilih semua",
+        "select_row": "Pilih baris"
     },
     "common": {
         "loading": "Memuat...",
@@ -1493,7 +1495,15 @@
     },
     "product_groups": {
         "title": "Grup produk",
-        "description": "Kategori untuk mengelompokkan produk di POS dan laporan."
+        "description": "Kategori untuk mengelompokkan produk di POS dan laporan.",
+        "bulk": {
+            "selected": "{{count}} dipilih",
+            "delete": "Hapus grup",
+            "delete_confirm_title": "Hapus grup yang dipilih?",
+            "delete_confirm_body": "Akan menghapus {{count}} grup. Tidak dapat dibatalkan.",
+            "delete_success": "Berhasil menghapus {{count}} grup.",
+            "delete_partial": "Gagal menghapus {{failed}} dari {{total}} (mungkin masih dipakai produk)."
+        }
     },
     "price_lists": {
         "title": "Daftar harga",

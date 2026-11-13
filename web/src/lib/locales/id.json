@@ -1422,6 +1422,9 @@
             "group": "Grup pelanggan",
             "group_placeholder": "Pilih grup…",
             "group_none": "Tanpa grup",
+            "section_identity": "Identitas",
+            "section_contact": "Kontak",
+            "section_address": "Alamat",
             "save_changes": "Simpan Perubahan",
             "create_customer": "Tambah Pelanggan"
         },

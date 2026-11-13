@@ -1434,6 +1434,9 @@
             "group": "Customer group",
             "group_placeholder": "Select group…",
             "group_none": "No group",
+            "section_identity": "Identity",
+            "section_contact": "Contact",
+            "section_address": "Address",
             "save_changes": "Save Changes",
             "create_customer": "Create Customer"
         },

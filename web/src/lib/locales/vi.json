@@ -1441,6 +1441,9 @@
             "group": "Nhóm khách",
             "group_placeholder": "Chọn nhóm…",
             "group_none": "Không gán nhóm",
+            "section_identity": "Nhận diện",
+            "section_contact": "Liên hệ",
+            "section_address": "Địa chỉ",
             "save_changes": "Lưu Thay Đổi",
             "create_customer": "Tạo khách hàng"
         },

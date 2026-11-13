@@ -23,6 +23,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label.tsx'
 import { Input } from '@/components/ui/input.tsx'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button.tsx'
 import { Loader2 } from 'lucide-react'
 import { CustomerDetailOrdersGrid } from '@/components/customers/CustomerDetailOrdersGrid'
@@ -178,104 +180,154 @@ export function CustomerFormDialog({
         }
     }, [open, customerToEdit])
 
+    const renderFieldErrors = (errors: unknown[]) =>
+        errors.length > 0 ? (
+            <em role="alert" className="text-sm font-medium text-destructive">
+                {errors
+                    .map((err) =>
+                        typeof err === 'object'
+                            ? ((err as { message?: string }).message ?? JSON.stringify(err))
+                            : String(err),
+                    )
+                    .join(', ')}
+            </em>
+        ) : null
+
     const profileFields = (
-        <div className="grid gap-4 py-2 sm:grid-cols-2">
-            {customerToEdit?.code ? (
-                <div className="space-y-1 sm:col-span-2">
-                    <Label>{t('customers.table.code', 'Code')}</Label>
-                    <p className="font-mono text-sm font-medium">{customerToEdit.code}</p>
-                </div>
-            ) : null}
-            <form.Field
-                name="name"
-                children={(field) => (
-                    <div className="space-y-2 sm:col-span-2">
-                        <Label htmlFor={field.name}>{t('customers.form.name', 'Name')} *</Label>
-                        <Input
-                            id={field.name}
-                            name={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                        {field.state.meta.errors.length > 0 && (
-                            <em role="alert" className="text-sm font-medium text-destructive">
-                                {field.state.meta.errors
-                                    .map((err) =>
-                                        typeof err === 'object'
-                                            ? ((err as { message?: string }).message ?? JSON.stringify(err))
-                                            : String(err),
-                                    )
-                                    .join(', ')}
-                            </em>
+        <div className="space-y-5 py-1">
+            <fieldset className="space-y-3 rounded-lg border bg-muted/20 p-4">
+                <legend className="px-1 text-sm font-medium">
+                    {t('customers.form.section_identity', 'Identity')}
+                </legend>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <form.Field
+                        name="name"
+                        children={(field) => (
+                            <div className="space-y-2 sm:col-span-2">
+                                <Label htmlFor={field.name}>{t('customers.form.name', 'Name')} *</Label>
+                                <Input
+                                    id={field.name}
+                                    name={field.name}
+                                    value={field.state.value}
+                                    onBlur={field.handleBlur}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    autoComplete="name"
+                                />
+                                {renderFieldErrors(field.state.meta.errors)}
+                            </div>
                         )}
-                    </div>
-                )}
-            />
-            <form.Field
-                name="email"
-                children={(field) => (
-                    <div className="space-y-2">
-                        <Label htmlFor={field.name}>{t('customers.form.email', 'Email')}</Label>
-                        <Input
-                            id={field.name}
-                            type="email"
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                    </div>
-                )}
-            />
-            <form.Field
-                name="customer_group_id"
-                children={(field) => (
-                    <div className="space-y-2 sm:col-span-2">
-                        <Label>{t('customers.form.group', 'Customer group')}</Label>
-                        <Select value={field.state.value || 'none'} onValueChange={(v) => field.handleChange(v === 'none' ? '' : v)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder={t('customers.form.group_placeholder', 'Select group…')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="none">{t('customers.form.group_none', 'No group')}</SelectItem>
-                                {customerGroups.map((g) => (
-                                    <SelectItem key={g.id} value={g.id}>
-                                        {g.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-            />
-            <form.Field
-                name="phone"
-                children={(field) => (
-                    <div className="space-y-2">
-                        <Label htmlFor={field.name}>{t('customers.form.phone', 'Phone')}</Label>
-                        <Input
-                            id={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                    </div>
-                )}
-            />
-            <form.Field
-                name="address"
-                children={(field) => (
-                    <div className="space-y-2 sm:col-span-2">
-                        <Label htmlFor={field.name}>{t('customers.form.address', 'Address')}</Label>
-                        <Input
-                            id={field.name}
-                            value={field.state.value}
-                            onBlur={field.handleBlur}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                        />
-                    </div>
-                )}
-            />
+                    />
+                    {customerToEdit?.code ? (
+                        <div className="space-y-2">
+                            <Label>{t('customers.table.code', 'Code')}</Label>
+                            <div className="flex h-9 items-center">
+                                <Badge variant="secondary" className="font-mono text-xs font-semibold">
+                                    {customerToEdit.code}
+                                </Badge>
+                            </div>
+                        </div>
+                    ) : null}
+                    <form.Field
+                        name="customer_group_id"
+                        children={(field) => (
+                            <div
+                                className={`space-y-2 ${customerToEdit?.code ? '' : 'sm:col-span-2'}`}
+                            >
+                                <Label>{t('customers.form.group', 'Customer group')}</Label>
+                                <Select
+                                    value={field.state.value || 'none'}
+                                    onValueChange={(v) => field.handleChange(v === 'none' ? '' : v)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue
+                                            placeholder={t(
+                                                'customers.form.group_placeholder',
+                                                'Select group…',
+                                            )}
+                                        />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">
+                                            {t('customers.form.group_none', 'No group')}
+                                        </SelectItem>
+                                        {customerGroups.map((g) => (
+                                            <SelectItem key={g.id} value={g.id}>
+                                                {g.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+                    />
+                </div>
+            </fieldset>
+
+            <fieldset className="space-y-3 rounded-lg border p-4">
+                <legend className="px-1 text-sm font-medium">
+                    {t('customers.form.section_contact', 'Contact')}
+                </legend>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <form.Field
+                        name="phone"
+                        children={(field) => (
+                            <div className="space-y-2">
+                                <Label htmlFor={field.name}>{t('customers.form.phone', 'Phone')}</Label>
+                                <Input
+                                    id={field.name}
+                                    type="tel"
+                                    inputMode="tel"
+                                    autoComplete="tel"
+                                    value={field.state.value}
+                                    onBlur={field.handleBlur}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                />
+                            </div>
+                        )}
+                    />
+                    <form.Field
+                        name="email"
+                        children={(field) => (
+                            <div className="space-y-2">
+                                <Label htmlFor={field.name}>{t('customers.form.email', 'Email')}</Label>
+                                <Input
+                                    id={field.name}
+                                    type="email"
+                                    autoComplete="email"
+                                    value={field.state.value}
+                                    onBlur={field.handleBlur}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                />
+                            </div>
+                        )}
+                    />
+                </div>
+            </fieldset>
+
+            <fieldset className="space-y-3 rounded-lg border p-4">
+                <legend className="px-1 text-sm font-medium">
+                    {t('customers.form.section_address', 'Address')}
+                </legend>
+                <form.Field
+                    name="address"
+                    children={(field) => (
+                        <div className="space-y-2">
+                            <Label htmlFor={field.name} className="sr-only">
+                                {t('customers.form.address', 'Address')}
+                            </Label>
+                            <Textarea
+                                id={field.name}
+                                rows={3}
+                                value={field.state.value}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                placeholder={t('customers.form.address', 'Address')}
+                                autoComplete="street-address"
+                            />
+                        </div>
+                    )}
+                />
+            </fieldset>
         </div>
     )
 
@@ -327,7 +379,7 @@ export function CustomerFormDialog({
                                 }}
                             >
                                 {profileFields}
-                                <DialogFooter className="mt-6 px-0">
+                                <DialogFooter className="sticky bottom-0 mt-6 border-t bg-background px-0 pt-4">
                                     <form.Subscribe
                                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                                         children={([canSubmit, isSubmitting]) => (

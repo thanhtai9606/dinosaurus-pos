@@ -720,16 +720,18 @@ func seedOrders(ctx context.Context, db *database.TenantDB, products []seededPro
 			}
 
 			// Insert order with backdated timestamp
+			seq := totalOrders + 1
+			orderNo := fmt.Sprintf("SO-%s-%04d", orderTime.UTC().Format("20060102"), seq)
 			var orderID string
 			err := db.QueryRow(ctx,
 				`INSERT INTO orders (user_id, type, status, gross_total, discount_amount, net_total,
 					payment_method_id, cash_received, change_due, customer_id, 
 					cancellation_reason_id, cancellation_notes, applied_promotion_id, 
-					created_at, updated_at, version)
-				 VALUES ($1, $2::order_type, $3::order_status, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $14, 1)
+					order_no, created_at, updated_at, version)
+				 VALUES ($1, $2::order_type, $3::order_status, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $15, 1)
 				 RETURNING id`,
 				userID, orderType, status, grossTotal, discountAmount, netTotal, pmID,
-				cashReceived, changeDue, customerID, cancelReasonID, cancelNote, appliedPromotionID, orderTime,
+				cashReceived, changeDue, customerID, cancelReasonID, cancelNote, appliedPromotionID, orderNo, orderTime,
 			).Scan(&orderID)
 			if err != nil {
 				log.Errorf("Failed to create order: %v", err)

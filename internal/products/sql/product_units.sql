@@ -38,6 +38,20 @@ SELECT code, name
 FROM measurement_units
 WHERE id = $1 AND deleted_at IS NULL;
 
+-- name: GetMeasurementUnitByNameCI :one
+SELECT id, name
+FROM measurement_units
+WHERE lower(trim(name)) = lower(trim($1))
+  AND deleted_at IS NULL
+LIMIT 1;
+
+-- name: GetDefaultMeasurementUnit :one
+SELECT id, name
+FROM measurement_units
+WHERE deleted_at IS NULL
+ORDER BY CASE WHEN lower(trim(name)) = lower('Cái') THEN 0 ELSE 1 END, name ASC
+LIMIT 1;
+
 -- name: CreateProductUnit :one
 INSERT INTO product_units (
     product_id,

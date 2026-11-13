@@ -13,7 +13,7 @@ type Props = {
 }
 
 function defaultBase(catalog: MeasurementUnit[]): ProductSaleUnit {
-    const pcs = catalog.find((c) => c.code === 'PCS') ?? catalog[0]
+    const pcs = catalog.find((c) => c.name === 'Cái') ?? catalog[0]
     return {
         measurement_unit_id: pcs?.id,
         name: pcs?.name ?? 'pcs',
@@ -114,7 +114,7 @@ export function ProductSaleUnitsEditor({ units, onChange, catalog, t }: Props) {
                             <option value="">{t('products.sale_units.pick_unit')}</option>
                             {catalogFor(row.measurement_unit_id).map((c) => (
                                 <option key={c.id} value={c.id}>
-                                    {c.code} — {c.name}
+                                    {c.name}
                                 </option>
                             ))}
                         </select>

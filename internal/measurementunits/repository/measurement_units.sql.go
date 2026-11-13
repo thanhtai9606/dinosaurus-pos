@@ -105,7 +105,7 @@ SELECT $1::uuid, $2::varchar, $3::varchar
 WHERE NOT EXISTS (
     SELECT 1 FROM measurement_units mu
     WHERE mu.tenant_id = $1::uuid
-      AND mu.code = $2::varchar
+      AND lower(trim(mu.name)) = lower(trim($3::varchar))
       AND mu.deleted_at IS NULL
 )
 `

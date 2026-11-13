@@ -45,7 +45,7 @@ SELECT sqlc.arg(tenant_id)::uuid, sqlc.arg(code)::varchar, sqlc.arg(name)::varch
 WHERE NOT EXISTS (
     SELECT 1 FROM measurement_units mu
     WHERE mu.tenant_id = sqlc.arg(tenant_id)::uuid
-      AND mu.code = sqlc.arg(code)::varchar
+      AND lower(trim(mu.name)) = lower(trim(sqlc.arg(name)::varchar))
       AND mu.deleted_at IS NULL
 );
 

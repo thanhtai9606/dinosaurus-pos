@@ -8,7 +8,7 @@ import { POSKasirInternalCommonErrorResponse } from '../generated'
 
 export type MeasurementUnit = {
     id: string
-    code: string
+    code?: string
     name: string
     created_at?: string
     updated_at?: string
@@ -44,7 +44,7 @@ export const useCreateMeasurementUnitMutation = () => {
     const isAllowed = canAccessApi('POST', '/measurement-units')
     return {
         ...useMutation({
-            mutationFn: async (body: { code: string; name: string }) => {
+            mutationFn: async (body: { name: string }) => {
                 const res = await axiosInstance.post('/measurement-units', body)
                 return (res.data as { data: MeasurementUnit }).data
             },
@@ -76,7 +76,7 @@ export const useUpdateMeasurementUnitMutation = () => {
     const isAllowed = canAccessApi('PUT', '/measurement-units/{id}')
     return {
         ...useMutation({
-            mutationFn: async ({ id, body }: { id: string; body: { code: string; name: string } }) => {
+            mutationFn: async ({ id, body }: { id: string; body: { name: string } }) => {
                 const res = await axiosInstance.put(`/measurement-units/${id}`, body)
                 return (res.data as { data: MeasurementUnit }).data
             },

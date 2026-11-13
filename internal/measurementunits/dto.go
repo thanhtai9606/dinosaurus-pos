@@ -8,12 +8,10 @@ import (
 )
 
 type CreateMeasurementUnitRequest struct {
-	Code string `json:"code" validate:"required,min=1,max=20"`
 	Name string `json:"name" validate:"required,min=1,max=100"`
 }
 
 type UpdateMeasurementUnitRequest struct {
-	Code string `json:"code" validate:"required,min=1,max=20"`
 	Name string `json:"name" validate:"required,min=1,max=100"`
 }
 
@@ -24,7 +22,7 @@ type ListMeasurementUnitsRequest struct {
 
 type MeasurementUnitResponse struct {
 	ID        uuid.UUID `json:"id"`
-	Code      string    `json:"code"`
+	Code      string    `json:"code,omitempty"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

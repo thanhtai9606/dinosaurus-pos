@@ -57,22 +57,14 @@ func NewService(repo repository.Querier, log logger.ILogger) IService {
 
 func (s *Service) SeedDefaults(ctx context.Context, tenantID uuid.UUID) error {
 	ctx = tenant.WithID(ctx, tenantID)
-	defaults := []struct{ code, name string }{
-		{"PCS", "Cái"},
-		{"HOP", "Hộp"},
-		{"THUNG", "Thùng"},
-		{"KG", "Kilogram"},
-		{"L", "Lít"},
-		{"GOI", "Gói"},
-		{"CHAI", "Chai"},
-	}
-	for _, d := range defaults {
+	names := []string{"Cái", "Hộp", "Thùng", "Kilogram", "Lít", "Gói", "Chai", "Ly", "Phần"}
+	for _, name := range names {
 		if err := s.repo.InsertMeasurementUnitIfMissing(ctx, repository.InsertMeasurementUnitIfMissingParams{
 			TenantID: tenantID,
-			Code:     d.code,
-			Name:     d.name,
+			Code:     deriveUnitCode(name),
+			Name:     name,
 		}); err != nil {
-			s.log.Errorf("SeedDefaults measurement unit %s: %v", d.code, err)
+			s.log.Errorf("SeedDefaults measurement unit %s: %v", name, err)
 			return err
 		}
 	}
@@ -90,9 +82,10 @@ func mapUnit(row repository.MeasurementUnit) *MeasurementUnitResponse {
 }
 
 func (s *Service) Create(ctx context.Context, req CreateMeasurementUnitRequest) (*MeasurementUnitResponse, error) {
+	name := strings.TrimSpace(req.Name)
 	row, err := s.repo.CreateMeasurementUnit(ctx, repository.CreateMeasurementUnitParams{
-		Code: strings.ToUpper(strings.TrimSpace(req.Code)),
-		Name: strings.TrimSpace(req.Name),
+		Code: deriveUnitCode(name),
+		Name: name,
 	})
 	if err != nil {
 		if dup := duplicateFromPg(err); dup != nil {
@@ -116,10 +109,11 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*MeasurementUnitRespon
 }
 
 func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateMeasurementUnitRequest) (*MeasurementUnitResponse, error) {
+	name := strings.TrimSpace(req.Name)
 	row, err := s.repo.UpdateMeasurementUnit(ctx, repository.UpdateMeasurementUnitParams{
 		ID:   id,
-		Code: strings.ToUpper(strings.TrimSpace(req.Code)),
-		Name: strings.TrimSpace(req.Name),
+		Code: deriveUnitCode(name),
+		Name: name,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

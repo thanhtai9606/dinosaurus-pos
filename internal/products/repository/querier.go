@@ -33,6 +33,8 @@ type Querier interface {
 	// Deletes a product. Its options will be deleted automatically due to 'ON DELETE CASCADE'.
 	DeleteProduct(ctx context.Context, id uuid.UUID) error
 	GetBaseProductUnit(ctx context.Context, productID uuid.UUID) (ProductUnit, error)
+	GetMeasurementUnitByNameCI(ctx context.Context, name string) (GetMeasurementUnitByNameCIRow, error)
+	GetDefaultMeasurementUnit(ctx context.Context) (GetDefaultMeasurementUnitRow, error)
 	GetMeasurementUnitLabel(ctx context.Context, id uuid.UUID) (GetMeasurementUnitLabelRow, error)
 	GetDeletedProduct(ctx context.Context, id uuid.UUID) (GetDeletedProductRow, error)
 	GetProductByBarcode(ctx context.Context, barcode *string) (Product, error)

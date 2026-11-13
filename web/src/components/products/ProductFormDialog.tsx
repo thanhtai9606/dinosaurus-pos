@@ -280,7 +280,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     setPreview(null)
                     setSelectedFile(null)
                     setVariants([])
-                    const pcs = catalogUnits.find((c) => c.code === 'PCS') ?? catalogUnits[0]
+                    const pcs = catalogUnits[0]
                     setSaleUnits([
                         {
                             measurement_unit_id: pcs?.id,

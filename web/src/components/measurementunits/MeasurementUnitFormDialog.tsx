@@ -41,15 +41,14 @@ export function MeasurementUnitFormDialog({
     const canDelete = deleteMutation.isAllowed && unitToEdit?.id
 
     const form = useForm({
-        defaultValues: { code: '', name: '' },
+        defaultValues: { name: '' },
         validators: {
             onChange: z.object({
-                code: z.string().min(1).max(20),
                 name: z.string().min(1).max(100),
             }),
         },
         onSubmit: async ({ value }) => {
-            const body = { code: value.code.trim().toUpperCase(), name: value.name.trim() }
+            const body = { name: value.name.trim() }
             if (unitToEdit?.id) {
                 await updateMutation.mutateAsync({ id: unitToEdit.id, body })
             } else {
@@ -62,7 +61,6 @@ export function MeasurementUnitFormDialog({
 
     useEffect(() => {
         if (!open) return
-        form.setFieldValue('code', unitToEdit?.code ?? '')
         form.setFieldValue('name', unitToEdit?.name ?? '')
     }, [open, unitToEdit, form])
 
@@ -96,24 +94,15 @@ export function MeasurementUnitFormDialog({
                         className="space-y-4"
                     >
                         <form.Field
-                            name="code"
-                            children={(field) => (
-                                <div className="space-y-2">
-                                    <Label>{t('measurementUnits.fields.code')}</Label>
-                                    <Input
-                                        value={field.state.value}
-                                        onChange={(e) => field.handleChange(e.target.value.toUpperCase())}
-                                        placeholder="PCS"
-                                    />
-                                </div>
-                            )}
-                        />
-                        <form.Field
                             name="name"
                             children={(field) => (
                                 <div className="space-y-2">
                                     <Label>{t('measurementUnits.fields.name')}</Label>
-                                    <Input value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                                    <Input
+                                        value={field.state.value}
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                        placeholder={t('measurementUnits.fields.name_placeholder')}
+                                    />
                                 </div>
                             )}
                         />

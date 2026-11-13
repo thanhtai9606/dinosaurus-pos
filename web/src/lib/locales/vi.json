@@ -1541,15 +1541,15 @@
     },
     "product_units_page": {
         "title": "Đơn vị tính",
-        "description": "Chỉ mã và tên đơn vị (Cái, Thùng, Kg…). Gán nhiều đơn vị cho từng sản phẩm kèm barcode, giá lẻ/sỉ trong form sản phẩm.",
+        "description": "Chỉ nhập tên đơn vị (Cái, Thùng, Ly…). Trên sản phẩm chọn đơn vị từ danh sách và cấu hình barcode, giá lẻ/sỉ.",
         "open_products": "Mở danh sách sản phẩm"
     },
     "measurementUnits": {
         "add_button": "Thêm đơn vị",
-        "search_placeholder": "Tìm theo mã, tên…",
+        "search_placeholder": "Tìm theo tên…",
         "fields": {
-            "code": "Mã",
-            "name": "Tên hiển thị"
+            "name": "Tên đơn vị",
+            "name_placeholder": "Ví dụ: Cái, Thùng, Ly"
         },
         "table": {
             "empty": "Chưa có đơn vị nào"

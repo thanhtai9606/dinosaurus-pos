@@ -53,6 +53,46 @@ func (q *Queries) GetMeasurementUnitLabel(ctx context.Context, id uuid.UUID) (Ge
 	return i, err
 }
 
+const getMeasurementUnitByNameCI = `-- name: GetMeasurementUnitByNameCI :one
+SELECT id, name
+FROM measurement_units
+WHERE lower(trim(name)) = lower(trim($1))
+  AND deleted_at IS NULL
+LIMIT 1
+`
+
+type GetMeasurementUnitByNameCIRow struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}
+
+func (q *Queries) GetMeasurementUnitByNameCI(ctx context.Context, name string) (GetMeasurementUnitByNameCIRow, error) {
+	row := q.db.QueryRow(ctx, getMeasurementUnitByNameCI, name)
+	var i GetMeasurementUnitByNameCIRow
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
+const getDefaultMeasurementUnit = `-- name: GetDefaultMeasurementUnit :one
+SELECT id, name
+FROM measurement_units
+WHERE deleted_at IS NULL
+ORDER BY CASE WHEN lower(trim(name)) = lower('Cái') THEN 0 ELSE 1 END, name ASC
+LIMIT 1
+`
+
+type GetDefaultMeasurementUnitRow struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}
+
+func (q *Queries) GetDefaultMeasurementUnit(ctx context.Context) (GetDefaultMeasurementUnitRow, error) {
+	row := q.db.QueryRow(ctx, getDefaultMeasurementUnit)
+	var i GetDefaultMeasurementUnitRow
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const createProductUnit = `-- name: CreateProductUnit :one
 INSERT INTO product_units (
     product_id,

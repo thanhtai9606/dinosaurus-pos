@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Settings2, Tags, Hash } from 'lucide-react'
+import { Settings2, Tags } from 'lucide-react'
 import type { MeasurementUnit } from '@/lib/api/query/measurementUnits'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
 import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
@@ -25,15 +25,6 @@ type Props = {
 export function MeasurementUnitsTable({ units, t, onRowClick, server, canEdit, canDelete, onEdit }: Props) {
     const columns = useMemo<DataGridColumnDef<MeasurementUnit>[]>(
         () => [
-            {
-                id: 'code',
-                header: t('measurementUnits.fields.code'),
-                icon: Hash,
-                sortable: true,
-                filterable: true,
-                accessor: (u) => u.code,
-                cell: (u) => <span className="font-mono text-sm">{u.code}</span>,
-            },
             {
                 id: 'name',
                 header: t('measurementUnits.fields.name'),

@@ -15,6 +15,24 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+func resolveMeasurementUnit(ctx context.Context, qtx products_repo.Querier, hint string) (uuid.UUID, string, error) {
+	hint = strings.TrimSpace(hint)
+	if hint != "" {
+		row, err := qtx.GetMeasurementUnitByNameCI(ctx, hint)
+		if err == nil {
+			return row.ID, row.Name, nil
+		}
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return uuid.Nil, "", err
+		}
+	}
+	row, err := qtx.GetDefaultMeasurementUnit(ctx)
+	if err != nil {
+		return uuid.Nil, "", err
+	}
+	return row.ID, row.Name, nil
+}
+
 func numericFromFloat(v float64) pgtype.Numeric {
 	var n pgtype.Numeric
 	_ = n.Scan(fmt.Sprintf("%v", v))
@@ -90,9 +108,9 @@ func EnsureBaseProductUnit(ctx context.Context, qtx products_repo.Querier, produ
 	if !errors.Is(err, pgx.ErrNoRows) {
 		return err
 	}
-	unit := product.Unit
-	if unit == "" {
-		unit = "pcs"
+	muID, muName, err := resolveMeasurementUnit(ctx, qtx, product.Unit)
+	if err != nil {
+		return fmt.Errorf("resolve measurement unit: %w", err)
 	}
 	barcode := product.Barcode
 	if barcode == nil || strings.TrimSpace(*barcode) == "" {
@@ -101,8 +119,8 @@ func EnsureBaseProductUnit(ctx context.Context, qtx products_repo.Querier, produ
 	}
 	_, err = qtx.CreateProductUnit(ctx, products_repo.CreateProductUnitParams{
 		ProductID:         product.ID,
-		MeasurementUnitID: pgtype.UUID{Valid: false},
-		Name:              unit,
+		MeasurementUnitID: pgtype.UUID{Bytes: muID, Valid: true},
+		Name:              muName,
 		IsBase:            true,
 		FactorToBase:      numericFromFloat(1),
 		SellPrice:         product.Price,

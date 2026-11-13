@@ -1534,15 +1534,15 @@
     },
     "product_units_page": {
         "title": "Units of measure",
-        "description": "Catalog codes and names only (pc, box, kg…). Assign multiple units per product with barcodes and retail/wholesale prices in the product form.",
+        "description": "Enter unit names only (piece, box, cup…). On products, pick units from the list and set barcodes and retail/wholesale prices.",
         "open_products": "Open product list"
     },
     "measurementUnits": {
         "add_button": "Add unit",
-        "search_placeholder": "Search by code, name…",
+        "search_placeholder": "Search by name…",
         "fields": {
-            "code": "Code",
-            "name": "Display name"
+            "name": "Unit name",
+            "name_placeholder": "e.g. Piece, Box, Cup"
         },
         "table": {
             "empty": "No units yet"

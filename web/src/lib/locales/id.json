@@ -1522,15 +1522,15 @@
     },
     "product_units_page": {
         "title": "Satuan ukuran",
-        "description": "Katalog satuan bersama untuk produk (kode + nama). Satuan konversi per produk tetap di editor produk.",
+        "description": "Hanya nama satuan. Di produk, pilih satuan dari daftar lalu atur barcode dan harga eceran/grosir.",
         "open_products": "Buka daftar produk"
     },
     "measurementUnits": {
         "add_button": "Tambah satuan",
-        "search_placeholder": "Cari kode, nama…",
+        "search_placeholder": "Cari nama…",
         "fields": {
-            "code": "Kode",
-            "name": "Nama tampilan"
+            "name": "Nama satuan",
+            "name_placeholder": "mis. Pcs, Dus, Gelas"
         },
         "table": {
             "empty": "Belum ada satuan"

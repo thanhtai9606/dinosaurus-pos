@@ -29,6 +29,13 @@ Remote hiện tại: GitLab `devops/dinosaurus-pos` (fork/tùy biến từ POS-k
 
 Schema mã nghiệp vụ (`order_no`, `customers.code`, `products.code`) nằm trong baseline — không cần migration riêng sau khi reset.
 
+### Catalog seed (đa mô hình demo)
+
+- Seeder: `pkg/database/seeder/production_catalog_vn.go` + `SeedProductionData` — ~22 SKU mẫu chia **cà phê/F&B**, **quán ăn**, **bán lẻ FMCG**, **điện tử**, **thời trang**, combo.
+- Mỗi SP seed có `code` cố định (`P-000001`…), `sku` nội bộ, `unit` (ly/phần/chai/cái…); sau insert gọi `products.EnsureBaseProductUnit` (đơn vị bán cho POS).
+- **Barcode:** chỉ gán cho bán lẻ/điện tử/một số fashion (EAN demo `893…`); F&B/cafe dùng `product_options` (size, topping…) — không bắt buộc barcode.
+- **Áp dụng catalog mới:** `make db-reset` (hoặc DB trống + `make seed`). `SeedProductionData` **bỏ qua** khi đã có >100 đơn — cần reset để thay catalog cũ. Sau reset, bật `MEILI_AUTO_REINDEX=true` nếu cần search lại.
+
 ---
 
 ## Multi-tenant (MVP)

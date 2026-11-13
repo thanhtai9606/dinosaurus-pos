@@ -1,7 +1,11 @@
 package seeder
 
+// Production catalog seed: multi-vertical demo SKUs (F&B, cafe, retail, electronics, fashion).
+// Use `make db-reset` (or empty DB + `make seed`) for a clean catalog; SeedProductionData skips when >100 orders exist.
+
 import (
 	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
+	"dinosaurus-pos/internal/docno"
 	"dinosaurus-pos/pkg/database"
 	"dinosaurus-pos/pkg/logger"
 	"context"
@@ -10,7 +14,6 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
-
 )
 
 func SeedProductionData(ctx context.Context, db *database.TenantDB, r2Client cloudflarer2.IR2, log logger.ILogger) error {
@@ -61,7 +64,7 @@ func SeedProductionData(ctx context.Context, db *database.TenantDB, r2Client clo
 	}
 
 	// 1. Seed Products + Options + Category Assignments
-	products, err := seedProducts(ctx, db, categoryMap, r2Client, log)
+	products, err := seedProductsVN(ctx, db, categoryMap, r2Client, log)
 	if err != nil {
 		return fmt.Errorf("failed to seed products: %w", err)
 	}
@@ -245,209 +248,7 @@ func getPromotions(ctx context.Context, db *database.TenantDB) ([]string, error)
 	return ids, rows.Err()
 }
 
-// ─── 1. Products ─────────────────────────────────────────────────
-
-func seedProducts(ctx context.Context, db *database.TenantDB, categoryMap map[string]int32, r2Client cloudflarer2.IR2, log logger.ILogger) ([]seededProduct, error) {
-	type productDef struct {
-		Name      string
-		Price     int64
-		CostPrice int64
-		Stock     int32
-		ImageURL  string
-		Category  string
-		Options   []struct {
-			Name            string
-			AdditionalPrice int64
-			ImageURL        string
-		}
-	}
-
-	defs := []productDef{
-		// ─── Makanan ───
-		{Name: "Nasi Goreng Spesial", Price: 25000, CostPrice: 12000, Stock: 200, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=400&fit=crop",
-			Options: []struct {
-				Name            string
-				AdditionalPrice int64
-				ImageURL        string
-			}{
-				{Name: "Pedas", AdditionalPrice: 0, ImageURL: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=200&h=200&fit=crop"},
-				{Name: "Ekstra Telur", AdditionalPrice: 5000, ImageURL: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=200&h=200&fit=crop"},
-				{Name: "Ekstra Ayam", AdditionalPrice: 8000, ImageURL: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=200&h=200&fit=crop"},
-			}},
-		{Name: "Mie Goreng", Price: 22000, CostPrice: 10000, Stock: 180, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=400&fit=crop",
-			Options: []struct {
-				Name            string
-				AdditionalPrice int64
-				ImageURL        string
-			}{
-				{Name: "Pedas", AdditionalPrice: 0, ImageURL: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=200&h=200&fit=crop"},
-				{Name: "Ekstra Bakso", AdditionalPrice: 5000, ImageURL: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=200&h=200&fit=crop"},
-			}},
-		{Name: "Mie Ayam Bakso", Price: 20000, CostPrice: 9000, Stock: 150, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=400&fit=crop"},
-		{Name: "Ayam Goreng Kremes", Price: 28000, CostPrice: 14000, Stock: 120, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400&h=400&fit=crop",
-			Options: []struct {
-				Name            string
-				AdditionalPrice int64
-				ImageURL        string
-			}{
-				{Name: "Sambal Matah", AdditionalPrice: 3000, ImageURL: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=200&h=200&fit=crop"},
-				{Name: "Lalapan", AdditionalPrice: 2000, ImageURL: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200&h=200&fit=crop"},
-			}},
-		{Name: "Soto Ayam", Price: 18000, CostPrice: 8000, Stock: 160, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&h=400&fit=crop"},
-		{Name: "Nasi Rendang", Price: 32000, CostPrice: 16000, Stock: 100, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400&h=400&fit=crop"},
-		{Name: "Gado-Gado", Price: 15000, CostPrice: 7000, Stock: 3, Category: "Makanan", // Intentionally low stock
-			ImageURL: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=400&fit=crop&q=60"},
-		{Name: "Bakso Urat", Price: 20000, CostPrice: 9500, Stock: 140, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&h=400&fit=crop",
-			Options: []struct {
-				Name            string
-				AdditionalPrice int64
-				ImageURL        string
-			}{
-				{Name: "Jumbo", AdditionalPrice: 5000, ImageURL: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=200&h=200&fit=crop"},
-			}},
-		{Name: "Nasi Uduk Komplit", Price: 22000, CostPrice: 10000, Stock: 130, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400&h=400&fit=crop"},
-		{Name: "Sate Ayam (10 tusuk)", Price: 25000, CostPrice: 12000, Stock: 110, Category: "Makanan",
-			ImageURL: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=400&fit=crop"},
-
-		// ─── Minuman ───
-		{Name: "Es Teh Manis", Price: 5000, CostPrice: 1500, Stock: 500, Category: "Minuman",
-			ImageURL: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop",
-			Options: []struct {
-				Name            string
-				AdditionalPrice int64
-				ImageURL        string
-			}{
-				{Name: "Large", AdditionalPrice: 3000, ImageURL: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=200&h=200&fit=crop"},
-			}},
-		{Name: "Es Jeruk", Price: 7000, CostPrice: 2500, Stock: 400, Category: "Minuman",
-			ImageURL: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&h=400&fit=crop"},
-		{Name: "Kopi Susu Gula Aren", Price: 18000, CostPrice: 6000, Stock: 300, Category: "Minuman",
-			ImageURL: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=400&fit=crop",
-			Options: []struct {
-				Name            string
-				AdditionalPrice int64
-				ImageURL        string
-			}{
-				{Name: "Iced", AdditionalPrice: 0, ImageURL: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop"},
-				{Name: "Hot", AdditionalPrice: 0, ImageURL: "https://images.unsplash.com/photo-1495774856032-8b90bbb32b32?w=200&h=200&fit=crop"},
-				{Name: "Extra Shot", AdditionalPrice: 5000, ImageURL: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&h=200&fit=crop"},
-			}},
-		{Name: "Jus Alpukat", Price: 15000, CostPrice: 5000, Stock: 250, Category: "Minuman",
-			ImageURL: "https://images.unsplash.com/photo-1623065422902-30a2d299bbe4?w=400&h=400&fit=crop"},
-		{Name: "Air Mineral", Price: 4000, CostPrice: 1000, Stock: 600, Category: "Minuman",
-			ImageURL: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=400&fit=crop"},
-
-		// ─── Camilan ───
-		{Name: "Kentang Goreng", Price: 15000, CostPrice: 6000, Stock: 200, Category: "Camilan",
-			ImageURL: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=400&fit=crop",
-			Options: []struct {
-				Name            string
-				AdditionalPrice int64
-				ImageURL        string
-			}{
-				{Name: "Cheese", AdditionalPrice: 5000, ImageURL: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=200&h=200&fit=crop"},
-			}},
-		{Name: "Pisang Goreng Keju", Price: 12000, CostPrice: 5000, Stock: 180, Category: "Camilan",
-			ImageURL: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&h=400&fit=crop"},
-		{Name: "Tahu Crispy", Price: 10000, CostPrice: 3500, Stock: 8, Category: "Camilan", // Intentionally low stock
-			ImageURL: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=400&fit=crop&q=70"},
-
-		// ─── Makanan Penutup ───
-		{Name: "Es Campur", Price: 12000, CostPrice: 4000, Stock: 5, Category: "Makanan Penutup", // Intentionally low stock
-			ImageURL: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=400&fit=crop"},
-		{Name: "Kolak Pisang", Price: 10000, CostPrice: 3500, Stock: 150, Category: "Makanan Penutup",
-			ImageURL: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&h=400&fit=crop"},
-
-		// ─── Paket ───
-		{Name: "Paket Nasi Goreng + Es Teh", Price: 27000, CostPrice: 13000, Stock: 100, Category: "Paket",
-			ImageURL: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=400&fit=crop&q=80"},
-		{Name: "Paket Ayam Goreng + Jus", Price: 38000, CostPrice: 18000, Stock: 80, Category: "Paket",
-			ImageURL: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400&h=400&fit=crop&q=80"},
-	}
-
-	var products []seededProduct
-
-	for _, d := range defs {
-		var productID string
-		err := db.QueryRow(ctx,
-			`INSERT INTO products (name, image_url, price, stock, cost_price)
-			 VALUES ($1, $2, $3, $4, $5)
-			 ON CONFLICT DO NOTHING
-			 RETURNING id`,
-			d.Name, d.ImageURL, d.Price, d.Stock, d.CostPrice,
-		).Scan(&productID)
-		if err != nil {
-			log.Infof("Product '%s' may already exist, skipping: %v", d.Name, err)
-			continue
-		}
-
-		// Download and upload image if URL exists
-		storedImageURL := uploadImageFromUrl(ctx, r2Client, d.ImageURL, "products", productID, log)
-		if storedImageURL != nil && *storedImageURL != d.ImageURL {
-			_, err = db.Exec(ctx, "UPDATE products SET image_url = $1 WHERE id = $2", *storedImageURL, productID)
-			if err != nil {
-				log.Warnf("Failed to update product %s with storage image URL: %v", productID, err)
-			}
-		}
-
-		// Assign category
-		if catID, ok := categoryMap[d.Category]; ok {
-			_, _ = db.Exec(ctx,
-				`INSERT INTO product_categories (product_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-				productID, catID,
-			)
-		}
-
-		p := seededProduct{
-			ID:        productID,
-			Name:      d.Name,
-			Price:     d.Price,
-			CostPrice: d.CostPrice,
-		}
-
-		// Seed options
-		for _, opt := range d.Options {
-			var optID string
-			err := db.QueryRow(ctx,
-				`INSERT INTO product_options (product_id, name, additional_price, image_url)
-				 VALUES ($1, $2, $3, $4)
-				 RETURNING id`,
-				productID, opt.Name, opt.AdditionalPrice, opt.ImageURL,
-			).Scan(&optID)
-			if err != nil {
-				log.Infof("Option '%s' for product '%s' failed: %v", opt.Name, d.Name, err)
-				continue
-			}
-
-			// Download and upload option image if URL exists
-			storedOptImageURL := uploadImageFromUrl(ctx, r2Client, opt.ImageURL, "product_options", optID, log)
-			if storedOptImageURL != nil && *storedOptImageURL != opt.ImageURL {
-				_, err = db.Exec(ctx, "UPDATE product_options SET image_url = $1 WHERE id = $2", *storedOptImageURL, optID)
-				if err != nil {
-					log.Warnf("Failed to update product option %s with storage image URL: %v", optID, err)
-				}
-			}
-
-			p.Options = append(p.Options, seededOption{
-				ID:              optID,
-				Name:            opt.Name,
-				AdditionalPrice: opt.AdditionalPrice,
-			})
-		}
-
-		products = append(products, p)
-	}
-
-	return products, nil
-}
+// ─── 1. Products (catalog in production_catalog_vn.go) ─────────────
 
 // ─── 2. Customers ────────────────────────────────────────────────
 
@@ -458,31 +259,37 @@ func seedCustomers(ctx context.Context, db *database.TenantDB, log logger.ILogge
 		Email   string
 		Address string
 	}{
-		{"Budi Santoso", "081234567890", "budi.santoso@email.com", "Jl. Sudirman No. 10, Jakarta"},
-		{"Siti Rahayu", "081234567891", "siti.rahayu@email.com", "Jl. Gatot Subroto No. 5, Jakarta"},
-		{"Ahmad Hidayat", "081234567892", "ahmad.hidayat@email.com", "Jl. MH Thamrin No. 15, Jakarta"},
-		{"Dewi Lestari", "081234567893", "dewi.lestari@email.com", "Jl. Kebon Sirih No. 8, Jakarta"},
-		{"Rizky Pratama", "081234567894", "rizky.pratama@email.com", "Jl. Cikini Raya No. 22, Jakarta"},
-		{"Nur Aini", "081234567895", "nur.aini@email.com", "Jl. Veteran No. 3, Bandung"},
-		{"Hendra Wijaya", "081234567896", "hendra.wijaya@email.com", "Jl. Asia Afrika No. 12, Bandung"},
-		{"Maya Sari", "081234567897", "maya.sari@email.com", "Jl. Malioboro No. 1, Yogyakarta"},
-		{"Fajar Nugroho", "081234567898", "fajar.nugroho@email.com", "Jl. Diponegoro No. 7, Surabaya"},
-		{"Putri Amelia", "081234567899", "putri.amelia@email.com", "Jl. Pemuda No. 20, Semarang"},
+		{"Nguyễn Văn An", "0901234567", "van.an@example.com", "123 Nguyễn Huệ, Q.1, TP.HCM"},
+		{"Trần Thị Bình", "0901234568", "thi.binh@example.com", "45 Lê Lợi, Q.1, TP.HCM"},
+		{"Lê Minh Cường", "0901234569", "minh.cuong@example.com", "88 Hai Bà Trưng, Q.3, TP.HCM"},
+		{"Phạm Thu Dung", "0901234570", "thu.dung@example.com", "12 Trần Hưng Đạo, Q.5, TP.HCM"},
+		{"Hoàng Văn Em", "0901234571", "van.em@example.com", "56 Cách Mạng Tháng 8, Q.10, TP.HCM"},
+		{"Võ Thị Phương", "0901234572", "thi.phuong@example.com", "9 Phan Đình Phùng, Huế"},
+		{"Đặng Quốc Huy", "0901234573", "quoc.huy@example.com", "30 Lý Thường Kiệt, Đà Nẵng"},
+		{"Bùi Ngọc Lan", "0901234574", "ngoc.lan@example.com", "7 Bà Triệu, Hà Nội"},
+		{"Đỗ Xuân Nam", "0901234575", "xuan.nam@example.com", "22 Nguyễn Trãi, Thanh Xuân, Hà Nội"},
+		{"Mai Thảo Linh", "0901234576", "thao.linh@example.com", "5 Quang Trung, Cần Thơ"},
 	}
 
 	var ids []string
-	for _, c := range customers {
+	for i, c := range customers {
+		code := docno.CustomerCode(int64(i + 1))
 		var id string
 		err := db.QueryRow(ctx,
-			`INSERT INTO customers (name, phone, email, address)
-			 VALUES ($1, $2, $3, $4)
-			 ON CONFLICT DO NOTHING
+			`INSERT INTO customers (name, phone, email, address, code)
+			 VALUES ($1, $2, $3, $4, $5)
 			 RETURNING id`,
-			c.Name, c.Phone, c.Email, c.Address,
+			c.Name, c.Phone, c.Email, c.Address, code,
 		).Scan(&id)
 		if err != nil {
-			log.Infof("Customer '%s' may already exist: %v", c.Name, err)
-			continue
+			err = db.QueryRow(ctx,
+				`SELECT id FROM customers WHERE code = $1 AND deleted_at IS NULL LIMIT 1`,
+				code,
+			).Scan(&id)
+			if err != nil {
+				log.Infof("Customer %s (%s) skipped: %v", c.Name, code, err)
+				continue
+			}
 		}
 		ids = append(ids, id)
 	}

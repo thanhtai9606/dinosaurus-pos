@@ -8,11 +8,12 @@ import (
 
 func SeedCategory(ctx context.Context, q categories_repo.Querier, log logger.ILogger) error {
 	kategori := []string{
-		"Makanan",
-		"Minuman",
-		"Camilan",
-		"Makanan Penutup",
-		"Paket",
+		"Đồ uống & Cà phê",
+		"Món ăn",
+		"Bán lẻ tiêu dùng",
+		"Điện tử",
+		"Thời trang",
+		"Combo",
 	}
 
 	for _, nama := range kategori {

@@ -1524,9 +1524,36 @@
         "card_description": "Download template, edit Excel, import; or export current prices."
     },
     "product_units_page": {
-        "title": "Sale units",
-        "description": "Base unit, SKU and barcode per product. Add conversion units in the product editor.",
+        "title": "Units of measure",
+        "description": "Shared unit catalog for products (code + label). Per-product conversion units stay in the product editor.",
         "open_products": "Open product list"
+    },
+    "measurementUnits": {
+        "add_button": "Add unit",
+        "search_placeholder": "Search by code, name…",
+        "fields": {
+            "code": "Code",
+            "name": "Display name"
+        },
+        "table": {
+            "empty": "No units yet"
+        },
+        "form": {
+            "create_title": "Add unit of measure",
+            "edit_title": "Edit unit of measure"
+        },
+        "delete": {
+            "title": "Delete unit?",
+            "body": "Delete \"{{name}}\"? Cannot delete if products use this code or name."
+        },
+        "messages": {
+            "create_success": "Unit added.",
+            "create_failed": "Could not add: {{message}}",
+            "update_success": "Unit updated.",
+            "update_failed": "Could not update: {{message}}",
+            "delete_success": "Unit deleted.",
+            "delete_failed": "Could not delete: {{message}}"
+        }
     },
     "customerGroups": {
         "title": "Customer groups",

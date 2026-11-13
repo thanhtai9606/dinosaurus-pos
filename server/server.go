@@ -14,6 +14,8 @@ import (
 	customers_repo "dinosaurus-pos/internal/customers/repository"
 	"dinosaurus-pos/internal/customergroups"
 	customergroups_repo "dinosaurus-pos/internal/customergroups/repository"
+	"dinosaurus-pos/internal/measurementunits"
+	measurementunits_repo "dinosaurus-pos/internal/measurementunits/repository"
 	"dinosaurus-pos/internal/stockreceipts"
 	sr_repo "dinosaurus-pos/internal/stockreceipts/repository"
 	"dinosaurus-pos/internal/suppliers"
@@ -104,6 +106,7 @@ type AppContainer struct {
 	CategoryHandler           categories.ICtgHandler
 	CustomerHandler           customers.ICustomerHandler
 	CustomerGroupHandler      customergroups.ICustomerGroupHandler
+	MeasurementUnitHandler    measurementunits.IHandler
 	SupplierHandler           suppliers.ISupplierHandler
 	StockReceiptHandler       stockreceipts.IStockReceiptHandler
 	SupplierDebtHandler       supplierdebts.ISupplierDebtHandler
@@ -220,8 +223,16 @@ func BuildAppContainer(app *App) *AppContainer {
 	customerGroupService := customergroups.NewService(customerGroupRepo, app.Logger)
 	customerGroupHandler := customergroups.NewHandler(customerGroupService, app.Logger)
 
+	measurementUnitRepo := measurementunits_repo.New(tenantDB)
+	measurementUnitService := measurementunits.NewService(measurementUnitRepo, app.Logger)
+	measurementUnitHandler := measurementunits.NewHandler(measurementUnitService, app.Logger)
+
 	tenantCatalogSeeder := catalog.NewTenantCatalogSeeder(tenantDB, app.R2, app.Logger)
-	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger, customerGroupService, tenantCatalogSeeder)
+	tenantDefaults := &tenantDefaultsSeeder{
+		customerGroups:   customerGroupService,
+		measurementUnits: measurementUnitService,
+	}
+	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger, tenantDefaults, tenantCatalogSeeder)
 	tenantLookupCache := tenants.NewLookupCache(app.RedisCache)
 	tenantHandler := tenants.NewHandler(tenantRepo, tenantService, app.Logger, platformAudit, tenantLookupCache, platformOverviewCache)
 	userService := user.NewUsrService(userRepo, tenantRepo, app.Logger, activityService, userAvatarRepo)
@@ -349,6 +360,7 @@ func BuildAppContainer(app *App) *AppContainer {
 		CategoryHandler:           categoryHandler,
 		CustomerHandler:           customerHandler,
 		CustomerGroupHandler:      customerGroupHandler,
+		MeasurementUnitHandler:    measurementUnitHandler,
 		SupplierHandler:           supplierHandler,
 		StockReceiptHandler:       stockReceiptHandler,
 		SupplierDebtHandler:       supplierDebtHandler,

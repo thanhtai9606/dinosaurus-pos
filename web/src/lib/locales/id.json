@@ -1512,9 +1512,36 @@
         "card_description": "Unduh template, edit Excel, impor; atau ekspor harga saat ini."
     },
     "product_units_page": {
-        "title": "Satuan jual",
-        "description": "Satuan dasar, SKU dan barcode per produk. Tambah satuan konversi di editor produk.",
+        "title": "Satuan ukuran",
+        "description": "Katalog satuan bersama untuk produk (kode + nama). Satuan konversi per produk tetap di editor produk.",
         "open_products": "Buka daftar produk"
+    },
+    "measurementUnits": {
+        "add_button": "Tambah satuan",
+        "search_placeholder": "Cari kode, nama…",
+        "fields": {
+            "code": "Kode",
+            "name": "Nama tampilan"
+        },
+        "table": {
+            "empty": "Belum ada satuan"
+        },
+        "form": {
+            "create_title": "Tambah satuan ukuran",
+            "edit_title": "Ubah satuan ukuran"
+        },
+        "delete": {
+            "title": "Hapus satuan?",
+            "body": "Hapus \"{{name}}\"? Tidak bisa jika produk memakai kode atau nama ini."
+        },
+        "messages": {
+            "create_success": "Satuan ditambahkan.",
+            "create_failed": "Gagal menambah: {{message}}",
+            "update_success": "Satuan diperbarui.",
+            "update_failed": "Gagal memperbarui: {{message}}",
+            "delete_success": "Satuan dihapus.",
+            "delete_failed": "Gagal menghapus: {{message}}"
+        }
     },
     "customerGroups": {
         "title": "Grup pelanggan",

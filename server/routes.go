@@ -193,6 +193,15 @@ func SetupRoutes(app *App, container *AppContainer) {
 		customerGroupsRoute.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleManager), container.CustomerGroupHandler.DeleteHandler)
 	}
 
+	measurementUnitsRoute := api.Group("/measurement-units", authMiddleware)
+	{
+		measurementUnitsRoute.Get("/", container.MeasurementUnitHandler.ListHandler)
+		measurementUnitsRoute.Post("/", middleware.RoleMiddleware(middleware.UserRoleManager), container.MeasurementUnitHandler.CreateHandler)
+		measurementUnitsRoute.Get("/:id", container.MeasurementUnitHandler.GetHandler)
+		measurementUnitsRoute.Put("/:id", middleware.RoleMiddleware(middleware.UserRoleManager), container.MeasurementUnitHandler.UpdateHandler)
+		measurementUnitsRoute.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleManager), container.MeasurementUnitHandler.DeleteHandler)
+	}
+
 	supplierGroup := api.Group("/suppliers", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{
 		supplierGroup.Get("/", container.SupplierHandler.ListSuppliersHandler)

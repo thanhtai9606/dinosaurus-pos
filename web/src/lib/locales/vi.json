@@ -1531,9 +1531,36 @@
         "card_description": "Tải mẫu, chỉnh file Excel và import lại; hoặc xuất giá hiện tại."
     },
     "product_units_page": {
-        "title": "Đơn vị bán",
-        "description": "Đơn vị cơ sở, SKU và barcode trên từng sản phẩm. Thêm đơn vị quy đổi trong form sửa sản phẩm.",
+        "title": "Đơn vị tính",
+        "description": "Danh mục đơn vị dùng chung khi nhập sản phẩm (mã + tên). Đơn vị quy đổi theo từng SP vẫn cấu hình trong form sản phẩm.",
         "open_products": "Mở danh sách sản phẩm"
+    },
+    "measurementUnits": {
+        "add_button": "Thêm đơn vị",
+        "search_placeholder": "Tìm theo mã, tên…",
+        "fields": {
+            "code": "Mã",
+            "name": "Tên hiển thị"
+        },
+        "table": {
+            "empty": "Chưa có đơn vị nào"
+        },
+        "form": {
+            "create_title": "Thêm đơn vị tính",
+            "edit_title": "Sửa đơn vị tính"
+        },
+        "delete": {
+            "title": "Xóa đơn vị?",
+            "body": "Xóa \"{{name}}\"? Không xóa được nếu sản phẩm đang dùng mã hoặc tên này."
+        },
+        "messages": {
+            "create_success": "Đã thêm đơn vị.",
+            "create_failed": "Không thêm được: {{message}}",
+            "update_success": "Đã cập nhật đơn vị.",
+            "update_failed": "Không cập nhật được: {{message}}",
+            "delete_success": "Đã xóa đơn vị.",
+            "delete_failed": "Không xóa được: {{message}}"
+        }
     },
     "customerGroups": {
         "title": "Nhóm khách hàng",

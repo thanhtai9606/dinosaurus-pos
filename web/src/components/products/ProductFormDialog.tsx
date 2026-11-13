@@ -33,6 +33,8 @@ import { Label } from "@/components/ui/label.tsx";
 import { useImageCropper } from "@/hooks/use-image-cropper.ts";
 import { ImageCropperDialog } from "@/components/common/ImageCropperDialog.tsx";
 import { useMoney } from '@/context/MoneyContext'
+import { useQuery } from '@tanstack/react-query'
+import { measurementUnitsListQueryOptions } from '@/lib/api/query/measurementUnits'
 
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -79,6 +81,11 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
     const productId = productToEdit?.id ?? ''
     const { data: detailProduct, isLoading: isLoadingDetail, isError: isDetailError } = useProductDetailQuery(productId)
     const { data: suppliersData } = useSuppliersListQuery({ limit: 100 })
+    const { data: measurementUnitsPage } = useQuery({
+        ...measurementUnitsListQueryOptions({ page: 1, limit: 200 }),
+        enabled: open,
+    })
+    const catalogUnits = measurementUnitsPage?.units ?? []
 
     const cropper = useImageCropper()
 
@@ -585,7 +592,22 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                 children={(field) => (
                                                     <div className="grid grid-cols-4 items-start gap-4">
                                                         <Label className="text-right mt-3">{t('products.fields.unit')}</Label>
-                                                        <Input className="col-span-3" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                                                        <div className="col-span-3">
+                                                            <Input
+                                                                className="w-full"
+                                                                list="product-measurement-units"
+                                                                value={field.state.value}
+                                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                                placeholder={t('measurementUnits.fields.code', 'PCS')}
+                                                            />
+                                                            <datalist id="product-measurement-units">
+                                                                {catalogUnits.map((u) => (
+                                                                    <option key={u.id} value={u.code}>
+                                                                        {u.name}
+                                                                    </option>
+                                                                ))}
+                                                            </datalist>
+                                                        </div>
                                                     </div>
                                                 )}
                                             />

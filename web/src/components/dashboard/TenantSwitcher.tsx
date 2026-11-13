@@ -6,6 +6,8 @@ import {
   useTenantsMineQuery,
   type TenantSummary,
 } from '@/lib/api/query/tenants'
+import { useTenantsAdminQuery } from '@/lib/api/query/tenantsAdmin'
+import { useRBAC } from '@/lib/auth/rbac'
 import {
   Select,
   SelectContent,
@@ -18,14 +20,19 @@ import { toast } from 'sonner'
 export function TenantSwitcher() {
   const { t } = useTranslation()
   const { data: me } = useMeQuery()
+  const { role } = useRBAC()
   const { data: tenantsFromApi } = useTenantsMineQuery()
+  const { data: allTenants } = useTenantsAdminQuery()
   const switchTenant = useSwitchTenantMutation()
 
   const tenants: TenantSummary[] = useMemo(() => {
+    if (role === 'super_admin' && allTenants?.length) {
+      return allTenants.filter((t) => t.is_active).map(({ id, code, name }) => ({ id, code, name }))
+    }
     const fromMe = (me as { tenants?: TenantSummary[] } | undefined)?.tenants
     if (fromMe?.length) return fromMe
     return tenantsFromApi ?? []
-  }, [me, tenantsFromApi])
+  }, [me, tenantsFromApi, role, allTenants])
 
   const currentId =
     (me as { tenant?: TenantSummary } | undefined)?.tenant?.id ?? tenants[0]?.id

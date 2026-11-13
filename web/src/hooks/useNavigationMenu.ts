@@ -18,10 +18,11 @@ import {
     Undo2,
     Receipt,
     ShoppingBag,
+    Building2,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
-type Role = POSKasirInternalUserRepositoryUserRole
+type Role = POSKasirInternalUserRepositoryUserRole | 'super_admin'
 
 export type DashboardMenuLink = {
     type: 'link'
@@ -52,15 +53,21 @@ const managerRoles: Role[] = [
     POSKasirInternalUserRepositoryUserRole.UserRoleManager,
 ]
 
-function filterEntries(entries: DashboardMenuEntry[], userRole?: Role): DashboardMenuEntry[] {
+function canAccessItem(allowedRoles: Role[], userRole?: string): boolean {
+    if (!userRole) return false
+    if (userRole === 'super_admin') return true
+    return allowedRoles.includes(userRole as Role)
+}
+
+function filterEntries(entries: DashboardMenuEntry[], userRole?: string): DashboardMenuEntry[] {
     if (!userRole) return []
     const result: DashboardMenuEntry[] = []
     for (const entry of entries) {
         if (entry.type === 'link') {
-            if (entry.allowedRoles.includes(userRole)) result.push(entry)
+            if (canAccessItem(entry.allowedRoles, userRole)) result.push(entry)
             continue
         }
-        const children = entry.children.filter((c) => c.allowedRoles.includes(userRole))
+        const children = entry.children.filter((c) => canAccessItem(c.allowedRoles, userRole))
         if (children.length > 0) {
             result.push({ ...entry, children })
         }
@@ -68,7 +75,7 @@ function filterEntries(entries: DashboardMenuEntry[], userRole?: Role): Dashboar
     return result
 }
 
-export function useNavigationMenu(userRole?: Role) {
+export function useNavigationMenu(userRole?: string) {
     const { t } = useTranslation()
 
     const menuItems: DashboardMenuEntry[] = [
@@ -173,6 +180,13 @@ export function useNavigationMenu(userRole?: Role) {
             icon: Users,
             to: '/customers',
             allowedRoles: cashierRoles,
+        },
+        {
+            type: 'link',
+            label: t('sidebar.tenants_admin'),
+            icon: Building2,
+            to: '/tenants',
+            allowedRoles: ['super_admin'],
         },
         {
             type: 'link',

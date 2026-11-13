@@ -30,6 +30,7 @@ import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.setti
 import { Route as DashboardStockReceiptsRouteImport } from './routes/_dashboard.stock-receipts'
 import { Route as DashboardSupplierDebtsRouteImport } from './routes/_dashboard.supplier-debts'
 import { Route as DashboardSuppliersRouteImport } from './routes/_dashboard.suppliers'
+import { Route as DashboardTenantsRouteImport } from './routes/_dashboard.tenants'
 import { Route as DashboardTransactionsRouteImport } from './routes/_dashboard.transactions'
 import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
 import { Route as DashboardStockReceiptsNewRouteImport } from './routes/_dashboard.stock-receipts.new'
@@ -138,6 +139,11 @@ const DashboardSuppliersRoute = DashboardSuppliersRouteImport.update({
   path: '/suppliers',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTenantsRoute = DashboardTenantsRouteImport.update({
+  id: '/tenants',
+  path: '/tenants',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardTransactionsRoute = DashboardTransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
   '/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/suppliers': typeof DashboardSuppliersRoute
+  '/tenants': typeof DashboardTenantsRoute
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
   '/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
   '/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/suppliers': typeof DashboardSuppliersRoute
+  '/tenants': typeof DashboardTenantsRoute
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
   '/': typeof DashboardIndexRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/_dashboard/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
   '/_dashboard/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/_dashboard/suppliers': typeof DashboardSuppliersRoute
+  '/_dashboard/tenants': typeof DashboardTenantsRoute
   '/_dashboard/transactions': typeof DashboardTransactionsRoute
   '/_dashboard/users': typeof DashboardUsersRoute
   '/_dashboard/': typeof DashboardIndexRoute
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
     | '/stock-receipts'
     | '/supplier-debts'
     | '/suppliers'
+    | '/tenants'
     | '/transactions'
     | '/users'
     | '/stock-receipts/new'
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/stock-receipts'
     | '/supplier-debts'
     | '/suppliers'
+    | '/tenants'
     | '/transactions'
     | '/users'
     | '/'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/_dashboard/stock-receipts'
     | '/_dashboard/supplier-debts'
     | '/_dashboard/suppliers'
+    | '/_dashboard/tenants'
     | '/_dashboard/transactions'
     | '/_dashboard/users'
     | '/_dashboard/'
@@ -466,6 +478,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSuppliersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/tenants': {
+      id: '/_dashboard/tenants'
+      path: '/tenants'
+      fullPath: '/tenants'
+      preLoaderRoute: typeof DashboardTenantsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/transactions': {
       id: '/_dashboard/transactions'
       path: '/transactions'
@@ -532,6 +551,7 @@ interface DashboardRouteChildren {
   DashboardStockReceiptsRoute: typeof DashboardStockReceiptsRouteWithChildren
   DashboardSupplierDebtsRoute: typeof DashboardSupplierDebtsRoute
   DashboardSuppliersRoute: typeof DashboardSuppliersRoute
+  DashboardTenantsRoute: typeof DashboardTenantsRoute
   DashboardTransactionsRoute: typeof DashboardTransactionsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -554,6 +574,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardStockReceiptsRoute: DashboardStockReceiptsRouteWithChildren,
   DashboardSupplierDebtsRoute: DashboardSupplierDebtsRoute,
   DashboardSuppliersRoute: DashboardSuppliersRoute,
+  DashboardTenantsRoute: DashboardTenantsRoute,
   DashboardTransactionsRoute: DashboardTransactionsRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,

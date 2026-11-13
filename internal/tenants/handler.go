@@ -57,3 +57,44 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{Message: "tenant created", Data: summary})
 }
+
+func (h *Handler) Update(c fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "invalid tenant id"})
+	}
+	var req UpdateTenantRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "invalid request"})
+	}
+	summary, err := h.service.Update(c.RequestCtx(), id, req)
+	if err != nil {
+		if errors.Is(err, common.ErrNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "tenant not found"})
+		}
+		if errors.Is(err, common.ErrBadRequest) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "cannot deactivate default tenant"})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "failed to update tenant"})
+	}
+	return c.JSON(common.SuccessResponse{Message: "tenant updated", Data: summary})
+}
+
+func (h *Handler) Delete(c fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "invalid tenant id"})
+	}
+	if err := h.service.Delete(c.RequestCtx(), id); err != nil {
+		if errors.Is(err, common.ErrNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "tenant not found"})
+		}
+		if errors.Is(err, common.ErrBadRequest) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: err.Error(),
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "failed to delete tenant"})
+	}
+	return c.JSON(common.SuccessResponse{Message: "tenant deleted"})
+}

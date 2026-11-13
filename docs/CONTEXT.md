@@ -34,7 +34,7 @@ Schema mã nghiệp vụ (`order_no`, `customers.code`, `products.code`) nằm t
 
 - Bảng `tenants`, `tenant_users`; cột `tenant_id` trên dữ liệu nghiệp vụ; **RLS** theo `app.tenant_id` (set qua `pkg/database/tenant_db.go` + `store.ExecTx`).
 - **Đăng nhập:** bắt buộc `tenant_code` + email + password. Vai trò JWT = `super_admin` hoặc `COALESCE(tenant_users.role, users.role)` trong tenant đó.
-- **super_admin:** quản lý mọi tenant (`GET/POST /api/v1/tenants`), đổi tenant bằng switcher; tạo user trong tenant hiện tại (JWT `tenant_id`). Demo: `superadmin@example.com` / `1q2w3E*`, tenant `default`.
+- **super_admin:** quản lý tenant (`GET/POST/PUT/DELETE /api/v1/tenants`), trang **`/tenants`** (menu « Quản lý cửa hàng »); đổi tenant bằng switcher; tạo user trong tenant hiện tại (JWT `tenant_id`). Demo: `superadmin@example.com` / `1q2w3E*`, tenant `default`.
 - **admin tenant:** chỉ user thuộc tenant (JWT); tạo/sửa user trong tenant hiện tại (`POST /users` gán `tenant_users`).
 - `POST /auth/switch-tenant`, `GET /tenants/mine`.
 - Tenant mặc định: UUID `00000000-0000-0000-0000-000000000001`, code `default` — seed + backfill migration.

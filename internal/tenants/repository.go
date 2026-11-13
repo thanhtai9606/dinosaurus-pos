@@ -57,6 +57,13 @@ func (r *Repository) GetByCode(ctx context.Context, code string) (Row, error) {
 	return row, err
 }
 
+func (r *Repository) GetByIDAny(ctx context.Context, id uuid.UUID) (Row, error) {
+	const q = `SELECT id, code, name, is_active FROM tenants WHERE id = $1`
+	var row Row
+	err := r.pool.QueryRow(ctx, q, id).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
+	return row, err
+}
+
 func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (Row, error) {
 	const q = `SELECT id, code, name, is_active FROM tenants WHERE id = $1 AND is_active = true`
 	var row Row
@@ -160,6 +167,23 @@ func (r *Repository) UserInTenant(ctx context.Context, tenantID, userID uuid.UUI
 		return false, err
 	}
 	return true, nil
+}
+
+func (r *Repository) Update(ctx context.Context, id uuid.UUID, name string, isActive bool) (Row, error) {
+	const q = `
+UPDATE tenants
+SET name = $2, is_active = $3, updated_at = now()
+WHERE id = $1
+RETURNING id, code, name, is_active`
+	var row Row
+	err := r.pool.QueryRow(ctx, q, id, name, isActive).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
+	return row, err
+}
+
+func (r *Repository) DeleteByID(ctx context.Context, id uuid.UUID) error {
+	const q = `DELETE FROM tenants WHERE id = $1`
+	_, err := r.pool.Exec(ctx, q, id)
+	return err
 }
 
 func (r *Repository) BackfillTenantMemberRoles(ctx context.Context) error {

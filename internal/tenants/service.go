@@ -3,13 +3,16 @@ package tenants
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"POS-kasir/internal/common"
+	"POS-kasir/internal/tenant"
 	user_repo "POS-kasir/internal/user/repository"
 	"POS-kasir/pkg/logger"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -27,6 +30,11 @@ func NewService(repo *Repository, log logger.ILogger) *Service {
 type CreateTenantRequest struct {
 	Code string `json:"code" validate:"required,min=2,max=32"`
 	Name string `json:"name" validate:"required,min=2,max=150"`
+}
+
+type UpdateTenantRequest struct {
+	Name     string `json:"name" validate:"required,min=2,max=150"`
+	IsActive bool   `json:"is_active"`
 }
 
 func (s *Service) ListAll(ctx context.Context) ([]Summary, error) {
@@ -53,7 +61,7 @@ func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary,
 		s.log.Errorf("Create tenant: %v", err)
 		return Summary{}, common.ErrInternal
 	}
-	return Summary{ID: row.ID, Code: row.Code, Name: row.Name}, nil
+	return Summary{ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive}, nil
 }
 
 type CreateTenantMemberRequest struct {
@@ -61,6 +69,44 @@ type CreateTenantMemberRequest struct {
 	Username string `json:"username" validate:"required,min=3,max=50"`
 	Password string `json:"password" validate:"required,min=6,max=100"`
 	Role     string `json:"role" validate:"required,oneof=admin manager cashier"`
+}
+
+func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateTenantRequest) (Summary, error) {
+	if id == tenant.DefaultTenantID && !req.IsActive {
+		return Summary{}, common.ErrBadRequest
+	}
+	name := strings.TrimSpace(req.Name)
+	row, err := s.repo.Update(ctx, id, name, req.IsActive)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return Summary{}, common.ErrNotFound
+		}
+		s.log.Errorf("Update tenant: %v", err)
+		return Summary{}, common.ErrInternal
+	}
+	return Summary{ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive}, nil
+}
+
+func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
+	if id == tenant.DefaultTenantID {
+		return common.ErrBadRequest
+	}
+	_, err := s.repo.GetByIDAny(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return common.ErrNotFound
+		}
+		return err
+	}
+	if err := s.repo.DeleteByID(ctx, id); err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23503" {
+			return fmt.Errorf("%w: tenant still has business data — deactivate instead", common.ErrBadRequest)
+		}
+		s.log.Errorf("Delete tenant: %v", err)
+		return common.ErrInternal
+	}
+	return nil
 }
 
 func (s *Service) AddMemberToTenant(ctx context.Context, tenantID uuid.UUID, userID uuid.UUID, role user_repo.UserRole) error {

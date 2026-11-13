@@ -10,9 +10,64 @@
 
 For **product decisions, debt ledgers, stock-receipt flows, and file map** (Vietnamese + technical detail), see **[docs/CONTEXT.md](docs/CONTEXT.md)**. Cursor loads a short summary from `.cursor/rules/project-domain-context.mdc` — update both when you add major features.
 
+## Ghi chú nhanh (vận hành local / demo)
+
+### Tài khoản mẫu (sau `make seed` hoặc `make db-reset`)
+
+Mật khẩu chung cho mọi user demo: **`1q2w3E*`**  
+Mã tenant khi đăng nhập: **`default`** (tenant mặc định)
+
+| Vai trò | Email | Username | Ghi chú |
+|---------|-------|----------|---------|
+| Super admin | `superadmin@example.com` | `superadmin` | Quản lý tenant, `GET/POST /api/v1/tenants`, đổi store trên UI rồi tạo user |
+| Admin (tenant) | `admin@example.com` | `admin` | Quản lý user & cấu hình trong tenant hiện tại |
+| Manager | `manager@example.com` | `manager` | Báo cáo, sản phẩm, danh mục, v.v. |
+| Cashier | `cashier@example.com` | `cashier` | POS, đơn hàng, ca thu ngân |
+
+Script tiện ích: `make create-demo-users` (chạy seeder và in lại danh sách trên).
+
+### Đăng nhập
+
+1. **Mã cửa hàng (tenant code)** — ví dụ `default`
+2. **Email** và **mật khẩu**
+
+API: `POST /api/v1/auth/login` body `{ "tenant_code", "email", "password" }`. JWT chứa `tenant_id`; vai trò hiệu lực = `super_admin` hoặc vai trò trên membership tenant (`tenant_users.role`).
+
+### Multi-tenant (tóm tắt)
+
+| Mục | Giá trị |
+|-----|---------|
+| Tenant mặc định | UUID `00000000-0000-0000-0000-000000000001`, code **`default`** |
+| Đổi tenant (đã login) | `POST /api/v1/auth/switch-tenant` hoặc **Tenant switcher** trên sidebar |
+| Danh sách tenant của user | `GET /api/v1/tenants/mine` |
+| Tạo tenant mới | Chỉ **super admin** — `POST /api/v1/tenants` `{ "code", "name" }` |
+
+Dữ liệu nghiệp vụ tách theo tenant (RLS PostgreSQL). User mới tạo qua **Users** được gán vào **tenant đang chọn** trong JWT.
+
+### Tiền tệ & cài đặt tài chính
+
+- Mặc định sau migration: **VND (₫)**; có thể bật thêm IDR, USD trong **Cài đặt → Tài chính**.
+- Lưu financial/branding yêu cầu DB đã migrate đủ **000002** (multi-tenant) và **000004** (defaults Dinosaurus / VND).
+- UI format tiền qua `MoneyContext` — đồng bộ với `GET /api/v1/settings/financial`.
+
+### Database lần đầu / làm sạch
+
+```bash
+make dev-setup          # infra + migrate + seed (dev)
+make migrate-up         # chỉ migrate
+make seed               # dữ liệu mẫu (users, SP, đơn, …)
+make db-reset           # DROP schema public + migrate + seed (gõ YES)
+```
+
+Migrate nằm trong `sqlc/migrations/` (baseline, multitenant, super admin, defaults).
+
+### Liên kết repo
+
+- Fork / triển khai nội bộ: GitLab `devops/dinosaurus-pos` (module Go vẫn là `POS-kasir` — tên sản phẩm hiển thị: **Dinosaurus POS**).
+
 ## Overview
 
-**POS Kasir** is a modern, high-performance Fullstack Point of Sales application designed to streamline retail operations. It provides a robust solution for managing products, processing orders, handling payments (including Digital Payments via Midtrans), and analyzing sales performance.
+**Dinosaurus POS** is a modern, high-performance full-stack Point of Sales application designed to streamline retail operations. It provides a robust solution for managing products, processing orders, handling payments (including digital payments via Midtrans), and analyzing sales performance—with **multi-tenant** stores and **super admin** platform roles.
 
 Built as a **single-port deployment** — the Go backend serves both the REST API and the React SPA frontend on port `8080`.
 
@@ -27,7 +82,7 @@ Built as a **single-port deployment** — the Go backend serves both the REST AP
 
 | Category | Feature |
 |----------|---------|
-| **Auth & Access** | JWT authentication, RBAC (Admin / Manager / Cashier), session management |
+| **Auth & Access** | JWT, RBAC (Super admin / Admin / Manager / Cashier), multi-tenant login (`tenant_code`), tenant switch |
 | **Inventory** | Products, categories, variants/options, stock history, image uploads, soft-delete & restore |
 | **Orders** | Cart system, order workflow, operational status tracking, item updates |
 | **Payments** | Manual cash/payment methods, Midtrans Payment Gateway (QRIS dynamic/static) |
@@ -41,7 +96,7 @@ Built as a **single-port deployment** — the Go backend serves both the REST AP
 | **Real-time Sync** | Global WebSocket Hub for instant cashier synchronization |
 | **Redis Caching** | Cache-aside for optimized reporting performance |
 | **Demo Maintenance**| Automated daily database reset (Wipe & Seed) at 01:00 AM |
-| **Multi-language** | i18n support (English / Indonesian) with `react-i18next` |
+| **Multi-language** | i18n (Vietnamese / English / Indonesian) with `react-i18next` |
 | **Theming** | Light / Dark / System mode |
 
 ## Tech Stack

@@ -53,7 +53,13 @@ func (h *Handler) Create(c fiber.Ctx) error {
 		if errors.Is(err, ErrTenantCodeExists) {
 			return c.Status(fiber.StatusConflict).JSON(common.ErrorResponse{Message: "tenant code already exists"})
 		}
+		if errors.Is(err, common.ErrBadRequest) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "failed to create tenant"})
+	}
+	if actorID, ok := c.Locals("user_id").(uuid.UUID); ok {
+		h.log.Infof("audit: tenant_create actor=%s code=%s data_plane=%s", actorID, summary.Code, summary.DataPlane)
 	}
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{Message: "tenant created", Data: summary})
 }
@@ -77,6 +83,9 @@ func (h *Handler) Update(c fiber.Ctx) error {
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "failed to update tenant"})
 	}
+	if actorID, ok := c.Locals("user_id").(uuid.UUID); ok {
+		h.log.Infof("audit: tenant_update actor=%s tenant_id=%s active=%v", actorID, summary.ID, summary.IsActive)
+	}
 	return c.JSON(common.SuccessResponse{Message: "tenant updated", Data: summary})
 }
 
@@ -95,6 +104,9 @@ func (h *Handler) Delete(c fiber.Ctx) error {
 			})
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "failed to delete tenant"})
+	}
+	if actorID, ok := c.Locals("user_id").(uuid.UUID); ok {
+		h.log.Infof("audit: tenant_delete actor=%s tenant_id=%s", actorID, id)
 	}
 	return c.JSON(common.SuccessResponse{Message: "tenant deleted"})
 }

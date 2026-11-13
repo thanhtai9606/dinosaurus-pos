@@ -25,7 +25,12 @@ export const useTenantsAdminQuery = () => {
   })
 }
 
-export type CreateTenantPayload = { code: string; name: string }
+export type CreateTenantPayload = {
+  code: string
+  name: string
+  data_plane?: 'shared' | 'dedicated'
+  database_dsn_key?: string
+}
 export type UpdateTenantPayload = { name: string; is_active: boolean }
 
 export const useCreateTenantMutation = () => {
@@ -36,6 +41,12 @@ export const useCreateTenantMutation = () => {
       const res = await axiosInstance.post('/tenants', {
         code: body.code.trim().toLowerCase(),
         name: body.name.trim(),
+        ...(body.data_plane && body.data_plane !== 'shared'
+          ? {
+              data_plane: body.data_plane,
+              database_dsn_key: body.database_dsn_key?.trim(),
+            }
+          : {}),
       })
       return (res.data as { data: TenantAdmin }).data
     },

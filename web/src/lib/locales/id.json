@@ -131,7 +131,13 @@
         "delete_success": "Toko dihapus",
         "delete_error": "Gagal menghapus (mungkin masih ada data — nonaktifkan saja)",
         "delete_confirm_title": "Hapus toko?",
-        "delete_confirm_body": "Hapus \"{{code}}\"? Hanya bisa jika belum ada data bisnis."
+        "delete_confirm_body": "Hapus \"{{code}}\"? Hanya bisa jika belum ada data bisnis.",
+        "data_plane": "Tier data",
+        "data_plane_shared": "Bersama (RLS)",
+        "data_plane_dedicated": "DB khusus",
+        "data_plane_help": "DB khusus butuh Postgres terpisah dan TENANT_DSN_* di .env server (lihat docs/MULTITENANT_OPS.md).",
+        "dsn_key": "Kunci env DSN",
+        "dsn_key_help": "Nama variabel lingkungan, mis. TENANT_DSN_ACME (bukan connection string)."
     },
     "salesOrders": {
         "subtitle": "Lihat semua pesanan terjual dan detail item.",

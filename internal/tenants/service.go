@@ -28,8 +28,10 @@ func NewService(repo *Repository, log logger.ILogger) *Service {
 }
 
 type CreateTenantRequest struct {
-	Code string `json:"code" validate:"required,min=2,max=32"`
-	Name string `json:"name" validate:"required,min=2,max=150"`
+	Code             string  `json:"code" validate:"required,min=2,max=32"`
+	Name             string  `json:"name" validate:"required,min=2,max=150"`
+	DataPlane        string  `json:"data_plane,omitempty" validate:"omitempty,oneof=shared dedicated"`
+	DatabaseDSNKey   *string `json:"database_dsn_key,omitempty" validate:"omitempty,max=64"`
 }
 
 type UpdateTenantRequest struct {
@@ -52,7 +54,21 @@ func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary,
 	if err != nil {
 		return Summary{}, err
 	}
-	row, err := s.repo.Create(ctx, id, code, name)
+	plane := strings.ToLower(strings.TrimSpace(req.DataPlane))
+	if plane == "" {
+		plane = "shared"
+	}
+	if plane == "dedicated" && (req.DatabaseDSNKey == nil || strings.TrimSpace(*req.DatabaseDSNKey) == "") {
+		return Summary{}, fmt.Errorf("%w: database_dsn_key required for dedicated tenant", common.ErrBadRequest)
+	}
+	var dsnKey *string
+	if req.DatabaseDSNKey != nil {
+		k := strings.TrimSpace(*req.DatabaseDSNKey)
+		if k != "" {
+			dsnKey = &k
+		}
+	}
+	row, err := s.repo.Create(ctx, id, code, name, plane, dsnKey)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
@@ -61,7 +77,10 @@ func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary,
 		s.log.Errorf("Create tenant: %v", err)
 		return Summary{}, common.ErrInternal
 	}
-	return Summary{ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive}, nil
+	return Summary{
+		ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive,
+		DataPlane: row.DataPlane, DatabaseDSNKey: row.DatabaseDSNKey,
+	}, nil
 }
 
 type CreateTenantMemberRequest struct {
@@ -84,7 +103,10 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateTenantRequ
 		s.log.Errorf("Update tenant: %v", err)
 		return Summary{}, common.ErrInternal
 	}
-	return Summary{ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive}, nil
+	return Summary{
+		ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive,
+		DataPlane: row.DataPlane, DatabaseDSNKey: row.DatabaseDSNKey,
+	}, nil
 }
 
 func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {

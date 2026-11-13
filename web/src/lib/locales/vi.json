@@ -131,7 +131,13 @@
         "delete_success": "Đã xóa",
         "delete_error": "Không xóa được (có thể còn dữ liệu — hãy tắt hoạt động)",
         "delete_confirm_title": "Xóa cửa hàng?",
-        "delete_confirm_body": "Xóa \"{{code}}\"? Chỉ xóa được khi chưa có dữ liệu nghiệp vụ."
+        "delete_confirm_body": "Xóa \"{{code}}\"? Chỉ xóa được khi chưa có dữ liệu nghiệp vụ.",
+        "data_plane": "Tầng dữ liệu",
+        "data_plane_shared": "Chung (RLS)",
+        "data_plane_dedicated": "DB riêng",
+        "data_plane_help": "DB riêng cần Postgres tách và biến TENANT_DSN_* trong .env API (xem docs/MULTITENANT_OPS.md).",
+        "dsn_key": "Khóa env DSN",
+        "dsn_key_help": "Tên biến môi trường, ví dụ TENANT_DSN_ACME (không phải chuỗi kết nối)."
     },
     "salesOrders": {
         "subtitle": "Xem toàn bộ đơn đã bán và chi tiết từng dòng.",

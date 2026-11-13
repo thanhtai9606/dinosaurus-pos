@@ -11,11 +11,24 @@ import (
 
 // TenantDB implements sqlc DBTX: each operation acquires a connection and sets app.tenant_id for RLS.
 type TenantDB struct {
-	pool *pgxpool.Pool
+	pool   *pgxpool.Pool
+	router *PoolRouter
 }
 
 func NewTenantDB(pool *pgxpool.Pool) *TenantDB {
 	return &TenantDB{pool: pool}
+}
+
+// NewRoutedTenantDB routes business queries to shared or dedicated pools via PoolRouter.
+func NewRoutedTenantDB(router *PoolRouter) *TenantDB {
+	return &TenantDB{router: router}
+}
+
+func (t *TenantDB) poolFor(ctx context.Context) *pgxpool.Pool {
+	if t.router != nil {
+		return t.router.PoolForContext(ctx)
+	}
+	return t.pool
 }
 
 func (t *TenantDB) applyTenant(ctx context.Context, conn *pgx.Conn) error {
@@ -33,7 +46,7 @@ func (t *TenantDB) resetTenant(ctx context.Context, conn *pgx.Conn) {
 }
 
 func (t *TenantDB) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
-	conn, err := t.pool.Acquire(ctx)
+	conn, err := t.poolFor(ctx).Acquire(ctx)
 	if err != nil {
 		return pgconn.CommandTag{}, err
 	}
@@ -48,7 +61,7 @@ func (t *TenantDB) Exec(ctx context.Context, sql string, args ...any) (pgconn.Co
 }
 
 func (t *TenantDB) Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
-	conn, err := t.pool.Acquire(ctx)
+	conn, err := t.poolFor(ctx).Acquire(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +79,7 @@ func (t *TenantDB) Query(ctx context.Context, sql string, args ...any) (pgx.Rows
 }
 
 func (t *TenantDB) CopyFrom(ctx context.Context, tableName pgx.Identifier, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
-	conn, err := t.pool.Acquire(ctx)
+	conn, err := t.poolFor(ctx).Acquire(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -81,7 +94,7 @@ func (t *TenantDB) CopyFrom(ctx context.Context, tableName pgx.Identifier, colum
 }
 
 func (t *TenantDB) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
-	conn, err := t.pool.Acquire(ctx)
+	conn, err := t.poolFor(ctx).Acquire(ctx)
 	if err != nil {
 		return errRow{err: err}
 	}

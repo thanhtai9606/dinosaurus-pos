@@ -617,6 +617,16 @@ func (h *AthHandler) SwitchTenantHandler(c fiber.Ctx) error {
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "switch failed"})
 	}
+	var roleStr string
+	switch r := c.Locals("role").(type) {
+	case middleware.UserRole:
+		roleStr = string(r)
+	case string:
+		roleStr = r
+	}
+	if roleStr == string(middleware.UserRoleSuperAdmin) {
+		h.Log.Infof("audit: super_admin_switch_tenant actor=%s tenant_id=%s", userID, req.TenantID)
+	}
 	cookie := &fiber.Cookie{
 		Name:     "access_token",
 		Value:    resp.Token,

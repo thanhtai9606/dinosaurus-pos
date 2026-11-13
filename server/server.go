@@ -91,6 +91,7 @@ type App struct {
 	Cache           *shift.Cache
 	RedisCache      cache.Cache
 	Redis           *redis.Client
+	PoolRouter      *database.PoolRouter
 }
 
 type AppContainer struct {
@@ -191,8 +192,10 @@ func BuildAppContainer(app *App) *AppContainer {
 	wsHub := ws.InitHub()
 
 	pool := app.DB.GetPool()
-	tenantDB := database.NewTenantDB(pool)
 	tenantRepo := tenants.NewRepository(pool)
+	poolRouter := database.NewPoolRouter(pool, app.Logger, tenantRepo.RoutingForTenant)
+	app.PoolRouter = poolRouter
+	tenantDB := database.NewRoutedTenantDB(poolRouter)
 	tenantHandler := tenants.NewHandler(tenantRepo, app.Logger)
 
 	// Activity Log IActivityService
@@ -379,6 +382,9 @@ func SetupMiddleware(app *App) {
 }
 
 func Cleanup(app *App) {
+	if app.PoolRouter != nil {
+		app.PoolRouter.CloseDedicated()
+	}
 	if app.DB != nil {
 		app.DB.Close()
 	}

@@ -5,6 +5,8 @@ export type TenantSummary = {
   id: string
   code: string
   name: string
+  data_plane?: 'shared' | 'dedicated'
+  database_dsn_key?: string | null
 }
 
 export const tenantsMineQueryOptions = () =>

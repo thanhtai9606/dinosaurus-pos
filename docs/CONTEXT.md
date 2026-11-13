@@ -8,7 +8,8 @@ Tài liệu này gom **quyết định sản phẩm, luồng nghiệp vụ và �
 |-----|---------|
 | Module Go | `POS-kasir` |
 | API + SPA | Go Fiber phục vụ API và build `web/dist` (thường cổng **8080**) |
-| DB | PostgreSQL 15, migrate trong `sqlc/migrations/` — `000001`–`000003` (multitenant + super admin). Reset sạch: `make db-reset` |
+| DB | PostgreSQL 15, migrate trong `sqlc/migrations/` — `000001`–`000005` (multitenant, super admin, branding, `data_plane`). Reset sạch: `make db-reset` |
+| Multi-tenant ops | `docs/MULTITENANT_OPS.md` — RLS audit, backup, `migrate-all-databases`, provision dedicated |
 | FE | `web/` — React 19, TanStack Router (file routes), TanStack Query, pnpm |
 | i18n | `web/src/lib/locales/{vi,en,id}.json` — thêm key đủ 3 ngôn ngữ |
 | RBAC FE | `web/src/lib/auth/rbacRules.ts` (map method + path → role) |
@@ -32,7 +33,8 @@ Schema mã nghiệp vụ (`order_no`, `customers.code`, `products.code`) nằm t
 
 ## Multi-tenant (MVP)
 
-- Bảng `tenants`, `tenant_users`; cột `tenant_id` trên dữ liệu nghiệp vụ; **RLS** theo `app.tenant_id` (set qua `pkg/database/tenant_db.go` + `store.ExecTx`).
+- Bảng `tenants`, `tenant_users`; cột `tenant_id` trên dữ liệu nghiệp vụ; **RLS** theo `app.tenant_id` (set qua `pkg/database/tenant_db.go` / `NewRoutedTenantDB` + `store.ExecTx`).
+- Tier **shared** (mặc định) hoặc **dedicated** (`tenants.data_plane`, `database_dsn_key` → env `TENANT_DSN_*`; routing `pkg/database/pool_router.go`).
 - **Đăng nhập:** bắt buộc `tenant_code` + email + password. Vai trò JWT = `super_admin` hoặc `COALESCE(tenant_users.role, users.role)` trong tenant đó.
 - **super_admin:** quản lý tenant (`GET/POST/PUT/DELETE /api/v1/tenants`), trang **`/tenants`** (menu « Quản lý cửa hàng »); đổi tenant bằng switcher; tạo user trong tenant hiện tại (JWT `tenant_id`). Demo: `superadmin@example.com` / `1q2w3E*`, tenant `default`.
 - **admin tenant:** chỉ user thuộc tenant (JWT); tạo/sửa user trong tenant hiện tại (`POST /users` gán `tenant_users`).

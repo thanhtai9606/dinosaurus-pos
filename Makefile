@@ -8,8 +8,8 @@
 	create-demo-users list-users create-admin remove-data backup restore db-shell db-reset \
 	logs logs-db status clean \
 	migrate-version migrate-up migrate-down migrate-down-one migrate-down-all migrate-force migrate-create \
-	sqlc-generate seed swag \
-	test lint format deps install \
+	migrate-all-databases sqlc-generate seed swag \
+	test test-integration lint format deps install \
 	docker-be docker-be-down
 
 .DEFAULT_GOAL := help
@@ -69,6 +69,7 @@ help:
 	@echo "  make restore        - Restore from backups/"
 	@echo "  make db-shell       - psql shell"
 	@echo "  make db-reset       - migrate down all, up, seed"
+	@echo "  make migrate-all-databases - Shared DB + every TENANT_DSN_* in .env"
 	@echo ""
 	@echo "$(GREEN)Code generation:$(NC)"
 	@echo "  make sqlc-generate  - sqlc generate"
@@ -277,6 +278,13 @@ test:
 	@echo ""
 	@echo "$(GREEN)🧪 Frontend tests$(NC)"
 	@cd web && pnpm test
+
+test-integration:
+	@echo "$(GREEN)🧪 RLS integration tests (Postgres required)$(NC)"
+	@INTEGRATION_TEST=1 go test -tags=integration ./pkg/database/ -count=1 -v
+
+migrate-all-databases:
+	@bash ./scripts/migrate-all-databases.sh
 
 lint:
 	@echo "$(GREEN)🔍 go vet$(NC)"

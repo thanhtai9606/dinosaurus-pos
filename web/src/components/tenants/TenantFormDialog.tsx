@@ -11,14 +11,29 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import type { TenantAdmin } from '@/lib/api/query/tenantsAdmin'
+
+export type TenantFormValues = {
+  code: string
+  name: string
+  is_active: boolean
+  data_plane: 'shared' | 'dedicated'
+  database_dsn_key: string
+}
 
 type Props = {
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: 'create' | 'edit'
   tenant?: TenantAdmin | null
-  onSubmit: (values: { code: string; name: string; is_active: boolean }) => void
+  onSubmit: (values: TenantFormValues) => void
   isPending?: boolean
 }
 
@@ -34,6 +49,8 @@ export function TenantFormDialog({
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
   const [isActive, setIsActive] = useState(true)
+  const [dataPlane, setDataPlane] = useState<'shared' | 'dedicated'>('shared')
+  const [dsnKey, setDsnKey] = useState('')
 
   useEffect(() => {
     if (!open) return
@@ -41,16 +58,26 @@ export function TenantFormDialog({
       setCode(tenant.code)
       setName(tenant.name)
       setIsActive(tenant.is_active)
+      setDataPlane(tenant.data_plane === 'dedicated' ? 'dedicated' : 'shared')
+      setDsnKey(tenant.database_dsn_key ?? '')
     } else {
       setCode('')
       setName('')
       setIsActive(true)
+      setDataPlane('shared')
+      setDsnKey('')
     }
   }, [open, mode, tenant])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({ code, name, is_active: isActive })
+    onSubmit({
+      code,
+      name,
+      is_active: isActive,
+      data_plane: dataPlane,
+      database_dsn_key: dsnKey.trim(),
+    })
   }
 
   return (
@@ -94,6 +121,52 @@ export function TenantFormDialog({
               maxLength={150}
             />
           </div>
+          {mode === 'create' && (
+            <>
+              <div className="space-y-2">
+                <Label>{t('tenants_admin.data_plane')}</Label>
+                <Select
+                  value={dataPlane}
+                  onValueChange={(v) => setDataPlane(v as 'shared' | 'dedicated')}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="shared">{t('tenants_admin.data_plane_shared')}</SelectItem>
+                    <SelectItem value="dedicated">{t('tenants_admin.data_plane_dedicated')}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">{t('tenants_admin.data_plane_help')}</p>
+              </div>
+              {dataPlane === 'dedicated' && (
+                <div className="space-y-2">
+                  <Label htmlFor="tenant-dsn-key">{t('tenants_admin.dsn_key')}</Label>
+                  <Input
+                    id="tenant-dsn-key"
+                    value={dsnKey}
+                    onChange={(e) => setDsnKey(e.target.value)}
+                    placeholder="TENANT_DSN_ACME"
+                    pattern="TENANT_DSN_[A-Z0-9_]+"
+                    required
+                    autoComplete="off"
+                  />
+                  <p className="text-xs text-muted-foreground">{t('tenants_admin.dsn_key_help')}</p>
+                </div>
+              )}
+            </>
+          )}
+          {mode === 'edit' && tenant?.data_plane === 'dedicated' && (
+            <div className="rounded-lg border p-3 text-sm space-y-1">
+              <p>
+                <span className="text-muted-foreground">{t('tenants_admin.data_plane')}: </span>
+                {t('tenants_admin.data_plane_dedicated')}
+              </p>
+              {tenant.database_dsn_key && (
+                <p className="font-mono text-xs">{tenant.database_dsn_key}</p>
+              )}
+            </div>
+          )}
           {mode === 'edit' && (
             <div className="flex items-center justify-between rounded-lg border p-3">
               <Label htmlFor="tenant-active">{t('tenants_admin.active')}</Label>

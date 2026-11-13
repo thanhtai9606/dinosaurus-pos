@@ -10,7 +10,7 @@ import {
   useDeleteTenantMutation,
   type TenantAdmin,
 } from '@/lib/api/query/tenantsAdmin'
-import { TenantFormDialog } from '@/components/tenants/TenantFormDialog'
+import { TenantFormDialog, type TenantFormValues } from '@/components/tenants/TenantFormDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -72,10 +72,15 @@ function TenantsAdminPage() {
     setDialogOpen(true)
   }
 
-  const handleFormSubmit = (values: { code: string; name: string; is_active: boolean }) => {
+  const handleFormSubmit = (values: TenantFormValues) => {
     if (dialogMode === 'create') {
       createMutation.mutate(
-        { code: values.code, name: values.name },
+        {
+          code: values.code,
+          name: values.name,
+          data_plane: values.data_plane,
+          database_dsn_key: values.database_dsn_key,
+        },
         {
           onSuccess: () => {
             toast.success(t('tenants_admin.create_success'))
@@ -148,6 +153,7 @@ function TenantsAdminPage() {
                 <TableRow>
                   <TableHead>{t('tenants_admin.code')}</TableHead>
                   <TableHead>{t('tenants_admin.name')}</TableHead>
+                  <TableHead>{t('tenants_admin.data_plane')}</TableHead>
                   <TableHead>{t('tenants_admin.status')}</TableHead>
                   <TableHead className="text-right">{t('common.actions')}</TableHead>
                 </TableRow>
@@ -157,6 +163,13 @@ function TenantsAdminPage() {
                   <TableRow key={tnt.id}>
                     <TableCell className="font-mono text-sm">{tnt.code}</TableCell>
                     <TableCell>{tnt.name}</TableCell>
+                    <TableCell>
+                      <Badge variant={tnt.data_plane === 'dedicated' ? 'outline' : 'secondary'}>
+                        {tnt.data_plane === 'dedicated'
+                          ? t('tenants_admin.data_plane_dedicated')
+                          : t('tenants_admin.data_plane_shared')}
+                      </Badge>
+                    </TableCell>
                     <TableCell>
                       <Badge variant={tnt.is_active ? 'default' : 'secondary'}>
                         {tnt.is_active ? t('tenants_admin.active') : t('tenants_admin.inactive')}

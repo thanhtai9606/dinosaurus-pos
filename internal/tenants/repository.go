@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"POS-kasir/internal/tenant"
+	"POS-kasir/pkg/database"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -12,10 +13,12 @@ import (
 )
 
 type Row struct {
-	ID       uuid.UUID
-	Code     string
-	Name     string
-	IsActive bool
+	ID             uuid.UUID
+	Code           string
+	Name           string
+	IsActive       bool
+	DataPlane      string
+	DatabaseDSNKey *string
 }
 
 type Repository struct {
@@ -26,9 +29,36 @@ func NewRepository(pool *pgxpool.Pool) *Repository {
 	return &Repository{pool: pool}
 }
 
+const tenantRowSelect = `id, code, name, is_active, data_plane::text, database_dsn_key`
+
+func scanTenantRow(row pgx.Row) (Row, error) {
+	var out Row
+	err := row.Scan(&out.ID, &out.Code, &out.Name, &out.IsActive, &out.DataPlane, &out.DatabaseDSNKey)
+	if out.DataPlane == "" {
+		out.DataPlane = "shared"
+	}
+	return out, err
+}
+
+// RoutingForTenant implements database.TenantRoutingLookup.
+func (r *Repository) RoutingForTenant(ctx context.Context, tenantID uuid.UUID) (database.TenantRouting, error) {
+	row, err := r.GetByIDAny(ctx, tenantID)
+	if err != nil {
+		return database.TenantRouting{}, err
+	}
+	key := ""
+	if row.DatabaseDSNKey != nil {
+		key = *row.DatabaseDSNKey
+	}
+	return database.TenantRouting{
+		DataPlane:      row.DataPlane,
+		DatabaseDSNKey: key,
+	}, nil
+}
+
 func (r *Repository) ListForUser(ctx context.Context, userID uuid.UUID) ([]Row, error) {
 	const q = `
-SELECT t.id, t.code, t.name, t.is_active
+SELECT t.id, t.code, t.name, t.is_active, t.data_plane::text, t.database_dsn_key
 FROM tenants t
 JOIN tenant_users tu ON tu.tenant_id = t.id
 WHERE tu.user_id = $1 AND t.is_active = true
@@ -41,8 +71,8 @@ ORDER BY t.name`
 
 	var out []Row
 	for rows.Next() {
-		var row Row
-		if err := rows.Scan(&row.ID, &row.Code, &row.Name, &row.IsActive); err != nil {
+		row, err := scanTenantRow(rows)
+		if err != nil {
 			return nil, err
 		}
 		out = append(out, row)
@@ -51,24 +81,18 @@ ORDER BY t.name`
 }
 
 func (r *Repository) GetByCode(ctx context.Context, code string) (Row, error) {
-	const q = `SELECT id, code, name, is_active FROM tenants WHERE code = $1 AND is_active = true`
-	var row Row
-	err := r.pool.QueryRow(ctx, q, code).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
-	return row, err
+	const q = `SELECT ` + tenantRowSelect + ` FROM tenants WHERE code = $1 AND is_active = true`
+	return scanTenantRow(r.pool.QueryRow(ctx, q, code))
 }
 
 func (r *Repository) GetByIDAny(ctx context.Context, id uuid.UUID) (Row, error) {
-	const q = `SELECT id, code, name, is_active FROM tenants WHERE id = $1`
-	var row Row
-	err := r.pool.QueryRow(ctx, q, id).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
-	return row, err
+	const q = `SELECT ` + tenantRowSelect + ` FROM tenants WHERE id = $1`
+	return scanTenantRow(r.pool.QueryRow(ctx, q, id))
 }
 
 func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (Row, error) {
-	const q = `SELECT id, code, name, is_active FROM tenants WHERE id = $1 AND is_active = true`
-	var row Row
-	err := r.pool.QueryRow(ctx, q, id).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
-	return row, err
+	const q = `SELECT ` + tenantRowSelect + ` FROM tenants WHERE id = $1 AND is_active = true`
+	return scanTenantRow(r.pool.QueryRow(ctx, q, id))
 }
 
 func (r *Repository) UserHasTenant(ctx context.Context, userID, tenantID uuid.UUID) (bool, error) {
@@ -109,7 +133,7 @@ ON CONFLICT DO NOTHING`
 }
 
 func (r *Repository) ListAll(ctx context.Context) ([]Row, error) {
-	const q = `SELECT id, code, name, is_active FROM tenants ORDER BY name`
+	const q = `SELECT ` + tenantRowSelect + ` FROM tenants ORDER BY name`
 	rows, err := r.pool.Query(ctx, q)
 	if err != nil {
 		return nil, err
@@ -117,8 +141,8 @@ func (r *Repository) ListAll(ctx context.Context) ([]Row, error) {
 	defer rows.Close()
 	var out []Row
 	for rows.Next() {
-		var row Row
-		if err := rows.Scan(&row.ID, &row.Code, &row.Name, &row.IsActive); err != nil {
+		row, err := scanTenantRow(rows)
+		if err != nil {
 			return nil, err
 		}
 		out = append(out, row)
@@ -126,14 +150,15 @@ func (r *Repository) ListAll(ctx context.Context) ([]Row, error) {
 	return out, rows.Err()
 }
 
-func (r *Repository) Create(ctx context.Context, id uuid.UUID, code, name string) (Row, error) {
+func (r *Repository) Create(ctx context.Context, id uuid.UUID, code, name, dataPlane string, dsnKey *string) (Row, error) {
+	if dataPlane == "" {
+		dataPlane = "shared"
+	}
 	const q = `
-INSERT INTO tenants (id, code, name, is_active)
-VALUES ($1, $2, $3, true)
-RETURNING id, code, name, is_active`
-	var row Row
-	err := r.pool.QueryRow(ctx, q, id, code, name).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
-	return row, err
+INSERT INTO tenants (id, code, name, is_active, data_plane, database_dsn_key)
+VALUES ($1, $2, $3, true, $4::tenant_data_plane, $5)
+RETURNING ` + tenantRowSelect
+	return scanTenantRow(r.pool.QueryRow(ctx, q, id, code, name, dataPlane, dsnKey))
 }
 
 func (r *Repository) AddMember(ctx context.Context, tenantID, userID uuid.UUID, role *string) error {
@@ -174,10 +199,8 @@ func (r *Repository) Update(ctx context.Context, id uuid.UUID, name string, isAc
 UPDATE tenants
 SET name = $2, is_active = $3, updated_at = now()
 WHERE id = $1
-RETURNING id, code, name, is_active`
-	var row Row
-	err := r.pool.QueryRow(ctx, q, id, name, isActive).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
-	return row, err
+RETURNING ` + tenantRowSelect
+	return scanTenantRow(r.pool.QueryRow(ctx, q, id, name, isActive))
 }
 
 func (r *Repository) DeleteByID(ctx context.Context, id uuid.UUID) error {

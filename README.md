@@ -40,9 +40,10 @@ API: `POST /api/v1/auth/login` body `{ "tenant_code", "email", "password" }`. JW
 | Tenant mặc định | UUID `00000000-0000-0000-0000-000000000001`, code **`default`** |
 | Đổi tenant (đã login) | `POST /api/v1/auth/switch-tenant` hoặc **Tenant switcher** trên sidebar |
 | Danh sách tenant của user | `GET /api/v1/tenants/mine` |
-| Tạo tenant mới | Chỉ **super admin** — `POST /api/v1/tenants` `{ "code", "name" }` |
+| Tạo tenant mới | Chỉ **super admin** — `POST /api/v1/tenants` `{ "code", "name", "data_plane?", "database_dsn_key?" }` |
+| Ops (backup, dedicated DB) | Xem [`docs/MULTITENANT_OPS.md`](docs/MULTITENANT_OPS.md) — `make migrate-all-databases`, `make test-integration` |
 
-Dữ liệu nghiệp vụ tách theo tenant (RLS PostgreSQL). User mới tạo qua **Users** được gán vào **tenant đang chọn** trong JWT.
+Dữ liệu nghiệp vụ tách theo tenant (RLS PostgreSQL). Tier **enterprise**: DB riêng + env `TENANT_DSN_*`. User mới tạo qua **Users** được gán vào **tenant đang chọn** trong JWT.
 
 ### Tiền tệ & cài đặt tài chính
 

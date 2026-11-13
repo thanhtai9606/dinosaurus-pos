@@ -129,7 +129,13 @@
         "delete_success": "Store deleted",
         "delete_error": "Failed to delete store (may still have data — deactivate instead)",
         "delete_confirm_title": "Delete store?",
-        "delete_confirm_body": "Remove store \"{{code}}\"? This only works if it has no business data."
+        "delete_confirm_body": "Remove store \"{{code}}\"? This only works if it has no business data.",
+        "data_plane": "Data tier",
+        "data_plane_shared": "Shared (RLS)",
+        "data_plane_dedicated": "Dedicated DB",
+        "data_plane_help": "Dedicated requires a separate Postgres DB and TENANT_DSN_* in server .env (see docs/MULTITENANT_OPS.md).",
+        "dsn_key": "DSN env key",
+        "dsn_key_help": "Name of the environment variable, e.g. TENANT_DSN_ACME (not the connection string)."
     },
     "salesOrders": {
         "subtitle": "Browse sold orders and open line-item detail.",

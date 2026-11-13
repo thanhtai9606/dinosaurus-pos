@@ -25,11 +25,45 @@ export const useTenantsAdminQuery = () => {
   })
 }
 
+export type TenantOnboardingVertical = {
+  id: string
+  label_key: string
+  description_key: string
+}
+
+export type TenantOnboardingMarket = {
+  code: string
+  label_key: string
+}
+
+export type TenantOnboardingOptions = {
+  markets: TenantOnboardingMarket[]
+  verticals: TenantOnboardingVertical[]
+}
+
+export const tenantOnboardingQueryKey = (market: string) => ['tenants', 'onboarding-options', market] as const
+
+export const useTenantOnboardingOptionsQuery = (market: string, enabled: boolean) => {
+  const { role } = useRBAC()
+  return useQuery({
+    queryKey: tenantOnboardingQueryKey(market),
+    queryFn: async () => {
+      const res = await axiosInstance.get('/tenants/onboarding-options', { params: { market } })
+      return (res.data as { data: TenantOnboardingOptions }).data
+    },
+    enabled: enabled && role === 'super_admin',
+    staleTime: 60_000,
+  })
+}
+
 export type CreateTenantPayload = {
   code: string
   name: string
   data_plane?: 'shared' | 'dedicated'
   database_dsn_key?: string
+  market_code?: string
+  business_vertical?: string
+  seed_demo?: boolean
 }
 export type UpdateTenantPayload = { name: string; is_active: boolean }
 
@@ -41,6 +75,9 @@ export const useCreateTenantMutation = () => {
       const res = await axiosInstance.post('/tenants', {
         code: body.code.trim().toLowerCase(),
         name: body.name.trim(),
+        market_code: body.market_code ?? 'vn',
+        business_vertical: body.business_vertical ?? 'multi',
+        seed_demo: body.seed_demo ?? true,
         ...(body.data_plane && body.data_plane !== 'shared'
           ? {
               data_plane: body.data_plane,

@@ -76,6 +76,9 @@ function TenantsAdminPage() {
           name: values.name,
           data_plane: values.data_plane,
           database_dsn_key: values.database_dsn_key,
+          market_code: values.market_code,
+          business_vertical: values.business_vertical,
+          seed_demo: values.seed_demo,
         },
         {
           onSuccess: (created) => {

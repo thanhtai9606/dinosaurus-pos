@@ -9,6 +9,8 @@ type Summary struct {
 	IsActive         bool      `json:"is_active"`
 	DataPlane        string    `json:"data_plane"`
 	DatabaseDSNKey   *string   `json:"database_dsn_key,omitempty"`
+	MarketCode       string    `json:"market_code"`
+	BusinessVertical string    `json:"business_vertical"`
 }
 
 func Summaries(rows []Row) []Summary {
@@ -17,6 +19,7 @@ func Summaries(rows []Row) []Summary {
 		out = append(out, Summary{
 			ID: r.ID, Code: r.Code, Name: r.Name, IsActive: r.IsActive,
 			DataPlane: r.DataPlane, DatabaseDSNKey: r.DatabaseDSNKey,
+			MarketCode: r.MarketCode, BusinessVertical: r.BusinessVertical,
 		})
 	}
 	return out

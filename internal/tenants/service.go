@@ -8,6 +8,7 @@ import (
 
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/pkg/database/seeder/catalog"
 	user_repo "dinosaurus-pos/internal/user/repository"
 	"dinosaurus-pos/pkg/logger"
 	"dinosaurus-pos/pkg/utils"
@@ -27,22 +28,31 @@ type CustomerGroupSeeder interface {
 	SeedDefaults(ctx context.Context, tenantID uuid.UUID) error
 }
 
-type Service struct {
-	repo          *Repository
-	users         user_repo.Querier
-	log           logger.ILogger
-	groupSeeder   CustomerGroupSeeder
+// DemoCatalogSeeder seeds demo products for a tenant onboarding profile.
+type DemoCatalogSeeder interface {
+	SeedDemoCatalog(ctx context.Context, tenantID uuid.UUID, market, vertical string) error
 }
 
-func NewService(repo *Repository, users user_repo.Querier, log logger.ILogger, groupSeeder CustomerGroupSeeder) *Service {
-	return &Service{repo: repo, users: users, log: log, groupSeeder: groupSeeder}
+type Service struct {
+	repo            *Repository
+	users           user_repo.Querier
+	log             logger.ILogger
+	groupSeeder     CustomerGroupSeeder
+	catalogSeeder   DemoCatalogSeeder
+}
+
+func NewService(repo *Repository, users user_repo.Querier, log logger.ILogger, groupSeeder CustomerGroupSeeder, catalogSeeder DemoCatalogSeeder) *Service {
+	return &Service{repo: repo, users: users, log: log, groupSeeder: groupSeeder, catalogSeeder: catalogSeeder}
 }
 
 type CreateTenantRequest struct {
-	Code             string  `json:"code" validate:"required,min=2,max=32"`
-	Name             string  `json:"name" validate:"required,min=2,max=150"`
-	DataPlane        string  `json:"data_plane,omitempty" validate:"omitempty,oneof=shared dedicated"`
-	DatabaseDSNKey   *string `json:"database_dsn_key,omitempty" validate:"omitempty,max=64"`
+	Code               string  `json:"code" validate:"required,min=2,max=32"`
+	Name               string  `json:"name" validate:"required,min=2,max=150"`
+	DataPlane          string  `json:"data_plane,omitempty" validate:"omitempty,oneof=shared dedicated"`
+	DatabaseDSNKey     *string `json:"database_dsn_key,omitempty" validate:"omitempty,max=64"`
+	MarketCode         string  `json:"market_code,omitempty" validate:"omitempty,max=8"`
+	BusinessVertical   string  `json:"business_vertical,omitempty" validate:"omitempty,max=32"`
+	SeedDemo           *bool   `json:"seed_demo,omitempty"`
 }
 
 type UpdateTenantRequest struct {
@@ -82,7 +92,22 @@ func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary,
 			dsnKey = &k
 		}
 	}
-	row, err := s.repo.Create(ctx, id, code, name, plane, dsnKey)
+	market := strings.ToLower(strings.TrimSpace(req.MarketCode))
+	if market == "" {
+		market = "vn"
+	}
+	vertical := strings.ToLower(strings.TrimSpace(req.BusinessVertical))
+	if vertical == "" {
+		vertical = "multi"
+	}
+	seedDemo := true
+	if req.SeedDemo != nil {
+		seedDemo = *req.SeedDemo
+	}
+	if seedDemo && !catalog.Validate(market, vertical) {
+		return Summary{}, fmt.Errorf("%w: invalid market_code or business_vertical for demo seed", common.ErrBadRequest)
+	}
+	row, err := s.repo.Create(ctx, id, code, name, plane, dsnKey, market, vertical)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
@@ -96,10 +121,20 @@ func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary,
 			s.log.Warnf("seed customer groups for tenant %s: %v", row.ID, err)
 		}
 	}
+	if seedDemo && s.catalogSeeder != nil {
+		if err := s.catalogSeeder.SeedDemoCatalog(ctx, row.ID, market, vertical); err != nil {
+			s.log.Warnf("seed demo catalog for tenant %s (%s/%s): %v", row.ID, market, vertical, err)
+		}
+	}
+	return summaryFromRow(row), nil
+}
+
+func summaryFromRow(row Row) Summary {
 	return Summary{
 		ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive,
 		DataPlane: row.DataPlane, DatabaseDSNKey: row.DatabaseDSNKey,
-	}, nil
+		MarketCode: row.MarketCode, BusinessVertical: row.BusinessVertical,
+	}
 }
 
 type CreateTenantMemberRequest struct {
@@ -122,10 +157,7 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateTenantRequ
 		s.log.Errorf("Update tenant: %v", err)
 		return Summary{}, common.ErrInternal
 	}
-	return Summary{
-		ID: row.ID, Code: row.Code, Name: row.Name, IsActive: row.IsActive,
-		DataPlane: row.DataPlane, DatabaseDSNKey: row.DatabaseDSNKey,
-	}, nil
+	return summaryFromRow(row), nil
 }
 
 func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {

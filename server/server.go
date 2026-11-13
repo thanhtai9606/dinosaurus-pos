@@ -44,6 +44,7 @@ import (
 	"dinosaurus-pos/pkg/cache"
 	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
 	"dinosaurus-pos/pkg/database"
+	"dinosaurus-pos/pkg/database/seeder/catalog"
 	"dinosaurus-pos/pkg/escpos"
 	"dinosaurus-pos/pkg/logger"
 	"dinosaurus-pos/pkg/payment"
@@ -219,7 +220,8 @@ func BuildAppContainer(app *App) *AppContainer {
 	customerGroupService := customergroups.NewService(customerGroupRepo, app.Logger)
 	customerGroupHandler := customergroups.NewHandler(customerGroupService, app.Logger)
 
-	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger, customerGroupService)
+	tenantCatalogSeeder := catalog.NewTenantCatalogSeeder(tenantDB, app.R2, app.Logger)
+	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger, customerGroupService, tenantCatalogSeeder)
 	tenantLookupCache := tenants.NewLookupCache(app.RedisCache)
 	tenantHandler := tenants.NewHandler(tenantRepo, tenantService, app.Logger, platformAudit, tenantLookupCache, platformOverviewCache)
 	userService := user.NewUsrService(userRepo, tenantRepo, app.Logger, activityService, userAvatarRepo)

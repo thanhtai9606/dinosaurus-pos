@@ -14,8 +14,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AppModal } from '@/components/common/AppModal'
 import type { TenantAdmin } from '@/lib/api/query/tenantsAdmin'
+import { useTenantOnboardingOptionsQuery } from '@/lib/api/query/tenantsAdmin'
 import { TenantUsersTab } from '@/components/tenants/TenantUsersTab'
 import { isValidTenantCode, stripTenantCodeInput } from '@/lib/tenantCode'
+import { Checkbox } from '@/components/ui/checkbox'
 
 export type TenantFormValues = {
   code: string
@@ -23,6 +25,9 @@ export type TenantFormValues = {
   is_active: boolean
   data_plane: 'shared' | 'dedicated'
   database_dsn_key: string
+  market_code: string
+  business_vertical: string
+  seed_demo: boolean
 }
 
 type Props = {
@@ -51,7 +56,12 @@ export function TenantFormDialog({
   const [isActive, setIsActive] = useState(true)
   const [dataPlane, setDataPlane] = useState<'shared' | 'dedicated'>('shared')
   const [dsnKey, setDsnKey] = useState('')
+  const [marketCode, setMarketCode] = useState('vn')
+  const [businessVertical, setBusinessVertical] = useState('multi')
+  const [seedDemo, setSeedDemo] = useState(true)
   const [codeError, setCodeError] = useState<string | null>(null)
+
+  const onboardingQuery = useTenantOnboardingOptionsQuery(marketCode, open && mode === 'create')
 
   useEffect(() => {
     if (!open) return
@@ -68,9 +78,15 @@ export function TenantFormDialog({
       setIsActive(true)
       setDataPlane('shared')
       setDsnKey('')
+      setMarketCode('vn')
+      setBusinessVertical('multi')
+      setSeedDemo(true)
       setCodeError(null)
     }
   }, [open, mode, tenant, defaultTab])
+
+  const verticals = onboardingQuery.data?.verticals ?? []
+  const markets = onboardingQuery.data?.markets ?? [{ code: 'vn', label_key: 'tenants_admin.market_vn' }]
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,6 +101,9 @@ export function TenantFormDialog({
       is_active: isActive,
       data_plane: dataPlane,
       database_dsn_key: dsnKey.trim(),
+      market_code: marketCode,
+      business_vertical: businessVertical,
+      seed_demo: seedDemo,
     })
   }
 
@@ -153,6 +172,60 @@ export function TenantFormDialog({
             </div>
             {mode === 'create' && (
               <>
+                <div className="space-y-2">
+                  <Label>{t('tenants_admin.market')}</Label>
+                  <Select
+                    value={marketCode}
+                    onValueChange={(v) => {
+                      setMarketCode(v)
+                      setBusinessVertical('multi')
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {markets.map((m) => (
+                        <SelectItem key={m.code} value={m.code}>
+                          {t(m.label_key)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>{t('tenants_admin.business_vertical')}</Label>
+                  <Select value={businessVertical} onValueChange={setBusinessVertical}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {verticals.map((v) => (
+                        <SelectItem key={v.id} value={v.id}>
+                          {t(v.label_key)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {verticals.find((v) => v.id === businessVertical)?.description_key && (
+                    <p className="text-xs text-muted-foreground">
+                      {t(verticals.find((v) => v.id === businessVertical)!.description_key)}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-start gap-3 rounded-lg border p-3">
+                  <Checkbox
+                    id="tenant-seed-demo"
+                    checked={seedDemo}
+                    onCheckedChange={(v) => setSeedDemo(v === true)}
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="tenant-seed-demo" className="cursor-pointer font-medium">
+                      {t('tenants_admin.seed_demo')}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">{t('tenants_admin.seed_demo_help')}</p>
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <Label>{t('tenants_admin.data_plane')}</Label>
                   <Select

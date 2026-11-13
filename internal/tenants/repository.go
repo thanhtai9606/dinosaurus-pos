@@ -13,12 +13,14 @@ import (
 )
 
 type Row struct {
-	ID             uuid.UUID
-	Code           string
-	Name           string
-	IsActive       bool
-	DataPlane      string
-	DatabaseDSNKey *string
+	ID               uuid.UUID
+	Code             string
+	Name             string
+	IsActive         bool
+	DataPlane        string
+	DatabaseDSNKey   *string
+	MarketCode       string
+	BusinessVertical string
 }
 
 type Repository struct {
@@ -29,13 +31,19 @@ func NewRepository(pool *pgxpool.Pool) *Repository {
 	return &Repository{pool: pool}
 }
 
-const tenantRowSelect = `id, code, name, is_active, data_plane::text, database_dsn_key`
+const tenantRowSelect = `id, code, name, is_active, data_plane::text, database_dsn_key, market_code, business_vertical`
 
 func scanTenantRow(row pgx.Row) (Row, error) {
 	var out Row
-	err := row.Scan(&out.ID, &out.Code, &out.Name, &out.IsActive, &out.DataPlane, &out.DatabaseDSNKey)
+	err := row.Scan(&out.ID, &out.Code, &out.Name, &out.IsActive, &out.DataPlane, &out.DatabaseDSNKey, &out.MarketCode, &out.BusinessVertical)
 	if out.DataPlane == "" {
 		out.DataPlane = "shared"
+	}
+	if out.MarketCode == "" {
+		out.MarketCode = "vn"
+	}
+	if out.BusinessVertical == "" {
+		out.BusinessVertical = "multi"
 	}
 	return out, err
 }
@@ -58,7 +66,7 @@ func (r *Repository) RoutingForTenant(ctx context.Context, tenantID uuid.UUID) (
 
 func (r *Repository) ListForUser(ctx context.Context, userID uuid.UUID) ([]Row, error) {
 	const q = `
-SELECT t.id, t.code, t.name, t.is_active, t.data_plane::text, t.database_dsn_key
+SELECT t.id, t.code, t.name, t.is_active, t.data_plane::text, t.database_dsn_key, t.market_code, t.business_vertical
 FROM tenants t
 JOIN tenant_users tu ON tu.tenant_id = t.id
 WHERE tu.user_id = $1 AND t.is_active = true
@@ -150,15 +158,21 @@ func (r *Repository) ListAll(ctx context.Context) ([]Row, error) {
 	return out, rows.Err()
 }
 
-func (r *Repository) Create(ctx context.Context, id uuid.UUID, code, name, dataPlane string, dsnKey *string) (Row, error) {
+func (r *Repository) Create(ctx context.Context, id uuid.UUID, code, name, dataPlane string, dsnKey *string, marketCode, businessVertical string) (Row, error) {
 	if dataPlane == "" {
 		dataPlane = "shared"
 	}
+	if marketCode == "" {
+		marketCode = "vn"
+	}
+	if businessVertical == "" {
+		businessVertical = "multi"
+	}
 	const q = `
-INSERT INTO tenants (id, code, name, is_active, data_plane, database_dsn_key)
-VALUES ($1, $2, $3, true, $4::tenant_data_plane, $5)
+INSERT INTO tenants (id, code, name, is_active, data_plane, database_dsn_key, market_code, business_vertical)
+VALUES ($1, $2, $3, true, $4::tenant_data_plane, $5, $6, $7)
 RETURNING ` + tenantRowSelect
-	return scanTenantRow(r.pool.QueryRow(ctx, q, id, code, name, dataPlane, dsnKey))
+	return scanTenantRow(r.pool.QueryRow(ctx, q, id, code, name, dataPlane, dsnKey, marketCode, businessVertical))
 }
 
 type MemberRow struct {

@@ -6,6 +6,7 @@ import (
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/platformaudit"
 	"dinosaurus-pos/internal/tenant"
+	"dinosaurus-pos/pkg/database/seeder/catalog"
 	"dinosaurus-pos/pkg/logger"
 
 	"github.com/gofiber/fiber/v3"
@@ -117,6 +118,14 @@ func (h *Handler) ListMine(c fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "failed to list tenants"})
 	}
 	return c.JSON(common.SuccessResponse{Message: "ok", Data: Summaries(rows)})
+}
+
+func (h *Handler) OnboardingOptions(c fiber.Ctx) error {
+	market := c.Query("market", "vn")
+	return c.JSON(common.SuccessResponse{
+		Message: "ok",
+		Data:    catalog.OnboardingOptions(market),
+	})
 }
 
 func (h *Handler) ListAll(c fiber.Ctx) error {

@@ -107,6 +107,11 @@
         "date": "Ngày",
         "transactions": "Giao dịch",
         "product": "Sản phẩm",
+        "products_menu": "Sản phẩm",
+        "products": "Danh sách SP",
+        "product_groups": "Nhóm sản phẩm",
+        "product_units": "Đơn vị",
+        "price_lists": "Bảng giá",
         "promotions": "Mã giảm giá",
         "reports": "Báo cáo",
         "users": "Người dùng",
@@ -1504,6 +1509,21 @@
             "deleting": "Đang xóa...",
             "delete_confirm": "Delete (Xóa)"
         }
+    },
+    "product_groups": {
+        "title": "Nhóm sản phẩm",
+        "description": "Danh mục / nhóm để phân loại sản phẩm trên POS và báo cáo."
+    },
+    "price_lists": {
+        "title": "Bảng giá",
+        "description": "Xuất và nhập giá bán hàng loạt (Excel).",
+        "card_title": "Giá bán sản phẩm",
+        "card_description": "Tải mẫu, chỉnh file Excel và import lại; hoặc xuất giá hiện tại."
+    },
+    "product_units_page": {
+        "title": "Đơn vị bán",
+        "description": "Đơn vị cơ sở, SKU và barcode trên từng sản phẩm. Thêm đơn vị quy đổi trong form sửa sản phẩm.",
+        "open_products": "Mở danh sách sản phẩm"
     },
     "customerGroups": {
         "title": "Nhóm khách hàng",

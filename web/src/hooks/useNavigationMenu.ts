@@ -23,6 +23,8 @@ import {
     Server,
     ScrollText,
     Tags,
+    Scale,
+    BadgeDollarSign,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
@@ -160,11 +162,36 @@ export function useNavigationMenu(userRole?: string) {
             ],
         },
         {
-            type: 'link',
-            label: t('sidebar.product'),
+            type: 'group',
+            label: t('sidebar.products_menu'),
             icon: Package,
-            to: '/product',
             allowedRoles: cashierRoles,
+            children: [
+                {
+                    label: t('sidebar.products'),
+                    icon: Package,
+                    to: '/product',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.product_groups'),
+                    icon: Tags,
+                    to: '/product-groups',
+                    allowedRoles: managerRoles,
+                },
+                {
+                    label: t('sidebar.product_units'),
+                    icon: Scale,
+                    to: '/product-units',
+                    allowedRoles: managerRoles,
+                },
+                {
+                    label: t('sidebar.price_lists'),
+                    icon: BadgeDollarSign,
+                    to: '/price-lists',
+                    allowedRoles: managerRoles,
+                },
+            ],
         },
         {
             type: 'link',

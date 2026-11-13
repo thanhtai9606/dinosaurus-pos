@@ -21,7 +21,10 @@ import { Route as DashboardCustomerGroupsRouteImport } from './routes/_dashboard
 import { Route as DashboardCustomersRouteImport } from './routes/_dashboard.customers'
 import { Route as DashboardInventoryRouteImport } from './routes/_dashboard.inventory'
 import { Route as DashboardOrderRouteImport } from './routes/_dashboard.order'
+import { Route as DashboardPriceListsRouteImport } from './routes/_dashboard.price-lists'
 import { Route as DashboardProductRouteImport } from './routes/_dashboard.product'
+import { Route as DashboardProductGroupsRouteImport } from './routes/_dashboard.product-groups'
+import { Route as DashboardProductUnitsRouteImport } from './routes/_dashboard.product-units'
 import { Route as DashboardPromotionsRouteImport } from './routes/_dashboard.promotions'
 import { Route as DashboardReportsRouteImport } from './routes/_dashboard.reports'
 import { Route as DashboardRetailPosRouteImport } from './routes/_dashboard.retail-pos'
@@ -99,9 +102,24 @@ const DashboardOrderRoute = DashboardOrderRouteImport.update({
   path: '/order',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPriceListsRoute = DashboardPriceListsRouteImport.update({
+  id: '/price-lists',
+  path: '/price-lists',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProductRoute = DashboardProductRouteImport.update({
   id: '/product',
   path: '/product',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProductGroupsRoute = DashboardProductGroupsRouteImport.update({
+  id: '/product-groups',
+  path: '/product-groups',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardProductUnitsRoute = DashboardProductUnitsRouteImport.update({
+  id: '/product-units',
+  path: '/product-units',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardPromotionsRoute = DashboardPromotionsRouteImport.update({
@@ -204,7 +222,10 @@ export interface FileRoutesByFullPath {
   '/customers': typeof DashboardCustomersRoute
   '/inventory': typeof DashboardInventoryRoute
   '/order': typeof DashboardOrderRoute
+  '/price-lists': typeof DashboardPriceListsRoute
   '/product': typeof DashboardProductRoute
+  '/product-groups': typeof DashboardProductGroupsRoute
+  '/product-units': typeof DashboardProductUnitsRoute
   '/promotions': typeof DashboardPromotionsRoute
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
@@ -234,7 +255,10 @@ export interface FileRoutesByTo {
   '/customers': typeof DashboardCustomersRoute
   '/inventory': typeof DashboardInventoryRoute
   '/order': typeof DashboardOrderRoute
+  '/price-lists': typeof DashboardPriceListsRoute
   '/product': typeof DashboardProductRoute
+  '/product-groups': typeof DashboardProductGroupsRoute
+  '/product-units': typeof DashboardProductUnitsRoute
   '/promotions': typeof DashboardPromotionsRoute
   '/reports': typeof DashboardReportsRoute
   '/retail-pos': typeof DashboardRetailPosRoute
@@ -267,7 +291,10 @@ export interface FileRoutesById {
   '/_dashboard/customers': typeof DashboardCustomersRoute
   '/_dashboard/inventory': typeof DashboardInventoryRoute
   '/_dashboard/order': typeof DashboardOrderRoute
+  '/_dashboard/price-lists': typeof DashboardPriceListsRoute
   '/_dashboard/product': typeof DashboardProductRoute
+  '/_dashboard/product-groups': typeof DashboardProductGroupsRoute
+  '/_dashboard/product-units': typeof DashboardProductUnitsRoute
   '/_dashboard/promotions': typeof DashboardPromotionsRoute
   '/_dashboard/reports': typeof DashboardReportsRoute
   '/_dashboard/retail-pos': typeof DashboardRetailPosRoute
@@ -301,7 +328,10 @@ export interface FileRouteTypes {
     | '/customers'
     | '/inventory'
     | '/order'
+    | '/price-lists'
     | '/product'
+    | '/product-groups'
+    | '/product-units'
     | '/promotions'
     | '/reports'
     | '/retail-pos'
@@ -331,7 +361,10 @@ export interface FileRouteTypes {
     | '/customers'
     | '/inventory'
     | '/order'
+    | '/price-lists'
     | '/product'
+    | '/product-groups'
+    | '/product-units'
     | '/promotions'
     | '/reports'
     | '/retail-pos'
@@ -363,7 +396,10 @@ export interface FileRouteTypes {
     | '/_dashboard/customers'
     | '/_dashboard/inventory'
     | '/_dashboard/order'
+    | '/_dashboard/price-lists'
     | '/_dashboard/product'
+    | '/_dashboard/product-groups'
+    | '/_dashboard/product-units'
     | '/_dashboard/promotions'
     | '/_dashboard/reports'
     | '/_dashboard/retail-pos'
@@ -476,11 +512,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOrderRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/price-lists': {
+      id: '/_dashboard/price-lists'
+      path: '/price-lists'
+      fullPath: '/price-lists'
+      preLoaderRoute: typeof DashboardPriceListsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/product': {
       id: '/_dashboard/product'
       path: '/product'
       fullPath: '/product'
       preLoaderRoute: typeof DashboardProductRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/product-groups': {
+      id: '/_dashboard/product-groups'
+      path: '/product-groups'
+      fullPath: '/product-groups'
+      preLoaderRoute: typeof DashboardProductGroupsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/product-units': {
+      id: '/_dashboard/product-units'
+      path: '/product-units'
+      fullPath: '/product-units'
+      preLoaderRoute: typeof DashboardProductUnitsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/promotions': {
@@ -638,7 +695,10 @@ interface DashboardRouteChildren {
   DashboardCustomersRoute: typeof DashboardCustomersRoute
   DashboardInventoryRoute: typeof DashboardInventoryRoute
   DashboardOrderRoute: typeof DashboardOrderRoute
+  DashboardPriceListsRoute: typeof DashboardPriceListsRoute
   DashboardProductRoute: typeof DashboardProductRoute
+  DashboardProductGroupsRoute: typeof DashboardProductGroupsRoute
+  DashboardProductUnitsRoute: typeof DashboardProductUnitsRoute
   DashboardPromotionsRoute: typeof DashboardPromotionsRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardRetailPosRoute: typeof DashboardRetailPosRoute
@@ -666,7 +726,10 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardCustomersRoute: DashboardCustomersRoute,
   DashboardInventoryRoute: DashboardInventoryRoute,
   DashboardOrderRoute: DashboardOrderRoute,
+  DashboardPriceListsRoute: DashboardPriceListsRoute,
   DashboardProductRoute: DashboardProductRoute,
+  DashboardProductGroupsRoute: DashboardProductGroupsRoute,
+  DashboardProductUnitsRoute: DashboardProductUnitsRoute,
   DashboardPromotionsRoute: DashboardPromotionsRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardRetailPosRoute: DashboardRetailPosRoute,

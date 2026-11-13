@@ -107,6 +107,11 @@
         "date": "Tanggal",
         "transactions": "Transaksi",
         "product": "Produk",
+        "products_menu": "Produk",
+        "products": "Daftar produk",
+        "product_groups": "Grup produk",
+        "product_units": "Satuan",
+        "price_lists": "Daftar harga",
         "promotions": "Promosi",
         "reports": "Laporan",
         "users": "Pengguna",
@@ -1485,6 +1490,21 @@
             "deleting": "Menghapus...",
             "delete_confirm": "Hapus"
         }
+    },
+    "product_groups": {
+        "title": "Grup produk",
+        "description": "Kategori untuk mengelompokkan produk di POS dan laporan."
+    },
+    "price_lists": {
+        "title": "Daftar harga",
+        "description": "Ekspor dan impor harga jual massal (Excel).",
+        "card_title": "Harga jual produk",
+        "card_description": "Unduh template, edit Excel, impor; atau ekspor harga saat ini."
+    },
+    "product_units_page": {
+        "title": "Satuan jual",
+        "description": "Satuan dasar, SKU dan barcode per produk. Tambah satuan konversi di editor produk.",
+        "open_products": "Buka daftar produk"
     },
     "customerGroups": {
         "title": "Grup pelanggan",

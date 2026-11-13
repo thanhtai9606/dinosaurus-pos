@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Ban, Tag, CreditCard, Palette, Printer, DollarSign, FileText, SlidersHorizontal } from 'lucide-react'
+import { Ban, CreditCard, Palette, Printer, DollarSign, FileText, SlidersHorizontal } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CancellationReasonsCard } from "@/components/settings/CancellationReasonsCard.tsx";
-import { CategoriesCard } from "@/components/settings/CategoriesCard.tsx";
 import { PaymentMethodsCard } from "@/components/settings/PaymentMethodsCard.tsx";
 import { BrandingSettingsCard } from "@/components/settings/BrandingSettingsCard.tsx";
 import { PrinterSettingsCard } from "@/components/settings/PrinterSettingsCard.tsx";
@@ -24,7 +23,6 @@ function SettingsPage() {
     
     const { canAccessApi } = useRBAC()
     const canViewCancellations = canAccessApi('GET', '/cancellation-reasons')
-    const canViewCategories = canAccessApi('GET', '/categories')
     const canViewPaymentMethods = canAccessApi('GET', '/payment-methods')
     const canViewBranding = canAccessApi('GET', '/settings/branding')
     const canViewPrinter = canAccessApi('GET', '/settings/printer')
@@ -45,13 +43,6 @@ function SettingsPage() {
                         <TabsTrigger value="cancellation" className="flex items-center gap-2">
                             <Ban className="h-4 w-4" />
                             {t('settings.tabs.cancellation')}
-                        </TabsTrigger>
-                    )}
-
-                    {canViewCategories && (
-                        <TabsTrigger value="category" className="flex items-center gap-2">
-                            <Tag className="h-4 w-4" />
-                            {t('settings.tabs.category')}
                         </TabsTrigger>
                     )}
 
@@ -98,13 +89,6 @@ function SettingsPage() {
                     <TabsContent value="cancellation">
                         <div className="grid gap-6">
                             <CancellationReasonsCard />
-                        </div>
-                    </TabsContent>
-                )}
-                {canViewCategories && (
-                    <TabsContent value="category">
-                        <div className="grid gap-6">
-                            <CategoriesCard />
                         </div>
                     </TabsContent>
                 )}

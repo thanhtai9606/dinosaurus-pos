@@ -8,6 +8,7 @@ export const LIST_SCOPES = {
     transactions: 'transactions',
     promotions: 'promotions',
     products: 'products',
+    productUnits: 'product-units',
     salesOrders: 'sales-orders',
     inventory: 'inventory',
     activityLogs: 'activity-logs',

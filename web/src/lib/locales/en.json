@@ -105,6 +105,11 @@
         "date": "Date",
         "transactions": "Transactions",
         "product": "Product",
+        "products_menu": "Products",
+        "products": "Product list",
+        "product_groups": "Product groups",
+        "product_units": "Units",
+        "price_lists": "Price lists",
         "promotions": "Promotions",
         "reports": "Reports",
         "users": "Users",
@@ -1497,6 +1502,21 @@
             "deleting": "Deleting...",
             "delete_confirm": "Delete"
         }
+    },
+    "product_groups": {
+        "title": "Product groups",
+        "description": "Categories to organize products for POS and reports."
+    },
+    "price_lists": {
+        "title": "Price lists",
+        "description": "Bulk export and import of selling prices (Excel).",
+        "card_title": "Product selling prices",
+        "card_description": "Download template, edit Excel, import; or export current prices."
+    },
+    "product_units_page": {
+        "title": "Sale units",
+        "description": "Base unit, SKU and barcode per product. Add conversion units in the product editor.",
+        "open_products": "Open product list"
     },
     "customerGroups": {
         "title": "Customer groups",

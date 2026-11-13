@@ -11,11 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Download, Loader2, PackagePlus, Upload } from 'lucide-react'
-import { ProductPriceImportDialog } from '@/components/inventory/ProductPriceImportDialog'
-import { downloadAuthenticatedFile } from '@/lib/api/downloadBlob'
-import { toast } from 'sonner'
-import { useRBAC } from '@/lib/auth/rbac'
+import { PackagePlus } from 'lucide-react'
 
 type InventoryList = {
     products: Array<{
@@ -65,11 +61,6 @@ function InventoryPage() {
         [page, limit, lowStockOnly],
     )
     const { data } = useQuery(inventoryQueryOptions(listParams))
-    const [importOpen, setImportOpen] = useState(false)
-    const [exporting, setExporting] = useState(false)
-    const { canAccessApi } = useRBAC()
-    const canExport = canAccessApi('GET', '/products/export-prices')
-
     return (
         <div className="space-y-4 p-4">
             <Card>
@@ -79,34 +70,6 @@ function InventoryPage() {
                         <CardDescription>{t('inventory.description')}</CardDescription>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        {canExport && (
-                            <Button
-                                variant="outline"
-                                disabled={exporting}
-                                onClick={async () => {
-                                    setExporting(true)
-                                    try {
-                                        await downloadAuthenticatedFile('/products/export-prices', 'product_prices_export.xlsx')
-                                        toast.success(t('exportPrices.success'))
-                                    } catch {
-                                        toast.error(t('exportPrices.failed'))
-                                    } finally {
-                                        setExporting(false)
-                                    }
-                                }}
-                            >
-                                {exporting ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Download className="mr-2 h-4 w-4" />
-                                )}
-                                {t('exportPrices.title')}
-                            </Button>
-                        )}
-                        <Button variant="outline" onClick={() => setImportOpen(true)}>
-                            <Upload className="mr-2 h-4 w-4" />
-                            {t('importPrices.title')}
-                        </Button>
                         <Button asChild>
                             <Link to="/stock-receipts/new">
                                 <PackagePlus className="mr-2 h-4 w-4" />
@@ -157,7 +120,6 @@ function InventoryPage() {
                     ) : null}
                 </CardContent>
             </Card>
-            <ProductPriceImportDialog open={importOpen} onOpenChange={setImportOpen} />
         </div>
     )
 }

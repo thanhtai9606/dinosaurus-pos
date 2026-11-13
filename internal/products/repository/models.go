@@ -996,18 +996,20 @@ type ProductOption struct {
 }
 
 type ProductUnit struct {
-	ID           uuid.UUID          `json:"id"`
-	ProductID    uuid.UUID          `json:"product_id"`
-	Name         string             `json:"name"`
-	IsBase       bool               `json:"is_base"`
-	FactorToBase pgtype.Numeric     `json:"factor_to_base"`
-	SellPrice    int64              `json:"sell_price"`
-	Barcode      *string            `json:"barcode"`
-	Sku          *string            `json:"sku"`
-	SortOrder    int32              `json:"sort_order"`
-	CreatedAt    pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
-	DeletedAt    pgtype.Timestamptz `json:"deleted_at"`
+	ID                uuid.UUID          `json:"id"`
+	ProductID         uuid.UUID          `json:"product_id"`
+	MeasurementUnitID pgtype.UUID        `json:"measurement_unit_id"`
+	Name              string             `json:"name"`
+	IsBase            bool               `json:"is_base"`
+	FactorToBase      pgtype.Numeric     `json:"factor_to_base"`
+	SellPrice         int64              `json:"sell_price"`
+	WholesalePrice    int64              `json:"wholesale_price"`
+	Barcode           *string            `json:"barcode"`
+	Sku               *string            `json:"sku"`
+	SortOrder         int32              `json:"sort_order"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt         pgtype.Timestamptz `json:"deleted_at"`
 }
 
 type Promotion struct {

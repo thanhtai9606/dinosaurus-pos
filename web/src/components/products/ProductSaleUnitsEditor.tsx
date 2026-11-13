@@ -1,127 +1,196 @@
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Sparkles, Star, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import type { MeasurementUnit } from '@/lib/api/query/measurementUnits'
 import type { ProductSaleUnit } from '@/lib/retail-pos/productUnits'
 
 type Props = {
     units: ProductSaleUnit[]
     onChange: (units: ProductSaleUnit[]) => void
+    catalog: MeasurementUnit[]
     t: (key: string, fallback?: string) => string
 }
 
-function emptyAltUnit(sortOrder: number): ProductSaleUnit {
+function defaultBase(catalog: MeasurementUnit[]): ProductSaleUnit {
+    const pcs = catalog.find((c) => c.code === 'PCS') ?? catalog[0]
     return {
-        name: '',
+        measurement_unit_id: pcs?.id,
+        name: pcs?.name ?? 'pcs',
+        is_base: true,
+        factor_to_base: 1,
+        sell_price: 0,
+        wholesale_price: 0,
+        barcode: '',
+        sort_order: 0,
+    }
+}
+
+function emptyAlt(catalog: MeasurementUnit[], sortOrder: number, used: Set<string>): ProductSaleUnit {
+    const next = catalog.find((c) => !used.has(c.id))
+    return {
+        measurement_unit_id: next?.id,
+        name: next?.name ?? '',
         is_base: false,
         factor_to_base: 1,
         sell_price: 0,
+        wholesale_price: 0,
         barcode: '',
-        sku: '',
         sort_order: sortOrder,
     }
 }
 
-export function ProductSaleUnitsEditor({ units, onChange, t }: Props) {
-    const base = units.find((u) => u.is_base) ?? units[0]
-    const alts = units.filter((u) => !u.is_base)
+export function ProductSaleUnitsEditor({ units, onChange, catalog, t }: Props) {
+    const usedIds = () => new Set(units.map((u) => u.measurement_unit_id).filter(Boolean) as string[])
+    const catalogFor = (currentId?: string) =>
+        catalog.filter((c) => c.id === currentId || !usedIds().has(c.id))
 
-    const setBase = (patch: Partial<ProductSaleUnit>) => {
-        if (!base) return
-        const next = units.map((u) => (u.is_base ? { ...u, ...patch, factor_to_base: 1, is_base: true } : u))
+    const ensureBase = units.length > 0 ? units : [defaultBase(catalog)]
+
+    const patchUnit = (index: number, patch: Partial<ProductSaleUnit>) => {
+        const next = [...ensureBase]
+        const row = next[index]
+        if (!row) return
+        let updated = { ...row, ...patch }
+        if (patch.measurement_unit_id) {
+            const mu = catalog.find((c) => c.id === patch.measurement_unit_id)
+            if (mu) {
+                updated = { ...updated, name: mu.name, measurement_unit_code: mu.code }
+            }
+        }
+        if (updated.is_base) {
+            updated.factor_to_base = 1
+        }
+        next[index] = updated
         onChange(next)
     }
 
-    const setAlt = (index: number, patch: Partial<ProductSaleUnit>) => {
-        const target = alts[index]
-        if (!target) return
-        const next = units.map((u) => (u === target ? { ...u, ...patch, is_base: false } : u))
-        onChange(next)
+    const setAsBase = (index: number) => {
+        onChange(
+            ensureBase.map((u, i) => ({
+                ...u,
+                is_base: i === index,
+                factor_to_base: i === index ? 1 : u.factor_to_base > 0 ? u.factor_to_base : 1,
+            })),
+        )
     }
 
-    const addAlt = () => {
-        onChange([...units, emptyAltUnit(units.length)])
+    const addUnit = () => {
+        const used = usedIds()
+        onChange([...ensureBase, emptyAlt(catalog, ensureBase.length, used)])
     }
 
-    const removeAlt = (index: number) => {
-        const target = alts[index]
-        onChange(units.filter((u) => u !== target))
+    const removeUnit = (index: number) => {
+        const row = ensureBase[index]
+        if (row?.is_base) return
+        onChange(ensureBase.filter((_, i) => i !== index))
     }
 
-    if (!base) return null
+    if (catalog.length === 0) {
+        return (
+            <p className="text-sm text-muted-foreground rounded-md border p-4">
+                {t('products.sale_units.no_catalog', 'Add measurement units in Settings → Units first.')}
+            </p>
+        )
+    }
 
     return (
         <div className="space-y-4 rounded-lg border p-4">
             <p className="text-sm font-semibold">{t('products.sale_units.title')}</p>
             <p className="text-xs text-muted-foreground">{t('products.sale_units.hint')}</p>
 
-            <div className="grid gap-3 rounded-md bg-muted/30 p-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div>
-                    <Label>{t('products.sale_units.base_name')}</Label>
-                    <Input value={base.name} onChange={(e) => setBase({ name: e.target.value })} />
-                </div>
-                <div>
-                    <Label>{t('products.form.price')}</Label>
-                    <Input
-                        type="number"
-                        min={0}
-                        value={base.sell_price}
-                        onChange={(e) => setBase({ sell_price: Number(e.target.value) })}
-                    />
-                </div>
-                <div>
-                    <Label>{t('products.fields.barcode')}</Label>
-                    <Input value={base.barcode ?? ''} onChange={(e) => setBase({ barcode: e.target.value || null })} />
-                </div>
-                <div>
-                    <Label>{t('products.fields.sku')}</Label>
-                    <Input value={base.sku ?? ''} onChange={(e) => setBase({ sku: e.target.value || null })} />
-                </div>
-            </div>
-
-            {alts.map((row, index) => (
-                <div key={index} className="grid gap-3 rounded-md border p-3 sm:grid-cols-2 lg:grid-cols-6">
-                    <div>
-                        <Label>{t('products.sale_units.unit_name')}</Label>
-                        <Input value={row.name} onChange={(e) => setAlt(index, { name: e.target.value })} />
+            {ensureBase.map((row, index) => (
+                <div
+                    key={row.id ?? `${row.measurement_unit_id}-${index}`}
+                    className="grid gap-3 rounded-md border p-3 sm:grid-cols-2 lg:grid-cols-8"
+                >
+                    <div className="lg:col-span-2">
+                        <Label>{t('products.sale_units.measurement_unit')}</Label>
+                        <select
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            value={row.measurement_unit_id ?? ''}
+                            onChange={(e) => patchUnit(index, { measurement_unit_id: e.target.value })}
+                        >
+                            <option value="">{t('products.sale_units.pick_unit')}</option>
+                            {catalogFor(row.measurement_unit_id).map((c) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.code} — {c.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
+                    {!row.is_base ? (
+                        <div>
+                            <Label>{t('products.sale_units.factor')}</Label>
+                            <Input
+                                type="number"
+                                min={1}
+                                step="any"
+                                value={row.factor_to_base}
+                                onChange={(e) => patchUnit(index, { factor_to_base: Number(e.target.value) })}
+                            />
+                        </div>
+                    ) : (
+                        <div className="flex items-end text-xs text-muted-foreground pb-2">
+                            <Star className="mr-1 h-3 w-3 fill-amber-400 text-amber-400" />
+                            {t('products.sale_units.base_badge')}
+                        </div>
+                    )}
                     <div>
-                        <Label>{t('products.sale_units.factor')}</Label>
-                        <Input
-                            type="number"
-                            min={1}
-                            step="any"
-                            value={row.factor_to_base}
-                            onChange={(e) => setAlt(index, { factor_to_base: Number(e.target.value) })}
-                        />
-                    </div>
-                    <div>
-                        <Label>{t('products.form.price')}</Label>
+                        <Label>{t('products.sale_units.retail_price')}</Label>
                         <Input
                             type="number"
                             min={0}
                             value={row.sell_price}
-                            onChange={(e) => setAlt(index, { sell_price: Number(e.target.value) })}
+                            onChange={(e) => patchUnit(index, { sell_price: Number(e.target.value) })}
                         />
                     </div>
                     <div>
+                        <Label>{t('products.sale_units.wholesale_price')}</Label>
+                        <Input
+                            type="number"
+                            min={0}
+                            value={row.wholesale_price ?? 0}
+                            onChange={(e) => patchUnit(index, { wholesale_price: Number(e.target.value) })}
+                        />
+                    </div>
+                    <div className="lg:col-span-2">
                         <Label>{t('products.fields.barcode')}</Label>
-                        <Input value={row.barcode ?? ''} onChange={(e) => setAlt(index, { barcode: e.target.value || null })} />
+                        <div className="flex gap-2">
+                            <Input
+                                value={row.barcode ?? ''}
+                                onChange={(e) => patchUnit(index, { barcode: e.target.value || null })}
+                                placeholder={t('products.sale_units.barcode_placeholder')}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                title={t('products.sale_units.generate_barcode')}
+                                onClick={() => patchUnit(index, { barcode: null })}
+                            >
+                                <Sparkles className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1">{t('products.sale_units.barcode_hint')}</p>
                     </div>
-                    <div>
-                        <Label>{t('products.fields.sku')}</Label>
-                        <Input value={row.sku ?? ''} onChange={(e) => setAlt(index, { sku: e.target.value || null })} />
-                    </div>
-                    <div className="flex items-end">
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeAlt(index)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                    <div className="flex items-end gap-1">
+                        {!row.is_base && (
+                            <Button type="button" variant="ghost" size="icon" onClick={() => removeUnit(index)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                        )}
+                        {!row.is_base && (
+                            <Button type="button" variant="secondary" size="sm" onClick={() => setAsBase(index)}>
+                                {t('products.sale_units.set_base')}
+                            </Button>
+                        )}
                     </div>
                 </div>
             ))}
 
-            <Button type="button" variant="outline" size="sm" onClick={addAlt}>
-                <Plus className="mr-1 h-4 w-4" />
+            <Button type="button" variant="outline" size="sm" onClick={addUnit} disabled={usedIds().size >= catalog.length}>
+                <Plus className="mr-2 h-4 w-4" />
                 {t('products.sale_units.add')}
             </Button>
         </div>

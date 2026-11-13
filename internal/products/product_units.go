@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 
 	"dinosaurus-pos/internal/common"
 	products_repo "dinosaurus-pos/internal/products/repository"
@@ -29,16 +30,36 @@ func FloatFromNumeric(n pgtype.Numeric) float64 {
 }
 
 func mapProductUnit(u products_repo.ProductUnit) ProductSaleUnitResponse {
-	return ProductSaleUnitResponse{
-		ID:           u.ID,
-		Name:         u.Name,
-		IsBase:       u.IsBase,
-		FactorToBase: FloatFromNumeric(u.FactorToBase),
-		SellPrice:    float64(u.SellPrice),
-		Barcode:      u.Barcode,
-		Sku:          u.Sku,
-		SortOrder:    u.SortOrder,
+	var muID *uuid.UUID
+	var muCode *string
+	if u.MeasurementUnitID.Valid {
+		id := uuid.UUID(u.MeasurementUnitID.Bytes)
+		muID = &id
 	}
+	resp := ProductSaleUnitResponse{
+		ID:             u.ID,
+		MeasurementUnitID: muID,
+		Name:           u.Name,
+		IsBase:         u.IsBase,
+		FactorToBase:   FloatFromNumeric(u.FactorToBase),
+		SellPrice:      float64(u.SellPrice),
+		WholesalePrice: float64(u.WholesalePrice),
+		Barcode:        u.Barcode,
+		Sku:            u.Sku,
+		SortOrder:      u.SortOrder,
+	}
+	if muCode != nil {
+		resp.MeasurementUnitCode = muCode
+	}
+	return resp
+}
+
+func mapProductUnitWithCode(u products_repo.ProductUnit, code string) ProductSaleUnitResponse {
+	r := mapProductUnit(u)
+	if code != "" {
+		r.MeasurementUnitCode = &code
+	}
+	return r
 }
 
 func (s *PrdService) loadSaleUnits(ctx context.Context, productID uuid.UUID) ([]ProductSaleUnitResponse, error) {
@@ -48,7 +69,14 @@ func (s *PrdService) loadSaleUnits(ctx context.Context, productID uuid.UUID) ([]
 	}
 	out := make([]ProductSaleUnitResponse, 0, len(rows))
 	for _, row := range rows {
-		out = append(out, mapProductUnit(row))
+		code := ""
+		if row.MeasurementUnitID.Valid {
+			label, err := s.repo.GetMeasurementUnitLabel(ctx, uuid.UUID(row.MeasurementUnitID.Bytes))
+			if err == nil {
+				code = label.Code
+			}
+		}
+		out = append(out, mapProductUnitWithCode(row, code))
 	}
 	return out, nil
 }
@@ -66,15 +94,22 @@ func EnsureBaseProductUnit(ctx context.Context, qtx products_repo.Querier, produ
 	if unit == "" {
 		unit = "pcs"
 	}
+	barcode := product.Barcode
+	if barcode == nil || strings.TrimSpace(*barcode) == "" {
+		generated := generateProductUnitBarcode(product.ID, 0)
+		barcode = &generated
+	}
 	_, err = qtx.CreateProductUnit(ctx, products_repo.CreateProductUnitParams{
-		ProductID:    product.ID,
-		Name:         unit,
-		IsBase:       true,
-		FactorToBase: numericFromFloat(1),
-		SellPrice:    product.Price,
-		Barcode:      product.Barcode,
-		Sku:          product.Sku,
-		SortOrder:    0,
+		ProductID:         product.ID,
+		MeasurementUnitID: pgtype.UUID{Valid: false},
+		Name:              unit,
+		IsBase:            true,
+		FactorToBase:      numericFromFloat(1),
+		SellPrice:         product.Price,
+		WholesalePrice:    0,
+		Barcode:           barcode,
+		Sku:               product.Sku,
+		SortOrder:         0,
 	})
 	return err
 }
@@ -93,7 +128,15 @@ func (s *PrdService) ReplaceSaleUnits(ctx context.Context, productID uuid.UUID, 
 	}
 
 	baseCount := 0
+	seenUnits := map[uuid.UUID]struct{}{}
 	for _, u := range req.Units {
+		if u.MeasurementUnitID == uuid.Nil {
+			return nil, fmt.Errorf("measurement_unit_id is required")
+		}
+		if _, dup := seenUnits[u.MeasurementUnitID]; dup {
+			return nil, fmt.Errorf("duplicate measurement unit on product")
+		}
+		seenUnits[u.MeasurementUnitID] = struct{}{}
 		if u.IsBase {
 			baseCount++
 		}
@@ -101,7 +144,7 @@ func (s *PrdService) ReplaceSaleUnits(ctx context.Context, productID uuid.UUID, 
 			return nil, fmt.Errorf("base unit factor must be 1")
 		}
 		if !u.IsBase && u.FactorToBase < 1 {
-			return nil, fmt.Errorf("invalid factor for %s", u.Name)
+			return nil, fmt.Errorf("invalid factor for unit")
 		}
 	}
 	if baseCount != 1 {
@@ -115,29 +158,51 @@ func (s *PrdService) ReplaceSaleUnits(ctx context.Context, productID uuid.UUID, 
 		}
 		var basePrice int64
 		var baseUnitName string
-		for _, u := range req.Units {
-			if u.IsBase {
-				basePrice = int64(u.SellPrice)
-				baseUnitName = u.Name
+		var baseBarcode *string
+		for i, u := range req.Units {
+			label, err := qtx.GetMeasurementUnitLabel(ctx, u.MeasurementUnitID)
+			if err != nil {
+				if errors.Is(err, pgx.ErrNoRows) {
+					return fmt.Errorf("measurement unit not found")
+				}
+				return err
 			}
-			_, err := qtx.CreateProductUnit(ctx, products_repo.CreateProductUnitParams{
-				ProductID:    productID,
-				Name:         u.Name,
-				IsBase:       u.IsBase,
-				FactorToBase: numericFromFloat(u.FactorToBase),
-				SellPrice:    int64(u.SellPrice),
-				Barcode:      u.Barcode,
-				Sku:          u.Sku,
-				SortOrder:    u.SortOrder,
+			unitName := label.Name
+			barcode := u.Barcode
+			if barcode == nil || strings.TrimSpace(*barcode) == "" {
+				generated := generateProductUnitBarcode(productID, int32(i))
+				barcode = &generated
+			}
+			mu := pgtype.UUID{Bytes: u.MeasurementUnitID, Valid: true}
+			_, err = qtx.CreateProductUnit(ctx, products_repo.CreateProductUnitParams{
+				ProductID:         productID,
+				MeasurementUnitID: mu,
+				Name:              unitName,
+				IsBase:            u.IsBase,
+				FactorToBase:      numericFromFloat(u.FactorToBase),
+				SellPrice:         int64(u.SellPrice),
+				WholesalePrice:    int64(u.WholesalePrice),
+				Barcode:           barcode,
+				Sku:               u.Sku,
+				SortOrder:         u.SortOrder,
 			})
 			if err != nil {
 				return err
 			}
+			if u.IsBase {
+				basePrice = int64(u.SellPrice)
+				baseUnitName = label.Code
+				if baseUnitName == "" {
+					baseUnitName = unitName
+				}
+				baseBarcode = barcode
+			}
 		}
 		_, err := qtx.UpdateProduct(ctx, products_repo.UpdateProductParams{
-			ID:    productID,
-			Price: &basePrice,
-			Unit:  &baseUnitName,
+			ID:      productID,
+			Price:   &basePrice,
+			Unit:    &baseUnitName,
+			Barcode: baseBarcode,
 		})
 		return err
 	})

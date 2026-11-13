@@ -33,18 +33,25 @@ WHERE product_id = $1
   AND deleted_at IS NULL
 LIMIT 1;
 
+-- name: GetMeasurementUnitLabel :one
+SELECT code, name
+FROM measurement_units
+WHERE id = $1 AND deleted_at IS NULL;
+
 -- name: CreateProductUnit :one
 INSERT INTO product_units (
     product_id,
+    measurement_unit_id,
     name,
     is_base,
     factor_to_base,
     sell_price,
+    wholesale_price,
     barcode,
     sku,
     sort_order
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 ) RETURNING *;
 
 -- name: SoftDeleteProductUnitsByProduct :exec

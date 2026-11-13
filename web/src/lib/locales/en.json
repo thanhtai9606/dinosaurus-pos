@@ -1022,7 +1022,8 @@
             "error_delete_variant": "Cannot delete existing variants (API limitation)",
             "tab_details": "Details",
             "tab_history": "History",
-            "cost_price": "Cost Price"
+            "cost_price": "Cost Price",
+            "code_auto": "Product code (P-code) is generated automatically when you save."
         },
         "messages": {
             "create_success": "Product created successfully",
@@ -1053,12 +1054,20 @@
             "no_supplier": "None"
         },
         "sale_units": {
-            "title": "Sale units & conversion",
-            "hint": "Stock is tracked in the base unit. Other units (case, pack…) have their own factor, price, and barcode.",
-            "base_name": "Base unit",
-            "unit_name": "Unit name",
+            "title": "Product sale units",
+            "hint": "Pick units from the catalog. Each unit has its own barcode (scan or auto-generated), retail and wholesale price, and conversion to the base unit for stock.",
+            "measurement_unit": "Unit",
+            "pick_unit": "Select unit…",
             "factor": "Conversion (× base)",
-            "add": "Add unit"
+            "retail_price": "Retail price",
+            "wholesale_price": "Wholesale price",
+            "base_badge": "Base unit",
+            "set_base": "Set as base",
+            "generate_barcode": "Clear to auto-generate barcode",
+            "barcode_placeholder": "Scan or type",
+            "barcode_hint": "Leave empty and save to generate a 13-digit code.",
+            "add": "Add unit",
+            "no_catalog": "Create measurement units under the Units menu first."
         },
         "stock_history": {
             "no_history": "No stock history found.",
@@ -1525,7 +1534,7 @@
     },
     "product_units_page": {
         "title": "Units of measure",
-        "description": "Shared unit catalog for products (code + label). Per-product conversion units stay in the product editor.",
+        "description": "Catalog codes and names only (pc, box, kg…). Assign multiple units per product with barcodes and retail/wholesale prices in the product form.",
         "open_products": "Open product list"
     },
     "measurementUnits": {

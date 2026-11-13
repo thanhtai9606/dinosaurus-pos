@@ -2,10 +2,13 @@ import { Product } from '@/lib/api/query/products'
 
 export type ProductSaleUnit = {
     id?: string
+    measurement_unit_id?: string
+    measurement_unit_code?: string | null
     name: string
     is_base: boolean
     factor_to_base: number
     sell_price: number
+    wholesale_price?: number
     barcode?: string | null
     sku?: string | null
     sort_order?: number
@@ -20,6 +23,7 @@ export function saleUnitsOf(product: Product & { sale_units?: ProductSaleUnit[] 
             is_base: true,
             factor_to_base: 1,
             sell_price: product.price || 0,
+            wholesale_price: 0,
             barcode: product.barcode,
             sku: product.sku,
             sort_order: 0,

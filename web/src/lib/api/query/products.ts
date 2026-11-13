@@ -402,11 +402,13 @@ export async function replaceProductSaleUnits(productId: string, units: ProductS
     const payload = {
         units: units.map((u, index) => ({
             id: u.id || undefined,
+            measurement_unit_id: u.measurement_unit_id,
             name: u.name,
             is_base: u.is_base,
             factor_to_base: u.factor_to_base,
             sell_price: u.sell_price,
-            barcode: u.barcode || undefined,
+            wholesale_price: u.wholesale_price ?? 0,
+            barcode: u.barcode === '' ? undefined : u.barcode ?? undefined,
             sku: u.sku || undefined,
             sort_order: u.sort_order ?? index,
         })),

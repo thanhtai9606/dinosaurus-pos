@@ -1028,7 +1028,8 @@
             "error_delete_variant": "Không thể xóa các biến thể hiện có (giới hạn API)",
             "tab_details": "Chi tiết",
             "tab_history": "Lịch sử",
-            "cost_price": "Chi phí"
+            "cost_price": "Chi phí",
+            "code_auto": "Mã sản phẩm (P-code) được sinh tự động khi lưu."
         },
         "messages": {
             "create_success": "Đã tạo sản phẩm thành công",
@@ -1059,12 +1060,20 @@
             "no_supplier": "Không chọn"
         },
         "sale_units": {
-            "title": "Đơn vị bán & quy đổi",
-            "hint": "Tồn kho tính theo đơn vị cơ bản. Đơn vị khác (thùng, lốc…) có hệ số quy đổi, giá và mã vạch riêng.",
-            "base_name": "ĐVT cơ bản",
-            "unit_name": "Tên ĐVT",
+            "title": "Đơn vị bán trên sản phẩm",
+            "hint": "Chọn từ danh mục đơn vị tính. Mỗi đơn vị có mã vạch riêng (quét hoặc tự sinh), giá lẻ, giá sỉ và hệ số quy đổi về đơn vị cơ bản (tồn kho).",
+            "measurement_unit": "Đơn vị tính",
+            "pick_unit": "Chọn đơn vị…",
             "factor": "Quy đổi (× cơ bản)",
-            "add": "Thêm đơn vị"
+            "retail_price": "Giá bán lẻ",
+            "wholesale_price": "Giá bán sỉ",
+            "base_badge": "Đơn vị cơ bản",
+            "set_base": "Đặt làm cơ bản",
+            "generate_barcode": "Để trống — hệ thống tự sinh mã vạch",
+            "barcode_placeholder": "Quét hoặc nhập",
+            "barcode_hint": "Để trống và lưu để tự sinh mã 13 số.",
+            "add": "Thêm đơn vị",
+            "no_catalog": "Hãy tạo danh mục đơn vị tính (menu Đơn vị) trước."
         },
         "stock_history": {
             "no_history": "Không tìm thấy lịch sử cổ phiếu.",
@@ -1532,7 +1541,7 @@
     },
     "product_units_page": {
         "title": "Đơn vị tính",
-        "description": "Danh mục đơn vị dùng chung khi nhập sản phẩm (mã + tên). Đơn vị quy đổi theo từng SP vẫn cấu hình trong form sản phẩm.",
+        "description": "Chỉ mã và tên đơn vị (Cái, Thùng, Kg…). Gán nhiều đơn vị cho từng sản phẩm kèm barcode, giá lẻ/sỉ trong form sản phẩm.",
         "open_products": "Mở danh sách sản phẩm"
     },
     "measurementUnits": {

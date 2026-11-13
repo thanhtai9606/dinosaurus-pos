@@ -127,8 +127,8 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                         price: Number(value.price),
                         cost_price: Number(value.cost_price),
                         stock: Number(value.stock),
-                        sku: value.sku || undefined,
-                        barcode: value.barcode || undefined,
+                        sku: undefined,
+                        barcode: undefined,
                         unit: value.unit || 'pcs',
                         min_stock: Number(value.min_stock),
                         default_supplier_id: value.default_supplier_id || undefined,
@@ -141,8 +141,8 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                         price: Number(value.price),
                         cost_price: Number(value.cost_price),
                         stock: Number(value.stock),
-                        sku: value.sku || undefined,
-                        barcode: value.barcode || undefined,
+                        sku: undefined,
+                        barcode: undefined,
                         unit: value.unit || 'pcs',
                         min_stock: Number(value.min_stock),
                         default_supplier_id: value.default_supplier_id || undefined,
@@ -159,22 +159,19 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                 // Handle Variants
                 if (productId) {
                     const unitsToSave = saleUnits
-                        .map((u, index) => {
-                            if (u.is_base) {
-                                return {
-                                    ...u,
-                                    name: value.unit || u.name || 'pcs',
-                                    sell_price: Number(value.price),
-                                    barcode: value.barcode || null,
-                                    sku: value.sku || null,
-                                    factor_to_base: 1,
-                                    sort_order: 0,
-                                }
-                            }
-                            return { ...u, sort_order: u.sort_order ?? index }
-                        })
-                        .filter((u) => u.is_base || u.name.trim().length > 0)
-                    await replaceProductSaleUnits(productId, unitsToSave)
+                        .filter((u) => Boolean(u.measurement_unit_id))
+                        .map((u, index) => ({
+                            ...u,
+                            sell_price: u.is_base ? Number(value.price) : u.sell_price,
+                            wholesale_price: u.wholesale_price ?? 0,
+                            factor_to_base: u.is_base ? 1 : u.factor_to_base,
+                            sort_order: u.sort_order ?? index,
+                        }))
+                    if (unitsToSave.length === 0) {
+                        toast.error(t('products.sale_units.pick_unit'))
+                    } else {
+                        await replaceProductSaleUnits(productId, unitsToSave)
+                    }
 
                     for (const variant of variants) {
                         let optionId = variant.id
@@ -247,8 +244,6 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     form.setFieldValue('cost_price', detailProduct?.cost_price ?? productToEdit.cost_price ?? 0)
                     form.setFieldValue('stock', detailProduct?.stock ?? productToEdit.stock ?? 0)
                     const inv = (detailProduct || productToEdit) as Record<string, unknown>
-                    form.setFieldValue('sku', String(inv.sku ?? ''))
-                    form.setFieldValue('barcode', String(inv.barcode ?? ''))
                     form.setFieldValue('unit', String(inv.unit || 'pcs'))
                     form.setFieldValue('min_stock', Number(inv.min_stock ?? 0))
                     form.setFieldValue('default_supplier_id', String(inv.default_supplier_id ?? ''))
@@ -285,12 +280,23 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     setPreview(null)
                     setSelectedFile(null)
                     setVariants([])
-                    setSaleUnits([{ name: 'pcs', is_base: true, factor_to_base: 1, sell_price: 0, sort_order: 0 }])
+                    const pcs = catalogUnits.find((c) => c.code === 'PCS') ?? catalogUnits[0]
+                    setSaleUnits([
+                        {
+                            measurement_unit_id: pcs?.id,
+                            name: pcs?.name ?? 'pcs',
+                            is_base: true,
+                            factor_to_base: 1,
+                            sell_price: 0,
+                            wholesale_price: 0,
+                            sort_order: 0,
+                        },
+                    ])
                 }
             }, 0)
             setActiveCropContext('main')
         }
-    }, [open, productToEdit, detailProduct])
+    }, [open, productToEdit, detailProduct, catalogUnits])
 
     const handleCropSuccess = (file: File) => {
         if (activeCropContext === 'main') {
@@ -569,48 +575,21 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                 )}
                                             />
 
-                                            <form.Field
-                                                name="sku"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label className="text-right mt-3">{t('products.fields.sku')}</Label>
-                                                        <Input className="col-span-3" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
-                                                    </div>
-                                                )}
-                                            />
-                                            <form.Field
-                                                name="barcode"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label className="text-right mt-3">{t('products.fields.barcode')}</Label>
-                                                        <Input className="col-span-3" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
-                                                    </div>
-                                                )}
-                                            />
-                                            <form.Field
-                                                name="unit"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label className="text-right mt-3">{t('products.fields.unit')}</Label>
-                                                        <div className="col-span-3">
-                                                            <Input
-                                                                className="w-full"
-                                                                list="product-measurement-units"
-                                                                value={field.state.value}
-                                                                onChange={(e) => field.handleChange(e.target.value)}
-                                                                placeholder={t('measurementUnits.fields.code', 'PCS')}
-                                                            />
-                                                            <datalist id="product-measurement-units">
-                                                                {catalogUnits.map((u) => (
-                                                                    <option key={u.id} value={u.code}>
-                                                                        {u.name}
-                                                                    </option>
-                                                                ))}
-                                                            </datalist>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            />
+                                            {(productToEdit?.code || (detailProduct as { code?: string })?.code) && (
+                                                <div className="grid grid-cols-4 items-start gap-4">
+                                                    <Label className="text-right mt-3">{t('products.fields.code', 'P-code')}</Label>
+                                                    <Input
+                                                        className="col-span-3 font-mono"
+                                                        readOnly
+                                                        value={productToEdit?.code ?? (detailProduct as { code?: string })?.code ?? ''}
+                                                    />
+                                                </div>
+                                            )}
+                                            {!productToEdit && (
+                                                <p className="text-xs text-muted-foreground">
+                                                    {t('products.form.code_auto')}
+                                                </p>
+                                            )}
                                             <form.Field
                                                 name="min_stock"
                                                 children={(field) => (
@@ -649,7 +628,12 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                         </div>
 
 
-                                        <ProductSaleUnitsEditor units={saleUnits} onChange={setSaleUnits} t={t} />
+                                        <ProductSaleUnitsEditor
+                                            units={saleUnits}
+                                            onChange={setSaleUnits}
+                                            catalog={catalogUnits}
+                                            t={t}
+                                        />
 
                                         {/* Variants Section */}
                                         <div className="space-y-4">

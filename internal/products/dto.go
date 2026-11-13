@@ -65,25 +65,30 @@ type ProductOptionResponse struct {
 }
 
 type ProductSaleUnitResponse struct {
-	ID           uuid.UUID `json:"id"`
-	Name         string    `json:"name"`
-	IsBase       bool      `json:"is_base"`
-	FactorToBase float64   `json:"factor_to_base"`
-	SellPrice    float64   `json:"sell_price"`
-	Barcode      *string   `json:"barcode,omitempty"`
-	Sku          *string   `json:"sku,omitempty"`
-	SortOrder    int32     `json:"sort_order"`
+	ID                  uuid.UUID  `json:"id"`
+	MeasurementUnitID   *uuid.UUID `json:"measurement_unit_id,omitempty"`
+	MeasurementUnitCode *string    `json:"measurement_unit_code,omitempty"`
+	Name                string     `json:"name"`
+	IsBase              bool       `json:"is_base"`
+	FactorToBase        float64    `json:"factor_to_base"`
+	SellPrice           float64    `json:"sell_price"`
+	WholesalePrice      float64    `json:"wholesale_price"`
+	Barcode             *string    `json:"barcode,omitempty"`
+	Sku                 *string    `json:"sku,omitempty"`
+	SortOrder           int32      `json:"sort_order"`
 }
 
 type SaleUnitInput struct {
-	ID           *uuid.UUID `json:"id,omitempty"`
-	Name         string     `json:"name" validate:"required,min=1,max=50"`
-	IsBase       bool       `json:"is_base"`
-	FactorToBase float64    `json:"factor_to_base" validate:"required,gt=0"`
-	SellPrice    float64    `json:"sell_price" validate:"required,gte=0"`
-	Barcode      *string    `json:"barcode" validate:"omitempty,max=100"`
-	Sku          *string    `json:"sku" validate:"omitempty,max=50"`
-	SortOrder    int32      `json:"sort_order"`
+	ID                *uuid.UUID `json:"id,omitempty"`
+	MeasurementUnitID uuid.UUID  `json:"measurement_unit_id" validate:"required"`
+	Name              string     `json:"name" validate:"omitempty,max=50"`
+	IsBase            bool       `json:"is_base"`
+	FactorToBase      float64    `json:"factor_to_base" validate:"required,gt=0"`
+	SellPrice         float64    `json:"sell_price" validate:"required,gte=0"`
+	WholesalePrice    float64    `json:"wholesale_price" validate:"gte=0"`
+	Barcode           *string    `json:"barcode" validate:"omitempty,max=100"`
+	Sku               *string    `json:"sku" validate:"omitempty,max=50"`
+	SortOrder         int32      `json:"sort_order"`
 }
 
 type ReplaceSaleUnitsRequest struct {

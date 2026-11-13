@@ -1011,7 +1011,8 @@
             "error_delete_variant": "Tidak dapat menghapus varian yang sudah ada (Batasan API)",
             "tab_details": "Detail",
             "tab_history": "Riwayat",
-            "cost_price": "Harga Modal"
+            "cost_price": "Harga Modal",
+            "code_auto": "Kode produk (P-code) dibuat otomatis saat menyimpan."
         },
         "messages": {
             "create_success": "Produk berhasil dibuat",
@@ -1042,12 +1043,20 @@
             "no_supplier": "Tidak ada"
         },
         "sale_units": {
-            "title": "Satuan jual & konversi",
-            "hint": "Stok dihitung dalam satuan dasar. Satuan lain (karton, pack…) punya faktor, harga, dan barcode sendiri.",
-            "base_name": "Satuan dasar",
-            "unit_name": "Nama satuan",
+            "title": "Satuan jual produk",
+            "hint": "Pilih dari katalog satuan. Tiap satuan punya barcode sendiri (scan atau otomatis), harga eceran/grosir, dan faktor ke satuan dasar.",
+            "measurement_unit": "Satuan",
+            "pick_unit": "Pilih satuan…",
             "factor": "Konversi (× dasar)",
-            "add": "Tambah satuan"
+            "retail_price": "Harga eceran",
+            "wholesale_price": "Harga grosir",
+            "base_badge": "Satuan dasar",
+            "set_base": "Jadikan dasar",
+            "generate_barcode": "Kosongkan untuk generate barcode",
+            "barcode_placeholder": "Scan atau ketik",
+            "barcode_hint": "Kosongkan lalu simpan untuk kode 13 digit otomatis.",
+            "add": "Tambah satuan",
+            "no_catalog": "Buat satuan ukuran di menu Satuan terlebih dahulu."
         },
         "stock_history": {
             "no_history": "Tidak ada riwayat stok ditemukan.",

@@ -118,6 +118,11 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
         },
         onSubmit: async ({ value }) => {
             try {
+                if (catalogUnits.length === 0) {
+                    toast.error(t('products.sale_units.no_catalog'))
+                    return
+                }
+
                 let productId = productToEdit?.id
 
                 if (productToEdit && productId) {
@@ -168,7 +173,11 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                             sort_order: u.sort_order ?? index,
                         }))
                     if (unitsToSave.length === 0) {
-                        toast.error(t('products.sale_units.pick_unit'))
+                        toast.error(
+                            catalogUnits.length === 0
+                                ? t('products.sale_units.no_catalog')
+                                : t('products.sale_units.pick_unit'),
+                        )
                     } else {
                         await replaceProductSaleUnits(productId, unitsToSave)
                     }

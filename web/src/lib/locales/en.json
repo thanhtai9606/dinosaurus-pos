@@ -1067,7 +1067,8 @@
             "barcode_placeholder": "Scan or type",
             "barcode_hint": "Leave empty and save to generate a 13-digit code.",
             "add": "Add unit",
-            "no_catalog": "Create measurement units under the Units menu first."
+            "no_catalog": "Create measurement units under Products → Units first.",
+            "open_units_menu": "Open Units"
         },
         "stock_history": {
             "no_history": "No stock history found.",
@@ -1534,7 +1535,7 @@
     },
     "product_units_page": {
         "title": "Units of measure",
-        "description": "Enter unit names only (piece, box, cup…). On products, pick units from the list and set barcodes and retail/wholesale prices.",
+        "description": "Create units here first (name only). Then assign them on each product with barcodes and retail/wholesale prices.",
         "open_products": "Open product list"
     },
     "measurementUnits": {

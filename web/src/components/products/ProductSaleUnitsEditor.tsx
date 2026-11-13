@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { Plus, Sparkles, Star, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -88,9 +89,12 @@ export function ProductSaleUnitsEditor({ units, onChange, catalog, t }: Props) {
 
     if (catalog.length === 0) {
         return (
-            <p className="text-sm text-muted-foreground rounded-md border p-4">
-                {t('products.sale_units.no_catalog', 'Add measurement units in Settings → Units first.')}
-            </p>
+            <div className="space-y-3 rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                <p>{t('products.sale_units.no_catalog')}</p>
+                <Button type="button" variant="secondary" size="sm" asChild>
+                    <Link to="/product-units">{t('products.sale_units.open_units_menu')}</Link>
+                </Button>
+            </div>
         )
     }
 

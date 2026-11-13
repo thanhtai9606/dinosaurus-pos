@@ -1056,7 +1056,8 @@
             "barcode_placeholder": "Scan atau ketik",
             "barcode_hint": "Kosongkan lalu simpan untuk kode 13 digit otomatis.",
             "add": "Tambah satuan",
-            "no_catalog": "Buat satuan ukuran di menu Satuan terlebih dahulu."
+            "no_catalog": "Buat satuan ukuran di Produk → Satuan terlebih dahulu.",
+            "open_units_menu": "Buka Satuan"
         },
         "stock_history": {
             "no_history": "Tidak ada riwayat stok ditemukan.",
@@ -1522,7 +1523,7 @@
     },
     "product_units_page": {
         "title": "Satuan ukuran",
-        "description": "Hanya nama satuan. Di produk, pilih satuan dari daftar lalu atur barcode dan harga eceran/grosir.",
+        "description": "Buat satuan di sini dulu (nama saja). Lalu tetapkan di tiap produk dengan barcode dan harga eceran/grosir.",
         "open_products": "Buka daftar produk"
     },
     "measurementUnits": {

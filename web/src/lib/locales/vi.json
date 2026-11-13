@@ -1073,7 +1073,8 @@
             "barcode_placeholder": "Quét hoặc nhập",
             "barcode_hint": "Để trống và lưu để tự sinh mã 13 số.",
             "add": "Thêm đơn vị",
-            "no_catalog": "Hãy tạo danh mục đơn vị tính (menu Đơn vị) trước."
+            "no_catalog": "Hãy tạo đơn vị tính tại Sản phẩm → Đơn vị trước.",
+            "open_units_menu": "Mở trang Đơn vị"
         },
         "stock_history": {
             "no_history": "Không tìm thấy lịch sử cổ phiếu.",
@@ -1541,7 +1542,7 @@
     },
     "product_units_page": {
         "title": "Đơn vị tính",
-        "description": "Chỉ nhập tên đơn vị (Cái, Thùng, Ly…). Trên sản phẩm chọn đơn vị từ danh sách và cấu hình barcode, giá lẻ/sỉ.",
+        "description": "Tạo đơn vị tại đây trước (chỉ tên). Sau đó gán cho từng sản phẩm kèm barcode và giá lẻ/sỉ.",
         "open_products": "Mở danh sách sản phẩm"
     },
     "measurementUnits": {

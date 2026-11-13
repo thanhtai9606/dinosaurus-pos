@@ -27,19 +27,13 @@ func ShiftMiddleware(queries shift_repo.Querier, cache ShiftCache, log logger.IL
 			})
 		}
 
-		// Check cache first
+		// Fast path: cache says open
 		hasShift, found := cache.GetOpen(userID)
-		if found {
-			if !hasShift {
-				log.Error("Shift Middleware | User has no open shift: ", "user_id", userID)
-				return c.Status(fiber.StatusForbidden).JSON(common.ErrorResponse{
-					Message: "You must have an open shift to perform this action",
-				})
-			}
+		if found && hasShift {
 			return c.Next()
 		}
 
-		// Check DB if not in cache
+		// Cache miss or stale "closed" — trust DB (UI may show open shift while cache was wrong)
 		_, err := queries.GetOpenShiftByUserID(c.RequestCtx(), userID)
 		if err != nil {
 			log.Error("Shift Middleware | Error getting open shift", "user_id", userID, "error", err)

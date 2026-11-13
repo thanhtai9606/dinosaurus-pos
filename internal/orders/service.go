@@ -1333,16 +1333,26 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 
 			var saleUnit products_repo.ProductUnit
 			var uErr error
+			usedExplicitUnit := false
 			if itemReq.ProductUnitID != nil {
 				saleUnit, uErr = qPrd.GetProductUnit(ctx, *itemReq.ProductUnitID)
-			} else {
-				saleUnit, uErr = qPrd.GetBaseProductUnit(ctx, itemReq.ProductID)
-			}
-			if uErr != nil {
-				if errors.Is(uErr, pgx.ErrNoRows) {
-					return fmt.Errorf("sale unit not configured for %s", product.Name)
+				if uErr == nil {
+					usedExplicitUnit = true
+				} else if !errors.Is(uErr, pgx.ErrNoRows) {
+					return uErr
 				}
-				return uErr
+			}
+			if !usedExplicitUnit {
+				if err := prdunits.EnsureBaseProductUnit(ctx, qPrd, product); err != nil {
+					return fmt.Errorf("sale unit not configured for %s: %w", product.Name, err)
+				}
+				saleUnit, uErr = qPrd.GetBaseProductUnit(ctx, itemReq.ProductID)
+				if uErr != nil {
+					if errors.Is(uErr, pgx.ErrNoRows) {
+						return fmt.Errorf("sale unit not configured for %s", product.Name)
+					}
+					return uErr
+				}
 			}
 			if saleUnit.ProductID != itemReq.ProductID {
 				return fmt.Errorf("sale unit does not match product %s", product.Name)

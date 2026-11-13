@@ -53,7 +53,8 @@ func (s *PrdService) loadSaleUnits(ctx context.Context, productID uuid.UUID) ([]
 	return out, nil
 }
 
-func (s *PrdService) ensureBaseSaleUnit(ctx context.Context, qtx products_repo.Querier, product products_repo.Product) error {
+// EnsureBaseProductUnit creates the default base sale unit when missing (legacy rows / old imports).
+func EnsureBaseProductUnit(ctx context.Context, qtx products_repo.Querier, product products_repo.Product) error {
 	_, err := qtx.GetBaseProductUnit(ctx, product.ID)
 	if err == nil {
 		return nil
@@ -76,6 +77,10 @@ func (s *PrdService) ensureBaseSaleUnit(ctx context.Context, qtx products_repo.Q
 		SortOrder:    0,
 	})
 	return err
+}
+
+func (s *PrdService) ensureBaseSaleUnit(ctx context.Context, qtx products_repo.Querier, product products_repo.Product) error {
+	return EnsureBaseProductUnit(ctx, qtx, product)
 }
 
 func (s *PrdService) ReplaceSaleUnits(ctx context.Context, productID uuid.UUID, req ReplaceSaleUnitsRequest) (*ProductResponse, error) {

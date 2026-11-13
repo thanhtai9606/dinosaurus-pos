@@ -7,6 +7,7 @@ import (
 	"dinosaurus-pos/pkg/payment"
 	"dinosaurus-pos/pkg/validator"
 	"errors"
+	"strings"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
@@ -419,7 +420,24 @@ func (h *OrderHandler) CreateOrderHandler(c fiber.Ctx) error {
 	orderResponse, err := h.orderService.CreateOrder(c.RequestCtx(), req)
 	if err != nil {
 		h.log.Errorf("Failed to create order in service", "error", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to create order"})
+		msg := err.Error()
+		switch {
+		case strings.Contains(msg, "insufficient stock"):
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "Insufficient stock",
+				Error:   msg,
+			})
+		case strings.Contains(msg, "sale unit not configured"), strings.Contains(msg, "not found"):
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "Invalid order items",
+				Error:   msg,
+			})
+		default:
+			return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+				Message: "Failed to create order",
+				Error:   msg,
+			})
+		}
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{

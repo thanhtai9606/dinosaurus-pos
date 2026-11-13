@@ -9,6 +9,7 @@ import { ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PaymentDialog } from "@/components/payment/PaymentDialog"
 import { useCreateOrderMutation } from '@/lib/api/query/orders'
+import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
 import { toast } from 'sonner'
 import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
 import { useCustomersListQuery } from '@/lib/api/query/customers'
@@ -187,7 +188,7 @@ function OrderPage() {
                 setIsPaymentOpen(true)
                 return t('order.success.created')
             },
-            error: t('order.errors.create_failed')
+            error: (err) => getApiErrorMessage(err, t('order.errors.create_failed')),
         })
     }
 

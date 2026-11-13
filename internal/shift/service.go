@@ -146,7 +146,14 @@ func (s *service) EndShift(ctx context.Context, userID uuid.UUID, req EndShiftRe
 func (s *service) GetOpenShift(ctx context.Context, userID uuid.UUID) (*ShiftResponse, error) {
 	shift, err := s.repo.GetOpenShiftByUserID(ctx, userID)
 	if err != nil {
+		if s.cache != nil {
+			s.cache.SetOpen(userID, false)
+		}
 		return nil, common.ErrNotFound
+	}
+
+	if s.cache != nil {
+		s.cache.SetOpen(userID, true)
 	}
 
 	return s.mapShiftToResponse(shift), nil

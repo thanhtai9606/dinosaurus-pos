@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import { AxiosError } from "axios"
 import { useRBAC } from "@/lib/auth/rbac"
 import i18n from '@/lib/i18n'
+import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
 
 export type OrdersListParams = {
     limit?: number
@@ -268,8 +269,7 @@ export const useCreateOrderMutation = () => {
             toast.success(i18n.t('order.create_success'))
         },
         onError: (error) => {
-            const msg = error.response?.data?.message || "Gagal membuat order"
-            toast.error(msg)
+            toast.error(getApiErrorMessage(error, i18n.t('order.errors.create_failed')))
         }
     })
 

@@ -34,6 +34,7 @@ import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
 import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
 import { RetailPosTabs } from '@/components/retail-pos/RetailPosTabs'
 import { createRetailSaleTab, patchTab, updateTabCart, type RetailSaleTab } from '@/lib/retail-pos/saleTabs'
+import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
 
 export const Route = createFileRoute('/_dashboard/retail-pos')({
     component: RetailPosPage,
@@ -376,7 +377,7 @@ function RetailPosPage() {
                     queueCurrentSale('retail_debt')
                     return
                 }
-                toast.error(t('order.errors.create_failed'))
+                toast.error(getApiErrorMessage(err, t('order.errors.create_failed')))
             }
             return
         }
@@ -426,7 +427,7 @@ function RetailPosPage() {
                 queueCurrentSale('retail_other')
                 return
             }
-            toast.error(t('order.errors.create_failed'))
+            toast.error(getApiErrorMessage(err, t('order.errors.create_failed')))
         }
     }
 

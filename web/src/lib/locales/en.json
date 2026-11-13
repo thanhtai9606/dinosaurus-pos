@@ -1054,8 +1054,8 @@
             "no_supplier": "None"
         },
         "sale_units": {
-            "title": "Product sale units",
-            "hint": "Pick units from the catalog. Each unit has its own barcode (scan or auto-generated), retail and wholesale price, and conversion to the base unit for stock.",
+            "title": "Sale units & pricing",
+            "hint": "Add multiple rows: each unit has its own retail, wholesale, and barcode. The base unit (★) drives stock; its retail price is the product list price.",
             "measurement_unit": "Unit",
             "pick_unit": "Select unit…",
             "factor": "Conversion (× base)",

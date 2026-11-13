@@ -1060,8 +1060,8 @@
             "no_supplier": "Không chọn"
         },
         "sale_units": {
-            "title": "Đơn vị bán trên sản phẩm",
-            "hint": "Chọn từ danh mục đơn vị tính. Mỗi đơn vị có mã vạch riêng (quét hoặc tự sinh), giá lẻ, giá sỉ và hệ số quy đổi về đơn vị cơ bản (tồn kho).",
+            "title": "Đơn vị bán & giá",
+            "hint": "Thêm nhiều dòng: mỗi đơn vị một giá lẻ, giá sỉ và mã vạch. Đơn vị cơ bản (★) dùng cho tồn kho — giá lẻ dòng đó là giá niêm yết sản phẩm.",
             "measurement_unit": "Đơn vị tính",
             "pick_unit": "Chọn đơn vị…",
             "factor": "Quy đổi (× cơ bản)",

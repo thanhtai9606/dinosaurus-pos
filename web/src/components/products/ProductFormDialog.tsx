@@ -123,13 +123,20 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     return
                 }
 
+                const baseUnit = saleUnits.find((u) => u.is_base)
+                const listPrice = baseUnit?.sell_price ?? value.price
+                if (!baseUnit?.measurement_unit_id) {
+                    toast.error(t('products.sale_units.pick_unit'))
+                    return
+                }
+
                 let productId = productToEdit?.id
 
                 if (productToEdit && productId) {
                     const payload = {
                         name: value.name,
                         category_ids: value.category_ids,
-                        price: Number(value.price),
+                        price: Number(listPrice),
                         cost_price: Number(value.cost_price),
                         stock: Number(value.stock),
                         sku: undefined,
@@ -143,7 +150,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     const payload = {
                         name: value.name,
                         category_ids: value.category_ids,
-                        price: Number(value.price),
+                        price: Number(listPrice),
                         cost_price: Number(value.cost_price),
                         stock: Number(value.stock),
                         sku: undefined,
@@ -167,7 +174,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                         .filter((u) => Boolean(u.measurement_unit_id))
                         .map((u, index) => ({
                             ...u,
-                            sell_price: u.is_base ? Number(value.price) : u.sell_price,
+                            sell_price: u.is_base ? Number(listPrice) : u.sell_price,
                             wholesale_price: u.wholesale_price ?? 0,
                             factor_to_base: u.is_base ? 1 : u.factor_to_base,
                             sort_order: u.sort_order ?? index,
@@ -227,6 +234,19 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
             }
         }
     })
+
+    const syncProductPriceFromBase = (units: ProductSaleUnit[]) => {
+        const base = units.find((u) => u.is_base)
+        if (base) {
+            form.setFieldValue('price', base.sell_price)
+        }
+    }
+
+    const handleSaleUnitsChange = (units: ProductSaleUnit[]) => {
+        setSaleUnits(units)
+        syncProductPriceFromBase(units)
+    }
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [preview, setPreview] = useState<string | null>(null)
     const [variants, setVariants] = useState<VariantItem[]>([])
@@ -271,18 +291,22 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     const dp = detailProduct as Product & { sale_units?: ProductSaleUnit[] }
                     if (dp?.sale_units?.length) {
                         setSaleUnits(dp.sale_units)
+                        syncProductPriceFromBase(dp.sale_units)
                     } else {
-                        setSaleUnits([
+                        const legacyUnits = [
                             {
                                 name: String(inv.unit || 'pcs'),
                                 is_base: true,
                                 factor_to_base: 1,
                                 sell_price: Number(detailProduct?.price ?? productToEdit.price ?? 0),
+                                wholesale_price: 0,
                                 barcode: String(inv.barcode ?? '') || null,
                                 sku: String(inv.sku ?? '') || null,
                                 sort_order: 0,
                             },
-                        ])
+                        ]
+                        setSaleUnits(legacyUnits)
+                        syncProductPriceFromBase(legacyUnits)
                     }
                 } else {
                     form.reset()
@@ -290,7 +314,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                     setSelectedFile(null)
                     setVariants([])
                     const pcs = catalogUnits[0]
-                    setSaleUnits([
+                    const initialUnits = [
                         {
                             measurement_unit_id: pcs?.id,
                             name: pcs?.name ?? 'pcs',
@@ -300,7 +324,9 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                             wholesale_price: 0,
                             sort_order: 0,
                         },
-                    ])
+                    ]
+                    setSaleUnits(initialUnits)
+                    syncProductPriceFromBase(initialUnits)
                 }
             }, 0)
             setActiveCropContext('main')
@@ -492,38 +518,6 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                 )}
                                             />
 
-                                            {/* Price */}
-                                            <form.Field
-                                                name="price"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label htmlFor={field.name} className="text-right mt-3">{t('products.form.price')}</Label>
-                                                        <div className="col-span-3 space-y-1">
-                                                            <div className="relative">
-                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">{currencySymbol}</span>
-                                                                <Input
-                                                                    id={field.name}
-                                                                    name={field.name}
-                                                                    type="text"
-                                                                    inputMode="numeric"
-                                                                    value={field.state.value ? field.state.value.toLocaleString('id-ID') : ''}
-                                                                    onBlur={field.handleBlur}
-                                                                    onChange={e => {
-                                                                        const val = e.target.value.replace(/\D/g, '')
-                                                                        field.handleChange(Number(val))
-                                                                    }}
-                                                                    className="pl-9"
-                                                                    placeholder="0"
-                                                                />
-                                                            </div>
-                                                            {field.state.meta.errors.length > 0 && (
-                                                                <p className="text-sm font-medium text-destructive">{formatError(field.state.meta.errors)}</p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            />
-
                                             {/* Cost Price */}
                                             <form.Field
                                                 name="cost_price"
@@ -636,12 +630,12 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                             />
                                         </div>
 
-
                                         <ProductSaleUnitsEditor
                                             units={saleUnits}
-                                            onChange={setSaleUnits}
+                                            onChange={handleSaleUnitsChange}
                                             catalog={catalogUnits}
                                             t={t}
+                                            currencySymbol={currencySymbol}
                                         />
 
                                         {/* Variants Section */}

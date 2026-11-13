@@ -1043,8 +1043,8 @@
             "no_supplier": "Tidak ada"
         },
         "sale_units": {
-            "title": "Satuan jual produk",
-            "hint": "Pilih dari katalog satuan. Tiap satuan punya barcode sendiri (scan atau otomatis), harga eceran/grosir, dan faktor ke satuan dasar.",
+            "title": "Satuan jual & harga",
+            "hint": "Tambah beberapa baris: tiap satuan punya harga eceran, grosir, dan barcode sendiri. Satuan dasar (★) untuk stok; harga ecerannya jadi harga produk.",
             "measurement_unit": "Satuan",
             "pick_unit": "Pilih satuan…",
             "factor": "Konversi (× dasar)",

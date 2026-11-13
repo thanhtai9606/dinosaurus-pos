@@ -10,11 +10,7 @@ Modern, multi-tenant Point of Sale for retail: inventory, checkout, shifts, supp
 
 **Contributing?** See [docs/CONTEXT.md](docs/CONTEXT.md) for domain flows (stock receipts, debts, RBAC, file map). Cursor loads a short summary from `.cursor/rules/project-domain-context.mdc` — keep both updated when you add major features.
 
-| | |
-|---|---|
-| **GitHub (development)** | https://github.com/thanhtai9606/dinosaurus-pos |
-| **Lineage (Go + React POS)** | https://github.com/agpprastyo/dinosaurus-pos · https://github.com/agpprastyo/POS-kasir |
-| **Reference demo (upstream)** | https://pos-kasir.agprastyo.me |
+**Repository:** https://github.com/thanhtai9606/dinosaurus-pos
 
 ---
 
@@ -217,7 +213,7 @@ GitHub Actions on push/PR to `master` and on semver tags. Typical flow: test →
 | Project | Author | What we reused / learned |
 |---------|--------|---------------------------|
 | [POS-kasir](https://github.com/agpprastyo/POS-kasir) | [Agung Prasetyo](https://github.com/agpprastyo) | Core POS domain: Go (Fiber) API, React SPA, inventory, orders, Midtrans, reports, single-port serving |
-| [dinosaurus-pos](https://github.com/agpprastyo/dinosaurus-pos) | Agung Prasetyo | Direct upstream fork base; module layout, sqlc, CI/CD, and feature set this repo extends |
+| [dinosaurus-pos](https://github.com/agpprastyo/dinosaurus-pos) | Agung Prasetyo | Referenced implementation: module layout, sqlc, CI/CD patterns, and POS feature baseline |
 | [poinf-of-sales](https://github.com/madebyaris/poinf-of-sales) | [madebyaris](https://github.com/madebyaris) | Reference for admin tables, RBAC-oriented UI, and PostgreSQL-backed enterprise POS patterns |
 
 **This repository** ([thanhtai9606/dinosaurus-pos](https://github.com/thanhtai9606/dinosaurus-pos)) is maintained for continued development (GitLab `devops/dinosaurus-pos` + public GitHub). Additions here include multi-tenant RLS, stock receipts, supplier/customer debt ledgers, measurement units, market-based catalog seeding, and Vietnamese/English/Indonesian UI.

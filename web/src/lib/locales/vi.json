@@ -1458,6 +1458,7 @@
             "tab_profile": "Thông tin",
             "tab_orders": "Lịch sử mua",
             "tab_debts": "Công nợ",
+            "order_no": "Mã đơn (SO)",
             "order_date": "Ngày",
             "order_status": "Trạng thái",
             "order_total": "Tổng",

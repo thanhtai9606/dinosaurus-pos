@@ -1451,6 +1451,7 @@
             "tab_profile": "Profile",
             "tab_orders": "Purchase history",
             "tab_debts": "Receivables",
+            "order_no": "Order no. (SO)",
             "order_date": "Date",
             "order_status": "Status",
             "order_total": "Total",

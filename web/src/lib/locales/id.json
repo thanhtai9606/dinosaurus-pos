@@ -1439,6 +1439,7 @@
             "tab_profile": "Profil",
             "tab_orders": "Riwayat belanja",
             "tab_debts": "Piutang",
+            "order_no": "No. pesanan (SO)",
             "order_date": "Tanggal",
             "order_status": "Status",
             "order_total": "Total",

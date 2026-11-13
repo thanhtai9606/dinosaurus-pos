@@ -11,7 +11,7 @@ import { useForm } from '@tanstack/react-form'
 import * as z from 'zod'
 import { Link } from '@tanstack/react-router'
 import { primeCustomerDebtsFilter } from '@/stores/customer-debts-list'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
     Dialog,
     DialogContent,
@@ -24,14 +24,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { Loader2 } from 'lucide-react'
+import { CustomerDetailOrdersGrid } from '@/components/customers/CustomerDetailOrdersGrid'
+import { CustomerDetailDebtsGrid } from '@/components/customers/CustomerDetailDebtsGrid'
+import { OrderDetailDialog } from '@/components/sales-orders/OrderDetailDialog'
 import { ordersListQueryOptions } from '@/lib/api/query/orders'
 import { customerDebtsListQueryOptions } from '@/lib/api/query/customerDebts'
 import { useFormatMoney } from '@/context/MoneyContext'
 import { useRBAC } from '@/lib/auth/rbac'
-import { ListPagination } from '@/components/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCustomerGroupsListQuery } from '@/lib/api/query/customerGroups'
 import type { CustomerProfile } from '@/lib/api/query/customers'
@@ -50,6 +50,7 @@ export function CustomerFormDialog({
     initialTab?: CustomerDialogTab
 }) {
     const { t } = useTranslation()
+    const queryClient = useQueryClient()
     const formatMoney = useFormatMoney()
     const createMutation = useCreateCustomerMutation()
     const updateMutation = useUpdateCustomerMutation()
@@ -58,6 +59,11 @@ export function CustomerFormDialog({
 
     const [activeTab, setActiveTab] = useState<CustomerDialogTab>(initialTab)
     const [ordersPage, setOrdersPage] = useState(1)
+    const [ordersLimit, setOrdersLimit] = useState(10)
+    const [debtsPage, setDebtsPage] = useState(1)
+    const [debtsLimit, setDebtsLimit] = useState(10)
+    const [orderDetailId, setOrderDetailId] = useState<string | null>(null)
+    const [orderDetailOpen, setOrderDetailOpen] = useState(false)
 
     const { canAccessApi } = useRBAC()
     const canOrders = canAccessApi('GET', '/orders')
@@ -69,21 +75,27 @@ export function CustomerFormDialog({
         if (open) {
             setActiveTab(isEdit ? initialTab : 'profile')
             setOrdersPage(1)
+            setDebtsPage(1)
         }
     }, [open, initialTab, isEdit, customerId])
 
     const ordersQuery = useQuery({
-        ...ordersListQueryOptions({ customerId, page: ordersPage, limit: 10 }),
+        ...ordersListQueryOptions({ customerId, page: ordersPage, limit: ordersLimit }),
         enabled: open && isEdit && activeTab === 'orders' && !!customerId && canOrders,
     })
     const debtsQuery = useQuery({
-        ...customerDebtsListQueryOptions({ customer_id: customerId, page: 1, limit: 50 }),
+        ...customerDebtsListQueryOptions({
+            customer_id: customerId,
+            page: debtsPage,
+            limit: debtsLimit,
+        }),
         enabled: open && isEdit && activeTab === 'debts' && !!customerId && canDebts,
     })
 
     const orders = ordersQuery.data?.orders ?? []
     const ordersPagination = ordersQuery.data?.pagination
     const debts = debtsQuery.data?.debts ?? []
+    const debtsPagination = debtsQuery.data?.pagination
     const totalDebtBalance = debts
         .filter((d) => d.status === 'open' || d.status === 'partial')
         .reduce((sum, d) => sum + d.balance_due, 0)
@@ -254,6 +266,7 @@ export function CustomerFormDialog({
     )
 
     return (
+        <>
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 size={isEdit ? 'xl' : 'md'}
@@ -337,60 +350,32 @@ export function CustomerFormDialog({
                                 <div className="flex justify-center py-12">
                                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                                 </div>
-                            ) : orders.length === 0 ? (
-                                <p className="py-8 text-center text-sm text-muted-foreground">
-                                    {t('customers.detail.orders_empty')}
-                                </p>
                             ) : (
-                                <>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>{t('customers.detail.order_date')}</TableHead>
-                                                <TableHead>{t('customers.detail.order_status')}</TableHead>
-                                                <TableHead className="text-right">
-                                                    {t('customers.detail.order_total')}
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {orders.map(
-                                                (order: {
-                                                    id?: string
-                                                    created_at?: string
-                                                    status?: string
-                                                    net_total?: number
-                                                }) => (
-                                                    <TableRow key={order.id}>
-                                                        <TableCell className="text-xs">
-                                                            {order.created_at
-                                                                ? new Date(order.created_at).toLocaleString()
-                                                                : '—'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge variant="secondary">
-                                                                {t(
-                                                                    `transactions.status.${order.status}`,
-                                                                    order.status ?? '',
-                                                                )}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-medium">
-                                                            {formatMoney(order.net_total || 0)}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ),
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                    {ordersPagination && (
-                                        <ListPagination
-                                            pagination={ordersPagination}
-                                            onPageChange={setOrdersPage}
-                                            onLimitChange={() => {}}
-                                        />
-                                    )}
-                                </>
+                                <CustomerDetailOrdersGrid
+                                    orders={orders}
+                                    t={t}
+                                    formatMoney={formatMoney}
+                                    emptyMessage={t('customers.detail.orders_empty')}
+                                    onOrderClick={(order) => {
+                                        if (order.id) {
+                                            setOrderDetailId(order.id)
+                                            setOrderDetailOpen(true)
+                                        }
+                                    }}
+                                    server={
+                                        ordersPagination
+                                            ? {
+                                                  pagination: ordersPagination,
+                                                  onPageChange: setOrdersPage,
+                                                  onLimitChange: (limit) => {
+                                                      setOrdersLimit(limit)
+                                                      setOrdersPage(1)
+                                                  },
+                                                  isFetching: ordersQuery.isFetching,
+                                              }
+                                            : undefined
+                                    }
+                                />
                             )}
                         </TabsContent>
 
@@ -416,39 +401,26 @@ export function CustomerFormDialog({
                                         <div className="flex justify-center py-12">
                                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                                         </div>
-                                    ) : debts.length === 0 ? (
-                                        <p className="py-8 text-center text-sm text-muted-foreground">
-                                            {t('customers.detail.debts_empty')}
-                                        </p>
                                     ) : (
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>{t('debts.fields.reference')}</TableHead>
-                                                    <TableHead>{t('debts.fields.status')}</TableHead>
-                                                    <TableHead className="text-right">
-                                                        {t('debts.fields.balance')}
-                                                    </TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {debts.map((d) => (
-                                                    <TableRow key={d.id}>
-                                                        <TableCell className="font-mono text-xs">
-                                                            {d.reference_no}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Badge variant="secondary">
-                                                                {t(`debts.status.${d.status}`, d.status)}
-                                                            </Badge>
-                                                        </TableCell>
-                                                        <TableCell className="text-right font-medium">
-                                                            {formatMoney(d.balance_due)}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
+                                        <CustomerDetailDebtsGrid
+                                            debts={debts}
+                                            t={t}
+                                            formatMoney={formatMoney}
+                                            emptyMessage={t('customers.detail.debts_empty')}
+                                            server={
+                                                debtsPagination
+                                                    ? {
+                                                          pagination: debtsPagination,
+                                                          onPageChange: setDebtsPage,
+                                                          onLimitChange: (limit) => {
+                                                              setDebtsLimit(limit)
+                                                              setDebtsPage(1)
+                                                          },
+                                                          isFetching: debtsQuery.isFetching,
+                                                      }
+                                                    : undefined
+                                            }
+                                        />
                                     )}
                                     {canDebts && customerId ? (
                                         <Button variant="outline" className="w-full" asChild>
@@ -498,5 +470,17 @@ export function CustomerFormDialog({
                 )}
             </DialogContent>
         </Dialog>
+        <OrderDetailDialog
+            orderId={orderDetailId}
+            open={orderDetailOpen}
+            onOpenChange={(nextOpen) => {
+                setOrderDetailOpen(nextOpen)
+                if (!nextOpen) setOrderDetailId(null)
+            }}
+            onChanged={() => {
+                void queryClient.invalidateQueries({ queryKey: ['orders', 'list'] })
+            }}
+        />
+        </>
     )
 }

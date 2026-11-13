@@ -72,6 +72,15 @@ func (r *PoolRouter) PoolForContext(ctx context.Context) *pgxpool.Pool {
 	return pool
 }
 
+func (r *PoolRouter) DedicatedPoolCount() int {
+	n := 0
+	r.dedicated.Range(func(_, _ any) bool {
+		n++
+		return true
+	})
+	return n
+}
+
 // CloseDedicated closes cached dedicated pools (app shutdown).
 func (r *PoolRouter) CloseDedicated() {
 	r.dedicated.Range(func(key, value any) bool {

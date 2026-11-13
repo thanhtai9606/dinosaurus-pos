@@ -26,7 +26,7 @@ export function RefundDialog({
 }: RefundDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('transactions.refund_dialog.title', 'Refund Order')}</DialogTitle>
                     <DialogDescription>

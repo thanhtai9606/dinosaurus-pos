@@ -80,7 +80,7 @@ export function StockReceiptEditorDialog({
 
     return (
         <Dialog open={open && !!receiptId} onOpenChange={onOpenChange}>
-            <DialogContent className="flex w-[min(96rem,calc(100vw-2rem))] max-h-[92vh] flex-col gap-4 overflow-y-auto sm:max-w-7xl">
+            <DialogContent size="full" dismissible className="flex flex-col gap-4 p-6" scrollable>
                 <DialogHeader>
                     <div className="flex flex-wrap items-center gap-2">
                         <DialogTitle className="text-base">{title}</DialogTitle>

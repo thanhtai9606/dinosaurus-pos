@@ -63,7 +63,7 @@ export function CategoryFormDialog({ open, onOpenChange, categoryToEdit }: {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{categoryToEdit ? t('settings.category.form.title_edit') : t('settings.category.form.title_add')}</DialogTitle>
                     <DialogDescription>

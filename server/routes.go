@@ -47,6 +47,14 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Post("/tenants", authMiddleware, middleware.SuperAdminOnly(), container.TenantHandler.Create)
 	api.Put("/tenants/:id", authMiddleware, middleware.SuperAdminOnly(), container.TenantHandler.Update)
 	api.Delete("/tenants/:id", authMiddleware, middleware.SuperAdminOnly(), container.TenantHandler.Delete)
+	api.Get("/tenants/:id/members", authMiddleware, middleware.SuperAdminOnly(), container.TenantHandler.ListMembers)
+	api.Post("/tenants/:id/members", authMiddleware, middleware.SuperAdminOnly(), container.TenantHandler.CreateMember)
+	api.Put("/tenants/:id/members/:userId", authMiddleware, middleware.SuperAdminOnly(), container.TenantHandler.UpdateMember)
+	api.Delete("/tenants/:id/members/:userId", authMiddleware, middleware.SuperAdminOnly(), container.TenantHandler.RemoveMember)
+
+	api.Get("/platform/overview", authMiddleware, middleware.SuperAdminOnly(), container.PlatformHandler.Overview)
+	api.Get("/platform/memberships", authMiddleware, middleware.SuperAdminOnly(), container.PlatformHandler.Memberships)
+	api.Get("/platform/audit", authMiddleware, middleware.SuperAdminOnly(), container.PlatformHandler.Audits)
 
 	api.Get("/users", authMiddleware, container.UserHandler.GetAllUsersHandler)
 	api.Post("/users", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.UserHandler.CreateUserHandler)

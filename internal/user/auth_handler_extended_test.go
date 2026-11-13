@@ -27,7 +27,7 @@ func setupExtendedAuthHandlerTest(t *testing.T) (*mocks.MockIAuthService, *mocks
 	mockValidator := mocks.NewMockValidator(ctrl)
 	cfg := &config.AppConfig{}
 
-	handler := user.NewAuthHandler(mockService, mockLogger, mockValidator, cfg)
+	handler := user.NewAuthHandler(mockService, mockLogger, mockValidator, cfg, nil)
 	app := fiber.New()
 
 	return mockService, mockLogger, mockValidator, handler, app

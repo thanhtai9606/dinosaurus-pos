@@ -19,6 +19,9 @@ import {
     Receipt,
     ShoppingBag,
     Building2,
+    Layers,
+    Server,
+    ScrollText,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
@@ -55,7 +58,6 @@ const managerRoles: Role[] = [
 
 function canAccessItem(allowedRoles: Role[], userRole?: string): boolean {
     if (!userRole) return false
-    if (userRole === 'super_admin') return true
     return allowedRoles.includes(userRole as Role)
 }
 
@@ -79,6 +81,44 @@ export function useNavigationMenu(userRole?: string) {
     const { t } = useTranslation()
 
     const menuItems: DashboardMenuEntry[] = [
+        {
+            type: 'group',
+            label: t('sidebar.platform'),
+            icon: Layers,
+            allowedRoles: ['super_admin'],
+            children: [
+                {
+                    label: t('sidebar.platform_overview'),
+                    icon: LayoutDashboard,
+                    to: '/platform/overview',
+                    allowedRoles: ['super_admin'],
+                },
+                {
+                    label: t('sidebar.tenants_admin'),
+                    icon: Building2,
+                    to: '/tenants',
+                    allowedRoles: ['super_admin'],
+                },
+                {
+                    label: t('sidebar.platform_ops'),
+                    icon: Server,
+                    to: '/platform/ops',
+                    allowedRoles: ['super_admin'],
+                },
+                {
+                    label: t('sidebar.platform_audit'),
+                    icon: ScrollText,
+                    to: '/platform/audit',
+                    allowedRoles: ['super_admin'],
+                },
+                {
+                    label: t('sidebar.account'),
+                    icon: UserIcon,
+                    to: '/account',
+                    allowedRoles: ['super_admin'],
+                },
+            ],
+        },
         {
             type: 'link',
             label: t('sidebar.summary'),
@@ -180,13 +220,6 @@ export function useNavigationMenu(userRole?: string) {
             icon: Users,
             to: '/customers',
             allowedRoles: cashierRoles,
-        },
-        {
-            type: 'link',
-            label: t('sidebar.tenants_admin'),
-            icon: Building2,
-            to: '/tenants',
-            allowedRoles: ['super_admin'],
         },
         {
             type: 'link',

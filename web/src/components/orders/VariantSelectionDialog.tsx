@@ -27,7 +27,7 @@ export function VariantSelectionDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('order.variant_dialog.title')}</DialogTitle>
                     <DialogDescription>

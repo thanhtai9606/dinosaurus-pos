@@ -4,6 +4,7 @@ import (
 	"POS-kasir/config"
 	"POS-kasir/internal/common"
 	"POS-kasir/internal/common/middleware"
+	"POS-kasir/internal/platformaudit"
 	"POS-kasir/pkg/logger"
 
 	"POS-kasir/pkg/validator"
@@ -33,14 +34,16 @@ type AthHandler struct {
 	Service   IAuthService
 	Log       logger.ILogger
 	Validator validator.Validator
+	audit     platformaudit.Recorder
 }
 
-func NewAuthHandler(service IAuthService, log logger.ILogger, validator validator.Validator, cfg *config.AppConfig) IAuthHandler {
+func NewAuthHandler(service IAuthService, log logger.ILogger, validator validator.Validator, cfg *config.AppConfig, audit platformaudit.Recorder) IAuthHandler {
 	return &AthHandler{
 		Service:   service,
 		Log:       log,
 		Validator: validator,
 		cfg:       cfg,
+		audit:     audit,
 	}
 }
 
@@ -626,6 +629,9 @@ func (h *AthHandler) SwitchTenantHandler(c fiber.Ctx) error {
 	}
 	if roleStr == string(middleware.UserRoleSuperAdmin) {
 		h.Log.Infof("audit: super_admin_switch_tenant actor=%s tenant_id=%s", userID, req.TenantID)
+		if h.audit != nil {
+			_ = h.audit.Record(c.RequestCtx(), userID, "switch_tenant", "tenant", req.TenantID.String(), nil)
+		}
 	}
 	cookie := &fiber.Cookie{
 		Name:     "access_token",

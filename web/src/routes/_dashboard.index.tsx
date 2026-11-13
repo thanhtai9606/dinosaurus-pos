@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useDashboardSummaryQuery, useSalesReportQuery, useProductPerformanceQuery, usePaymentMethodPerformanceQuery } from '@/lib/api/query/reports'
 import { useQueryClient } from '@tanstack/react-query'
@@ -14,10 +14,16 @@ import { formatDate } from '@/lib/utils'
 import { useFormatMoney } from '@/context/MoneyContext'
 
 
-export const Route = createFileRoute('/_dashboard/')(({
+export const Route = createFileRoute('/_dashboard/')({
+    beforeLoad: async ({ context: { queryClient } }) => {
+        const me = await queryClient.ensureQueryData(meQueryOptions())
+        if ((me as { role?: string })?.role === 'super_admin') {
+            throw redirect({ to: '/platform/overview' })
+        }
+    },
     component: DashboardIndex,
     loader: ({ context: { queryClient } }: any) => queryClient.ensureQueryData(meQueryOptions()),
-} as any))
+})
 
 function DashboardIndex() {
     const { t } = useTranslation()

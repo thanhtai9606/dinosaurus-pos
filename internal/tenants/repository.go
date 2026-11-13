@@ -161,6 +161,61 @@ RETURNING ` + tenantRowSelect
 	return scanTenantRow(r.pool.QueryRow(ctx, q, id, code, name, dataPlane, dsnKey))
 }
 
+type MemberRow struct {
+	UserID   uuid.UUID
+	Email    string
+	Username string
+	Role     string
+	IsActive bool
+}
+
+func (r *Repository) ListMembers(ctx context.Context, tenantID uuid.UUID) ([]MemberRow, error) {
+	const q = `
+SELECT u.id, u.email, u.username, COALESCE(tu.role::text, u.role::text), u.is_active
+FROM tenant_users tu
+JOIN users u ON u.id = tu.user_id
+WHERE tu.tenant_id = $1 AND u.role <> 'super_admin'
+ORDER BY u.email`
+	rows, err := r.pool.Query(ctx, q, tenantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []MemberRow
+	for rows.Next() {
+		var row MemberRow
+		if err := rows.Scan(&row.UserID, &row.Email, &row.Username, &row.Role, &row.IsActive); err != nil {
+			return nil, err
+		}
+		out = append(out, row)
+	}
+	return out, rows.Err()
+}
+
+func (r *Repository) RemoveMember(ctx context.Context, tenantID, userID uuid.UUID) error {
+	const q = `DELETE FROM tenant_users WHERE tenant_id = $1 AND user_id = $2`
+	tag, err := r.pool.Exec(ctx, q, tenantID, userID)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return pgx.ErrNoRows
+	}
+	return nil
+}
+
+func (r *Repository) UpdateMemberRole(ctx context.Context, tenantID, userID uuid.UUID, role string) error {
+	const q = `UPDATE tenant_users SET role = $3::user_role WHERE tenant_id = $1 AND user_id = $2`
+	tag, err := r.pool.Exec(ctx, q, tenantID, userID, role)
+	if err != nil {
+		return err
+	}
+	if tag.RowsAffected() == 0 {
+		return pgx.ErrNoRows
+	}
+	return nil
+}
+
 func (r *Repository) AddMember(ctx context.Context, tenantID, userID uuid.UUID, role *string) error {
 	const q = `
 INSERT INTO tenant_users (tenant_id, user_id, role)

@@ -95,7 +95,7 @@ export function UserFormDialog({ open, onOpenChange, userToEdit }: {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{userToEdit ? t('users.form.title_edit') : t('users.form.title_create')}</DialogTitle>
                     <DialogDescription>

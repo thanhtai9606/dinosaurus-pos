@@ -171,7 +171,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent size="lg" dismissible scrollable>
                 <DialogHeader>
                     <DialogTitle>
                         {promotionToEdit ? t('promotions.form.title_edit') : t('promotions.form.title_create')}

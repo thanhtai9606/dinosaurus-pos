@@ -190,7 +190,7 @@ function SupplierDebtsPage() {
             />
 
             <Dialog open={manualOpen} onOpenChange={setManualOpen}>
-                <DialogContent>
+                <DialogContent size="md" dismissible>
                     <DialogHeader>
                         <DialogTitle>{t('supplierDebts.actions.add_manual')}</DialogTitle>
                     </DialogHeader>

@@ -346,7 +346,7 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-[500px] h-[80vh] flex flex-col p-0">
+                <DialogContent size="lg" dismissible scrollable className="h-[80vh] flex flex-col p-0">
                     <DialogHeader className="p-6 pb-2">
                         <DialogTitle>{productToEdit ? t('products.form.title_edit') : t('products.form.title_create')}</DialogTitle>
                         <DialogDescription>

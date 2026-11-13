@@ -87,7 +87,7 @@ export function PaymentDialog({ open, onOpenChange, orderId, onPaymentSuccess, m
     return (
         <>
             <Dialog open={open} onOpenChange={handleAttemptClose}>
-                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden">
+                <DialogContent size="md" dismissible scrollable>
                     <DialogHeader>
                         <DialogTitle>{t('order.payment_dialog.title')}</DialogTitle>
                         <DialogDescription>{t('order.payment_dialog.desc')}</DialogDescription>

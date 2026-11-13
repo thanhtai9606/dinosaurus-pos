@@ -42,7 +42,7 @@ export const OpenShiftModal: React.FC = () => {
 
     return (
         <Dialog open={openShiftModalOpen} onOpenChange={setOpenShiftModalOpen}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('shift.open_modal.title')}</DialogTitle>
                     <DialogDescription>

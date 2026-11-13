@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { createFileRoute, Outlet, redirect, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouter, useRouterState } from '@tanstack/react-router'
 import { OpenShiftModal } from "@/components/modals/OpenShiftModal"
 import { CloseShiftModal } from "@/components/modals/CloseShiftModal"
 import { cn } from '@/lib/utils'
@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { useBrandingSettingsQuery, financialSettingsQueryOptions } from '@/lib/api/query/settings'
 import { MoneyProvider } from '@/context/MoneyContext'
 import { useNavigationMenu } from '@/hooks/useNavigationMenu'
+import { isSuperAdminPlatformPath, SUPER_ADMIN_HOME } from '@/lib/auth/superAdminPaths'
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar"
 import { DashboardMobileNav } from "@/components/dashboard/DashboardMobileNav"
 import { useAppWebSocket } from '@/hooks/useAppWebSocket'
@@ -67,6 +68,15 @@ function DashboardLayout() {
     }
 
     const { filteredMenu } = useNavigationMenu(auth.user?.role)
+    const pathname = useRouterState({ select: (s) => s.location.pathname })
+    const isSuperAdmin = auth.user?.role === 'super_admin'
+
+    useEffect(() => {
+        if (!isSuperAdmin) return
+        if (pathname === '/' || !isSuperAdminPlatformPath(pathname)) {
+            void router.navigate({ to: SUPER_ADMIN_HOME, replace: true })
+        }
+    }, [isSuperAdmin, pathname, router])
 
     return (
         <div className={cn(
@@ -103,8 +113,12 @@ function DashboardLayout() {
                         </div>
                     </main>
                 </div>
-                <OpenShiftModal />
-                <CloseShiftModal />
+                {!isSuperAdmin && (
+                    <>
+                        <OpenShiftModal />
+                        <CloseShiftModal />
+                    </>
+                )}
             </div>
         </div>
     )

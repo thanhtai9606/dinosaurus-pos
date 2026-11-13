@@ -10,7 +10,7 @@ type Props = {
 export function RetailReturnDialog({ open, onOpenChange, t }: Props) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('retailPos.return.title')}</DialogTitle>
                 </DialogHeader>

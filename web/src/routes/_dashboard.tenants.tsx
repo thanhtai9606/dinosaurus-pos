@@ -1,8 +1,12 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Building2, Pencil, Plus, Trash2 } from 'lucide-react'
-import { meQueryOptions } from '@/lib/api/query/auth'
+import { Building2, Hash, Layers, Pencil, Plus, Settings2, Trash2, ToggleLeft } from 'lucide-react'
+import { useMemo } from 'react'
+import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
+import { requireSuperAdmin } from '@/lib/auth/requireSuperAdmin'
+import { usePlatformOverviewQuery } from '@/lib/api/query/platform'
+import { DedicatedDsnAlert } from '@/components/platform/DedicatedDsnAlert'
 import {
   useTenantsAdminQuery,
   useCreateTenantMutation,
@@ -13,14 +17,6 @@ import {
 import { TenantFormDialog, type TenantFormValues } from '@/components/tenants/TenantFormDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import {
   AlertDialog,
@@ -39,11 +35,7 @@ const DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000001'
 
 export const Route = createFileRoute('/_dashboard/tenants')({
   beforeLoad: async ({ context: { queryClient } }) => {
-    const me = await queryClient.ensureQueryData(meQueryOptions())
-  const role = (me as { role?: string })?.role
-    if (role !== 'super_admin') {
-      throw redirect({ to: '/' })
-    }
+    await requireSuperAdmin(queryClient)
   },
   component: TenantsAdminPage,
 })
@@ -51,24 +43,28 @@ export const Route = createFileRoute('/_dashboard/tenants')({
 function TenantsAdminPage() {
   const { t } = useTranslation()
   const { data: tenants, isLoading, refetch } = useTenantsAdminQuery()
+  const { data: platformOverview } = usePlatformOverviewQuery()
   const createMutation = useCreateTenantMutation()
   const updateMutation = useUpdateTenantMutation()
   const deleteMutation = useDeleteTenantMutation()
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create')
+  const [dialogTab, setDialogTab] = useState<'general' | 'users'>('general')
   const [selected, setSelected] = useState<TenantAdmin | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<TenantAdmin | null>(null)
 
   const openCreate = () => {
     setDialogMode('create')
     setSelected(null)
+    setDialogTab('general')
     setDialogOpen(true)
   }
 
-  const openEdit = (tnt: TenantAdmin) => {
+  const openEdit = (tnt: TenantAdmin, tab: 'general' | 'users' = 'general') => {
     setDialogMode('edit')
     setSelected(tnt)
+    setDialogTab(tab)
     setDialogOpen(true)
   }
 
@@ -82,9 +78,12 @@ function TenantsAdminPage() {
           database_dsn_key: values.database_dsn_key,
         },
         {
-          onSuccess: () => {
+          onSuccess: (created) => {
             toast.success(t('tenants_admin.create_success'))
-            setDialogOpen(false)
+            setDialogMode('edit')
+            setSelected(created)
+            setDialogTab('users')
+            void refetch()
           },
           onError: (err: any) => {
             toast.error(err?.response?.data?.message || t('tenants_admin.create_error'))
@@ -106,6 +105,85 @@ function TenantsAdminPage() {
       )
     }
   }
+
+  const columns = useMemo<DataGridColumnDef<TenantAdmin>[]>(
+    () => [
+      {
+        id: 'code',
+        header: t('tenants_admin.code'),
+        icon: Hash,
+        sortable: true,
+        accessor: (r) => r.code,
+        cell: (tnt) => <span className="font-mono text-sm">{tnt.code}</span>,
+      },
+      {
+        id: 'name',
+        header: t('tenants_admin.name'),
+        icon: Building2,
+        sortable: true,
+        accessor: (r) => r.name,
+        cell: (tnt) => tnt.name,
+      },
+      {
+        id: 'data_plane',
+        header: t('tenants_admin.data_plane'),
+        icon: Layers,
+        cell: (tnt) => (
+          <Badge variant={tnt.data_plane === 'dedicated' ? 'outline' : 'secondary'}>
+            {tnt.data_plane === 'dedicated'
+              ? t('tenants_admin.data_plane_dedicated')
+              : t('tenants_admin.data_plane_shared')}
+          </Badge>
+        ),
+      },
+      {
+        id: 'status',
+        header: t('tenants_admin.status'),
+        icon: ToggleLeft,
+        sortable: true,
+        accessor: (r) => (r.is_active ? 1 : 0),
+        cell: (tnt) => (
+          <Badge variant={tnt.is_active ? 'default' : 'secondary'}>
+            {tnt.is_active ? t('tenants_admin.active') : t('tenants_admin.inactive')}
+          </Badge>
+        ),
+      },
+      {
+        id: 'actions',
+        header: t('common.actions'),
+        icon: Settings2,
+        align: 'right',
+        locked: true,
+        cell: (tnt) => (
+          <div className="text-right space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openEdit(tnt, 'users')}
+              className="gap-1 hidden sm:inline-flex"
+            >
+              {t('tenants_admin.manage_users')}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => openEdit(tnt)} className="gap-1">
+              <Pencil className="h-3.5 w-3.5" />
+              {t('common.edit')}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1 text-destructive hover:text-destructive"
+              disabled={tnt.id === DEFAULT_TENANT_ID}
+              onClick={() => setDeleteTarget(tnt)}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {t('common.delete')}
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    [t],
+  )
 
   const confirmDelete = () => {
     if (!deleteTarget) return
@@ -137,6 +215,10 @@ function TenantsAdminPage() {
         </Button>
       </div>
 
+      {platformOverview && (
+        <DedicatedDsnAlert issues={platformOverview.dedicated_missing_dsn} />
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>{t('tenants_admin.list_title')}</CardTitle>
@@ -148,53 +230,13 @@ function TenantsAdminPage() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('tenants_admin.code')}</TableHead>
-                  <TableHead>{t('tenants_admin.name')}</TableHead>
-                  <TableHead>{t('tenants_admin.data_plane')}</TableHead>
-                  <TableHead>{t('tenants_admin.status')}</TableHead>
-                  <TableHead className="text-right">{t('common.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(tenants ?? []).map((tnt) => (
-                  <TableRow key={tnt.id}>
-                    <TableCell className="font-mono text-sm">{tnt.code}</TableCell>
-                    <TableCell>{tnt.name}</TableCell>
-                    <TableCell>
-                      <Badge variant={tnt.data_plane === 'dedicated' ? 'outline' : 'secondary'}>
-                        {tnt.data_plane === 'dedicated'
-                          ? t('tenants_admin.data_plane_dedicated')
-                          : t('tenants_admin.data_plane_shared')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={tnt.is_active ? 'default' : 'secondary'}>
-                        {tnt.is_active ? t('tenants_admin.active') : t('tenants_admin.inactive')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => openEdit(tnt)} className="gap-1">
-                        <Pencil className="h-3.5 w-3.5" />
-                        {t('common.edit')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1 text-destructive hover:text-destructive"
-                        disabled={tnt.id === DEFAULT_TENANT_ID}
-                        onClick={() => setDeleteTarget(tnt)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        {t('common.delete')}
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DataGrid
+              storageKey="tenants-admin-grid"
+              columns={columns}
+              data={tenants ?? []}
+              getRowId={(r) => r.id}
+              emptyMessage={t('tenants_admin.list_title')}
+            />
           )}
         </CardContent>
       </Card>
@@ -204,6 +246,7 @@ function TenantsAdminPage() {
         onOpenChange={setDialogOpen}
         mode={dialogMode}
         tenant={selected}
+        defaultTab={dialogTab}
         onSubmit={handleFormSubmit}
         isPending={createMutation.isPending || updateMutation.isPending}
       />

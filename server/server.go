@@ -27,6 +27,7 @@ import (
 	"POS-kasir/internal/printer"
 	"POS-kasir/internal/products"
 	products_repo "POS-kasir/internal/products/repository"
+	"POS-kasir/internal/platform"
 	"POS-kasir/internal/promotions"
 	promotions_repo "POS-kasir/internal/promotions/repository"
 	"POS-kasir/internal/report"
@@ -114,6 +115,7 @@ type AppContainer struct {
 	PrinterHandler            *printer.PrinterHandler
 	ShiftHandler              shift.Handler
 	TenantHandler             *tenants.Handler
+	PlatformHandler           *platform.Handler
 	ShiftRepo                 shift_repo.Querier
 	ShiftService              shift.Service
 	WSHub                     *ws.Hub
@@ -196,7 +198,10 @@ func BuildAppContainer(app *App) *AppContainer {
 	poolRouter := database.NewPoolRouter(pool, app.Logger, tenantRepo.RoutingForTenant)
 	app.PoolRouter = poolRouter
 	tenantDB := database.NewRoutedTenantDB(poolRouter)
-	tenantHandler := tenants.NewHandler(tenantRepo, app.Logger)
+	platformRepo := platform.NewRepository(pool)
+	platformSvc := platform.NewService(platformRepo, tenantRepo, pool, poolRouter)
+	platformHandler := platform.NewHandler(platformSvc, app.Logger)
+	platformAudit := platform.NewRecorder(platformRepo)
 
 	// Activity Log IActivityService
 	activityLogRepo := activitylog_repo.New(tenantDB)
@@ -206,12 +211,14 @@ func BuildAppContainer(app *App) *AppContainer {
 	// User Module
 	userAvatarRepo := user.NewAuthRepo(app.Logger, app.R2)
 	userRepo := user_repo.New(pool)
+	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger)
+	tenantHandler := tenants.NewHandler(tenantRepo, tenantService, app.Logger, platformAudit)
 	userService := user.NewUsrService(userRepo, tenantRepo, app.Logger, activityService, userAvatarRepo)
 	userHandler := user.NewUsrHandler(userService, app.Logger, app.Validator)
 
 	// Auth Module (Merged into user domain)
 	authService := user.NewAuthService(userRepo, tenantRepo, app.Logger, app.JWT, userAvatarRepo, activityService)
-	authHandler := user.NewAuthHandler(authService, app.Logger, app.Validator, app.Config)
+	authHandler := user.NewAuthHandler(authService, app.Logger, app.Validator, app.Config, platformAudit)
 
 	// Category Module
 	categoryRepo := categories_repo.New(tenantDB)
@@ -332,6 +339,7 @@ func BuildAppContainer(app *App) *AppContainer {
 		PrinterHandler:            printerHandler,
 		ShiftHandler:              shiftHandler,
 		TenantHandler:             tenantHandler,
+		PlatformHandler:           platformHandler,
 		ShiftRepo:                 shiftRepo,
 		ShiftService:              shiftService,
 		WSHub:                     wsHub,

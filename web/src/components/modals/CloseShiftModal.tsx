@@ -53,7 +53,7 @@ export const CloseShiftModal: React.FC = () => {
 
         return (
             <Dialog open={closeShiftModalOpen} onOpenChange={handleClose}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent size="md" dismissible>
                     <DialogHeader>
                         <DialogTitle>{t('shift.close_modal.title_summary')}</DialogTitle>
                         <DialogDescription>
@@ -90,7 +90,7 @@ export const CloseShiftModal: React.FC = () => {
 
     return (
         <Dialog open={closeShiftModalOpen} onOpenChange={setCloseShiftModalOpen}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('shift.close_modal.title')}</DialogTitle>
                     <DialogDescription>

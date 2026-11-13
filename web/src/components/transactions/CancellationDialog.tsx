@@ -37,7 +37,7 @@ export function CancellationDialog({
 }: CancellationDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('transactions.cancellation_dialog.title')}</DialogTitle>
                     <DialogDescription>

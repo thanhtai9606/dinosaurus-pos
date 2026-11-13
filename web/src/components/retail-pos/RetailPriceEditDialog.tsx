@@ -64,7 +64,7 @@ export function RetailPriceEditDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('retailPos.price_edit.title')}</DialogTitle>
                 </DialogHeader>

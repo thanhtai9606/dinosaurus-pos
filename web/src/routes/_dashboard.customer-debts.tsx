@@ -193,7 +193,7 @@ function CustomerDebtsPage() {
             />
 
             <Dialog open={manualOpen} onOpenChange={setManualOpen}>
-                <DialogContent>
+                <DialogContent size="md" dismissible>
                     <DialogHeader>
                         <DialogTitle>{t('customerDebts.actions.add_manual')}</DialogTitle>
                     </DialogHeader>

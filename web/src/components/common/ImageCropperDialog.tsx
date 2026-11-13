@@ -34,7 +34,7 @@ export function ImageCropperDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('common.crop.title')}</DialogTitle>
                     <DialogDescription>

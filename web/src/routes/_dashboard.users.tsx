@@ -172,7 +172,17 @@ function UsersPage() {
             {showFetchingSkeleton && viewMode === 'grid' ? (
                 <UserGridSkeleton />
             ) : viewMode === 'list' ? (
-                <UsersTable users={users} t={t} renderActions={renderActions} />
+                <UsersTable
+                    users={users}
+                    t={t}
+                    renderActions={renderActions}
+                    server={{
+                        pagination,
+                        onPageChange: handlePageChange,
+                        onLimitChange: handleLimitChange,
+                        isFetching: usersQuery.isFetching,
+                    }}
+                />
             ) : (
                 <UsersCardView
                     users={users}
@@ -182,12 +192,14 @@ function UsersPage() {
                 />
             )}
 
-            <ListPagination
-                pagination={pagination}
-                onPageChange={handlePageChange}
-                onLimitChange={handleLimitChange}
-                isFetching={usersQuery.isFetching}
-            />
+            {viewMode === 'grid' ? (
+                <ListPagination
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                    isFetching={usersQuery.isFetching}
+                />
+            ) : null}
 
             <UserFormDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} userToEdit={selectedUser} />
         </div>

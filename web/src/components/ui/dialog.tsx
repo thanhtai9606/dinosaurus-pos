@@ -5,6 +5,16 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 
+export const dialogSizeClasses = {
+  sm: "sm:max-w-sm",
+  md: "sm:max-w-lg",
+  lg: "sm:max-w-2xl",
+  xl: "sm:max-w-4xl",
+  full: "sm:max-w-[min(96rem,calc(100vw-2rem))] max-h-[min(92vh,900px)]",
+} as const
+
+export type DialogSize = keyof typeof dialogSizeClasses
+
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -49,9 +59,16 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  size = "md",
+  dismissible = true,
+  scrollable = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  size?: DialogSize
+  /** Close when clicking outside (default true). */
+  dismissible?: boolean
+  scrollable?: boolean
 }) {
   return (
     <DialogPortal>
@@ -59,9 +76,13 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-background p-4 text-sm/relaxed ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-background p-4 text-sm/relaxed ring-1 ring-foreground/10 duration-100 outline-none data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          dialogSizeClasses[size],
+          scrollable && "overflow-y-auto",
           className
         )}
+        onInteractOutside={dismissible ? undefined : (e) => e.preventDefault()}
+        onPointerDownOutside={dismissible ? undefined : (e) => e.preventDefault()}
         {...props}
       >
         {children}
@@ -72,8 +93,7 @@ function DialogContent({
               className="absolute top-2 right-2"
               size="icon-sm"
             >
-              <XIcon
-              />
+              <XIcon />
               <span className="sr-only">Close</span>
             </Button>
           </DialogPrimitive.Close>
@@ -87,7 +107,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1", className)}
+      className={cn("flex flex-col gap-1 pr-8", className)}
       {...props}
     />
   )
@@ -127,7 +147,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("font-heading text-sm font-medium", className)}
+      className={cn("font-heading text-lg font-semibold", className)}
       {...props}
     />
   )

@@ -71,7 +71,7 @@ export function DashboardSidebar({
 
                 {/* Bottom section */}
                 <div className={cn("mt-auto p-4 space-y-3", isSidebarCollapsed && "p-2")}>
-                    {!isSidebarCollapsed && (
+                    {!isSidebarCollapsed && userRole !== 'super_admin' && (
                         <>
                             <div className="hidden md:block">
                                 <TenantSwitcher />

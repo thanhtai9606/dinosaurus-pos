@@ -272,11 +272,10 @@ export function OrderDetailDialog({
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent
-                    className={
-                        detailView === 'receipt'
-                            ? 'flex max-h-[92vh] flex-col gap-4 overflow-hidden sm:max-w-lg'
-                            : 'flex max-h-[92vh] w-[min(96rem,calc(100vw-2rem))] flex-col gap-4 overflow-hidden sm:max-w-6xl'
-                    }
+                    size={detailView === 'receipt' ? 'md' : 'xl'}
+                    dismissible
+                    scrollable={false}
+                    className="flex max-h-[92vh] flex-col gap-4 overflow-hidden"
                 >
                     <DialogHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
                         <DialogTitle className="flex flex-wrap items-center gap-2">

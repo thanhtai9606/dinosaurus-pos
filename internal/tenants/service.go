@@ -10,6 +10,7 @@ import (
 	"POS-kasir/internal/tenant"
 	user_repo "POS-kasir/internal/user/repository"
 	"POS-kasir/pkg/logger"
+	"POS-kasir/pkg/utils"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -19,12 +20,13 @@ import (
 var ErrTenantCodeExists = errors.New("tenant code already exists")
 
 type Service struct {
-	repo *Repository
-	log  logger.ILogger
+	repo  *Repository
+	users user_repo.Querier
+	log   logger.ILogger
 }
 
-func NewService(repo *Repository, log logger.ILogger) *Service {
-	return &Service{repo: repo, log: log}
+func NewService(repo *Repository, users user_repo.Querier, log logger.ILogger) *Service {
+	return &Service{repo: repo, users: users, log: log}
 }
 
 type CreateTenantRequest struct {
@@ -137,4 +139,142 @@ func (s *Service) AddMemberToTenant(ctx context.Context, tenantID uuid.UUID, use
 	}
 	roleStr := string(role)
 	return s.repo.AddMember(ctx, tenantID, userID, &roleStr)
+}
+
+type MemberSummary struct {
+	UserID   uuid.UUID `json:"user_id"`
+	Email    string    `json:"email"`
+	Username string    `json:"username"`
+	Role     string    `json:"role"`
+	IsActive bool      `json:"is_active"`
+}
+
+func memberSummaries(rows []MemberRow) []MemberSummary {
+	out := make([]MemberSummary, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, MemberSummary{
+			UserID: r.UserID, Email: r.Email, Username: r.Username,
+			Role: r.Role, IsActive: r.IsActive,
+		})
+	}
+	return out
+}
+
+func (s *Service) ListMembers(ctx context.Context, tenantID uuid.UUID) ([]MemberSummary, error) {
+	if _, err := s.repo.GetByIDAny(ctx, tenantID); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, common.ErrNotFound
+		}
+		return nil, err
+	}
+	rows, err := s.repo.ListMembers(ctx, tenantID)
+	if err != nil {
+		return nil, err
+	}
+	return memberSummaries(rows), nil
+}
+
+func (s *Service) CreateMember(ctx context.Context, tenantID uuid.UUID, req CreateTenantMemberRequest) (MemberSummary, error) {
+	if _, err := s.repo.GetByIDAny(ctx, tenantID); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return MemberSummary{}, common.ErrNotFound
+		}
+		return MemberSummary{}, err
+	}
+	email := strings.TrimSpace(strings.ToLower(req.Email))
+	username := strings.TrimSpace(req.Username)
+	roleStr := strings.TrimSpace(req.Role)
+	if roleStr == "" {
+		roleStr = string(user_repo.UserRoleCashier)
+	}
+	if roleStr == string(user_repo.UserRoleSuperAdmin) {
+		return MemberSummary{}, common.ErrForbidden
+	}
+
+	exist, err := s.users.CheckUserExistence(ctx, user_repo.CheckUserExistenceParams{
+		Email:    email,
+		Username: username,
+	})
+	if err != nil {
+		s.log.Errorf("CreateMember check: %v", err)
+		return MemberSummary{}, common.ErrInternal
+	}
+
+	var userID uuid.UUID
+	if exist.EmailExists || exist.UsernameExists {
+		// Link existing user by email (must match username if both exist)
+		u, err := s.users.GetUserByEmail(ctx, email)
+		if err != nil {
+			return MemberSummary{}, common.ErrBadRequest
+		}
+		userID = u.ID
+	} else {
+		userUUID, err := uuid.NewV7()
+		if err != nil {
+			return MemberSummary{}, err
+		}
+		passHash, err := utils.HashPassword(req.Password)
+		if err != nil {
+			return MemberSummary{}, err
+		}
+		u, err := s.users.CreateUser(ctx, user_repo.CreateUserParams{
+			ID:           userUUID,
+			Username:     username,
+			Email:        email,
+			PasswordHash: passHash,
+			Role:         user_repo.UserRole(roleStr),
+			IsActive:     true,
+		})
+		if err != nil {
+			s.log.Errorf("CreateMember create user: %v", err)
+			return MemberSummary{}, common.ErrInternal
+		}
+		userID = u.ID
+	}
+
+	if err := s.repo.AddMember(ctx, tenantID, userID, &roleStr); err != nil {
+		s.log.Errorf("CreateMember add: %v", err)
+		return MemberSummary{}, common.ErrInternal
+	}
+
+	rows, err := s.repo.ListMembers(ctx, tenantID)
+	if err != nil {
+		return MemberSummary{}, err
+	}
+	for _, r := range rows {
+		if r.UserID == userID {
+			return MemberSummary{
+				UserID: r.UserID, Email: r.Email, Username: r.Username,
+				Role: r.Role, IsActive: r.IsActive,
+			}, nil
+		}
+	}
+	return MemberSummary{}, common.ErrInternal
+}
+
+type UpdateMemberRoleRequest struct {
+	Role string `json:"role" validate:"required,oneof=admin manager cashier"`
+}
+
+func (s *Service) UpdateMemberRole(ctx context.Context, tenantID, userID uuid.UUID, role string) error {
+	if role == string(user_repo.UserRoleSuperAdmin) {
+		return common.ErrForbidden
+	}
+	if err := s.repo.UpdateMemberRole(ctx, tenantID, userID, role); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return common.ErrNotFound
+		}
+		return err
+	}
+	return nil
+}
+
+func (s *Service) RemoveMember(ctx context.Context, tenantID, userID uuid.UUID) error {
+	if err := s.repo.RemoveMember(ctx, tenantID, userID); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return common.ErrNotFound
+		}
+		return err
+	}
+	return nil
 }

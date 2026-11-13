@@ -83,7 +83,7 @@ export function SupplierFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-lg">
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>
                         {supplierToEdit ? t('suppliers.form.edit_title') : t('suppliers.form.create_title')}

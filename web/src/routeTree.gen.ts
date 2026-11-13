@@ -33,6 +33,10 @@ import { Route as DashboardSuppliersRouteImport } from './routes/_dashboard.supp
 import { Route as DashboardTenantsRouteImport } from './routes/_dashboard.tenants'
 import { Route as DashboardTransactionsRouteImport } from './routes/_dashboard.transactions'
 import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
+import { Route as DashboardPlatformAuditRouteImport } from './routes/_dashboard.platform.audit'
+import { Route as DashboardPlatformOpsRouteImport } from './routes/_dashboard.platform.ops'
+import { Route as DashboardPlatformOverviewRouteImport } from './routes/_dashboard.platform.overview'
+import { Route as DashboardPlatformUsersRouteImport } from './routes/_dashboard.platform.users'
 import { Route as DashboardStockReceiptsNewRouteImport } from './routes/_dashboard.stock-receipts.new'
 
 const LocaleRoute = LocaleRouteImport.update({
@@ -154,6 +158,27 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPlatformAuditRoute = DashboardPlatformAuditRouteImport.update({
+  id: '/platform/audit',
+  path: '/platform/audit',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPlatformOpsRoute = DashboardPlatformOpsRouteImport.update({
+  id: '/platform/ops',
+  path: '/platform/ops',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPlatformOverviewRoute =
+  DashboardPlatformOverviewRouteImport.update({
+    id: '/platform/overview',
+    path: '/platform/overview',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardPlatformUsersRoute = DashboardPlatformUsersRouteImport.update({
+  id: '/platform/users',
+  path: '/platform/users',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardStockReceiptsNewRoute =
   DashboardStockReceiptsNewRouteImport.update({
     id: '/new',
@@ -185,6 +210,10 @@ export interface FileRoutesByFullPath {
   '/tenants': typeof DashboardTenantsRoute
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
+  '/platform/audit': typeof DashboardPlatformAuditRoute
+  '/platform/ops': typeof DashboardPlatformOpsRoute
+  '/platform/overview': typeof DashboardPlatformOverviewRoute
+  '/platform/users': typeof DashboardPlatformUsersRoute
   '/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRoutesByTo {
@@ -211,6 +240,10 @@ export interface FileRoutesByTo {
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
   '/': typeof DashboardIndexRoute
+  '/platform/audit': typeof DashboardPlatformAuditRoute
+  '/platform/ops': typeof DashboardPlatformOpsRoute
+  '/platform/overview': typeof DashboardPlatformOverviewRoute
+  '/platform/users': typeof DashboardPlatformUsersRoute
   '/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRoutesById {
@@ -239,6 +272,10 @@ export interface FileRoutesById {
   '/_dashboard/transactions': typeof DashboardTransactionsRoute
   '/_dashboard/users': typeof DashboardUsersRoute
   '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/platform/audit': typeof DashboardPlatformAuditRoute
+  '/_dashboard/platform/ops': typeof DashboardPlatformOpsRoute
+  '/_dashboard/platform/overview': typeof DashboardPlatformOverviewRoute
+  '/_dashboard/platform/users': typeof DashboardPlatformUsersRoute
   '/_dashboard/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRouteTypes {
@@ -267,6 +304,10 @@ export interface FileRouteTypes {
     | '/tenants'
     | '/transactions'
     | '/users'
+    | '/platform/audit'
+    | '/platform/ops'
+    | '/platform/overview'
+    | '/platform/users'
     | '/stock-receipts/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -293,6 +334,10 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/users'
     | '/'
+    | '/platform/audit'
+    | '/platform/ops'
+    | '/platform/overview'
+    | '/platform/users'
     | '/stock-receipts/new'
   id:
     | '__root__'
@@ -320,6 +365,10 @@ export interface FileRouteTypes {
     | '/_dashboard/transactions'
     | '/_dashboard/users'
     | '/_dashboard/'
+    | '/_dashboard/platform/audit'
+    | '/_dashboard/platform/ops'
+    | '/_dashboard/platform/overview'
+    | '/_dashboard/platform/users'
     | '/_dashboard/stock-receipts/new'
   fileRoutesById: FileRoutesById
 }
@@ -499,6 +548,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/platform/audit': {
+      id: '/_dashboard/platform/audit'
+      path: '/platform/audit'
+      fullPath: '/platform/audit'
+      preLoaderRoute: typeof DashboardPlatformAuditRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/platform/ops': {
+      id: '/_dashboard/platform/ops'
+      path: '/platform/ops'
+      fullPath: '/platform/ops'
+      preLoaderRoute: typeof DashboardPlatformOpsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/platform/overview': {
+      id: '/_dashboard/platform/overview'
+      path: '/platform/overview'
+      fullPath: '/platform/overview'
+      preLoaderRoute: typeof DashboardPlatformOverviewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/platform/users': {
+      id: '/_dashboard/platform/users'
+      path: '/platform/users'
+      fullPath: '/platform/users'
+      preLoaderRoute: typeof DashboardPlatformUsersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/stock-receipts/new': {
       id: '/_dashboard/stock-receipts/new'
       path: '/new'
@@ -555,6 +632,10 @@ interface DashboardRouteChildren {
   DashboardTransactionsRoute: typeof DashboardTransactionsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardPlatformAuditRoute: typeof DashboardPlatformAuditRoute
+  DashboardPlatformOpsRoute: typeof DashboardPlatformOpsRoute
+  DashboardPlatformOverviewRoute: typeof DashboardPlatformOverviewRoute
+  DashboardPlatformUsersRoute: typeof DashboardPlatformUsersRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -578,6 +659,10 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardTransactionsRoute: DashboardTransactionsRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardPlatformAuditRoute: DashboardPlatformAuditRoute,
+  DashboardPlatformOpsRoute: DashboardPlatformOpsRoute,
+  DashboardPlatformOverviewRoute: DashboardPlatformOverviewRoute,
+  DashboardPlatformUsersRoute: DashboardPlatformUsersRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

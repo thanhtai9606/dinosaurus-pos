@@ -223,10 +223,13 @@ export function CustomerFormDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
+                size={isEdit ? 'xl' : 'md'}
+                dismissible
+                scrollable={!isEdit}
                 className={
                     isEdit
-                        ? 'flex max-h-[92vh] w-[min(96rem,calc(100vw-2rem))] flex-col gap-4 overflow-hidden sm:max-w-6xl'
-                        : 'sm:max-w-lg'
+                        ? 'flex max-h-[92vh] flex-col gap-4 overflow-hidden'
+                        : undefined
                 }
             >
                 <DialogHeader>

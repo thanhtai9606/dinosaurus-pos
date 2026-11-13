@@ -51,7 +51,7 @@ export function ProductPriceImportDialog({ open, onOpenChange }: { open: boolean
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent size="md" dismissible>
                 <DialogHeader>
                     <DialogTitle>{t('importPrices.title')}</DialogTitle>
                     <DialogDescription>{t('importPrices.description')}</DialogDescription>

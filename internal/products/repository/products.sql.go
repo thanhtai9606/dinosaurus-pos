@@ -1021,6 +1021,7 @@ func (q *Queries) ListProductsForPriceExport(ctx context.Context) ([]ListProduct
 const listProductsForSearchIndex = `-- name: ListProductsForSearchIndex :many
 SELECT
     p.id,
+    p.tenant_id,
     p.name,
     p.sku,
     p.barcode,
@@ -1033,13 +1034,14 @@ ORDER BY p.updated_at DESC
 `
 
 type ListProductsForSearchIndexRow struct {
-	ID      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	Sku     *string   `json:"sku"`
-	Barcode *string   `json:"barcode"`
-	Price   int64     `json:"price"`
-	Stock   int32     `json:"stock"`
-	Unit    string    `json:"unit"`
+	ID       uuid.UUID `json:"id"`
+	TenantID uuid.UUID `json:"tenant_id"`
+	Name     string    `json:"name"`
+	Sku      *string   `json:"sku"`
+	Barcode  *string   `json:"barcode"`
+	Price    int64     `json:"price"`
+	Stock    int32     `json:"stock"`
+	Unit     string    `json:"unit"`
 }
 
 func (q *Queries) ListProductsForSearchIndex(ctx context.Context) ([]ListProductsForSearchIndexRow, error) {
@@ -1053,6 +1055,7 @@ func (q *Queries) ListProductsForSearchIndex(ctx context.Context) ([]ListProduct
 		var i ListProductsForSearchIndexRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.TenantID,
 			&i.Name,
 			&i.Sku,
 			&i.Barcode,

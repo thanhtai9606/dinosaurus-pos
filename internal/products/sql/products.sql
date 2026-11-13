@@ -327,6 +327,7 @@ FOR UPDATE;
 -- name: ListProductsForSearchIndex :many
 SELECT
     p.id,
+    p.tenant_id,
     p.name,
     p.sku,
     p.barcode,

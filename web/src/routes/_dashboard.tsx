@@ -5,7 +5,6 @@ import { CloseShiftModal } from "@/components/modals/CloseShiftModal"
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { meQueryOptions } from '@/lib/api/query/auth'
-import { useTranslation } from 'react-i18next'
 import { useBrandingSettingsQuery, financialSettingsQueryOptions } from '@/lib/api/query/settings'
 import { MoneyProvider } from '@/context/MoneyContext'
 import { useNavigationMenu } from '@/hooks/useNavigationMenu'
@@ -33,7 +32,6 @@ export const Route = createFileRoute('/_dashboard')({
 })
 
 function DashboardLayout() {
-    const { t } = useTranslation()
     const auth = useAuth()
     const router = useRouter()
     const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -84,7 +82,6 @@ function DashboardLayout() {
             isSidebarCollapsed ? "md:grid-cols-[80px_1fr]" : "md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]"
         )}>
             <DashboardSidebar
-                t={t}
                 branding={branding}
                 isSidebarCollapsed={isSidebarCollapsed}
                 setIsSidebarCollapsed={setIsSidebarCollapsed}

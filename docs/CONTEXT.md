@@ -38,9 +38,11 @@ Schema mã nghiệp vụ (`order_no`, `customers.code`, `products.code`) nằm t
 - **Đăng nhập:** bắt buộc `tenant_code` + email + password. Vai trò JWT = `super_admin` hoặc `COALESCE(tenant_users.role, users.role)` trong tenant đó.
 - **super_admin:** chỉ menu **Nền tảng**; quản lý user **theo từng tenant** — tab « Người dùng » trong dialog sửa cửa hàng (`GET/POST/PUT/DELETE /api/v1/tenants/:id/members`). Home `/platform/overview`. Demo: `superadmin@example.com` / `1q2w3E*`, tenant `default`.
 - **admin tenant:** chỉ user thuộc tenant (JWT); tạo/sửa user trong tenant hiện tại (`POST /users` gán `tenant_users`).
-- `POST /auth/switch-tenant`, `GET /tenants/mine`.
+- `POST /auth/switch-tenant` (API còn, FE không switch — user làm việc trên tenant đã chọn lúc login).
 - Tenant mặc định: UUID `00000000-0000-0000-0000-000000000001`, code `default` — seed + backfill migration.
-- FE: `TenantSwitcher` trên sidebar (`web/src/components/dashboard/TenantSwitcher.tsx`).
+- FE chrome: `DashboardTopBar` — welcome + ca + theme + profile; ngôn ngữ trong Settings → Preferences.
+- **Redis:** `tenant:lookup:v1:{code}` (login lookup, TTL 15m / miss 2m); `platform:overview:v1` (~45s); báo cáo & shift như cũ.
+- **Meilisearch:** field `tenant_id` filterable; search sản phẩm theo tenant JWT; auto-reindex mọi tenant active khi `MEILI_AUTO_REINDEX=true`.
 
 ---
 

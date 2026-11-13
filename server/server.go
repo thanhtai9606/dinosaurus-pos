@@ -36,7 +36,6 @@ import (
 	settings_repo "POS-kasir/internal/settings/repository"
 	"POS-kasir/internal/shift"
 	shift_repo "POS-kasir/internal/shift/repository"
-	"POS-kasir/internal/tenant"
 	"POS-kasir/internal/tenants"
 	"POS-kasir/internal/user"
 	user_repo "POS-kasir/internal/user/repository"
@@ -73,6 +72,7 @@ import (
 
 	"POS-kasir/sqlc/migrations"
 
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -200,7 +200,8 @@ func BuildAppContainer(app *App) *AppContainer {
 	tenantDB := database.NewRoutedTenantDB(poolRouter)
 	platformRepo := platform.NewRepository(pool)
 	platformSvc := platform.NewService(platformRepo, tenantRepo, pool, poolRouter)
-	platformHandler := platform.NewHandler(platformSvc, app.Logger)
+	platformOverviewCache := platform.NewOverviewCache(app.RedisCache)
+	platformHandler := platform.NewHandler(platformSvc, app.Logger, platformOverviewCache)
 	platformAudit := platform.NewRecorder(platformRepo)
 
 	// Activity Log IActivityService
@@ -212,7 +213,8 @@ func BuildAppContainer(app *App) *AppContainer {
 	userAvatarRepo := user.NewAuthRepo(app.Logger, app.R2)
 	userRepo := user_repo.New(pool)
 	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger)
-	tenantHandler := tenants.NewHandler(tenantRepo, tenantService, app.Logger, platformAudit)
+	tenantLookupCache := tenants.NewLookupCache(app.RedisCache)
+	tenantHandler := tenants.NewHandler(tenantRepo, tenantService, app.Logger, platformAudit, tenantLookupCache, platformOverviewCache)
 	userService := user.NewUsrService(userRepo, tenantRepo, app.Logger, activityService, userAvatarRepo)
 	userHandler := user.NewUsrHandler(userService, app.Logger, app.Validator)
 
@@ -261,9 +263,20 @@ func BuildAppContainer(app *App) *AppContainer {
 			app.Logger.Warnf("Meilisearch index setup failed: %v", err)
 		} else if app.Config.Meili.AutoReindex {
 			go func() {
-				reindexCtx := tenant.WithID(context.Background(), tenant.DefaultTenantID)
+				reindexCtx := context.Background()
+				allTenants, err := tenantRepo.ListAll(reindexCtx)
+				if err != nil {
+					app.Logger.Warnf("Meilisearch auto-reindex: list tenants: %v", err)
+					return
+				}
+				var tenantIDs []uuid.UUID
+				for _, t := range allTenants {
+					if t.IsActive {
+						tenantIDs = append(tenantIDs, t.ID)
+					}
+				}
 				svc := products.NewPrdService(app.Store, products_repo.New(tenantDB), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer)
-				if n, err := svc.ReindexProductSearch(reindexCtx); err != nil {
+				if n, err := svc.ReindexProductSearchAllTenants(reindexCtx, tenantIDs); err != nil {
 					app.Logger.Warnf("Meilisearch auto-reindex failed: %v", err)
 				} else {
 					app.Logger.Infof("Meilisearch indexed %d products", n)

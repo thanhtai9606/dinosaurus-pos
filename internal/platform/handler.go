@@ -10,19 +10,29 @@ import (
 )
 
 type Handler struct {
-	svc *Service
-	log logger.ILogger
+	svc   *Service
+	log   logger.ILogger
+	cache *OverviewCache
 }
 
-func NewHandler(svc *Service, log logger.ILogger) *Handler {
-	return &Handler{svc: svc, log: log}
+func NewHandler(svc *Service, log logger.ILogger, cache *OverviewCache) *Handler {
+	return &Handler{svc: svc, log: log, cache: cache}
 }
 
 func (h *Handler) Overview(c fiber.Ctx) error {
-	data, err := h.svc.Overview(c.RequestCtx())
+	ctx := c.RequestCtx()
+	if h.cache != nil {
+		if cached, ok := h.cache.Get(ctx); ok {
+			return c.JSON(common.SuccessResponse{Message: "ok", Data: ToOverviewDTO(cached)})
+		}
+	}
+	data, err := h.svc.Overview(ctx)
 	if err != nil {
 		h.log.Errorf("platform overview: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "failed to load overview"})
+	}
+	if h.cache != nil {
+		h.cache.Set(ctx, data)
 	}
 	return c.JSON(common.SuccessResponse{Message: "ok", Data: ToOverviewDTO(data)})
 }

@@ -8,6 +8,10 @@ Generic dialog with `size`: `sm` | `md` | `lg` | `xl` | `full`, click-outside to
 
 Use `size` and `dismissible` on any raw `Dialog` instead of hand-rolled `max-w-*`.
 
+## Helpers
+
+- `applyClientFilters.ts` — shared row filtering for column quick-filters.
+
 ## DataGrid (`components/data-table/DataGrid.tsx`)
 
 - Column icons + sort (client or server via `server.onSortChange`)

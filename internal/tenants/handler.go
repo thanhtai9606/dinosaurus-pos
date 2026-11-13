@@ -14,14 +14,43 @@ import (
 )
 
 type Handler struct {
-	repo    *Repository
-	service *Service
-	log     logger.ILogger
-	audit   platformaudit.Recorder
+	repo          *Repository
+	service       *Service
+	log           logger.ILogger
+	audit         platformaudit.Recorder
+	lookupCache   *LookupCache
+	overviewCache overviewCacheInvalidator
 }
 
-func NewHandler(repo *Repository, service *Service, log logger.ILogger, audit platformaudit.Recorder) *Handler {
-	return &Handler{repo: repo, service: service, log: log, audit: audit}
+type overviewCacheInvalidator interface {
+	Invalidate()
+}
+
+func NewHandler(
+	repo *Repository,
+	service *Service,
+	log logger.ILogger,
+	audit platformaudit.Recorder,
+	lookupCache *LookupCache,
+	overviewCache overviewCacheInvalidator,
+) *Handler {
+	return &Handler{
+		repo:          repo,
+		service:       service,
+		log:           log,
+		audit:         audit,
+		lookupCache:   lookupCache,
+		overviewCache: overviewCache,
+	}
+}
+
+func (h *Handler) bustPlatformCaches(code string) {
+	if h.lookupCache != nil {
+		h.lookupCache.InvalidateCode(code)
+	}
+	if h.overviewCache != nil {
+		h.overviewCache.Invalidate()
+	}
 }
 
 func (h *Handler) recordPlatform(c fiber.Ctx, action, resourceType, resourceID string, details map[string]any) {
@@ -43,13 +72,32 @@ func (h *Handler) LookupByCode(c fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "invalid tenant code"})
 	}
-	row, err := h.repo.GetByCode(c.RequestCtx(), code)
+	ctx := c.RequestCtx()
+	if h.lookupCache != nil {
+		if cached, hit := h.lookupCache.Get(ctx, code); hit {
+			if cached == nil {
+				return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "tenant not found"})
+			}
+			return c.JSON(common.SuccessResponse{
+				Message: "ok",
+				Data:    map[string]string{"code": cached.Code, "name": cached.Name},
+			})
+		}
+	}
+	row, err := h.repo.GetByCode(ctx, code)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
+			if h.lookupCache != nil {
+				h.lookupCache.SetMiss(ctx, code)
+			}
 			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "tenant not found"})
 		}
 		h.log.Errorf("LookupByCode: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "tenant lookup failed"})
+	}
+	res := LookupCacheFromTenantRow(row.Code, row.Name)
+	if h.lookupCache != nil {
+		h.lookupCache.SetHit(ctx, code, res)
 	}
 	return c.JSON(common.SuccessResponse{
 		Message: "ok",
@@ -101,6 +149,7 @@ func (h *Handler) Create(c fiber.Ctx) error {
 	h.recordPlatform(c, "tenant_create", "tenant", summary.ID.String(), map[string]any{
 		"code": summary.Code, "data_plane": summary.DataPlane,
 	})
+	h.bustPlatformCaches(summary.Code)
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{Message: "tenant created", Data: summary})
 }
 
@@ -129,6 +178,7 @@ func (h *Handler) Update(c fiber.Ctx) error {
 	h.recordPlatform(c, "tenant_update", "tenant", summary.ID.String(), map[string]any{
 		"code": summary.Code, "is_active": summary.IsActive,
 	})
+	h.bustPlatformCaches(summary.Code)
 	return c.JSON(common.SuccessResponse{Message: "tenant updated", Data: summary})
 }
 
@@ -137,7 +187,12 @@ func (h *Handler) Delete(c fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "invalid tenant id"})
 	}
-	if err := h.service.Delete(c.RequestCtx(), id); err != nil {
+	ctx := c.RequestCtx()
+	var deleteCode string
+	if row, err := h.repo.GetByIDAny(ctx, id); err == nil {
+		deleteCode = row.Code
+	}
+	if err := h.service.Delete(ctx, id); err != nil {
 		if errors.Is(err, common.ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "tenant not found"})
 		}
@@ -152,6 +207,9 @@ func (h *Handler) Delete(c fiber.Ctx) error {
 		h.log.Infof("audit: tenant_delete actor=%s tenant_id=%s", actorID, id)
 	}
 	h.recordPlatform(c, "tenant_delete", "tenant", id.String(), nil)
+	if deleteCode != "" {
+		h.bustPlatformCaches(deleteCode)
+	}
 	return c.JSON(common.SuccessResponse{Message: "tenant deleted"})
 }
 

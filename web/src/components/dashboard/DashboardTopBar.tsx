@@ -1,16 +1,18 @@
 import { useTranslation } from 'react-i18next'
-import { SettingsPanel } from '@/components/SettingsPanel'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { ShiftControl } from '@/components/dashboard/ShiftControl'
 import { DashboardUserMenu } from '@/components/dashboard/DashboardUserMenu'
 import { StoreWelcome } from '@/components/dashboard/StoreWelcome'
 import { DashboardMobileNav } from '@/components/dashboard/DashboardMobileNav'
+import type { DashboardBranding, DashboardSessionUser } from '@/components/dashboard/types'
 import type { DashboardMenuEntry } from '@/hooks/useNavigationMenu'
+import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
 
 type Props = {
-  branding: { app_logo?: string; app_name?: string } | undefined
+  branding?: DashboardBranding
   filteredMenu: DashboardMenuEntry[]
-  user: Parameters<typeof DashboardUserMenu>[0]['user']
-  userRole?: string
+  user: DashboardSessionUser | null | undefined
+  userRole?: POSKasirInternalUserRepositoryUserRole | string
   isSuperAdmin: boolean
   handleLogout: () => void
 }
@@ -28,11 +30,7 @@ export function DashboardTopBar({
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-border/50 bg-card/90 backdrop-blur-md px-3 sm:px-5">
       <div className="flex items-center md:hidden">
-        <DashboardMobileNav
-          t={t}
-          branding={branding}
-          filteredMenu={filteredMenu}
-        />
+        <DashboardMobileNav branding={branding} filteredMenu={filteredMenu} />
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3 min-w-0">
@@ -46,15 +44,9 @@ export function DashboardTopBar({
 
         {!isSuperAdmin && <ShiftControl compact />}
 
-        <SettingsPanel />
+        <ThemeToggle />
 
-        <DashboardUserMenu
-          t={t}
-          user={user}
-          userRole={userRole as Parameters<typeof DashboardUserMenu>[0]['userRole']}
-          handleLogout={handleLogout}
-          variant="header"
-        />
+        <DashboardUserMenu t={t} user={user} userRole={userRole} handleLogout={handleLogout} />
       </div>
     </header>
   )

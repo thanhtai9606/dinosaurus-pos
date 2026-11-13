@@ -49,6 +49,7 @@ type IPrdService interface {
 	BuildImportPricesTemplate() ([]byte, error)
 	ExportProductPricesXLSX(ctx context.Context) ([]byte, error)
 	SearchProducts(ctx context.Context, query string, limit int) (*ListProductsResponse, error)
+	ReindexProductSearchAllTenants(ctx context.Context, tenantIDs []uuid.UUID) (int, error)
 	ReindexProductSearch(ctx context.Context) (int, error)
 	ReplaceSaleUnits(ctx context.Context, productID uuid.UUID, req ReplaceSaleUnitsRequest) (*ProductResponse, error)
 }

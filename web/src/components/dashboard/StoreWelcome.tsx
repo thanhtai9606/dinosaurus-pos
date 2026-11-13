@@ -1,12 +1,10 @@
 import { Store } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { useMeQuery } from '@/lib/api/query/auth'
+import { useSessionTenant } from '@/hooks/useSessionTenant'
 
 export function StoreWelcome() {
   const { t } = useTranslation()
-  const { data: me } = useMeQuery()
-  const tenant = (me as { tenant?: { name?: string; code?: string } } | undefined)?.tenant
-  const username = me?.username
+  const { tenant, username } = useSessionTenant()
 
   if (!tenant?.name && !username) return null
 

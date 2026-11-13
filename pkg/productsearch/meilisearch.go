@@ -47,6 +47,8 @@ func (m *MeiliIndexer) EnsureIndex(ctx context.Context) error {
 	}
 	idx := m.client.Index(m.index)
 	_, _ = idx.UpdateSearchableAttributes(ctx, &[]string{"name", "sku", "barcode"})
+	filterable := []interface{}{"tenant_id"}
+	_, _ = idx.UpdateFilterableAttributes(ctx, &filterable)
 	return nil
 }
 
@@ -66,9 +68,12 @@ func (m *MeiliIndexer) Delete(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-func (m *MeiliIndexer) Search(ctx context.Context, query string, limit int) ([]uuid.UUID, error) {
+func (m *MeiliIndexer) Search(ctx context.Context, tenantID uuid.UUID, query string, limit int) ([]uuid.UUID, error) {
 	if !m.Enabled() {
 		return nil, fmt.Errorf("meilisearch disabled")
+	}
+	if tenantID == uuid.Nil {
+		return nil, fmt.Errorf("tenant required for search")
 	}
 	if limit <= 0 {
 		limit = 20
@@ -76,7 +81,11 @@ func (m *MeiliIndexer) Search(ctx context.Context, query string, limit int) ([]u
 	if limit > 50 {
 		limit = 50
 	}
-	res, err := m.client.Index(m.index).Search(ctx, query, &meilisearch.SearchRequest{Limit: int64(limit)})
+	filter := fmt.Sprintf("tenant_id = %q", tenantID.String())
+	res, err := m.client.Index(m.index).Search(ctx, query, &meilisearch.SearchRequest{
+		Limit:  int64(limit),
+		Filter: &filter,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +127,7 @@ func (NoopIndexer) Index(context.Context, Document) error { return nil }
 func (NoopIndexer) Delete(context.Context, uuid.UUID) error {
 	return nil
 }
-func (NoopIndexer) Search(context.Context, string, int) ([]uuid.UUID, error) {
+func (NoopIndexer) Search(context.Context, uuid.UUID, string, int) ([]uuid.UUID, error) {
 	return nil, fmt.Errorf("search disabled")
 }
 func (NoopIndexer) Reindex(context.Context, []Document) error { return nil }

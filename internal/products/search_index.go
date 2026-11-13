@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"POS-kasir/internal/common/pagination"
+	"POS-kasir/internal/tenant"
 	products_repo "POS-kasir/internal/products/repository"
 	"POS-kasir/pkg/productsearch"
 
@@ -24,18 +25,23 @@ func docFromListRow(p products_repo.ListProductsForSearchIndexRow) productsearch
 		unit = "pcs"
 	}
 	return productsearch.Document{
-		ID:      p.ID.String(),
-		Name:    p.Name,
-		SKU:     sku,
-		Barcode: barcode,
-		Unit:    unit,
-		Price:   p.Price,
-		Stock:   p.Stock,
+		ID:       p.ID.String(),
+		TenantID: p.TenantID.String(),
+		Name:     p.Name,
+		SKU:      sku,
+		Barcode:  barcode,
+		Unit:     unit,
+		Price:    p.Price,
+		Stock:    p.Stock,
 	}
 }
 
 func (s *PrdService) syncProductToSearch(ctx context.Context, productID uuid.UUID) {
 	if s.search == nil || !s.search.Enabled() {
+		return
+	}
+	tid, ok := tenant.IDFromContext(ctx)
+	if !ok {
 		return
 	}
 	row, err := s.repo.GetProductByID(ctx, productID)
@@ -59,13 +65,14 @@ func (s *PrdService) syncProductToSearch(ctx context.Context, productID uuid.UUI
 		unit = "pcs"
 	}
 	_ = s.search.Index(ctx, productsearch.Document{
-		ID:      row.ID.String(),
-		Name:    row.Name,
-		SKU:     sku,
-		Barcode: barcode,
-		Unit:    unit,
-		Price:   row.Price,
-		Stock:   row.Stock,
+		ID:       row.ID.String(),
+		TenantID: tid.String(),
+		Name:     row.Name,
+		SKU:      sku,
+		Barcode:  barcode,
+		Unit:     unit,
+		Price:    row.Price,
+		Stock:    row.Stock,
 	})
 }
 
@@ -94,6 +101,28 @@ func (s *PrdService) ReindexProductSearch(ctx context.Context) (int, error) {
 	return len(docs), nil
 }
 
+// ReindexProductSearchAllTenants rebuilds the Meilisearch index for every active tenant.
+func (s *PrdService) ReindexProductSearchAllTenants(ctx context.Context, tenantIDs []uuid.UUID) (int, error) {
+	if s.search == nil || !s.search.Enabled() {
+		return 0, nil
+	}
+	docs := make([]productsearch.Document, 0)
+	for _, tid := range tenantIDs {
+		tctx := tenant.WithID(ctx, tid)
+		rows, err := s.repo.ListProductsForSearchIndex(tctx)
+		if err != nil {
+			return 0, err
+		}
+		for _, r := range rows {
+			docs = append(docs, docFromListRow(r))
+		}
+	}
+	if err := s.search.Reindex(ctx, docs); err != nil {
+		return 0, err
+	}
+	return len(docs), nil
+}
+
 func (s *PrdService) SearchProducts(ctx context.Context, query string, limit int) (*ListProductsResponse, error) {
 	if limit <= 0 {
 		limit = 20
@@ -106,7 +135,11 @@ func (s *PrdService) SearchProducts(ctx context.Context, query string, limit int
 	if s.search == nil || !s.search.Enabled() {
 		return fallback()
 	}
-	ids, err := s.search.Search(ctx, query, limit)
+	tid, ok := tenant.IDFromContext(ctx)
+	if !ok {
+		return fallback()
+	}
+	ids, err := s.search.Search(ctx, tid, query, limit)
 	if err != nil {
 		s.log.Warn("Meilisearch search failed, falling back to SQL", "error", err)
 		return fallback()

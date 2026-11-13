@@ -5,7 +5,7 @@ import { meQueryOptions } from "@/lib/api/query/auth.ts";
 import { SUPER_ADMIN_HOME } from '@/lib/auth/superAdminPaths'
 import { useAuth } from "@/context/AuthContext";
 import { useTranslation } from 'react-i18next'
-import { SettingsPanel } from "@/components/SettingsPanel.tsx";
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { LoginForm } from "@/components/auth/LoginForm"
 
 export const Route = createFileRoute('/login')({
@@ -46,7 +46,7 @@ function LoginPage() {
             </div>
 
             <div className="absolute top-4 right-4 z-10">
-                <SettingsPanel />
+                <ThemeToggle />
             </div>
             <LoginForm 
                 t={t}

@@ -7,13 +7,14 @@ import (
 )
 
 type Document struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	SKU     string `json:"sku"`
-	Barcode string `json:"barcode"`
-	Unit    string `json:"unit"`
-	Price   int64  `json:"price"`
-	Stock   int32  `json:"stock"`
+	ID       string `json:"id"`
+	TenantID string `json:"tenant_id"`
+	Name     string `json:"name"`
+	SKU      string `json:"sku"`
+	Barcode  string `json:"barcode"`
+	Unit     string `json:"unit"`
+	Price    int64  `json:"price"`
+	Stock    int32  `json:"stock"`
 }
 
 type Indexer interface {
@@ -21,6 +22,6 @@ type Indexer interface {
 	EnsureIndex(ctx context.Context) error
 	Index(ctx context.Context, doc Document) error
 	Delete(ctx context.Context, id uuid.UUID) error
-	Search(ctx context.Context, query string, limit int) ([]uuid.UUID, error)
+	Search(ctx context.Context, tenantID uuid.UUID, query string, limit int) ([]uuid.UUID, error)
 	Reindex(ctx context.Context, docs []Document) error
 }

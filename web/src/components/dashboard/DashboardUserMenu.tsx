@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Activity, LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -11,38 +10,20 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import type { DashboardSessionUser } from '@/components/dashboard/types'
 
 interface DashboardUserMenuProps {
     t: (key: string) => string
-    user: {
-        username?: string
-        email?: string
-        role?: string
-        avatar?: string | null
-    } | null | undefined
-    userRole?: POSKasirInternalUserRepositoryUserRole
-    isSidebarCollapsed?: boolean
+    user: DashboardSessionUser | null | undefined
+    userRole?: POSKasirInternalUserRepositoryUserRole | string
     handleLogout: () => void
-    isMobile?: boolean
-    variant?: 'sidebar' | 'header'
 }
 
-export function DashboardUserMenu({
-    t,
-    user,
-    userRole,
-    isSidebarCollapsed,
-    handleLogout,
-    isMobile = false,
-    variant = 'sidebar',
-}: DashboardUserMenuProps) {
-    const isHeader = variant === 'header'
+export function DashboardUserMenu({ t, user, userRole, handleLogout }: DashboardUserMenuProps) {
     const userName = user?.username ?? 'User'
     const userEmail = user?.email ?? ''
     const userAvatar = user?.avatar
-    const roleLabel = user?.role ?? userRole ?? ''
 
     const canSettings =
         userRole === POSKasirInternalUserRepositoryUserRole.UserRoleAdmin ||
@@ -51,60 +32,23 @@ export function DashboardUserMenu({
 
     const canActivityLogs = userRole === POSKasirInternalUserRepositoryUserRole.UserRoleAdmin
 
-    const trigger = (
-        <Button
-            type="button"
-            variant="ghost"
-            className={cn(
-                'transition-colors hover:bg-muted/60',
-                isHeader && 'h-9 w-9 rounded-full p-0 justify-center',
-                !isHeader && 'h-auto w-full rounded-xl',
-                !isHeader && isSidebarCollapsed && !isMobile ? 'justify-center p-2' : '',
-                !isHeader && (!isSidebarCollapsed || isMobile) ? 'justify-start gap-3 p-2' : '',
-                !isHeader && isMobile && 'justify-start gap-3 px-0 py-2',
-                !isHeader && !isSidebarCollapsed && !isMobile && 'justify-start gap-3 p-2',
-            )}
-        >
-            <Avatar
-                className={cn(
-                    'shrink-0',
-                    isHeader ? 'h-9 w-9' : 'h-9 w-9',
-                    isSidebarCollapsed && !isMobile && !isHeader && 'h-10 w-10',
-                )}
-            >
-                <AvatarImage src={userAvatar || undefined} alt={userName} />
-                <AvatarFallback>
-                    <UserIcon className="h-4 w-4" />
-                </AvatarFallback>
-            </Avatar>
-            {!isHeader && (!isSidebarCollapsed || isMobile) && (
-                <div className="flex min-w-0 flex-1 items-center gap-2 text-left">
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">{userName}</p>
-                        {userEmail ? (
-                            <p className="truncate text-xs text-muted-foreground">{userEmail}</p>
-                        ) : (
-                            <p className="truncate text-xs capitalize text-muted-foreground">{roleLabel}</p>
-                        )}
-                    </div>
-                    {roleLabel && (
-                        <Badge variant="outline" className="hidden shrink-0 text-[10px] uppercase sm:inline-flex">
-                            {roleLabel}
-                        </Badge>
-                    )}
-                </div>
-            )}
-        </Button>
-    )
-
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-            <DropdownMenuContent
-                align="end"
-                side={isHeader ? 'bottom' : isSidebarCollapsed && !isMobile ? 'center' : 'top'}
-                className="w-56"
-            >
+            <DropdownMenuTrigger asChild>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className="h-9 w-9 rounded-full p-0 justify-center transition-colors hover:bg-muted/60"
+                >
+                    <Avatar className="h-9 w-9 shrink-0">
+                        <AvatarImage src={userAvatar || undefined} alt={userName} />
+                        <AvatarFallback>
+                            <UserIcon className="h-4 w-4" />
+                        </AvatarFallback>
+                    </Avatar>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="bottom" className="w-56">
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">{userName}</p>
@@ -115,22 +59,14 @@ export function DashboardUserMenu({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link
-                        to="/account"
-                        search={{ tab: 'account' }}
-                        className="cursor-pointer"
-                    >
+                    <Link to="/account" search={{ tab: 'account' }} className="cursor-pointer">
                         <UserIcon className="mr-2 h-4 w-4" />
                         {t('user_menu.profile')}
                     </Link>
                 </DropdownMenuItem>
                 {canSettings && (
                     <DropdownMenuItem asChild>
-                        <Link
-                            to="/settings"
-                            search={{ tab: 'preferences' }}
-                            className="cursor-pointer"
-                        >
+                        <Link to="/settings" search={{ tab: 'preferences' }} className="cursor-pointer">
                             <Settings className="mr-2 h-4 w-4" />
                             {t('user_menu.settings')}
                         </Link>

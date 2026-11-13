@@ -14,9 +14,9 @@ import { useForm } from '@tanstack/react-form'
 import * as z from 'zod'
 import { Zap } from 'lucide-react'
 import {
-    isValidTenantCode,
     normalizeTenantCode,
     stripTenantCodeInput,
+    tenantCodeZodField,
 } from '@/lib/tenantCode'
 import { lookupTenantByCode } from '@/lib/api/tenantLookup'
 
@@ -30,13 +30,6 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
     const [serverError, setServerError] = useState<string | null>(null)
     const [tenantLookupError, setTenantLookupError] = useState<string | null>(null)
     const [tenantLookupOk, setTenantLookupOk] = useState(false)
-
-    const tenantCodeSchema = z
-        .string()
-        .min(2)
-        .max(32)
-        .refine((v) => !/\s/.test(v), { message: t('auth.tenant_code_no_spaces') })
-        .refine((v) => isValidTenantCode(v), { message: t('auth.tenant_code_invalid') })
 
     const verifyTenantExists = useCallback(
         async (raw: string): Promise<boolean> => {
@@ -75,7 +68,7 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
         },
         validators: {
             onChange: z.object({
-                tenant_code: tenantCodeSchema,
+                tenant_code: tenantCodeZodField(t),
                 email: z.string().email(),
                 password: z.string().min(1),
             }),

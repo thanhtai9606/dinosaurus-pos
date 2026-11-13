@@ -1,21 +1,20 @@
-import { Link } from '@tanstack/react-router'
-import { Zap, Menu } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { DashboardNavMenu } from '@/components/dashboard/DashboardNavMenu'
+import { DashboardAppBrand } from '@/components/dashboard/DashboardAppBrand'
+import type { DashboardBranding } from '@/components/dashboard/types'
 import type { DashboardMenuEntry } from '@/hooks/useNavigationMenu'
 
 interface DashboardSidebarProps {
-    t: any
-    branding: any
+    branding?: DashboardBranding
     isSidebarCollapsed: boolean
     setIsSidebarCollapsed: (collapsed: boolean) => void
     filteredMenu: DashboardMenuEntry[]
 }
 
 export function DashboardSidebar({
-    t,
     branding,
     isSidebarCollapsed,
     setIsSidebarCollapsed,
@@ -24,26 +23,17 @@ export function DashboardSidebar({
     return (
         <div className="hidden md:block">
             <div className="flex h-full max-h-screen flex-col gap-2 bg-card border-r border-border/50">
-                <div className={cn('flex h-16 items-center px-5', isSidebarCollapsed ? 'justify-center' : 'justify-between')}>
-                    <Link
-                        to="/"
-                        className={cn('flex items-center gap-3 font-heading font-bold', isSidebarCollapsed && 'hidden')}
-                    >
-                        {branding?.app_logo ? (
-                            <img
-                                src={branding.app_logo}
-                                alt={t('settings.branding.logo')}
-                                className="h-9 w-9 object-contain rounded-xl"
-                            />
-                        ) : (
-                            <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-                                <Zap className="h-5 w-5 text-primary-foreground" />
-                            </div>
-                        )}
-                        <span className="text-xl truncate tracking-tight">
-                            {branding?.app_name || t('dashboard.brand_name')}
-                        </span>
-                    </Link>
+                <div
+                    className={cn(
+                        'flex h-16 items-center px-5',
+                        isSidebarCollapsed ? 'justify-center' : 'justify-between',
+                    )}
+                >
+                    <DashboardAppBrand
+                        branding={branding}
+                        titleClassName="text-xl"
+                        className={cn(isSidebarCollapsed && 'hidden')}
+                    />
                     <Button
                         variant="ghost"
                         size="icon"

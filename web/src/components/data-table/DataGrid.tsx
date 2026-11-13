@@ -32,27 +32,8 @@ import { useClientSort } from '@/hooks/use-client-sort'
 import { useDataGridColumnVisibility } from '@/hooks/useDataGridColumnVisibility'
 import { useDataGridClientPagination } from '@/hooks/useDataGridClientPagination'
 import { cn } from '@/lib/utils'
+import { applyClientFilters } from '@/components/data-table/applyClientFilters'
 import type { DataGridProps } from '@/components/data-table/types'
-
-function applyClientFilters<T>(
-  rows: T[],
-  columns: DataGridProps<T>['columns'],
-  filters: Record<string, string>,
-): T[] {
-  const active = Object.entries(filters).filter(([, v]) => v.trim() !== '' && v !== '__all__')
-  if (active.length === 0) return rows
-
-  return rows.filter((row) =>
-    active.every(([colId, raw]) => {
-      const col = columns.find((c) => c.id === colId)
-      if (!col) return true
-      const hay = (col.filterAccessor?.(row) ?? (col.accessor ? String(col.accessor(row)) : '')).toLowerCase()
-      const needle = raw.trim().toLowerCase()
-      if (col.filterType === 'select') return hay === needle
-      return hay.includes(needle)
-    }),
-  )
-}
 
 export function DataGrid<T>({
   columns,

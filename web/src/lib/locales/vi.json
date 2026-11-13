@@ -69,6 +69,8 @@
         "login_failed": "Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn.",
         "email_placeholder": "m.scott@dundermifflin.com",
         "password_placeholder": "••••••••",
+        "tenant_code": "Mã cửa hàng (tenant)",
+        "tenant_code_placeholder": "default",
         "demo_account": "Sử dụng tài khoản demo:",
         "logout_failed": "Đăng xuất không thành công: {{message}}",
         "update_avatar_failed": "Không thể cập nhật hình đại diện: {{message}}",
@@ -411,8 +413,8 @@
             "use_action_button": "Vui lòng sử dụng các nút hành động"
         },
         "loading": "Memuat status shift...",
-        "register_open": "Mesin Kasir Terbuka",
-        "open_register": "Buka Mesin Kasir",
+        "register_open": "Quầy đang mở",
+        "open_register": "Mở quầy thu ngân",
         "open_shift_title": "Buka Shift"
     },
     "dashboard": {
@@ -446,7 +448,7 @@
         "active_users": "Người dùng hoạt động",
         "sales": "Bán hàng",
         "active_now": "Kích hoạt Ngay",
-        "brand_name": "POS Kasir",
+        "brand_name": "Dinosaurus POS",
         "secret_reports": "Trang Báo cáo Bí mật (Chỉ dành cho Quản trị viên)",
         "placeholder_content": "Nội dung khác có thể được đặt ở đây..."
     },
@@ -669,8 +671,8 @@
             "upload_button": "Tải lên Logo mới",
             "remove_button": "Xóa/Xóa",
             "logo_help": "Kích thước đề xuất: 512x512px. Tối đa 5MB. Các giá trị được cập nhật ngay sau khi tải lên.",
-            "app_name_placeholder": "POS Kasir",
-            "footer_placeholder": "© 2024 POS Kasir",
+            "app_name_placeholder": "Dinosaurus POS",
+            "footer_placeholder": "© Dinosaurus POS",
             "logo_alt": "Logo ứng dụng",
             "color_placeholder": "000000 ",
             "color_dark_placeholder": "#FFFFFF"

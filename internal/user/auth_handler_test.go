@@ -50,8 +50,9 @@ func TestAthHandler_LoginHandler(t *testing.T) {
 	app.Post("/login", handler.LoginHandler)
 
 	reqBody := user.LoginRequest{
-		Email:    "test@example.com",
-		Password: "password",
+		Email:      "test@example.com",
+		Password:   "password",
+		TenantCode: "default",
 	}
 	body, _ := json.Marshal(reqBody)
 

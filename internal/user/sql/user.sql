@@ -38,6 +38,10 @@ WHERE
         ELSE deleted_at IS NULL
         END
     )
+  AND (
+    sqlc.narg(tenant_id)::uuid IS NULL
+    OR id IN (SELECT user_id FROM tenant_users WHERE tenant_id = sqlc.narg(tenant_id)::uuid)
+  )
 ORDER BY
     CASE WHEN @order_by::user_order_column = 'username' AND @sort_order::sort_order = 'asc'  THEN username END ASC,
     CASE WHEN @order_by::user_order_column = 'username' AND @sort_order::sort_order = 'desc' THEN username END DESC,
@@ -111,7 +115,11 @@ WHERE
         WHEN sqlc.narg(status)::text = 'all' THEN TRUE
         ELSE deleted_at IS NULL
         END
-    );
+    )
+  AND (
+    sqlc.narg(tenant_id)::uuid IS NULL
+    OR id IN (SELECT user_id FROM tenant_users WHERE tenant_id = sqlc.narg(tenant_id)::uuid)
+  );
 
 -- name: CountActiveUsers :one
 -- Hanya menghitung pengguna yang aktif dan belum dihapus.

@@ -22,7 +22,7 @@ export function FinancialSettingsCard() {
     const canEdit = updateMutation.isAllowed
 
     const [form, setForm] = useState<FinancialSettings>({
-        currency: 'IDR',
+        currency: 'VND',
         tax_rate: 11,
         service_charge_rate: 0,
         tax_enabled: true,

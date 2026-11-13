@@ -49,6 +49,7 @@ func JWTAuthMiddleware(tokenManager utils.Manager, cfg *config.AppConfig, log lo
 		c.Locals("user_id", claims.UserID)
 
 		c.RequestCtx().SetUserValue(common.UserIDKey, claims.UserID)
+		c.RequestCtx().SetUserValue(common.RoleKey, claims.Role)
 
 		tenantID := claims.TenantID
 		if tenantID == uuid.Nil {

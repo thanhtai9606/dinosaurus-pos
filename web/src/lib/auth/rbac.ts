@@ -15,6 +15,10 @@ export function hasApiAccess(role: string | undefined | null, method: HttpMethod
     if (!role) return false;
 
     const key = `${method.toUpperCase()} ${path}`;
+    if (role === "super_admin") {
+        return true;
+    }
+
     const allowedRoles = RBAC_RULES[key];
 
     if (!allowedRoles) {

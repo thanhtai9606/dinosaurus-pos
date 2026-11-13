@@ -5,9 +5,9 @@ import (
 	"POS-kasir/server"
 )
 
-// @title POS Kasir API
+// @title Dinosaurus POS API
 // @version 1.0
-// @description POS Kasir API
+// @description Dinosaurus POS API
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {

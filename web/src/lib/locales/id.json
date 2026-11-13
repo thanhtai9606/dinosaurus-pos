@@ -69,6 +69,8 @@
         "login_failed": "Gagal masuk. Silakan periksa kredensial Anda.",
         "email_placeholder": "m.scott@dundermifflin.com",
         "password_placeholder": "••••••••",
+        "tenant_code": "Kode toko (tenant)",
+        "tenant_code_placeholder": "default",
         "demo_account": "Gunakan akun demo:",
         "logout_failed": "Gagal logout: {{message}}",
         "update_avatar_failed": "Gagal memperbarui avatar: {{message}}",
@@ -446,7 +448,7 @@
         "active_users": "Pengguna Aktif",
         "sales": "Penjualan",
         "active_now": "Aktif Sekarang",
-        "brand_name": "POS Kasir",
+        "brand_name": "Dinosaurus POS",
         "secret_reports": "Halaman Laporan Rahasia (Khusus Admin)",
         "placeholder_content": "Content lainnya bisa ditaruh di sini..."
     },
@@ -667,8 +669,8 @@
             "upload_button": "Unggah Logo Baru",
             "remove_button": "Hapus/Bersihkan",
             "logo_help": "Ukuran disarankan: 512x512px. Maks 5MB. Nilai diperbarui segera setelah unggah.",
-            "app_name_placeholder": "POS Kasir",
-            "footer_placeholder": "© 2024 POS Kasir",
+            "app_name_placeholder": "Dinosaurus POS",
+            "footer_placeholder": "© Dinosaurus POS",
             "logo_alt": "Logo Aplikasi",
             "color_placeholder": "#000000",
             "color_dark_placeholder": "#ffffff"

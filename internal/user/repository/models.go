@@ -717,9 +717,10 @@ func (ns NullUserOrderColumn) Value() (driver.Value, error) {
 type UserRole string
 
 const (
-	UserRoleAdmin   UserRole = "admin"
-	UserRoleCashier UserRole = "cashier"
-	UserRoleManager UserRole = "manager"
+	UserRoleAdmin       UserRole = "admin"
+	UserRoleCashier     UserRole = "cashier"
+	UserRoleManager     UserRole = "manager"
+	UserRoleSuperAdmin  UserRole = "super_admin"
 )
 
 func (e *UserRole) Scan(src interface{}) error {

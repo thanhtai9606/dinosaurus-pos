@@ -203,7 +203,7 @@ func BuildAppContainer(app *App) *AppContainer {
 	// User Module
 	userAvatarRepo := user.NewAuthRepo(app.Logger, app.R2)
 	userRepo := user_repo.New(pool)
-	userService := user.NewUsrService(userRepo, app.Logger, activityService, userAvatarRepo)
+	userService := user.NewUsrService(userRepo, tenantRepo, app.Logger, activityService, userAvatarRepo)
 	userHandler := user.NewUsrHandler(userService, app.Logger, app.Validator)
 
 	// Auth Module (Merged into user domain)

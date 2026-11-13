@@ -6,6 +6,7 @@ import {
 } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  DEFAULT_APP_CURRENCY,
   formatMoney,
   formatMoneyAxisCompact,
   getCurrencySymbol,
@@ -28,10 +29,10 @@ export type MoneyContextValue = {
 }
 
 const loadingValue: MoneyContextValue = {
-  formatMoney: (amount) => formatMoney(amount, 'IDR'),
-  formatAxisCompact: (amount) => formatMoneyAxisCompact(amount, 'IDR'),
-  currencyCode: 'IDR',
-  currencySymbol: 'Rp',
+  formatMoney: (amount) => formatMoney(amount, DEFAULT_APP_CURRENCY),
+  formatAxisCompact: (amount) => formatMoneyAxisCompact(amount, DEFAULT_APP_CURRENCY),
+  currencyCode: DEFAULT_APP_CURRENCY,
+  currencySymbol: '₫',
   financialSettings: undefined,
   isLoading: true,
 }
@@ -48,7 +49,7 @@ export function MoneyProvider({ children }: { children: ReactNode }) {
     staleTime: 60_000,
   })
 
-  const currency = (data?.currency ?? 'IDR').toUpperCase()
+  const currency = (data?.currency ?? DEFAULT_APP_CURRENCY).toUpperCase()
   const meta = data?.available_currencies?.find(
     (c) => c.code.toUpperCase() === currency,
   )

@@ -5,6 +5,8 @@ import (
 	activitylog_repo "POS-kasir/internal/activitylog/repository"
 	"POS-kasir/internal/common"
 	"POS-kasir/internal/common/pagination"
+	"POS-kasir/internal/tenant"
+	"POS-kasir/internal/tenants"
 	user_repo "POS-kasir/internal/user/repository"
 	"POS-kasir/pkg/logger"
 
@@ -28,12 +30,34 @@ type IUsrService interface {
 
 type UsrService struct {
 	repo           user_repo.Querier
+	tenants        *tenants.Repository
 	log            logger.ILogger
 	activityLogger activitylog.IActivityService
 	avatar         IAthRepo
 }
 
+func (s *UsrService) assertUserInTenant(ctx context.Context, userID uuid.UUID) error {
+	if s.tenants == nil {
+		return nil
+	}
+	tid, ok := tenant.IDFromContext(ctx)
+	if !ok {
+		return common.ErrForbidden
+	}
+	in, err := s.tenants.UserInTenant(ctx, tid, userID)
+	if err != nil {
+		return err
+	}
+	if !in {
+		return common.ErrNotFound
+	}
+	return nil
+}
+
 func (s *UsrService) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	if err := s.assertUserInTenant(ctx, userID); err != nil {
+		return err
+	}
 	err := s.repo.DeleteUser(ctx, userID)
 	if err != nil {
 		switch {
@@ -67,6 +91,9 @@ func (s *UsrService) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 }
 
 func (s *UsrService) ToggleUserStatus(ctx context.Context, userID uuid.UUID) error {
+	if err := s.assertUserInTenant(ctx, userID); err != nil {
+		return err
+	}
 	_, err := s.repo.ToggleUserActiveStatus(ctx, userID)
 	if err != nil {
 		switch {
@@ -101,6 +128,9 @@ func (s *UsrService) ToggleUserStatus(ctx context.Context, userID uuid.UUID) err
 }
 
 func (s *UsrService) UpdateUser(ctx context.Context, userID uuid.UUID, req UpdateUserRequest) (*ProfileResponse, error) {
+	if err := s.assertUserInTenant(ctx, userID); err != nil {
+		return nil, err
+	}
 	existingUser, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
 		s.log.Errorf("UpdateUser | Failed to get user by ID: %v, userID=%v", err, userID)
@@ -202,6 +232,9 @@ func (s *UsrService) UpdateUser(ctx context.Context, userID uuid.UUID, req Updat
 }
 
 func (s *UsrService) GetUserByID(ctx context.Context, userID uuid.UUID) (*ProfileResponse, error) {
+	if err := s.assertUserInTenant(ctx, userID); err != nil {
+		return nil, err
+	}
 	user, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
 		s.log.Errorf("GetUserByID | Failed to get user by ID: %v, userID=%v", err, userID)
@@ -257,6 +290,9 @@ func (s *UsrService) CreateUser(ctx context.Context, req CreateUserRequest) (*Pr
 	if userRole == "" {
 		userRole = user_repo.UserRoleCashier
 	}
+	if userRole == user_repo.UserRoleSuperAdmin {
+		return nil, common.ErrForbidden
+	}
 
 	isActive := true
 	if req.IsActive != nil {
@@ -286,6 +322,18 @@ func (s *UsrService) CreateUser(ctx context.Context, req CreateUserRequest) (*Pr
 	if err != nil {
 		s.log.Errorf("CreateUser | Failed to create user: %s", err)
 		return nil, err
+	}
+
+	if s.tenants != nil {
+		tid, ok := tenant.IDFromContext(ctx)
+		if !ok {
+			return nil, common.ErrForbidden
+		}
+		roleStr := string(userRole)
+		if err := s.tenants.AddMember(ctx, tid, newUser.ID, &roleStr); err != nil {
+			s.log.Errorf("CreateUser | Failed to add tenant membership: %s", err)
+			return nil, common.ErrInternal
+		}
 	}
 
 	actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID)
@@ -322,9 +370,10 @@ func (s *UsrService) CreateUser(ctx context.Context, req CreateUserRequest) (*Pr
 	return &response, nil
 }
 
-func NewUsrService(repo user_repo.Querier, log logger.ILogger, actLog activitylog.IActivityService, avatar IAthRepo) IUsrService {
+func NewUsrService(repo user_repo.Querier, tenantsRepo *tenants.Repository, log logger.ILogger, actLog activitylog.IActivityService, avatar IAthRepo) IUsrService {
 	return &UsrService{
 		repo:           repo,
+		tenants:        tenantsRepo,
 		log:            log,
 		activityLogger: actLog,
 		avatar:         avatar,
@@ -361,6 +410,11 @@ func (s *UsrService) GetAllUsers(ctx context.Context, req UsersRequest) (*UsersR
 		r := user_repo.UserRole(*req.Role)
 		listParams.Role = &r
 	}
+	if s.tenants != nil {
+		if tid, ok := tenant.IDFromContext(ctx); ok {
+			listParams.TenantID = &tid
+		}
+	}
 
 	users, err := s.repo.ListUsers(ctx, listParams)
 	if err != nil {
@@ -387,6 +441,7 @@ func (s *UsrService) GetAllUsers(ctx context.Context, req UsersRequest) (*UsersR
 		Role:       listParams.Role,
 		IsActive:   listParams.IsActive,
 		Status:     listParams.Status,
+		TenantID:   listParams.TenantID,
 	}
 
 	totalFilteredUsers, err := s.repo.CountUsers(ctx, countParams)

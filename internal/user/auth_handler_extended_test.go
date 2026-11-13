@@ -35,8 +35,9 @@ func setupExtendedAuthHandlerTest(t *testing.T) (*mocks.MockIAuthService, *mocks
 
 func TestAuthHandler_Login_Extended(t *testing.T) {
 	reqBody := user.LoginRequest{
-		Email:    "test@example.com",
-		Password: "password",
+		Email:      "test@example.com",
+		Password:   "password",
+		TenantCode: "default",
 	}
 	body, _ := json.Marshal(reqBody)
 

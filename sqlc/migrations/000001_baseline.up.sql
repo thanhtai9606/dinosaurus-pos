@@ -300,9 +300,9 @@ CREATE TABLE IF NOT EXISTS settings (
 
 -- Seed default values
 INSERT INTO settings (key, value, description) VALUES
-('app_name', 'POS Kasir', 'Application Name displayed in sidebar and titles'),
+('app_name', 'Dinosaurus POS', 'Application Name displayed in sidebar and titles'),
 ('app_logo', '', 'URL or path to the application logo image'),
-('footer_text', '© 2024 POS Kasir. All rights reserved.', 'Text displayed in the footer'),
+('footer_text', '© Dinosaurus POS', 'Text displayed in the footer'),
 ('theme_color', '#000000', 'Primary theme color (hex code)');
 -- <<< 000013_create_settings_table.up.sql
 
@@ -422,7 +422,7 @@ ALTER TABLE products DROP COLUMN category_id;
 
 -- >>> 000022_financial_invoice_settings.up.sql
 INSERT INTO settings (key, value, description) VALUES
-('currency', 'IDR', 'Default currency code for display and receipts'),
+('currency', 'VND', 'Default currency code for display and receipts'),
 ('tax_rate', '11', 'Tax rate percentage applied to order subtotal (e.g. 11 for 11%)'),
 ('service_charge_rate', '0', 'Service charge percentage applied to order subtotal'),
 ('tax_enabled', 'true', 'Whether tax is applied when creating orders'),

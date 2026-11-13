@@ -68,6 +68,9 @@ func main() {
 	if err := tenantRepo.AssignAllUsersToDefault(ctx); err != nil {
 		log.Fatalf("Failed to assign users to default tenant: %v", err)
 	}
+	if err := tenantRepo.BackfillTenantMemberRoles(ctx); err != nil {
+		log.Fatalf("Failed to backfill tenant member roles: %v", err)
+	}
 
 	log.Println("Seeding completed successfully.")
 }

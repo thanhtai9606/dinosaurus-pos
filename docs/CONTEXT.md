@@ -1,4 +1,4 @@
-# Ngữ cảnh dự án (dinosaur-pos / POS-kasir)
+# Ngữ cảnh dự án (Dinosaurus POS)
 
 Tài liệu này gom **quyết định sản phẩm, luồng nghiệp vụ và đường dẫn code** đã triển khai trên nhánh `master`, để không phải giải thích lại từ đầu mỗi phiên làm việc. Cập nhật file khi thêm module lớn.
 
@@ -8,7 +8,7 @@ Tài liệu này gom **quyết định sản phẩm, luồng nghiệp vụ và �
 |-----|---------|
 | Module Go | `POS-kasir` |
 | API + SPA | Go Fiber phục vụ API và build `web/dist` (thường cổng **8080**) |
-| DB | PostgreSQL 15, migrate trong `sqlc/migrations/` — `000001_baseline` + **`000002_multitenant`**. Reset sạch: `make db-reset` |
+| DB | PostgreSQL 15, migrate trong `sqlc/migrations/` — `000001`–`000003` (multitenant + super admin). Reset sạch: `make db-reset` |
 | FE | `web/` — React 19, TanStack Router (file routes), TanStack Query, pnpm |
 | i18n | `web/src/lib/locales/{vi,en,id}.json` — thêm key đủ 3 ngôn ngữ |
 | RBAC FE | `web/src/lib/auth/rbacRules.ts` (map method + path → role) |
@@ -33,7 +33,10 @@ Schema mã nghiệp vụ (`order_no`, `customers.code`, `products.code`) nằm t
 ## Multi-tenant (MVP)
 
 - Bảng `tenants`, `tenant_users`; cột `tenant_id` trên dữ liệu nghiệp vụ; **RLS** theo `app.tenant_id` (set qua `pkg/database/tenant_db.go` + `store.ExecTx`).
-- JWT claim `tenant_id`; login chọn tenant đầu tiên (hoặc `tenant_code`); `POST /auth/switch-tenant`, `GET /tenants/mine`.
+- **Đăng nhập:** bắt buộc `tenant_code` + email + password. Vai trò JWT = `super_admin` hoặc `COALESCE(tenant_users.role, users.role)` trong tenant đó.
+- **super_admin:** quản lý mọi tenant (`GET/POST /api/v1/tenants`), đổi tenant bằng switcher; tạo user trong tenant hiện tại (JWT `tenant_id`). Demo: `superadmin@example.com` / `1q2w3E*`, tenant `default`.
+- **admin tenant:** chỉ user thuộc tenant (JWT); tạo/sửa user trong tenant hiện tại (`POST /users` gán `tenant_users`).
+- `POST /auth/switch-tenant`, `GET /tenants/mine`.
 - Tenant mặc định: UUID `00000000-0000-0000-0000-000000000001`, code `default` — seed + backfill migration.
 - FE: `TenantSwitcher` trên sidebar (`web/src/components/dashboard/TenantSwitcher.tsx`).
 

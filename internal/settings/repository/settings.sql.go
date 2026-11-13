@@ -83,9 +83,17 @@ func (q *Queries) UpdateSetting(ctx context.Context, arg UpdateSettingParams) (S
 }
 
 const upsertSetting = `-- name: UpsertSetting :one
-INSERT INTO settings (key, value, updated_at)
-VALUES ($1, $2, NOW())
-ON CONFLICT (key) DO UPDATE
+INSERT INTO settings (tenant_id, key, value, updated_at)
+VALUES (
+  COALESCE(
+    NULLIF(current_setting('app.tenant_id', true), '')::uuid,
+    '00000000-0000-0000-0000-000000000001'::uuid
+  ),
+  $1,
+  $2,
+  NOW()
+)
+ON CONFLICT (tenant_id, key) DO UPDATE
 SET value = EXCLUDED.value, updated_at = NOW()
 RETURNING key, value, description, updated_at
 `

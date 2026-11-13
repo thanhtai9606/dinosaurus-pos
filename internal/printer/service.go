@@ -67,7 +67,7 @@ func (s *PrinterService) PrintInvoice(ctx context.Context, orderID uuid.UUID) er
 	}
 	defer p.Close()
 
-	return s.printInvoiceToPrinter(p, order, branding, cashierName, paymentMethodName, invoice)
+	return s.printInvoiceToPrinter(ctx, p, order, branding, cashierName, paymentMethodName, invoice)
 }
 
 func (s *PrinterService) GetInvoiceData(ctx context.Context, orderID uuid.UUID) ([]byte, string, error) {
@@ -77,7 +77,7 @@ func (s *PrinterService) GetInvoiceData(ctx context.Context, orderID uuid.UUID) 
 	}
 
 	bp := escpos.NewBufferPrinter()
-	if err := s.printInvoiceToPrinter(bp, order, branding, cashierName, paymentMethodName, invoice); err != nil {
+	if err := s.printInvoiceToPrinter(ctx, bp, order, branding, cashierName, paymentMethodName, invoice); err != nil {
 		return nil, "", err
 	}
 
@@ -127,7 +127,11 @@ func (s *PrinterService) prepareInvoiceData(ctx context.Context, orderID uuid.UU
 	return order, branding, cashierName, paymentMethodName, invoice, nil
 }
 
-func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.OrderDetailResponse, branding *settings.BrandingSettingsResponse, cashierName, paymentMethodName string, invoice *settings.InvoiceSettingsResponse) error {
+func (s *PrinterService) printInvoiceToPrinter(ctx context.Context, p escpos.Printer, order *orders.OrderDetailResponse, branding *settings.BrandingSettingsResponse, cashierName, paymentMethodName string, invoice *settings.InvoiceSettingsResponse) error {
+	fin, _ := s.settingsService.GetFinancialSettings(ctx)
+	formatAmount := func(amount int64) string {
+		return settings.FormatAmount(fin, amount)
+	}
 	if err := p.Init(); err != nil {
 		return err
 	}
@@ -154,8 +158,8 @@ func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.O
 	for _, item := range order.Items {
 		p.WriteString(item.ProductName + "\n")
 
-		qtyLine := fmt.Sprintf("%dx %s", item.Quantity, formatCurrency(item.PriceAtSale))
-		totalLine := formatCurrency(item.Subtotal)
+		qtyLine := fmt.Sprintf("%dx %s", item.Quantity, formatAmount(item.PriceAtSale))
+		totalLine := formatAmount(item.Subtotal)
 
 		padding := 32 - len(qtyLine) - len(totalLine)
 		if padding < 1 {
@@ -173,20 +177,20 @@ func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.O
 
 	p.WriteString("--------------------------------\n")
 
-	writeTotalLine(p, "Subtotal", formatCurrency(order.GrossTotal))
+	writeTotalLine(p, "Subtotal", formatAmount(order.GrossTotal))
 	if order.DiscountAmount > 0 {
-		writeTotalLine(p, "Discount", "-"+formatCurrency(order.DiscountAmount))
+		writeTotalLine(p, "Discount", "-"+formatAmount(order.DiscountAmount))
 	}
 	if invoice != nil && invoice.ShowTaxOnReceipt {
 		if order.TaxAmount > 0 {
-			writeTotalLine(p, "Tax", formatCurrency(order.TaxAmount))
+			writeTotalLine(p, "Tax", formatAmount(order.TaxAmount))
 		}
 		if order.ServiceChargeAmount > 0 {
-			writeTotalLine(p, "Service", formatCurrency(order.ServiceChargeAmount))
+			writeTotalLine(p, "Service", formatAmount(order.ServiceChargeAmount))
 		}
 	}
 	p.SetBold(true)
-	writeTotalLine(p, "TOTAL", formatCurrency(order.NetTotal))
+	writeTotalLine(p, "TOTAL", formatAmount(order.NetTotal))
 	p.SetBold(false)
 
 	p.WriteString("--------------------------------\n")
@@ -195,9 +199,9 @@ func (s *PrinterService) printInvoiceToPrinter(p escpos.Printer, order *orders.O
 		p.WriteString("Payment: " + paymentMethodName + "\n")
 
 		if order.CashReceived != nil && *order.CashReceived > 0 {
-			writeTotalLine(p, "Cash", formatCurrency(*order.CashReceived))
+			writeTotalLine(p, "Cash", formatAmount(*order.CashReceived))
 			if order.ChangeDue != nil {
-				writeTotalLine(p, "Change", formatCurrency(*order.ChangeDue))
+				writeTotalLine(p, "Change", formatAmount(*order.ChangeDue))
 			}
 		}
 	} else {
@@ -243,7 +247,7 @@ func (s *PrinterService) TestPrint(ctx context.Context) error {
 	p.SetBold(true)
 	p.WriteString("TEST PRINT SUCCESS\n")
 	p.SetBold(false)
-	p.WriteString("POS Kasir System\n")
+	p.WriteString("Dinosaurus POS\n")
 	p.WriteString(time.Now().Format("02 Jan 2006 15:04:05") + "\n")
 	p.WriteString("\n\n")
 
@@ -262,6 +266,3 @@ func writeTotalLine(p escpos.Printer, label, value string) {
 	p.WriteString(label + strings.Repeat(" ", padding) + value + "\n")
 }
 
-func formatCurrency(amount int64) string {
-	return fmt.Sprintf("Rp %d", amount)
-}

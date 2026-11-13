@@ -36,6 +36,7 @@ func AuthMiddleware(tokenManager utils.Manager, log logger.ILogger) fiber.Handle
 		log.Infof("current user is %v, role is %v, email is %v, user ID is %v", claims.Username, claims.Role, claims.Email, claims.UserID)
 
 		c.RequestCtx().SetUserValue(common.UserIDKey, claims.UserID)
+		c.RequestCtx().SetUserValue(common.RoleKey, claims.Role)
 
 		tenantID := claims.TenantID
 		if tenantID == uuid.Nil {

@@ -51,8 +51,9 @@ func TestAuthService_Login(t *testing.T) {
 	}
 
 	req := user.LoginRequest{
-		Email:    "test@example.com",
-		Password: "password123",
+		Email:      "test@example.com",
+		Password:   "password123",
+		TenantCode: "default",
 	}
 
 	t.Run("Success", func(t *testing.T) {

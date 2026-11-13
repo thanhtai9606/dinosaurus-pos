@@ -57,6 +57,13 @@ func (r *Repository) GetByCode(ctx context.Context, code string) (Row, error) {
 	return row, err
 }
 
+func (r *Repository) GetByID(ctx context.Context, id uuid.UUID) (Row, error) {
+	const q = `SELECT id, code, name, is_active FROM tenants WHERE id = $1 AND is_active = true`
+	var row Row
+	err := r.pool.QueryRow(ctx, q, id).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
+	return row, err
+}
+
 func (r *Repository) UserHasTenant(ctx context.Context, userID, tenantID uuid.UUID) (bool, error) {
 	const q = `SELECT 1 FROM tenant_users WHERE user_id = $1 AND tenant_id = $2`
 	var one int
@@ -91,5 +98,76 @@ INSERT INTO tenant_users (tenant_id, user_id)
 SELECT $1, u.id FROM users u
 ON CONFLICT DO NOTHING`
 	_, err := r.pool.Exec(ctx, q, tenant.DefaultTenantID)
+	return err
+}
+
+func (r *Repository) ListAll(ctx context.Context) ([]Row, error) {
+	const q = `SELECT id, code, name, is_active FROM tenants ORDER BY name`
+	rows, err := r.pool.Query(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []Row
+	for rows.Next() {
+		var row Row
+		if err := rows.Scan(&row.ID, &row.Code, &row.Name, &row.IsActive); err != nil {
+			return nil, err
+		}
+		out = append(out, row)
+	}
+	return out, rows.Err()
+}
+
+func (r *Repository) Create(ctx context.Context, id uuid.UUID, code, name string) (Row, error) {
+	const q = `
+INSERT INTO tenants (id, code, name, is_active)
+VALUES ($1, $2, $3, true)
+RETURNING id, code, name, is_active`
+	var row Row
+	err := r.pool.QueryRow(ctx, q, id, code, name).Scan(&row.ID, &row.Code, &row.Name, &row.IsActive)
+	return row, err
+}
+
+func (r *Repository) AddMember(ctx context.Context, tenantID, userID uuid.UUID, role *string) error {
+	const q = `
+INSERT INTO tenant_users (tenant_id, user_id, role)
+VALUES ($1, $2, $3::user_role)
+ON CONFLICT (tenant_id, user_id) DO UPDATE SET role = COALESCE(EXCLUDED.role, tenant_users.role)`
+	_, err := r.pool.Exec(ctx, q, tenantID, userID, role)
+	return err
+}
+
+func (r *Repository) EffectiveRole(ctx context.Context, tenantID, userID uuid.UUID) (string, error) {
+	const q = `
+SELECT COALESCE(tu.role, u.role)::text
+FROM users u
+LEFT JOIN tenant_users tu ON tu.user_id = u.id AND tu.tenant_id = $1
+WHERE u.id = $2 AND u.deleted_at IS NULL`
+	var role string
+	err := r.pool.QueryRow(ctx, q, tenantID, userID).Scan(&role)
+	return role, err
+}
+
+func (r *Repository) UserInTenant(ctx context.Context, tenantID, userID uuid.UUID) (bool, error) {
+	const q = `SELECT 1 FROM tenant_users WHERE tenant_id = $1 AND user_id = $2`
+	var one int
+	err := r.pool.QueryRow(ctx, q, tenantID, userID).Scan(&one)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+func (r *Repository) BackfillTenantMemberRoles(ctx context.Context) error {
+	const q = `
+UPDATE tenant_users tu
+SET role = u.role
+FROM users u
+WHERE tu.user_id = u.id AND tu.role IS NULL AND u.role <> 'super_admin'`
+	_, err := r.pool.Exec(ctx, q)
 	return err
 }

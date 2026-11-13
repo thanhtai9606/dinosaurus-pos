@@ -8,7 +8,7 @@ import (
 
 // CurrencyOption is stored in settings.supported_currencies (JSON array).
 type CurrencyOption struct {
-	Code           string `json:"code" validate:"required,len=3,uppercase"`
+	Code           string `json:"code" validate:"required,len=3"`
 	Label          string `json:"label" validate:"required,max=64"`
 	Locale         string `json:"locale" validate:"required,max=16"`
 	FractionDigits int    `json:"fraction_digits" validate:"gte=0,lte=4"`
@@ -16,8 +16,8 @@ type CurrencyOption struct {
 
 func defaultSupportedCurrencies() []CurrencyOption {
 	return []CurrencyOption{
-		{Code: "IDR", Label: "IDR (Rp)", Locale: "id-ID", FractionDigits: 0},
 		{Code: "VND", Label: "VND (₫)", Locale: "vi-VN", FractionDigits: 0},
+		{Code: "IDR", Label: "IDR (Rp)", Locale: "id-ID", FractionDigits: 0},
 		{Code: "USD", Label: "USD ($)", Locale: "en-US", FractionDigits: 2},
 	}
 }

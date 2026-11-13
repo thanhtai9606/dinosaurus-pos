@@ -67,6 +67,8 @@
         "login_failed": "Login failed. Please check your credentials.",
         "email_placeholder": "m.scott@dundermifflin.com",
         "password_placeholder": "••••••••",
+        "tenant_code": "Store / tenant code",
+        "tenant_code_placeholder": "default",
         "demo_account": "Use demo account:",
         "logout_failed": "Logout failed: {{message}}",
         "update_avatar_failed": "Failed to update avatar: {{message}}",
@@ -440,7 +442,7 @@
         "active_users": "Active Users",
         "sales": "Sales",
         "active_now": "Active Now",
-        "brand_name": "POS Kasir",
+        "brand_name": "Dinosaurus POS",
         "secret_reports": "Secret Reports Page (Admin Only)",
         "placeholder_content": "Other content can be placed here..."
     },
@@ -663,8 +665,8 @@
             "upload_button": "Upload New Logo",
             "remove_button": "Remove/Clear",
             "logo_help": "Recommended size: 512x512px. Max 5MB. Values are updated immediately upon upload.",
-            "app_name_placeholder": "POS Kasir",
-            "footer_placeholder": "© 2024 POS Kasir",
+            "app_name_placeholder": "Dinosaurus POS",
+            "footer_placeholder": "© Dinosaurus POS",
             "logo_alt": "App Logo",
             "color_placeholder": "#000000",
             "color_dark_placeholder": "#ffffff"

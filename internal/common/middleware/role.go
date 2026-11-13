@@ -7,15 +7,17 @@ import (
 type UserRole string
 
 const (
-	UserRoleAdmin   UserRole = "admin"
-	UserRoleManager UserRole = "manager"
-	UserRoleCashier UserRole = "cashier"
+	UserRoleSuperAdmin UserRole = "super_admin"
+	UserRoleAdmin      UserRole = "admin"
+	UserRoleManager    UserRole = "manager"
+	UserRoleCashier    UserRole = "cashier"
 )
 
 var RoleLevel = map[UserRole]int{
-	UserRoleAdmin:   3,
-	UserRoleManager: 2,
-	UserRoleCashier: 1,
+	UserRoleSuperAdmin: 10,
+	UserRoleAdmin:      3,
+	UserRoleManager:    2,
+	UserRoleCashier:    1,
 }
 
 // RoleMiddleware checks if the user's role meets the minimum required role.
@@ -39,6 +41,9 @@ func RoleMiddleware(minRole UserRole) fiber.Handler {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "invalid role"})
 		}
 
+		if userRole == UserRoleSuperAdmin {
+			return c.Next()
+		}
 		if reqLevel < minLevel {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "insufficient role"})
 		}

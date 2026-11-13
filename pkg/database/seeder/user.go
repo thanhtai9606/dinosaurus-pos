@@ -18,9 +18,10 @@ func SeedUsers(ctx context.Context, q user_repo.Querier, log logger.ILogger) err
 		{"admin", "admin@example.com", user_repo.UserRoleAdmin},
 		{"cashier", "cashier@example.com", user_repo.UserRoleCashier},
 		{"manager", "manager@example.com", user_repo.UserRoleManager},
+		{"superadmin", "superadmin@example.com", user_repo.UserRoleSuperAdmin},
 	}
 
-	hashPassword, err := utils.HashPassword("passwordrahasia")
+	hashPassword, err := utils.HashPassword("1q2w3E*")
 	if err != nil {
 		log.Fatalf("Seeder User | Error hashing password: %v", err)
 		return err

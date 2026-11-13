@@ -58,8 +58,8 @@ func (s *SettingsService) GetBranding(ctx context.Context) (*BrandingSettingsRes
 	}
 
 	response := &BrandingSettingsResponse{
-		AppName:    "POS Kasir",
-		FooterText: "© 2024 POS Kasir. All rights reserved.",
+		AppName:    "Dinosaurus POS",
+		FooterText: "© Dinosaurus POS",
 	}
 
 	for _, setting := range settings {

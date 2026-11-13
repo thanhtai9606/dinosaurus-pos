@@ -27,7 +27,7 @@ func TestDeleteUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 
@@ -45,7 +45,7 @@ func TestDeleteUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 
@@ -64,7 +64,7 @@ func TestDeleteUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 
@@ -86,7 +86,7 @@ func TestToggleUserStatus(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 
@@ -104,7 +104,7 @@ func TestToggleUserStatus(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 
@@ -123,7 +123,7 @@ func TestToggleUserStatus(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 
@@ -145,7 +145,7 @@ func TestGetUserByID(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 		userID := uuid.New()
 		avatarFile := "avatar.jpg"
@@ -177,7 +177,7 @@ func TestGetUserByID(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 		userID := uuid.New()
 		dbUser := user_repo.User{
@@ -206,7 +206,7 @@ func TestGetUserByID(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 		userID := uuid.New()
 
@@ -226,7 +226,7 @@ func TestGetUserByID(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 		userID := uuid.New()
 		avatarFile := "avatar.jpg"
@@ -254,7 +254,7 @@ func TestUpdateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 
@@ -299,7 +299,7 @@ func TestUpdateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 		req := user.UpdateUserRequest{}
@@ -320,7 +320,7 @@ func TestUpdateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 		existingUser := user_repo.User{ID: userID}
@@ -344,7 +344,7 @@ func TestUpdateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		userID := uuid.New()
 		existingUser := user_repo.User{ID: userID}
@@ -370,7 +370,7 @@ func TestGetAllUsers(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 
 		users := []user_repo.ListUsersRow{
@@ -392,7 +392,7 @@ func TestGetAllUsers(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 
 		page := 2
@@ -433,7 +433,7 @@ func TestGetAllUsers(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().ListUsers(ctx, gomock.Any()).Return([]user_repo.ListUsersRow{}, pgx.ErrNoRows)
@@ -452,7 +452,7 @@ func TestGetAllUsers(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.Background()
 
 		mockRepo.EXPECT().ListUsers(ctx, gomock.Any()).Return(nil, errors.New("db error"))
@@ -473,7 +473,7 @@ func TestCreateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		req := user.CreateUserRequest{
 			Username: "newuser",
@@ -505,7 +505,7 @@ func TestCreateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		req := user.CreateUserRequest{Username: "newuser"}
 
@@ -525,7 +525,7 @@ func TestCreateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		req := user.CreateUserRequest{Email: "new@example.com"}
 
@@ -545,7 +545,7 @@ func TestCreateUser(t *testing.T) {
 		mockLogger := mocks.NewMockILogger(ctrl)
 		mockActivity := mocks.NewMockIActivityService(ctrl)
 		mockAvatar := mocks.NewMockIAthRepo(ctrl)
-		service := user.NewUsrService(mockRepo, mockLogger, mockActivity, mockAvatar)
+		service := user.NewUsrService(mockRepo, nil, mockLogger, mockActivity, mockAvatar)
 		ctx := context.WithValue(context.Background(), common.UserIDKey, uuid.New())
 		req := user.CreateUserRequest{Password: "pass"}
 

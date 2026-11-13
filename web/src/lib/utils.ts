@@ -79,19 +79,21 @@ const CURRENCY_LOCALE: Record<string, string> = {
   VND: 'vi-VN',
 }
 
+export const DEFAULT_APP_CURRENCY = 'VND'
+
 /** Format amount using app financial settings currency (see MoneyProvider). */
 export function formatMoney(
   amount: number,
-  currency = 'IDR',
+  currency = DEFAULT_APP_CURRENCY,
   locale?: string,
   fractionDigits?: number,
 ) {
-  const code = (currency || 'IDR').toUpperCase()
+  const code = (currency || DEFAULT_APP_CURRENCY).toUpperCase()
   const loc = locale ?? CURRENCY_LOCALE[code] ?? 'en-US'
   const fd =
     fractionDigits ??
     (code === 'IDR' || code === 'VND' ? 0 : 2)
-  const currencyCode = CURRENCY_LOCALE[code] ? code : 'IDR'
+  const currencyCode = CURRENCY_LOCALE[code] ? code : DEFAULT_APP_CURRENCY
   return new Intl.NumberFormat(loc, {
     style: 'currency',
     currency: currencyCode,
@@ -102,9 +104,9 @@ export function formatMoney(
 
 /** Currency glyph/symbol for input prefixes and chart axes (e.g. ₫, Rp). */
 export function getCurrencySymbol(currency: string, locale?: string) {
-  const code = (currency || 'IDR').toUpperCase()
+  const code = (currency || DEFAULT_APP_CURRENCY).toUpperCase()
   const loc = locale ?? CURRENCY_LOCALE[code] ?? 'en-US'
-  const currencyCode = CURRENCY_LOCALE[code] ? code : 'IDR'
+  const currencyCode = CURRENCY_LOCALE[code] ? code : DEFAULT_APP_CURRENCY
   try {
     const parts = new Intl.NumberFormat(loc, {
       style: 'currency',

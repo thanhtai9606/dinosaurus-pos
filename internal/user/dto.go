@@ -9,9 +9,9 @@ import (
 )
 
 type LoginRequest struct {
-	Email      string  `json:"email" validate:"required,email"`
-	Password   string  `json:"password" validate:"required"`
-	TenantCode *string `json:"tenant_code,omitempty" validate:"omitempty,min=2,max=32"`
+	Email      string `json:"email" validate:"required,email"`
+	Password   string `json:"password" validate:"required"`
+	TenantCode string `json:"tenant_code" validate:"required,min=2,max=32"`
 }
 
 type TenantSummary struct {

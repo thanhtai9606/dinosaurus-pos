@@ -77,13 +77,18 @@ WHERE
         ELSE deleted_at IS NULL
         END
     )
+  AND (
+    $5::uuid IS NULL
+    OR id IN (SELECT user_id FROM tenant_users WHERE tenant_id = $5::uuid)
+  )
 `
 
 type CountUsersParams struct {
-	SearchText *string   `json:"search_text"`
-	Role       *UserRole `json:"role"`
-	IsActive   *bool     `json:"is_active"`
-	Status     *string   `json:"status"`
+	SearchText *string    `json:"search_text"`
+	Role       *UserRole  `json:"role"`
+	IsActive   *bool      `json:"is_active"`
+	Status     *string    `json:"status"`
+	TenantID   *uuid.UUID `json:"tenant_id"`
 }
 
 // Menghitung pengguna dengan filter status.
@@ -93,6 +98,7 @@ func (q *Queries) CountUsers(ctx context.Context, arg CountUsersParams) (int64, 
 		arg.Role,
 		arg.IsActive,
 		arg.Status,
+		arg.TenantID,
 	)
 	var count int64
 	err := row.Scan(&count)
@@ -254,6 +260,10 @@ WHERE
         ELSE deleted_at IS NULL
         END
     )
+  AND (
+    $9::uuid IS NULL
+    OR id IN (SELECT user_id FROM tenant_users WHERE tenant_id = $9::uuid)
+  )
 ORDER BY
     CASE WHEN $7::user_order_column = 'username' AND $8::sort_order = 'asc'  THEN username END ASC,
     CASE WHEN $7::user_order_column = 'username' AND $8::sort_order = 'desc' THEN username END DESC,
@@ -274,6 +284,7 @@ type ListUsersParams struct {
 	Status     *string         `json:"status"`
 	OrderBy    UserOrderColumn `json:"order_by"`
 	SortOrder  SortOrder       `json:"sort_order"`
+	TenantID   *uuid.UUID      `json:"tenant_id"`
 }
 
 type ListUsersRow struct {
@@ -299,6 +310,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]ListUse
 		arg.Status,
 		arg.OrderBy,
 		arg.SortOrder,
+		arg.TenantID,
 	)
 	if err != nil {
 		return nil, err

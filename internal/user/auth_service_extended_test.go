@@ -32,8 +32,9 @@ func TestAuthService_Login_Extended(t *testing.T) {
 		UpdatedAt:    pgtype.Timestamptz{Time: time.Now(), Valid: true},
 	}
 	req := user.LoginRequest{
-		Email:    "test@example.com",
-		Password: "password123",
+		Email:      "test@example.com",
+		Password:   "password123",
+		TenantCode: "default",
 	}
 
 	t.Run("GenerateTokenError", func(t *testing.T) {

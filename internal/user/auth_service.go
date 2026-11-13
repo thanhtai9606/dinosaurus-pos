@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -67,47 +68,66 @@ func defaultTenantRow() tenants.Row {
 	}
 }
 
-func (s *AthService) resolveLoginTenant(ctx context.Context, userID uuid.UUID, tenantCode *string) (tenants.Row, []TenantSummary, error) {
+func (s *AthService) jwtRole(ctx context.Context, user user_repo.User, tenantID uuid.UUID) (string, error) {
+	if user.Role == user_repo.UserRoleSuperAdmin {
+		return string(user_repo.UserRoleSuperAdmin), nil
+	}
+	if s.Tenants == nil {
+		return string(user.Role), nil
+	}
+	return s.Tenants.EffectiveRole(ctx, tenantID, user.ID)
+}
+
+func (s *AthService) resolveLoginTenant(ctx context.Context, user user_repo.User, tenantCode string) (tenants.Row, []TenantSummary, error) {
+	code := strings.ToLower(strings.TrimSpace(tenantCode))
+	if code == "" {
+		return tenants.Row{}, nil, common.ErrInvalidInput
+	}
 	if s.Tenants == nil {
 		def := defaultTenantRow()
+		if code != def.Code {
+			return tenants.Row{}, nil, common.ErrForbidden
+		}
 		return def, tenantSummaries([]tenants.Row{def}), nil
 	}
-	list, err := s.Tenants.ListForUser(ctx, userID)
+	if user.Role == user_repo.UserRoleSuperAdmin {
+		t, err := s.Tenants.GetByCode(ctx, code)
+		if err != nil {
+			return tenants.Row{}, nil, common.ErrForbidden
+		}
+		all, err := s.Tenants.ListAll(ctx)
+		if err != nil {
+			return tenants.Row{}, nil, err
+		}
+		return t, tenantSummaries(all), nil
+	}
+	list, err := s.Tenants.ListForUser(ctx, user.ID)
 	if err != nil {
 		return tenants.Row{}, nil, err
 	}
 	summaries := tenantSummaries(list)
-	if len(list) == 0 {
-		if err := s.Tenants.AddUserToDefaultTenant(ctx, userID); err != nil {
-			return tenants.Row{}, nil, err
-		}
-		list, err = s.Tenants.ListForUser(ctx, userID)
-		if err != nil {
-			return tenants.Row{}, nil, err
-		}
-		summaries = tenantSummaries(list)
+	t, err := s.Tenants.GetByCode(ctx, code)
+	if err != nil {
+		return tenants.Row{}, summaries, common.ErrForbidden
 	}
-	if tenantCode != nil && *tenantCode != "" {
-		t, err := s.Tenants.GetByCode(ctx, *tenantCode)
-		if err != nil {
-			return tenants.Row{}, summaries, common.ErrForbidden
-		}
-		ok, err := s.Tenants.UserHasTenant(ctx, userID, t.ID)
-		if err != nil || !ok {
-			return tenants.Row{}, summaries, common.ErrForbidden
-		}
-		return t, summaries, nil
+	ok, err := s.Tenants.UserHasTenant(ctx, user.ID, t.ID)
+	if err != nil || !ok {
+		return tenants.Row{}, summaries, common.ErrForbidden
 	}
-	return list[0], summaries, nil
+	return t, summaries, nil
 }
 
 func (s *AthService) buildLoginResponse(ctx context.Context, user user_repo.User, tenantRow tenants.Row, tenantList []TenantSummary, refreshToken string) (*LoginResponse, error) {
-	token, expiredAt, err := s.Token.GenerateToken(user.Username, user.Email, user.ID, string(user.Role), tenantRow.ID)
+	jwtRole, err := s.jwtRole(ctx, user, tenantRow.ID)
+	if err != nil {
+		return nil, err
+	}
+	token, expiredAt, err := s.Token.GenerateToken(user.Username, user.Email, user.ID, jwtRole, tenantRow.ID)
 	if err != nil {
 		return nil, err
 	}
 	if refreshToken == "" {
-		refreshToken, _, err = s.Token.GenerateRefreshToken(user.Username, user.Email, user.ID, string(user.Role), tenantRow.ID)
+		refreshToken, _, err = s.Token.GenerateRefreshToken(user.Username, user.Email, user.ID, jwtRole, tenantRow.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +152,7 @@ func (s *AthService) buildLoginResponse(ctx context.Context, user user_repo.User
 			CreatedAt: user.CreatedAt.Time,
 			UpdatedAt: user.UpdatedAt.Time,
 			Avatar:    user.Avatar,
-			Role:      user.Role,
+			Role:      user_repo.UserRole(jwtRole),
 			Tenant:    &TenantSummary{ID: tenantRow.ID, Code: tenantRow.Code, Name: tenantRow.Name},
 			Tenants:   tenantList,
 		},
@@ -442,7 +462,7 @@ func (s *AthService) Login(ctx context.Context, req LoginRequest) (*LoginRespons
 		return nil, common.ErrInvalidCredentials
 	}
 
-	tenantRow, tenantList, err := s.resolveLoginTenant(ctx, user.ID, req.TenantCode)
+	tenantRow, tenantList, err := s.resolveLoginTenant(ctx, user, req.TenantCode)
 	if err != nil {
 		s.Log.Errorf("Login | Tenant resolve failed: %v", err)
 		return nil, err
@@ -499,6 +519,16 @@ func (s *AthService) RefreshToken(ctx context.Context, refreshToken string) (*Lo
 	if s.Tenants == nil {
 		tenantRow = defaultTenantRow()
 		list = []tenants.Row{tenantRow}
+	} else if user.Role == user_repo.UserRoleSuperAdmin {
+		var err error
+		tenantRow, err = s.Tenants.GetByID(ctx, tenantID)
+		if err != nil {
+			return nil, common.ErrForbidden
+		}
+		list, err = s.Tenants.ListAll(ctx)
+		if err != nil {
+			return nil, common.ErrInternal
+		}
 	} else {
 		ok, err := s.Tenants.UserHasTenant(ctx, user.ID, tenantID)
 		if err != nil || !ok {
@@ -526,27 +556,39 @@ func (s *AthService) SwitchTenant(ctx context.Context, userID, tenantID uuid.UUI
 	if s.Tenants == nil {
 		return nil, common.ErrForbidden
 	}
-	ok, err := s.Tenants.UserHasTenant(ctx, userID, tenantID)
-	if err != nil || !ok {
-		return nil, common.ErrForbidden
-	}
 	user, err := s.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, common.ErrUnauthorized
 	}
-	list, err := s.Tenants.ListForUser(ctx, userID)
-	if err != nil {
-		return nil, common.ErrInternal
-	}
 	var tenantRow tenants.Row
-	for _, r := range list {
-		if r.ID == tenantID {
-			tenantRow = r
-			break
+	var list []tenants.Row
+	if user.Role == user_repo.UserRoleSuperAdmin {
+		tenantRow, err = s.Tenants.GetByID(ctx, tenantID)
+		if err != nil {
+			return nil, common.ErrForbidden
 		}
-	}
-	if tenantRow.ID == uuid.Nil {
-		return nil, common.ErrForbidden
+		list, err = s.Tenants.ListAll(ctx)
+		if err != nil {
+			return nil, common.ErrInternal
+		}
+	} else {
+		ok, err := s.Tenants.UserHasTenant(ctx, userID, tenantID)
+		if err != nil || !ok {
+			return nil, common.ErrForbidden
+		}
+		list, err = s.Tenants.ListForUser(ctx, userID)
+		if err != nil {
+			return nil, common.ErrInternal
+		}
+		for _, r := range list {
+			if r.ID == tenantID {
+				tenantRow = r
+				break
+			}
+		}
+		if tenantRow.ID == uuid.Nil {
+			return nil, common.ErrForbidden
+		}
 	}
 	return s.buildLoginResponse(ctx, user, tenantRow, tenantSummaries(list), "")
 }

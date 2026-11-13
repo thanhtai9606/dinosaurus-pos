@@ -25,11 +25,13 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
 
     const form = useForm({
         defaultValues: {
+            tenant_code: 'default',
             email: '',
             password: '',
         },
         validators: {
             onChange: z.object({
+                tenant_code: z.string().min(2).max(32),
                 email: z.string().email(),
                 password: z.string().min(1)
             })
@@ -38,6 +40,7 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
             setServerError(null)
             try {
                 await auth.login({
+                    tenant_code: value.tenant_code.trim().toLowerCase(),
                     email: value.email,
                     password: value.password,
                 })
@@ -51,8 +54,9 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
     })
 
     const demoAccount = {
+        tenant_code: 'default',
         email: 'admin@example.com',
-        password: 'passwordrahasia'
+        password: '1q2w3E*'
     }
 
     return (
@@ -72,6 +76,32 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
                     e.stopPropagation();
                     form.handleSubmit();
                 }} className="space-y-5">
+                    <form.Field
+                        name="tenant_code"
+                        children={(field) => (
+                            <div className="space-y-2">
+                                <Label htmlFor={field.name} className="text-sm font-medium">
+                                    {t('auth.tenant_code')}
+                                </Label>
+                                <Input
+                                    id={field.name}
+                                    name={field.name}
+                                    value={field.state.value}
+                                    onBlur={field.handleBlur}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    placeholder={t('auth.tenant_code_placeholder')}
+                                    autoComplete="organization"
+                                    className="h-12 rounded-xl"
+                                />
+                                {field.state.meta.errors.length > 0 && (
+                                    <em role="alert" className="text-sm font-medium text-destructive">
+                                        {field.state.meta.errors.map(err => typeof err === 'object' ? ((err as any).message ?? JSON.stringify(err)) : String(err)).join(', ')}
+                                    </em>
+                                )}
+                            </div>
+                        )}
+                    />
+
                     <form.Field
                         name="email"
                         children={(field) => (
@@ -149,6 +179,7 @@ export function LoginForm({ t, auth, onSubmitSuccess }: LoginFormProps) {
             <CardFooter className="px-8 pb-8">
                 <div className="w-full text-center text-sm text-muted-foreground bg-muted/50 rounded-xl p-4">
                     <p className="font-medium mb-1">{t('auth.demo_account')}:</p>
+                    <p>{t('auth.tenant_code')}: <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.tenant_code}</code></p>
                     <p>{t('auth.email')}: <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.email}</code></p>
                     <p>{t('auth.password')}: <code className="text-sm bg-background px-1.5 py-0.5 rounded-md">{demoAccount.password}</code></p>
                 </div>

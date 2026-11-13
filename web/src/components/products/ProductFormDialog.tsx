@@ -429,118 +429,186 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                         e.preventDefault()
                                         e.stopPropagation()
                                         form.handleSubmit()
-                                    }} className="grid gap-6 py-4">
-                                        {/* Image Upload Section */}
-                                        <div className="flex flex-col items-center gap-4">
-                                            <Avatar
-                                                className="h-24 w-24 border-2 border-muted cursor-pointer hover:opacity-80 transition-opacity"
-                                                onClick={triggerMainImageUpload}>
-                                                <AvatarImage src={preview || undefined} className="object-cover" />
-                                                <AvatarFallback className="bg-muted">
-                                                    <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={triggerMainImageUpload}
-                                            >
-                                                {preview ? t('products.form.change_image') : t('products.form.upload_image')}
-                                            </Button>
+                                    }} className="space-y-8 py-2">
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={cropper.onFileChange}
+                                        />
 
-                                            {/* Input File Hidden terhubung ke hook */}
-                                            <input
-                                                ref={fileInputRef}
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={cropper.onFileChange}
-                                            />
-                                        </div>
+                                        <section className="space-y-4">
+                                            <h3 className="text-sm font-semibold tracking-tight">
+                                                {t('products.form.section_basics')}
+                                            </h3>
+                                            <div className="grid gap-6 lg:grid-cols-[minmax(10rem,12rem)_1fr]">
+                                                <div className="flex flex-col items-center gap-3 lg:items-start">
+                                                    <Avatar
+                                                        className="h-28 w-28 cursor-pointer border-2 border-muted transition-opacity hover:opacity-80"
+                                                        onClick={triggerMainImageUpload}
+                                                    >
+                                                        <AvatarImage src={preview || undefined} className="object-cover" />
+                                                        <AvatarFallback className="bg-muted">
+                                                            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="w-full max-w-[12rem]"
+                                                        onClick={triggerMainImageUpload}
+                                                    >
+                                                        {preview ? t('products.form.change_image') : t('products.form.upload_image')}
+                                                    </Button>
+                                                </div>
+                                                <div className="grid min-w-0 gap-4">
+                                                    <form.Field
+                                                        name="name"
+                                                        children={(field) => (
+                                                            <div className="space-y-2">
+                                                                <Label htmlFor={field.name}>{t('products.form.name')}</Label>
+                                                                <Input
+                                                                    id={field.name}
+                                                                    name={field.name}
+                                                                    value={field.state.value}
+                                                                    onBlur={field.handleBlur}
+                                                                    onChange={(e) => field.handleChange(e.target.value)}
+                                                                />
+                                                                {field.state.meta.errors.length > 0 && (
+                                                                    <p className="text-sm font-medium text-destructive">
+                                                                        {formatError(field.state.meta.errors)}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    />
+                                                    <form.Field
+                                                        name="category_ids"
+                                                        children={(field) => (
+                                                            <div className="space-y-2">
+                                                                <Label>{t('products.form.category')}</Label>
+                                                                <div className="grid max-h-36 grid-cols-2 gap-2 overflow-y-auto rounded-md border p-3 sm:grid-cols-3">
+                                                                    {categories.map((cat: any) => (
+                                                                        <div key={cat.id} className="flex items-center space-x-2">
+                                                                            <Checkbox
+                                                                                id={`cat-${cat.id}`}
+                                                                                checked={(field.state.value ?? []).includes(Number(cat.id))}
+                                                                                onCheckedChange={(checked) => {
+                                                                                    const catId = Number(cat.id)
+                                                                                    const current = (field.state.value ?? []) as number[]
+                                                                                    if (checked) {
+                                                                                        if (current.includes(catId)) return
+                                                                                        field.handleChange([...current, catId])
+                                                                                    } else {
+                                                                                        field.handleChange(current.filter((id) => id !== catId))
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                            <label
+                                                                                htmlFor={`cat-${cat.id}`}
+                                                                                className="cursor-pointer text-sm font-medium leading-none"
+                                                                            >
+                                                                                {cat.name}
+                                                                            </label>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                {field.state.meta.errors.length > 0 && (
+                                                                    <p className="text-sm font-medium text-destructive">
+                                                                        {formatError(field.state.meta.errors)}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    />
+                                                    {(productToEdit?.code || (detailProduct as { code?: string })?.code) ? (
+                                                        <div className="space-y-2">
+                                                            <Label>{t('products.fields.code', 'P-code')}</Label>
+                                                            <Input
+                                                                className="font-mono"
+                                                                readOnly
+                                                                value={
+                                                                    productToEdit?.code ??
+                                                                    (detailProduct as { code?: string })?.code ??
+                                                                    ''
+                                                                }
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-muted-foreground">{t('products.form.code_auto')}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </section>
 
-
-                                        <div className="grid gap-4">
-                                            {/* Name */}
-                                            <form.Field
-                                                name="name"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label htmlFor={field.name} className="text-right mt-3:">{t('products.form.name')}</Label>
-                                                        <div className="col-span-3 space-y-1">
+                                        <section className="space-y-4 rounded-lg border bg-muted/15 p-4">
+                                            <h3 className="text-sm font-semibold tracking-tight">
+                                                {t('products.form.section_inventory')}
+                                            </h3>
+                                            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                                                <form.Field
+                                                    name="stock"
+                                                    children={(field) => (
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor={field.name}>{t('products.form.stock')}</Label>
                                                             <Input
                                                                 id={field.name}
                                                                 name={field.name}
-                                                                value={field.state.value}
+                                                                type="text"
+                                                                inputMode="numeric"
+                                                                value={field.state.value ? field.state.value.toLocaleString('id-ID') : ''}
                                                                 onBlur={field.handleBlur}
-                                                                onChange={e => field.handleChange(e.target.value)}
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value.replace(/\D/g, '')
+                                                                    field.handleChange(Number(val))
+                                                                }}
+                                                                placeholder="0"
                                                             />
                                                             {field.state.meta.errors.length > 0 && (
-                                                                <p className="text-sm font-medium text-destructive">{formatError(field.state.meta.errors)}</p>
+                                                                <p className="text-sm font-medium text-destructive">
+                                                                    {formatError(field.state.meta.errors)}
+                                                                </p>
                                                             )}
                                                         </div>
-                                                    </div>
-                                                )}
-                                            />
-
-                                            {/* Category Multi-Select */}
-                                            <form.Field
-                                                name="category_ids"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label className="text-right mt-3">{t('products.form.category')}</Label>
-                                                        <div className="col-span-3 space-y-2">
-                                                            <div className="grid grid-cols-2 gap-2 border rounded-md p-3 max-h-[150px] overflow-y-auto">
-                                                                {categories.map((cat: any) => (
-                                                                    <div key={cat.id} className="flex items-center space-x-2">
-                                                                        <Checkbox
-                                                                            id={`cat-${cat.id}`}
-                                                                            checked={(field.state.value ?? []).includes(Number(cat.id))}
-                                                                            onCheckedChange={(checked) => {
-                                                                                const catId = Number(cat.id)
-                                                                                const current = (field.state.value ?? []) as number[]
-                                                                                if (checked) {
-                                                                                    if (current.includes(catId)) return
-                                                                                    field.handleChange([...current, catId])
-                                                                                } else {
-                                                                                    field.handleChange(current.filter((id) => id !== catId))
-                                                                                }
-                                                                            }}
-                                                                        />
-                                                                        <label
-                                                                            htmlFor={`cat-${cat.id}`}
-                                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                                                        >
-                                                                            {cat.name}
-                                                                        </label>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            {field.state.meta.errors.length > 0 && (
-                                                                <p className="text-sm font-medium text-destructive">{formatError(field.state.meta.errors)}</p>
-                                                            )}
+                                                    )}
+                                                />
+                                                <form.Field
+                                                    name="min_stock"
+                                                    children={(field) => (
+                                                        <div className="space-y-2">
+                                                            <Label>{t('products.fields.min_stock')}</Label>
+                                                            <Input
+                                                                type="number"
+                                                                min={0}
+                                                                value={field.state.value}
+                                                                onChange={(e) => field.handleChange(Number(e.target.value))}
+                                                            />
                                                         </div>
-                                                    </div>
-                                                )}
-                                            />
-
-                                            {/* Cost Price */}
-                                            <form.Field
-                                                name="cost_price"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label htmlFor={field.name} className="text-right mt-3">{t('products.form.cost_price')}</Label>
-                                                        <div className="col-span-3 space-y-1">
+                                                    )}
+                                                />
+                                                <form.Field
+                                                    name="cost_price"
+                                                    children={(field) => (
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor={field.name}>{t('products.form.cost_price')}</Label>
                                                             <div className="relative">
-                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">{currencySymbol}</span>
+                                                                <span className="absolute left-3 top-2.5 text-sm text-muted-foreground">
+                                                                    {currencySymbol}
+                                                                </span>
                                                                 <Input
                                                                     id={field.name}
                                                                     name={field.name}
                                                                     type="text"
                                                                     inputMode="numeric"
-                                                                    value={field.state.value ? field.state.value.toLocaleString('id-ID') : ''}
+                                                                    value={
+                                                                        field.state.value
+                                                                            ? field.state.value.toLocaleString('id-ID')
+                                                                            : ''
+                                                                    }
                                                                     onBlur={field.handleBlur}
-                                                                    onChange={e => {
+                                                                    onChange={(e) => {
                                                                         const val = e.target.value.replace(/\D/g, '')
                                                                         field.handleChange(Number(val))
                                                                     }}
@@ -549,92 +617,35 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                                 />
                                                             </div>
                                                             {field.state.meta.errors.length > 0 && (
-                                                                <p className="text-sm font-medium text-destructive">{formatError(field.state.meta.errors)}</p>
+                                                                <p className="text-sm font-medium text-destructive">
+                                                                    {formatError(field.state.meta.errors)}
+                                                                </p>
                                                             )}
                                                         </div>
-                                                    </div>
-                                                )}
-                                            />
-
-                                            {/* Stock */}
-                                            <form.Field
-                                                name="stock"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label htmlFor={field.name} className="text-right mt-3">{t('products.form.stock')}</Label>
-                                                        <div className="col-span-3 space-y-1">
-                                                            <Input
-                                                                id={field.name}
-                                                                name={field.name}
-                                                                type="text"
-                                                                inputMode="numeric"
-                                                                value={field.state.value ? field.state.value.toLocaleString('id-ID') : ''}
-                                                                onBlur={field.handleBlur}
-                                                                onChange={e => {
-                                                                    const val = e.target.value.replace(/\D/g, '')
-                                                                    field.handleChange(Number(val))
-                                                                }}
-                                                                placeholder="0"
-                                                            />
-                                                            {field.state.meta.errors.length > 0 && (
-                                                                <p className="text-sm font-medium text-destructive">{formatError(field.state.meta.errors)}</p>
-                                                            )}
+                                                    )}
+                                                />
+                                                <form.Field
+                                                    name="default_supplier_id"
+                                                    children={(field) => (
+                                                        <div className="space-y-2 sm:col-span-2 xl:col-span-1">
+                                                            <Label>{t('products.fields.default_supplier')}</Label>
+                                                            <select
+                                                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                                                value={field.state.value}
+                                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                            >
+                                                                <option value="">{t('products.fields.no_supplier')}</option>
+                                                                {(suppliersData?.suppliers || []).map((s) => (
+                                                                    <option key={s.id} value={s.id}>
+                                                                        {s.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
                                                         </div>
-                                                    </div>
-                                                )}
-                                            />
-
-                                            {(productToEdit?.code || (detailProduct as { code?: string })?.code) && (
-                                                <div className="grid grid-cols-4 items-start gap-4">
-                                                    <Label className="text-right mt-3">{t('products.fields.code', 'P-code')}</Label>
-                                                    <Input
-                                                        className="col-span-3 font-mono"
-                                                        readOnly
-                                                        value={productToEdit?.code ?? (detailProduct as { code?: string })?.code ?? ''}
-                                                    />
-                                                </div>
-                                            )}
-                                            {!productToEdit && (
-                                                <p className="text-xs text-muted-foreground">
-                                                    {t('products.form.code_auto')}
-                                                </p>
-                                            )}
-                                            <form.Field
-                                                name="min_stock"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label className="text-right mt-3">{t('products.fields.min_stock')}</Label>
-                                                        <Input
-                                                            className="col-span-3"
-                                                            type="number"
-                                                            min={0}
-                                                            value={field.state.value}
-                                                            onChange={(e) => field.handleChange(Number(e.target.value))}
-                                                        />
-                                                    </div>
-                                                )}
-                                            />
-                                            <form.Field
-                                                name="default_supplier_id"
-                                                children={(field) => (
-                                                    <div className="grid grid-cols-4 items-start gap-4">
-                                                        <Label className="text-right mt-3">{t('products.fields.default_supplier')}</Label>
-                                                        <select
-                                                            className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                                            value={field.state.value}
-                                                            onChange={(e) => field.handleChange(e.target.value)}
-                                                        >
-                                                            <option value="">{t('products.fields.no_supplier')}</option>
-                                                            {(suppliersData?.suppliers || []).map((s) => (
-                                                                <option key={s.id} value={s.id}>
-                                                                    {s.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                )}
-                                            />
-                                        </div>
+                                                    )}
+                                                />
+                                            </div>
+                                        </section>
 
                                         {catalogLoading ? (
                                             <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
@@ -650,10 +661,11 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                             />
                                         )}
 
-                                        {/* Variants Section */}
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <Label>{t('products.form.variants')}</Label>
+                                        <section className="space-y-4 rounded-lg border p-4">
+                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                                <h3 className="text-sm font-semibold tracking-tight">
+                                                    {t('products.form.section_variants')}
+                                                </h3>
                                                 <Button type="button" variant="outline" size="sm" onClick={handleAddVariant}>
                                                     <Plus className="mr-2 h-3 w-3" /> {t('products.form.add_variant')}
                                                 </Button>
@@ -713,10 +725,12 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                                     </div>
                                                 ))}
                                                 {variants.length === 0 && (
-                                                    <p className="text-sm text-center text-muted-foreground py-2">{t('products.form.no_variants')}</p>
+                                                    <p className="py-2 text-center text-sm text-muted-foreground">
+                                                        {t('products.form.no_variants')}
+                                                    </p>
                                                 )}
                                             </div>
-                                        </div>
+                                        </section>
                                     </form>
                                 </TabsContent>
                                 <TabsContent value="history" className="mt-4">

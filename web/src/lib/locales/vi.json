@@ -1006,7 +1006,7 @@
         "form": {
             "title_create": "Tạo sản phẩm mới",
             "title_edit": "Sửa sản phẩm",
-            "desc": "Điền thông tin chi tiết bên dưới. Nhấp vào lưu khi bạn hoàn tất.",
+            "desc": "Thông tin cơ bản → tồn kho → đơn vị bán & giá → biến thể (nếu có).",
             "upload_image": "Tải lên hình ảnh",
             "change_image": "Thay đổi hình ảnh",
             "name": "Tên",
@@ -1029,7 +1029,10 @@
             "tab_details": "Chi tiết",
             "tab_history": "Lịch sử",
             "cost_price": "Chi phí",
-            "code_auto": "Mã sản phẩm (P-code) được sinh tự động khi lưu."
+            "code_auto": "Mã sản phẩm (P-code) được sinh tự động khi lưu.",
+            "section_basics": "Thông tin cơ bản",
+            "section_inventory": "Tồn kho & giá vốn",
+            "section_variants": "Biến thể (topping, size…)"
         },
         "messages": {
             "create_success": "Đã tạo sản phẩm thành công",

@@ -1000,7 +1000,7 @@
         "form": {
             "title_create": "Create New Product",
             "title_edit": "Edit Product",
-            "desc": "Fill in the details below. Click save when you're done.",
+            "desc": "Basics → stock & cost → sale units & prices → optional variants.",
             "upload_image": "Upload Image",
             "change_image": "Change Image",
             "name": "Name",
@@ -1023,6 +1023,9 @@
             "tab_details": "Details",
             "tab_history": "History",
             "cost_price": "Cost Price",
+            "section_basics": "Basic information",
+            "section_inventory": "Stock & cost",
+            "section_variants": "Variants (toppings, sizes…)",
             "code_auto": "Product code (P-code) is generated automatically when you save."
         },
         "messages": {

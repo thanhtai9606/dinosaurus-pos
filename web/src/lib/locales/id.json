@@ -989,7 +989,7 @@
         "form": {
             "title_create": "Buat Produk Baru",
             "title_edit": "Edit Produk",
-            "desc": "Isi detail di bawah ini. Klik simpan setelah selesai.",
+            "desc": "Dasar → stok & harga pokok → satuan jual & harga → varian (opsional).",
             "upload_image": "Unggah Gambar",
             "change_image": "Ganti Gambar",
             "name": "Nama",
@@ -1012,7 +1012,10 @@
             "tab_details": "Detail",
             "tab_history": "Riwayat",
             "cost_price": "Harga Modal",
-            "code_auto": "Kode produk (P-code) dibuat otomatis saat menyimpan."
+            "code_auto": "Kode produk (P-code) dibuat otomatis saat menyimpan.",
+            "section_basics": "Informasi dasar",
+            "section_inventory": "Stok & harga pokok",
+            "section_variants": "Varian (topping, ukuran…)"
         },
         "messages": {
             "create_success": "Produk berhasil dibuat",

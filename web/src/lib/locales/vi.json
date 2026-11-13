@@ -1061,7 +1061,7 @@
         },
         "sale_units": {
             "title": "Đơn vị bán & giá",
-            "hint": "Thêm nhiều dòng: mỗi đơn vị một giá lẻ, giá sỉ và mã vạch. Đơn vị cơ bản (★) dùng cho tồn kho — giá lẻ dòng đó là giá niêm yết sản phẩm.",
+            "hint": "Chọn đơn vị từ danh sách (tên đơn vị khai báo tại Sản phẩm → Đơn vị). Thêm dòng để gán nhiều đơn vị; mỗi dòng nhập giá lẻ, giá sỉ, mã vạch. ★ = đơn vị cơ bản (tồn kho).",
             "measurement_unit": "Đơn vị tính",
             "pick_unit": "Chọn đơn vị…",
             "factor": "Quy đổi (× cơ bản)",
@@ -1073,7 +1073,8 @@
             "barcode_placeholder": "Quét hoặc nhập",
             "barcode_hint": "Để trống và lưu để tự sinh mã 13 số.",
             "add": "Thêm đơn vị",
-            "no_catalog": "Hãy tạo đơn vị tính tại Sản phẩm → Đơn vị trước.",
+            "no_catalog": "Danh sách đơn vị đang trống. Thêm tên đơn vị tại Sản phẩm → Đơn vị, rồi quay lại chọn tại đây.",
+            "catalog_load_failed": "Không tải được danh sách đơn vị. Thử đóng form và mở lại, hoặc tải lại trang.",
             "open_units_menu": "Mở trang Đơn vị"
         },
         "stock_history": {

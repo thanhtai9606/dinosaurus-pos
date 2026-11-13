@@ -34,7 +34,7 @@ import { useImageCropper } from "@/hooks/use-image-cropper.ts";
 import { ImageCropperDialog } from "@/components/common/ImageCropperDialog.tsx";
 import { useMoney } from '@/context/MoneyContext'
 import { useQuery } from '@tanstack/react-query'
-import { measurementUnitsListQueryOptions } from '@/lib/api/query/measurementUnits'
+import { measurementUnitsCatalogQueryOptions } from '@/lib/api/query/measurementUnits'
 
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -81,9 +81,10 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
     const productId = productToEdit?.id ?? ''
     const { data: detailProduct, isLoading: isLoadingDetail, isError: isDetailError } = useProductDetailQuery(productId)
     const { data: suppliersData } = useSuppliersListQuery({ limit: 100 })
-    const { data: measurementUnitsPage } = useQuery({
-        ...measurementUnitsListQueryOptions({ page: 1, limit: 200 }),
+    const { data: measurementUnitsPage, isError: catalogLoadError, isLoading: catalogLoading } = useQuery({
+        ...measurementUnitsCatalogQueryOptions(),
         enabled: open,
+        retry: 1,
     })
     const catalogUnits = measurementUnitsPage?.units ?? []
 
@@ -630,13 +631,19 @@ export function ProductFormDialog({ open, onOpenChange, productToEdit, categorie
                                             />
                                         </div>
 
-                                        <ProductSaleUnitsEditor
-                                            units={saleUnits}
-                                            onChange={handleSaleUnitsChange}
-                                            catalog={catalogUnits}
-                                            t={t}
-                                            currencySymbol={currencySymbol}
-                                        />
+                                        {catalogLoading ? (
+                                            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+                                        ) : catalogLoadError ? (
+                                            <p className="text-sm text-destructive">{t('products.sale_units.catalog_load_failed')}</p>
+                                        ) : (
+                                            <ProductSaleUnitsEditor
+                                                units={saleUnits}
+                                                onChange={handleSaleUnitsChange}
+                                                catalog={catalogUnits}
+                                                t={t}
+                                                currencySymbol={currencySymbol}
+                                            />
+                                        )}
 
                                         {/* Variants Section */}
                                         <div className="space-y-4">

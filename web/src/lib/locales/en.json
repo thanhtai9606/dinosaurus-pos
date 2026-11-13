@@ -1055,7 +1055,7 @@
         },
         "sale_units": {
             "title": "Sale units & pricing",
-            "hint": "Add multiple rows: each unit has its own retail, wholesale, and barcode. The base unit (★) drives stock; its retail price is the product list price.",
+            "hint": "Pick units from the catalog (names are managed under Products → Units). Add rows for multiple units; set retail, wholesale, and barcode per row. ★ = base unit for stock.",
             "measurement_unit": "Unit",
             "pick_unit": "Select unit…",
             "factor": "Conversion (× base)",
@@ -1067,7 +1067,8 @@
             "barcode_placeholder": "Scan or type",
             "barcode_hint": "Leave empty and save to generate a 13-digit code.",
             "add": "Add unit",
-            "no_catalog": "Create measurement units under Products → Units first.",
+            "no_catalog": "The unit list is empty. Add unit names under Products → Units, then come back here to select them.",
+            "catalog_load_failed": "Could not load the unit list. Close this form and try again, or refresh the page.",
             "open_units_menu": "Open Units"
         },
         "stock_history": {

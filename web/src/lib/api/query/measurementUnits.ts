@@ -21,6 +21,13 @@ export type PagedMeasurementUnits = {
 
 export type MeasurementUnitsListParams = { page?: number; limit?: number; search?: string }
 
+/** Backend pagination caps at 100 (`pagination.PaginationRequest`). */
+export const MEASUREMENT_UNITS_LIST_MAX = 100
+
+/** Load full tenant catalog for product sale-unit pickers (first page, max limit). */
+export const measurementUnitsCatalogQueryOptions = () =>
+    measurementUnitsListQueryOptions({ page: 1, limit: MEASUREMENT_UNITS_LIST_MAX })
+
 export const measurementUnitsListQueryOptions = (params?: MeasurementUnitsListParams) =>
     queryOptions<PagedMeasurementUnits, AxiosError<POSKasirInternalCommonErrorResponse>>({
         queryKey: ['measurement-units', 'list', params],

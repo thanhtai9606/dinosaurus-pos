@@ -1044,7 +1044,7 @@
         },
         "sale_units": {
             "title": "Satuan jual & harga",
-            "hint": "Tambah beberapa baris: tiap satuan punya harga eceran, grosir, dan barcode sendiri. Satuan dasar (★) untuk stok; harga ecerannya jadi harga produk.",
+            "hint": "Pilih satuan dari daftar (nama dikelola di Produk → Satuan). Tambah baris untuk banyak satuan; isi harga eceran, grosir, barcode per baris. ★ = satuan dasar untuk stok.",
             "measurement_unit": "Satuan",
             "pick_unit": "Pilih satuan…",
             "factor": "Konversi (× dasar)",
@@ -1056,7 +1056,8 @@
             "barcode_placeholder": "Scan atau ketik",
             "barcode_hint": "Kosongkan lalu simpan untuk kode 13 digit otomatis.",
             "add": "Tambah satuan",
-            "no_catalog": "Buat satuan ukuran di Produk → Satuan terlebih dahulu.",
+            "no_catalog": "Daftar satuan masih kosong. Tambahkan nama satuan di Produk → Satuan, lalu kembali ke sini untuk memilih.",
+            "catalog_load_failed": "Gagal memuat daftar satuan. Tutup form dan coba lagi, atau muat ulang halaman.",
             "open_units_menu": "Buka Satuan"
         },
         "stock_history": {

@@ -2,6 +2,7 @@ package seeder
 
 import (
 	cloudflarer2 "POS-kasir/pkg/cloudflare-r2"
+	"POS-kasir/pkg/database"
 	"POS-kasir/pkg/logger"
 	"context"
 	"fmt"
@@ -10,15 +11,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func SeedProductionData(ctx context.Context, pool *pgxpool.Pool, r2Client cloudflarer2.IR2, log logger.ILogger) error {
+func SeedProductionData(ctx context.Context, db *database.TenantDB, r2Client cloudflarer2.IR2, log logger.ILogger) error {
 	log.Info("Seeding production data...")
 
 	// Check if production data already exists (idempotent)
 	var orderCount int
-	err := pool.QueryRow(ctx, "SELECT COUNT(*) FROM orders").Scan(&orderCount)
+	err := db.QueryRow(ctx, "SELECT COUNT(*) FROM orders").Scan(&orderCount)
 	if err != nil {
 		return fmt.Errorf("failed to check existing orders: %w", err)
 	}
@@ -28,7 +28,7 @@ func SeedProductionData(ctx context.Context, pool *pgxpool.Pool, r2Client cloudf
 	}
 
 	// Get user IDs for assigning orders
-	userIDs, err := getUserIDs(ctx, pool)
+	userIDs, err := getUserIDs(ctx, db)
 	if err != nil {
 		return fmt.Errorf("failed to get user IDs: %w", err)
 	}
@@ -37,59 +37,59 @@ func SeedProductionData(ctx context.Context, pool *pgxpool.Pool, r2Client cloudf
 	}
 
 	// Get category IDs
-	categoryMap, err := getCategoryMap(ctx, pool)
+	categoryMap, err := getCategoryMap(ctx, db)
 	if err != nil {
 		return fmt.Errorf("failed to get categories: %w", err)
 	}
 
 	// Get payment method IDs
-	paymentMethodMap, err := getPaymentMethodMap(ctx, pool)
+	paymentMethodMap, err := getPaymentMethodMap(ctx, db)
 	if err != nil {
 		return fmt.Errorf("failed to get payment methods: %w", err)
 	}
 
 	// Get cancellation reasons
-	cancelReasons, err := getCancellationReasons(ctx, pool)
+	cancelReasons, err := getCancellationReasons(ctx, db)
 	if err != nil {
 		return fmt.Errorf("failed to get cancellation reasons: %w", err)
 	}
 
 	// Get promotions
-	promotions, err := getPromotions(ctx, pool)
+	promotions, err := getPromotions(ctx, db)
 	if err != nil {
 		return fmt.Errorf("failed to get promotions: %w", err)
 	}
 
 	// 1. Seed Products + Options + Category Assignments
-	products, err := seedProducts(ctx, pool, categoryMap, r2Client, log)
+	products, err := seedProducts(ctx, db, categoryMap, r2Client, log)
 	if err != nil {
 		return fmt.Errorf("failed to seed products: %w", err)
 	}
 	log.Infof("Seeded %d products with variants", len(products))
 
 	// 2. Seed Customers
-	customerIDs, err := seedCustomers(ctx, pool, log)
+	customerIDs, err := seedCustomers(ctx, db, log)
 	if err != nil {
 		return fmt.Errorf("failed to seed customers: %w", err)
 	}
 	log.Infof("Seeded %d customers", len(customerIDs))
 
 	// 3. Seed Promotions
-	err = seedPromotions(ctx, pool, log)
+	err = seedPromotions(ctx, db, log)
 	if err != nil {
 		return fmt.Errorf("failed to seed promotions: %w", err)
 	}
 	log.Info("Seeded promotions")
 
 	// 4. Seed Orders (with backdated timestamps)
-	totalOrders, err := seedOrders(ctx, pool, products, userIDs, customerIDs, paymentMethodMap, cancelReasons, promotions, log)
+	totalOrders, err := seedOrders(ctx, db, products, userIDs, customerIDs, paymentMethodMap, cancelReasons, promotions, log)
 	if err != nil {
 		return fmt.Errorf("failed to seed orders: %w", err)
 	}
 	log.Infof("Seeded %d orders spanning 2-4 months", totalOrders)
 
 	// 5. Seed Shifts
-	if err := seedShifts(ctx, pool, userIDs, log); err != nil {
+	if err := seedShifts(ctx, db, userIDs, log); err != nil {
 		return fmt.Errorf("failed to seed shifts: %w", err)
 	}
 	log.Info("Seeded cashier shifts")
@@ -158,8 +158,8 @@ type seededOption struct {
 
 // ─── Helper Functions ────────────────────────────────────────────
 
-func getUserIDs(ctx context.Context, pool *pgxpool.Pool) ([]string, error) {
-	rows, err := pool.Query(ctx, "SELECT id FROM users WHERE is_active = true")
+func getUserIDs(ctx context.Context, db *database.TenantDB) ([]string, error) {
+	rows, err := db.Query(ctx, "SELECT id FROM users WHERE is_active = true")
 	if err != nil {
 		return nil, err
 	}
@@ -175,8 +175,8 @@ func getUserIDs(ctx context.Context, pool *pgxpool.Pool) ([]string, error) {
 	return ids, rows.Err()
 }
 
-func getCategoryMap(ctx context.Context, pool *pgxpool.Pool) (map[string]int32, error) {
-	rows, err := pool.Query(ctx, "SELECT id, name FROM categories")
+func getCategoryMap(ctx context.Context, db *database.TenantDB) (map[string]int32, error) {
+	rows, err := db.Query(ctx, "SELECT id, name FROM categories")
 	if err != nil {
 		return nil, err
 	}
@@ -193,8 +193,8 @@ func getCategoryMap(ctx context.Context, pool *pgxpool.Pool) (map[string]int32, 
 	return m, rows.Err()
 }
 
-func getPaymentMethodMap(ctx context.Context, pool *pgxpool.Pool) (map[string]int32, error) {
-	rows, err := pool.Query(ctx, "SELECT id, name FROM payment_methods WHERE is_active = true")
+func getPaymentMethodMap(ctx context.Context, db *database.TenantDB) (map[string]int32, error) {
+	rows, err := db.Query(ctx, "SELECT id, name FROM payment_methods WHERE is_active = true")
 	if err != nil {
 		return nil, err
 	}
@@ -211,8 +211,8 @@ func getPaymentMethodMap(ctx context.Context, pool *pgxpool.Pool) (map[string]in
 	return m, rows.Err()
 }
 
-func getCancellationReasons(ctx context.Context, pool *pgxpool.Pool) ([]int32, error) {
-	rows, err := pool.Query(ctx, "SELECT id FROM cancellation_reasons")
+func getCancellationReasons(ctx context.Context, db *database.TenantDB) ([]int32, error) {
+	rows, err := db.Query(ctx, "SELECT id FROM cancellation_reasons")
 	if err != nil {
 		return nil, err
 	}
@@ -228,8 +228,8 @@ func getCancellationReasons(ctx context.Context, pool *pgxpool.Pool) ([]int32, e
 	return ids, rows.Err()
 }
 
-func getPromotions(ctx context.Context, pool *pgxpool.Pool) ([]string, error) {
-	rows, err := pool.Query(ctx, "SELECT id FROM promotions WHERE is_active = true")
+func getPromotions(ctx context.Context, db *database.TenantDB) ([]string, error) {
+	rows, err := db.Query(ctx, "SELECT id FROM promotions WHERE is_active = true")
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func getPromotions(ctx context.Context, pool *pgxpool.Pool) ([]string, error) {
 
 // ─── 1. Products ─────────────────────────────────────────────────
 
-func seedProducts(ctx context.Context, pool *pgxpool.Pool, categoryMap map[string]int32, r2Client cloudflarer2.IR2, log logger.ILogger) ([]seededProduct, error) {
+func seedProducts(ctx context.Context, db *database.TenantDB, categoryMap map[string]int32, r2Client cloudflarer2.IR2, log logger.ILogger) ([]seededProduct, error) {
 	type productDef struct {
 		Name      string
 		Price     int64
@@ -377,7 +377,7 @@ func seedProducts(ctx context.Context, pool *pgxpool.Pool, categoryMap map[strin
 
 	for _, d := range defs {
 		var productID string
-		err := pool.QueryRow(ctx,
+		err := db.QueryRow(ctx,
 			`INSERT INTO products (name, image_url, price, stock, cost_price)
 			 VALUES ($1, $2, $3, $4, $5)
 			 ON CONFLICT DO NOTHING
@@ -392,7 +392,7 @@ func seedProducts(ctx context.Context, pool *pgxpool.Pool, categoryMap map[strin
 		// Download and upload image if URL exists
 		storedImageURL := uploadImageFromUrl(ctx, r2Client, d.ImageURL, "products", productID, log)
 		if storedImageURL != nil && *storedImageURL != d.ImageURL {
-			_, err = pool.Exec(ctx, "UPDATE products SET image_url = $1 WHERE id = $2", *storedImageURL, productID)
+			_, err = db.Exec(ctx, "UPDATE products SET image_url = $1 WHERE id = $2", *storedImageURL, productID)
 			if err != nil {
 				log.Warnf("Failed to update product %s with storage image URL: %v", productID, err)
 			}
@@ -400,7 +400,7 @@ func seedProducts(ctx context.Context, pool *pgxpool.Pool, categoryMap map[strin
 
 		// Assign category
 		if catID, ok := categoryMap[d.Category]; ok {
-			_, _ = pool.Exec(ctx,
+			_, _ = db.Exec(ctx,
 				`INSERT INTO product_categories (product_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
 				productID, catID,
 			)
@@ -416,7 +416,7 @@ func seedProducts(ctx context.Context, pool *pgxpool.Pool, categoryMap map[strin
 		// Seed options
 		for _, opt := range d.Options {
 			var optID string
-			err := pool.QueryRow(ctx,
+			err := db.QueryRow(ctx,
 				`INSERT INTO product_options (product_id, name, additional_price, image_url)
 				 VALUES ($1, $2, $3, $4)
 				 RETURNING id`,
@@ -430,7 +430,7 @@ func seedProducts(ctx context.Context, pool *pgxpool.Pool, categoryMap map[strin
 			// Download and upload option image if URL exists
 			storedOptImageURL := uploadImageFromUrl(ctx, r2Client, opt.ImageURL, "product_options", optID, log)
 			if storedOptImageURL != nil && *storedOptImageURL != opt.ImageURL {
-				_, err = pool.Exec(ctx, "UPDATE product_options SET image_url = $1 WHERE id = $2", *storedOptImageURL, optID)
+				_, err = db.Exec(ctx, "UPDATE product_options SET image_url = $1 WHERE id = $2", *storedOptImageURL, optID)
 				if err != nil {
 					log.Warnf("Failed to update product option %s with storage image URL: %v", optID, err)
 				}
@@ -451,7 +451,7 @@ func seedProducts(ctx context.Context, pool *pgxpool.Pool, categoryMap map[strin
 
 // ─── 2. Customers ────────────────────────────────────────────────
 
-func seedCustomers(ctx context.Context, pool *pgxpool.Pool, log logger.ILogger) ([]string, error) {
+func seedCustomers(ctx context.Context, db *database.TenantDB, log logger.ILogger) ([]string, error) {
 	customers := []struct {
 		Name    string
 		Phone   string
@@ -473,7 +473,7 @@ func seedCustomers(ctx context.Context, pool *pgxpool.Pool, log logger.ILogger) 
 	var ids []string
 	for _, c := range customers {
 		var id string
-		err := pool.QueryRow(ctx,
+		err := db.QueryRow(ctx,
 			`INSERT INTO customers (name, phone, email, address)
 			 VALUES ($1, $2, $3, $4)
 			 ON CONFLICT DO NOTHING
@@ -491,7 +491,7 @@ func seedCustomers(ctx context.Context, pool *pgxpool.Pool, log logger.ILogger) 
 
 // ─── 3. Promotions ───────────────────────────────────────────────
 
-func seedPromotions(ctx context.Context, pool *pgxpool.Pool, log logger.ILogger) error {
+func seedPromotions(ctx context.Context, db *database.TenantDB, log logger.ILogger) error {
 	now := time.Now()
 	threeMonthsAgo := now.AddDate(0, -3, 0)
 	oneMonthLater := now.AddDate(0, 1, 0)
@@ -530,7 +530,7 @@ func seedPromotions(ctx context.Context, pool *pgxpool.Pool, log logger.ILogger)
 
 	for _, p := range promos {
 		var promoID string
-		err := pool.QueryRow(ctx,
+		err := db.QueryRow(ctx,
 			`INSERT INTO promotions (name, description, scope, discount_type, discount_value, max_discount_amount, start_date, end_date, is_active)
 			 VALUES ($1, $2, $3::promotion_scope, $4::discount_type, $5, $6, $7, $8, true)
 			 ON CONFLICT DO NOTHING
@@ -543,7 +543,7 @@ func seedPromotions(ctx context.Context, pool *pgxpool.Pool, log logger.ILogger)
 		}
 
 		// Add rule
-		_, err = pool.Exec(ctx,
+		_, err = db.Exec(ctx,
 			`INSERT INTO promotion_rules (promotion_id, rule_type, rule_value)
 			 VALUES ($1, $2::promotion_rule_type, $3)`,
 			promoID, p.RuleType, p.RuleValue,
@@ -558,7 +558,7 @@ func seedPromotions(ctx context.Context, pool *pgxpool.Pool, log logger.ILogger)
 
 // ─── 4. Orders ───────────────────────────────────────────────────
 
-func seedOrders(ctx context.Context, pool *pgxpool.Pool, products []seededProduct, userIDs []string, customerIDs []string, paymentMethodMap map[string]int32, cancelReasons []int32, promotions []string, log logger.ILogger) (int, error) {
+func seedOrders(ctx context.Context, db *database.TenantDB, products []seededProduct, userIDs []string, customerIDs []string, paymentMethodMap map[string]int32, cancelReasons []int32, promotions []string, log logger.ILogger) (int, error) {
 	if len(products) == 0 {
 		return 0, fmt.Errorf("no products to create orders from")
 	}
@@ -721,7 +721,7 @@ func seedOrders(ctx context.Context, pool *pgxpool.Pool, products []seededProduc
 
 			// Insert order with backdated timestamp
 			var orderID string
-			err := pool.QueryRow(ctx,
+			err := db.QueryRow(ctx,
 				`INSERT INTO orders (user_id, type, status, gross_total, discount_amount, net_total,
 					payment_method_id, cash_received, change_due, customer_id, 
 					cancellation_reason_id, cancellation_notes, applied_promotion_id, 
@@ -738,7 +738,7 @@ func seedOrders(ctx context.Context, pool *pgxpool.Pool, products []seededProduc
 
 			// Insert order items
 			for _, item := range items {
-				_, err := pool.Exec(ctx,
+				_, err := db.Exec(ctx,
 					`INSERT INTO order_items (order_id, product_id, quantity, price_at_sale, subtotal, net_subtotal, cost_price_at_sale)
 					 VALUES ($1, $2, $3, $4, $5, $5, $6)`,
 					orderID, item.productID, item.qty, item.price, item.subtotal, item.costPrice,
@@ -773,7 +773,7 @@ func pickWeighted(rng *rand.Rand, items []string, weights []int) string {
 
 // ─── 5. Shifts ───────────────────────────────────────────────────
 
-func seedShifts(ctx context.Context, pool *pgxpool.Pool, userIDs []string, log logger.ILogger) error {
+func seedShifts(ctx context.Context, db *database.TenantDB, userIDs []string, log logger.ILogger) error {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	now := time.Now()
 	startDate := now.AddDate(0, 0, -120) // go back 120 days
@@ -812,7 +812,7 @@ func seedShifts(ctx context.Context, pool *pgxpool.Pool, userIDs []string, log l
 				actualCash += diff
 			}
 
-			_, err := pool.Exec(ctx,
+			_, err := db.Exec(ctx,
 				`INSERT INTO shifts (user_id, start_time, end_time, start_cash, expected_cash_end, actual_cash_end, status, created_at, updated_at)
 				 VALUES ($1, $2, $3, $4, $5, $6, 'closed', $2, $3)`,
 				userID, startTime, endTime, startCash, expectedCash, actualCash,

@@ -61,7 +61,7 @@ func main() {
 	paymentMethodRepo := payment_methods_repo.New(tenantDB)
 	cancelRepo := cancellation_reasons_repo.New(tenantDB)
 
-	if err := seeder.RunSeeders(ctx, pool, userRepo, catRepo, paymentMethodRepo, cancelRepo, r2Client, logr); err != nil {
+	if err := seeder.RunSeeders(ctx, tenantDB, userRepo, catRepo, paymentMethodRepo, cancelRepo, r2Client, logr); err != nil {
 		log.Fatalf("Seeding failed: %v", err)
 	}
 

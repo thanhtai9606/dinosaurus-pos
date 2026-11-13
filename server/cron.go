@@ -1,6 +1,9 @@
 package server
 
 import (
+	"POS-kasir/internal/tenant"
+	"POS-kasir/internal/tenants"
+	"POS-kasir/pkg/database"
 	"POS-kasir/pkg/database/seeder"
 	"context"
 
@@ -38,9 +41,17 @@ func SetupCron(app *App, container *AppContainer) {
 			}
 
 			// 2. Re-seed
+			pool := app.DB.GetPool()
+			tenantRepo := tenants.NewRepository(pool)
+			if err := tenantRepo.EnsureDefaultTenant(ctx); err != nil {
+				app.Logger.Errorf("Cron | Ensure default tenant: %v", err)
+				return
+			}
+			seedCtx := tenant.WithID(ctx, tenant.DefaultTenantID)
+			tenantDB := database.NewTenantDB(pool)
 			if err := seeder.RunSeeders(
-				ctx,
-				app.DB.GetPool(),
+				seedCtx,
+				tenantDB,
 				container.UserRepo,
 				container.CategoryRepo,
 				container.PaymentMethodRepo,

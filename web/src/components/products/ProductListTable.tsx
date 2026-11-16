@@ -7,7 +7,7 @@ import { formatProductListCodes } from '@/lib/products/productListCodes'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
 import { ProductActions } from './ProductActions'
 import { useFormatMoney } from '@/context/MoneyContext'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 
 type Props = {
     products: ProductListItem[]
@@ -25,7 +25,7 @@ type Props = {
         allSelected: boolean
         someSelected: boolean
     }
-    pagination?: POSKasirInternalCommonPaginationPagination
+    pagination?: ApiPagination
     onPageChange?: (page: number) => void
     onLimitChange?: (limit: number) => void
     isFetching?: boolean

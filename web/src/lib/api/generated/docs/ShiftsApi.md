@@ -21,7 +21,7 @@ import {
     ShiftsApi,
     Configuration,
     InternalShiftCashTransactionRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ShiftsApi(configuration);
@@ -75,7 +75,7 @@ Check for and retrieve the details of an active shift session for the authentica
 import {
     ShiftsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ShiftsApi(configuration);
@@ -122,7 +122,7 @@ import {
     ShiftsApi,
     Configuration,
     InternalShiftEndShiftRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ShiftsApi(configuration);
@@ -177,7 +177,7 @@ import {
     ShiftsApi,
     Configuration,
     InternalShiftStartShiftRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ShiftsApi(configuration);

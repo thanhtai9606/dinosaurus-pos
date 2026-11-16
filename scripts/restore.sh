@@ -27,7 +27,8 @@ echo ""
 BACKUP_FILES=()
 INDEX=1
 
-for file in "$BACKUP_DIR"/pos_kasir_backup_*_database.sql; do
+shopt -s nullglob
+for file in "$BACKUP_DIR"/"${BACKUP_FILE_PREFIX}"_*_database.sql "$BACKUP_DIR"/pos_kasir_backup_*_database.sql; do
 	[[ -f "$file" ]] || continue
 	SIZE=$(du -h "$file" | cut -f1)
 	echo "$INDEX) $(basename "$file") ($SIZE)"

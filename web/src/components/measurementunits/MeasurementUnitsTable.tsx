@@ -2,11 +2,11 @@ import { useMemo } from 'react'
 import { Settings2, Tags } from 'lucide-react'
 import type { MeasurementUnit } from '@/lib/api/query/measurementUnits'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 import { MeasurementUnitActions } from './MeasurementUnitActions'
 
 type ServerState = {
-    pagination?: POSKasirInternalCommonPaginationPagination
+    pagination?: ApiPagination
     onPageChange?: (page: number) => void
     onLimitChange?: (limit: number) => void
     isFetching?: boolean

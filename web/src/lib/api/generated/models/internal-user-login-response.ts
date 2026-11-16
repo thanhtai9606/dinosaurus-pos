@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -16,11 +16,16 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import type { InternalUserProfileResponse } from './internal-user-profile-response';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { InternalUserTenantSummary } from './internal-user-tenant-summary';
 
 export interface InternalUserLoginResponse {
     'Token'?: string;
     'expired_at'?: string;
     'profile'?: InternalUserProfileResponse;
     'refresh_token'?: string;
+    'tenant'?: InternalUserTenantSummary;
+    'tenants'?: Array<InternalUserTenantSummary>;
 }
 

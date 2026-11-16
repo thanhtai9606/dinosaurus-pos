@@ -22,7 +22,7 @@ Get total number of categories with products (Roles: admin, manager, cashier)
 import {
     CategoriesApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CategoriesApi(configuration);
@@ -67,7 +67,7 @@ Get all categories with product count (Roles: admin, manager, cashier)
 import {
     CategoriesApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CategoriesApi(configuration);
@@ -113,7 +113,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **categoriesIdDelete**
-> POSKasirInternalCommonSuccessResponse categoriesIdDelete()
+> DinosaurusPosInternalCommonSuccessResponse categoriesIdDelete()
 
 Delete category by ID (Roles: admin, manager)
 
@@ -123,7 +123,7 @@ Delete category by ID (Roles: admin, manager)
 import {
     CategoriesApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CategoriesApi(configuration);
@@ -144,7 +144,7 @@ const { status, data } = await apiInstance.categoriesIdDelete(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -178,7 +178,7 @@ Get category by ID (Roles: admin, manager)
 import {
     CategoriesApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CategoriesApi(configuration);
@@ -233,7 +233,7 @@ import {
     CategoriesApi,
     Configuration,
     InternalCategoriesCreateCategoryRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CategoriesApi(configuration);
@@ -292,7 +292,7 @@ import {
     CategoriesApi,
     Configuration,
     InternalCategoriesCreateCategoryRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CategoriesApi(configuration);

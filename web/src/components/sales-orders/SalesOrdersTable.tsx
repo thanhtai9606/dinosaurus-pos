@@ -1,9 +1,9 @@
+import { OrderType, OrderStatus } from '@/lib/api/domain'
 import { Utensils, ShoppingBag } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { DataTableSkeleton } from '@/components/ui/list-skeletons'
 import { useFormatMoney } from '@/context/MoneyContext'
-import { POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 
 type OrderRow = {
     id?: string
@@ -97,10 +97,10 @@ export function SalesOrdersTable({
                             <TableCell>
                                 <Badge
                                     variant={
-                                        order.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid
+                                        order.status === OrderStatus.OrderStatusPaid
                                             ? 'default'
                                             : order.status ===
-                                                POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled
+                                                OrderStatus.OrderStatusCancelled
                                               ? 'destructive'
                                               : 'secondary'
                                     }

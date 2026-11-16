@@ -10,15 +10,16 @@ Name | Type | Description | Notes
 **is_paid** | **boolean** |  | [optional] [default to undefined]
 **items** | [**Array&lt;InternalOrdersOrderItemResponse&gt;**](InternalOrdersOrderItemResponse.md) |  | [optional] [default to undefined]
 **net_total** | **number** |  | [optional] [default to undefined]
+**order_no** | **string** |  | [optional] [default to undefined]
 **queue_number** | **string** |  | [optional] [default to undefined]
-**status** | [**POSKasirInternalOrdersRepositoryOrderStatus**](POSKasirInternalOrdersRepositoryOrderStatus.md) |  | [optional] [default to undefined]
-**type** | [**POSKasirInternalOrdersRepositoryOrderType**](POSKasirInternalOrdersRepositoryOrderType.md) |  | [optional] [default to undefined]
+**status** | [**DinosaurusPosInternalOrdersRepositoryOrderStatus**](DinosaurusPosInternalOrdersRepositoryOrderStatus.md) |  | [optional] [default to undefined]
+**type** | [**DinosaurusPosInternalOrdersRepositoryOrderType**](DinosaurusPosInternalOrdersRepositoryOrderType.md) |  | [optional] [default to undefined]
 **user_id** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalOrdersOrderListResponse } from 'restClient';
+import { InternalOrdersOrderListResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersOrderListResponse = {
     created_at,
@@ -26,6 +27,7 @@ const instance: InternalOrdersOrderListResponse = {
     is_paid,
     items,
     net_total,
+    order_no,
     queue_number,
     status,
     type,

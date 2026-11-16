@@ -56,7 +56,7 @@ require_local_infra() {
 	source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 	local _name
 	_name="$(require_postgres)"
-	if ! docker ps --format '{{.Names}}' | grep -qx 'pos-redis'; then
+	if ! docker ps --format '{{.Names}}' | grep -qx "$REDIS_CONTAINER"; then
 		echo -e "${YELLOW:-}⚠️  Redis container not running — start with: make up${NC:-}"
 	fi
 	echo "$_name"

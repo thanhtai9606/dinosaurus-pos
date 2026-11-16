@@ -9,17 +9,21 @@ Name | Type | Description | Notes
 **expired_at** | **string** |  | [optional] [default to undefined]
 **profile** | [**InternalUserProfileResponse**](InternalUserProfileResponse.md) |  | [optional] [default to undefined]
 **refresh_token** | **string** |  | [optional] [default to undefined]
+**tenant** | [**InternalUserTenantSummary**](InternalUserTenantSummary.md) |  | [optional] [default to undefined]
+**tenants** | [**Array&lt;InternalUserTenantSummary&gt;**](InternalUserTenantSummary.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalUserLoginResponse } from 'restClient';
+import { InternalUserLoginResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalUserLoginResponse = {
     Token,
     expired_at,
     profile,
     refresh_token,
+    tenant,
+    tenants,
 };
 ```
 

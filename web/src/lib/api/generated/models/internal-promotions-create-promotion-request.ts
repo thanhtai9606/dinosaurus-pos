@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,27 +15,27 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { DinosaurusPosInternalPromotionsRepositoryDiscountType } from './dinosaurus-pos-internal-promotions-repository-discount-type';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DinosaurusPosInternalPromotionsRepositoryPromotionScope } from './dinosaurus-pos-internal-promotions-repository-promotion-scope';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { InternalPromotionsCreatePromotionRuleRequest } from './internal-promotions-create-promotion-rule-request';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { InternalPromotionsCreatePromotionTargetRequest } from './internal-promotions-create-promotion-target-request';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalPromotionsRepositoryDiscountType } from './poskasir-internal-promotions-repository-discount-type';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalPromotionsRepositoryPromotionScope } from './poskasir-internal-promotions-repository-promotion-scope';
 
 export interface InternalPromotionsCreatePromotionRequest {
     'description'?: string;
-    'discount_type': POSKasirInternalPromotionsRepositoryDiscountType;
+    'discount_type': DinosaurusPosInternalPromotionsRepositoryDiscountType;
     'discount_value': number;
     'end_date': string;
     'is_active'?: boolean;
     'max_discount_amount'?: number;
     'name': string;
     'rules'?: Array<InternalPromotionsCreatePromotionRuleRequest>;
-    'scope': POSKasirInternalPromotionsRepositoryPromotionScope;
+    'scope': DinosaurusPosInternalPromotionsRepositoryPromotionScope;
     'start_date': string;
     'targets'?: Array<InternalPromotionsCreatePromotionTargetRequest>;
 }

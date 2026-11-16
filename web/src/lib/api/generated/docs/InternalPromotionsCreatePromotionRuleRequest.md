@@ -6,13 +6,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **description** | **string** |  | [optional] [default to undefined]
-**rule_type** | [**POSKasirInternalPromotionsRepositoryPromotionRuleType**](POSKasirInternalPromotionsRepositoryPromotionRuleType.md) |  | [default to undefined]
+**rule_type** | [**DinosaurusPosInternalPromotionsRepositoryPromotionRuleType**](DinosaurusPosInternalPromotionsRepositoryPromotionRuleType.md) |  | [default to undefined]
 **rule_value** | **string** |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalPromotionsCreatePromotionRuleRequest } from 'restClient';
+import { InternalPromotionsCreatePromotionRuleRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalPromotionsCreatePromotionRuleRequest = {
     description,

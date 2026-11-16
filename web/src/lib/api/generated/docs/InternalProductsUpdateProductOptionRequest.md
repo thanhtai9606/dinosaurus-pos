@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalProductsUpdateProductOptionRequest } from 'restClient';
+import { InternalProductsUpdateProductOptionRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalProductsUpdateProductOptionRequest = {
     additional_price,

@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalCancellationReasonsCancellationReasonResponse } from 'restClient';
+import { InternalCancellationReasonsCancellationReasonResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalCancellationReasonsCancellationReasonResponse = {
     created_at,

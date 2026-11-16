@@ -1,13 +1,13 @@
 import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { promotionsApi } from "../../api/client"
 import {
-    POSKasirInternalCommonErrorResponse,
     InternalPromotionsCreatePromotionRequest,
     InternalPromotionsUpdatePromotionRequest,
-    POSKasirInternalPromotionsRepositoryDiscountType,
-    POSKasirInternalPromotionsRepositoryPromotionRuleType,
-    POSKasirInternalPromotionsRepositoryPromotionScope,
-    POSKasirInternalPromotionsRepositoryPromotionTargetType
+    DinosaurusPosInternalPromotionsRepositoryDiscountType,
+    DinosaurusPosInternalPromotionsRepositoryPromotionRuleType,
+    DinosaurusPosInternalPromotionsRepositoryPromotionScope,
+    DinosaurusPosInternalPromotionsRepositoryPromotionTargetType
 } from "../generated"
 import { toast } from "sonner"
 import { AxiosError } from "axios"
@@ -16,14 +16,14 @@ import i18n from '@/lib/i18n'
 
 export interface PromotionRuleResponse {
     id: string
-    rule_type: POSKasirInternalPromotionsRepositoryPromotionRuleType
+    rule_type: DinosaurusPosInternalPromotionsRepositoryPromotionRuleType
     rule_value: string
     description?: string
 }
 
 export interface PromotionTargetResponse {
     id: string
-    target_type: POSKasirInternalPromotionsRepositoryPromotionTargetType
+    target_type: DinosaurusPosInternalPromotionsRepositoryPromotionTargetType
     target_id: string
 }
 
@@ -31,8 +31,8 @@ export interface Promotion {
     id: string
     name: string
     description?: string
-    scope: POSKasirInternalPromotionsRepositoryPromotionScope
-    discount_type: POSKasirInternalPromotionsRepositoryDiscountType
+    scope: DinosaurusPosInternalPromotionsRepositoryPromotionScope
+    discount_type: DinosaurusPosInternalPromotionsRepositoryDiscountType
     discount_value: number
     max_discount_amount?: number
     start_date: string
@@ -64,7 +64,7 @@ export type PromotionsListParams = {
 export const promotionsListQueryOptions = (params?: PromotionsListParams) =>
     queryOptions<
         PagedPromotionResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['promotions', 'list', params],
         queryFn: async () => {
@@ -97,7 +97,7 @@ export const useRestorePromotionMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         string
     >({
         mutationKey: ['promotions', 'restore'],
@@ -121,7 +121,7 @@ export const useRestorePromotionMutation = () => {
 export const promotionDetailQueryOptions = (id: string) =>
     queryOptions<
         Promotion,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['promotions', 'detail', id],
         queryFn: async () => {
@@ -149,7 +149,7 @@ export const useCreatePromotionMutation = () => {
 
     const mutation = useMutation<
         Promotion,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         InternalPromotionsCreatePromotionRequest
     >({
         mutationKey: ['promotions', 'create'],
@@ -177,7 +177,7 @@ export const useUpdatePromotionMutation = () => {
 
     const mutation = useMutation<
         Promotion,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalPromotionsUpdatePromotionRequest }
     >({
         mutationKey: ['promotions', 'update'],
@@ -206,7 +206,7 @@ export const useDeletePromotionMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         string
     >({
         mutationKey: ['promotions', 'delete'],

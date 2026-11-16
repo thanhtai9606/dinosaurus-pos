@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalSettingsBrandingSettingsResponse } from 'restClient';
+import { InternalSettingsBrandingSettingsResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalSettingsBrandingSettingsResponse = {
     app_logo,

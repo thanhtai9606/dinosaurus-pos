@@ -4,7 +4,7 @@ import { axiosInstance } from '../client'
 import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
-import { POSKasirInternalCommonErrorResponse } from '../generated'
+import { ApiErrorBody } from '../domain'
 
 export type DebtStatus = 'open' | 'partial' | 'settled' | 'void'
 
@@ -46,7 +46,7 @@ export type SupplierDebtsListParams = {
 }
 
 export const supplierDebtsListQueryOptions = (params?: SupplierDebtsListParams) =>
-    queryOptions<PagedSupplierDebts, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<PagedSupplierDebts, AxiosError<ApiErrorBody>>({
         queryKey: ['supplier-debts', 'list', params],
         queryFn: async () => {
             const res = await axiosInstance.get('/supplier-debts', { params })
@@ -62,7 +62,7 @@ export const useSupplierDebtsListQuery = (params?: SupplierDebtsListParams) => {
 }
 
 export const supplierDebtDetailQueryOptions = (id: string) =>
-    queryOptions<SupplierDebt, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<SupplierDebt, AxiosError<ApiErrorBody>>({
         queryKey: ['supplier-debts', 'detail', id],
         queryFn: async () => {
             const res = await axiosInstance.get(`/supplier-debts/${id}`)
@@ -98,7 +98,7 @@ export const useCreateSupplierDebtMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['supplier-debts'] })
                 toast.success(t('supplierDebts.messages.create_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('supplierDebts.messages.create_failed', { message: error.response?.data?.message || '' }))
             },
         }),

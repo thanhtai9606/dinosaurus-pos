@@ -13,7 +13,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Promotion } from '@/lib/api/query/promotions'
-import { POSKasirInternalPromotionsRepositoryDiscountType } from '@/lib/api/generated'
+import { DinosaurusPosInternalPromotionsRepositoryDiscountType } from '@/lib/api/generated'
 
 interface PromotionsTableProps {
     promotions: Promotion[]
@@ -76,7 +76,7 @@ export function PromotionsTable({
                                 <TableCell>
                                     <div className="flex flex-col">
                                         <span className="font-bold">
-                                            {promo.discount_type === POSKasirInternalPromotionsRepositoryDiscountType.DiscountTypePercentage
+                                            {promo.discount_type === DinosaurusPosInternalPromotionsRepositoryDiscountType.DiscountTypePercentage
                                                 ? `${promo.discount_value}%`
                                                 : formatMoney(promo.discount_value)}
                                         </span>

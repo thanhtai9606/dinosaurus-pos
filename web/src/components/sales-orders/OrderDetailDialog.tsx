@@ -1,3 +1,4 @@
+import { OrderType, OrderStatus } from '@/lib/api/domain'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -34,7 +35,6 @@ import { useFormatMoney } from '@/context/MoneyContext'
 import { useRBAC } from '@/lib/auth/rbac'
 import { CancellationDialog } from '@/components/transactions/CancellationDialog'
 import { RefundDialog } from '@/components/transactions/RefundDialog'
-import { POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 import type { InternalOrdersUpdateOrderItemsRequest } from '@/lib/api/generated'
 import {
     getSalesOrdersDetailView,
@@ -176,10 +176,10 @@ export function OrderDetailDialog({
         setDraftQty(next)
     }, [order?.items, order?.id])
 
-    const isOpen = order?.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusOpen
-    const isPaid = order?.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid
+    const isOpen = order?.status === OrderStatus.OrderStatusOpen
+    const isPaid = order?.status === OrderStatus.OrderStatusPaid
     const isCancelled =
-        order?.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled
+        order?.status === OrderStatus.OrderStatusCancelled
 
     const canPrint = canAccessApi('POST', '/orders/{id}/print') && printMutation.isAllowed
     const canAdjust =

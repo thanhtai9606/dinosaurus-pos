@@ -11,7 +11,8 @@ import { PaymentDialog } from "@/components/payment/PaymentDialog"
 import { useCreateOrderMutation } from '@/lib/api/query/orders'
 import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
 import { toast } from 'sonner'
-import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
+import { InternalProductsProductOptionResponse } from '@/lib/api/generated'
+import { OrderType } from '@/lib/api/domain'
 import { useCustomersListQuery } from '@/lib/api/query/customers'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { CartContent, CartItem } from '@/components/orders/CartContent'
@@ -95,7 +96,7 @@ function OrderPage() {
     const customers = customersData?.customers || []
 
     const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
-    const [selectedOrderType, setSelectedOrderType] = useState<POSKasirInternalOrdersRepositoryOrderType>(POSKasirInternalOrdersRepositoryOrderType.OrderTypeDineIn)
+    const [selectedOrderType, setSelectedOrderType] = useState<OrderType>(OrderType.OrderTypeDineIn)
 
     const categories = useMemo(() => {
         return (categoriesFromApi ?? [])

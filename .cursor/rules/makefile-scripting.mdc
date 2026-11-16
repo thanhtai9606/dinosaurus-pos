@@ -32,12 +32,12 @@ Dev lokal: `make dev` menjalankan infra + backend (`air`) + frontend (`pnpm dev`
 
 - **Infra dev:** `docker compose -f docker-compose.infra.yml`
 - **Production full stack:** `docker compose -f docker-compose.yml`
-- Container DB: `pos-postgres` (user/db dari `.env`, default `pos_user` / `pos_kasir`)
+- Container DB: `dinosaur-postgres` (user/db dari `.env`, default `dinosaur` / `dinosaur_pos`)
 
 Sebelum operasi DB, cek container:
 
 ```bash
-docker ps -q -f name=pos-postgres
+docker ps -q -f name=dinosaur-postgres
 ```
 
 ## Shell scripts (`scripts/`)
@@ -59,7 +59,7 @@ docker ps -q -f name=pos-postgres
 | `create-demo-users.sh` | `make create-demo-users` |
 | `dev.sh` | `make dev` |
 
-Backup disimpan di `backups/` dengan prefix `pos_kasir_backup_*`.
+Backup disimpan di `backups/` dengan prefix `dinosaur_pos_backup_*`.
 
 ## Migrations
 

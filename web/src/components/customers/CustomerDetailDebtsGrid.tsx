@@ -3,7 +3,7 @@ import { CircleDollarSign, Hash } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
 import type { CustomerDebt } from '@/lib/api/query/customerDebts'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 
 type Props = {
     debts: CustomerDebt[]
@@ -11,7 +11,7 @@ type Props = {
     formatMoney: (amount: number) => string
     emptyMessage?: string
     server?: {
-        pagination?: POSKasirInternalCommonPaginationPagination
+        pagination?: ApiPagination
         onPageChange?: (page: number) => void
         onLimitChange?: (limit: number) => void
         isFetching?: boolean

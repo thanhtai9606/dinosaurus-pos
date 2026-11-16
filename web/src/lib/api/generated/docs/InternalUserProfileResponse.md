@@ -11,14 +11,16 @@ Name | Type | Description | Notes
 **email** | **string** |  | [optional] [default to undefined]
 **id** | **string** |  | [optional] [default to undefined]
 **is_active** | **boolean** |  | [optional] [default to undefined]
-**role** | [**POSKasirInternalUserRepositoryUserRole**](POSKasirInternalUserRepositoryUserRole.md) |  | [optional] [default to undefined]
+**role** | [**DinosaurusPosInternalUserRepositoryUserRole**](DinosaurusPosInternalUserRepositoryUserRole.md) |  | [optional] [default to undefined]
+**tenant** | [**InternalUserTenantSummary**](InternalUserTenantSummary.md) |  | [optional] [default to undefined]
+**tenants** | [**Array&lt;InternalUserTenantSummary&gt;**](InternalUserTenantSummary.md) |  | [optional] [default to undefined]
 **updated_at** | **string** |  | [optional] [default to undefined]
 **username** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalUserProfileResponse } from 'restClient';
+import { InternalUserProfileResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalUserProfileResponse = {
     avatar,
@@ -28,6 +30,8 @@ const instance: InternalUserProfileResponse = {
     id,
     is_active,
     role,
+    tenant,
+    tenants,
     updated_at,
     username,
 };

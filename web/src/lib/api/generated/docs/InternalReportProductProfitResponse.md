@@ -5,13 +5,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**pagination** | [**POSKasirInternalCommonPaginationPagination**](POSKasirInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
+**pagination** | [**DinosaurusPosInternalCommonPaginationPagination**](DinosaurusPosInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
 **products** | [**Array&lt;InternalReportProductProfitRow&gt;**](InternalReportProductProfitRow.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalReportProductProfitResponse } from 'restClient';
+import { InternalReportProductProfitResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalReportProductProfitResponse = {
     pagination,

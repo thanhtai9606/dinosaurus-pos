@@ -7,15 +7,17 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **email** | **string** |  | [default to undefined]
 **password** | **string** |  | [default to undefined]
+**tenant_code** | **string** |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalUserLoginRequest } from 'restClient';
+import { InternalUserLoginRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalUserLoginRequest = {
     email,
     password,
+    tenant_code,
 };
 ```
 

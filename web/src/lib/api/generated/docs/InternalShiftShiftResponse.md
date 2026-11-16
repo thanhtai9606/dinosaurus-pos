@@ -12,13 +12,13 @@ Name | Type | Description | Notes
 **id** | **string** |  | [optional] [default to undefined]
 **start_cash** | **number** |  | [optional] [default to undefined]
 **start_time** | **string** |  | [optional] [default to undefined]
-**status** | [**POSKasirInternalShiftRepositoryShiftStatus**](POSKasirInternalShiftRepositoryShiftStatus.md) |  | [optional] [default to undefined]
+**status** | [**DinosaurusPosInternalShiftRepositoryShiftStatus**](DinosaurusPosInternalShiftRepositoryShiftStatus.md) |  | [optional] [default to undefined]
 **user_id** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalShiftShiftResponse } from 'restClient';
+import { InternalShiftShiftResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalShiftShiftResponse = {
     actual_cash_end,

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -22,7 +22,7 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
 // @ts-ignore
 import type { ReportsCancellationsGet200Response } from '../models';
 // @ts-ignore

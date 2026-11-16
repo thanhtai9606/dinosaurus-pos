@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { ShiftsCurrentGet200Response } from 'restClient';
+import { ShiftsCurrentGet200Response } from 'dinosaurus-pos-api';
 
 const instance: ShiftsCurrentGet200Response = {
     data,

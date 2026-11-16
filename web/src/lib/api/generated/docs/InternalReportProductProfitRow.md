@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalReportProductProfitRow } from 'restClient';
+import { InternalReportProductProfitRow } from 'dinosaurus-pos-api';
 
 const instance: InternalReportProductProfitRow = {
     gross_profit,

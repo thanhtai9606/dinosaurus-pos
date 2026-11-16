@@ -6,6 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **address** | **string** |  | [optional] [default to undefined]
+**customer_group_id** | **string** |  | [optional] [default to undefined]
 **email** | **string** |  | [optional] [default to undefined]
 **name** | **string** |  | [default to undefined]
 **phone** | **string** |  | [optional] [default to undefined]
@@ -13,10 +14,11 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalCustomersUpdateCustomerRequest } from 'restClient';
+import { InternalCustomersUpdateCustomerRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalCustomersUpdateCustomerRequest = {
     address,
+    customer_group_id,
     email,
     name,
     phone,

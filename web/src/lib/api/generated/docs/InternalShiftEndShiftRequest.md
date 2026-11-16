@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalShiftEndShiftRequest } from 'restClient';
+import { InternalShiftEndShiftRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalShiftEndShiftRequest = {
     actual_cash_end,

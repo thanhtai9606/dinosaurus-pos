@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -26,11 +26,11 @@ import type { CategoriesGet200Response } from '../models';
 // @ts-ignore
 import type { CategoriesPost201Response } from '../models';
 // @ts-ignore
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
+// @ts-ignore
+import type { DinosaurusPosInternalCommonSuccessResponse } from '../models';
+// @ts-ignore
 import type { InternalCategoriesCreateCategoryRequest } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonSuccessResponse } from '../models';
 /**
  * CategoriesApi - axios parameter creator
  */
@@ -292,7 +292,7 @@ export const CategoriesApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async categoriesIdDelete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async categoriesIdDelete(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.categoriesIdDelete(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CategoriesApi.categoriesIdDelete']?.[localVarOperationServerIndex]?.url;
@@ -374,7 +374,7 @@ export const CategoriesApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        categoriesIdDelete(id: number, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        categoriesIdDelete(id: number, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.categoriesIdDelete(id, options).then((request) => request(axios, basePath));
         },
         /**

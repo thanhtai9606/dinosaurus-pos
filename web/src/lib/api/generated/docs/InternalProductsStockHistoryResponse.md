@@ -19,7 +19,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalProductsStockHistoryResponse } from 'restClient';
+import { InternalProductsStockHistoryResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalProductsStockHistoryResponse = {
     change_amount,

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalShiftRepositoryShiftStatus } from './poskasir-internal-shift-repository-shift-status';
+import type { DinosaurusPosInternalShiftRepositoryShiftStatus } from './dinosaurus-pos-internal-shift-repository-shift-status';
 
 export interface InternalShiftShiftResponse {
     'actual_cash_end'?: number;
@@ -28,7 +28,7 @@ export interface InternalShiftShiftResponse {
     'id'?: string;
     'start_cash'?: number;
     'start_time'?: string;
-    'status'?: POSKasirInternalShiftRepositoryShiftStatus;
+    'status'?: DinosaurusPosInternalShiftRepositoryShiftStatus;
     'user_id'?: string;
 }
 

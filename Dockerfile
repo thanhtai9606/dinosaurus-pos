@@ -21,7 +21,7 @@ COPY . .
 
 COPY --from=frontend-builder /app/web/dist ./web/dist
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o pos-server ./cmd/app
+RUN CGO_ENABLED=0 GOOS=linux go build -o dinosaurus-server ./cmd/app
 
 # --- Stage 3: Final Image (minimal, no Node.js) ---
 FROM alpine:3.21
@@ -29,10 +29,10 @@ WORKDIR /app
 
 RUN apk add --no-cache ca-certificates
 
-COPY --from=backend-builder /app/pos-server ./pos-server
+COPY --from=backend-builder /app/dinosaurus-server ./dinosaurus-server
 COPY --from=frontend-builder /app/web/dist ./web/dist
 COPY --from=backend-builder /app/docs ./docs
 
 EXPOSE 8080
 
-CMD ["./pos-server"]
+CMD ["./dinosaurus-server"]

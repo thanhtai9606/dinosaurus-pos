@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -26,13 +26,13 @@ import type { CustomersGet200Response } from '../models';
 // @ts-ignore
 import type { CustomersPost201Response } from '../models';
 // @ts-ignore
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
+// @ts-ignore
+import type { DinosaurusPosInternalCommonSuccessResponse } from '../models';
+// @ts-ignore
 import type { InternalCustomersCreateCustomerRequest } from '../models';
 // @ts-ignore
 import type { InternalCustomersUpdateCustomerRequest } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonSuccessResponse } from '../models';
 /**
  * CustomersApi - axios parameter creator
  */
@@ -258,7 +258,7 @@ export const CustomersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async customersIdDelete(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async customersIdDelete(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.customersIdDelete(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CustomersApi.customersIdDelete']?.[localVarOperationServerIndex]?.url;
@@ -332,7 +332,7 @@ export const CustomersApiFactory = function (configuration?: Configuration, base
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        customersIdDelete(id: string, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        customersIdDelete(id: string, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.customersIdDelete(id, options).then((request) => request(axios, basePath));
         },
         /**

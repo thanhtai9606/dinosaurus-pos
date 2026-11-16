@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,22 +15,22 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { DinosaurusPosInternalPromotionsRepositoryDiscountType } from './dinosaurus-pos-internal-promotions-repository-discount-type';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DinosaurusPosInternalPromotionsRepositoryPromotionScope } from './dinosaurus-pos-internal-promotions-repository-promotion-scope';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { InternalPromotionsPromotionRuleResponse } from './internal-promotions-promotion-rule-response';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { InternalPromotionsPromotionTargetResponse } from './internal-promotions-promotion-target-response';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalPromotionsRepositoryDiscountType } from './poskasir-internal-promotions-repository-discount-type';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalPromotionsRepositoryPromotionScope } from './poskasir-internal-promotions-repository-promotion-scope';
 
 export interface InternalPromotionsPromotionResponse {
     'created_at'?: string;
     'deleted_at'?: string;
     'description'?: string;
-    'discount_type'?: POSKasirInternalPromotionsRepositoryDiscountType;
+    'discount_type'?: DinosaurusPosInternalPromotionsRepositoryDiscountType;
     'discount_value'?: number;
     'end_date'?: string;
     'id'?: string;
@@ -38,7 +38,7 @@ export interface InternalPromotionsPromotionResponse {
     'max_discount_amount'?: number;
     'name'?: string;
     'rules'?: Array<InternalPromotionsPromotionRuleResponse>;
-    'scope'?: POSKasirInternalPromotionsRepositoryPromotionScope;
+    'scope'?: DinosaurusPosInternalPromotionsRepositoryPromotionScope;
     'start_date'?: string;
     'targets'?: Array<InternalPromotionsPromotionTargetResponse>;
     'updated_at'?: string;

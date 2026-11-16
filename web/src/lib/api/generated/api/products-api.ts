@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -22,9 +22,15 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
+// @ts-ignore
+import type { DinosaurusPosInternalCommonSuccessResponse } from '../models';
+// @ts-ignore
 import type { InternalProductsCreateProductOptionRequestStandalone } from '../models';
 // @ts-ignore
 import type { InternalProductsCreateProductRequest } from '../models';
+// @ts-ignore
+import type { InternalProductsReplaceSaleUnitsRequest } from '../models';
 // @ts-ignore
 import type { InternalProductsRestoreBulkRequest } from '../models';
 // @ts-ignore
@@ -32,13 +38,11 @@ import type { InternalProductsUpdateProductOptionRequest } from '../models';
 // @ts-ignore
 import type { InternalProductsUpdateProductRequest } from '../models';
 // @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonSuccessResponse } from '../models';
-// @ts-ignore
 import type { ProductsGet200Response } from '../models';
 // @ts-ignore
 import type { ProductsIdStockHistoryGet200Response } from '../models';
+// @ts-ignore
+import type { ProductsImportPricesPost200Response } from '../models';
 // @ts-ignore
 import type { ProductsPost201Response } from '../models';
 // @ts-ignore
@@ -48,6 +52,36 @@ import type { ProductsProductIdOptionsPost201Response } from '../models';
  */
 export const ProductsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Export product prices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsExportPricesGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/products/export-prices`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Get a list of products with filtering by category and search term (Roles: authenticated)
          * @summary List products
@@ -252,6 +286,46 @@ export const ProductsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * 
+         * @summary Replace product sale units
+         * @param {string} id Product ID
+         * @param {InternalProductsReplaceSaleUnitsRequest} body Sale units
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsIdSaleUnitsPut: async (id: string, body: InternalProductsReplaceSaleUnitsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('productsIdSaleUnitsPut', 'id', id)
+            // verify required parameter 'body' is not null or undefined
+            assertParamExists('productsIdSaleUnitsPut', 'body', body)
+            const localVarPath = `/products/{id}/sale-units`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(body, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get stock history for a specific product by its ID with pagination (Roles: admin, manager)
          * @summary Get stock history for a product
          * @param {string} id Product ID
@@ -282,6 +356,112 @@ export const ProductsApiAxiosParamCreator = function (configuration?: Configurat
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Import product prices
+         * @param {File} [file] CSV file (sku/product_id, cost_price, price)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsImportPricesPost: async (file?: File, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/products/import-prices`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Download import prices template
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsImportPricesTemplateGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/products/import-prices/template`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Lookup product by barcode or SKU
+         * @param {string} code Barcode or SKU
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsLookupGet: async (code: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'code' is not null or undefined
+            assertParamExists('productsLookupGet', 'code', code)
+            const localVarPath = `/products/lookup`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (code !== undefined) {
+                localVarQueryParameter['code'] = code;
             }
 
 
@@ -465,6 +645,36 @@ export const ProductsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * 
+         * @summary Export product prices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsSearchGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/products/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get a list of deleted products with pagination and filtering (Roles: admin)
          * @summary List deleted products
          * @param {number} [page] Page number
@@ -628,6 +838,18 @@ export const ProductsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ProductsApiAxiosParamCreator(configuration)
     return {
         /**
+         * 
+         * @summary Export product prices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async productsExportPricesGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.productsExportPricesGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsExportPricesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get a list of products with filtering by category and search term (Roles: authenticated)
          * @summary List products
          * @param {number} [page] Page number
@@ -650,7 +872,7 @@ export const ProductsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async productsIdDelete(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async productsIdDelete(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.productsIdDelete(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsIdDelete']?.[localVarOperationServerIndex]?.url;
@@ -698,6 +920,20 @@ export const ProductsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary Replace product sale units
+         * @param {string} id Product ID
+         * @param {InternalProductsReplaceSaleUnitsRequest} body Sale units
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async productsIdSaleUnitsPut(id: string, body: InternalProductsReplaceSaleUnitsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProductsPost201Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.productsIdSaleUnitsPut(id, body, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsIdSaleUnitsPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get stock history for a specific product by its ID with pagination (Roles: admin, manager)
          * @summary Get stock history for a product
          * @param {string} id Product ID
@@ -710,6 +946,44 @@ export const ProductsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.productsIdStockHistoryGet(id, page, limit, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsIdStockHistoryGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Import product prices
+         * @param {File} [file] CSV file (sku/product_id, cost_price, price)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async productsImportPricesPost(file?: File, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProductsImportPricesPost200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.productsImportPricesPost(file, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsImportPricesPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Download import prices template
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async productsImportPricesTemplateGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.productsImportPricesTemplateGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsImportPricesTemplateGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Lookup product by barcode or SKU
+         * @param {string} code Barcode or SKU
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async productsLookupGet(code: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProductsPost201Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.productsLookupGet(code, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsLookupGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -770,6 +1044,18 @@ export const ProductsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary Export product prices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async productsSearchGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<File>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.productsSearchGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsSearchGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get a list of deleted products with pagination and filtering (Roles: admin)
          * @summary List deleted products
          * @param {number} [page] Page number
@@ -805,7 +1091,7 @@ export const ProductsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async productsTrashIdRestorePost(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async productsTrashIdRestorePost(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.productsTrashIdRestorePost(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsTrashIdRestorePost']?.[localVarOperationServerIndex]?.url;
@@ -818,7 +1104,7 @@ export const ProductsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async productsTrashRestoreBulkPost(body: InternalProductsRestoreBulkRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async productsTrashRestoreBulkPost(body: InternalProductsRestoreBulkRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.productsTrashRestoreBulkPost(body, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProductsApi.productsTrashRestoreBulkPost']?.[localVarOperationServerIndex]?.url;
@@ -833,6 +1119,15 @@ export const ProductsApiFp = function(configuration?: Configuration) {
 export const ProductsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ProductsApiFp(configuration)
     return {
+        /**
+         * 
+         * @summary Export product prices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsExportPricesGet(options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.productsExportPricesGet(options).then((request) => request(axios, basePath));
+        },
         /**
          * Get a list of products with filtering by category and search term (Roles: authenticated)
          * @summary List products
@@ -853,7 +1148,7 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        productsIdDelete(id: string, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        productsIdDelete(id: string, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.productsIdDelete(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -889,6 +1184,17 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.productsIdPatch(id, body, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary Replace product sale units
+         * @param {string} id Product ID
+         * @param {InternalProductsReplaceSaleUnitsRequest} body Sale units
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsIdSaleUnitsPut(id: string, body: InternalProductsReplaceSaleUnitsRequest, options?: RawAxiosRequestConfig): AxiosPromise<ProductsPost201Response> {
+            return localVarFp.productsIdSaleUnitsPut(id, body, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get stock history for a specific product by its ID with pagination (Roles: admin, manager)
          * @summary Get stock history for a product
          * @param {string} id Product ID
@@ -899,6 +1205,35 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
          */
         productsIdStockHistoryGet(id: string, page?: number, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<ProductsIdStockHistoryGet200Response> {
             return localVarFp.productsIdStockHistoryGet(id, page, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Import product prices
+         * @param {File} [file] CSV file (sku/product_id, cost_price, price)
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsImportPricesPost(file?: File, options?: RawAxiosRequestConfig): AxiosPromise<ProductsImportPricesPost200Response> {
+            return localVarFp.productsImportPricesPost(file, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Download import prices template
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsImportPricesTemplateGet(options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.productsImportPricesTemplateGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Lookup product by barcode or SKU
+         * @param {string} code Barcode or SKU
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsLookupGet(code: string, options?: RawAxiosRequestConfig): AxiosPromise<ProductsPost201Response> {
+            return localVarFp.productsLookupGet(code, options).then((request) => request(axios, basePath));
         },
         /**
          * Create a new product with multiple options (Roles: admin, manager)
@@ -946,6 +1281,15 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.productsProductIdOptionsPost(productId, body, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary Export product prices
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        productsSearchGet(options?: RawAxiosRequestConfig): AxiosPromise<File> {
+            return localVarFp.productsSearchGet(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get a list of deleted products with pagination and filtering (Roles: admin)
          * @summary List deleted products
          * @param {number} [page] Page number
@@ -975,7 +1319,7 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        productsTrashIdRestorePost(id: string, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        productsTrashIdRestorePost(id: string, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.productsTrashIdRestorePost(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -985,7 +1329,7 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        productsTrashRestoreBulkPost(body: InternalProductsRestoreBulkRequest, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        productsTrashRestoreBulkPost(body: InternalProductsRestoreBulkRequest, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.productsTrashRestoreBulkPost(body, options).then((request) => request(axios, basePath));
         },
     };
@@ -995,6 +1339,16 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
  * ProductsApi - object-oriented interface
  */
 export class ProductsApi extends BaseAPI {
+    /**
+     * 
+     * @summary Export product prices
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public productsExportPricesGet(options?: RawAxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).productsExportPricesGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Get a list of products with filtering by category and search term (Roles: authenticated)
      * @summary List products
@@ -1056,6 +1410,18 @@ export class ProductsApi extends BaseAPI {
     }
 
     /**
+     * 
+     * @summary Replace product sale units
+     * @param {string} id Product ID
+     * @param {InternalProductsReplaceSaleUnitsRequest} body Sale units
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public productsIdSaleUnitsPut(id: string, body: InternalProductsReplaceSaleUnitsRequest, options?: RawAxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).productsIdSaleUnitsPut(id, body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get stock history for a specific product by its ID with pagination (Roles: admin, manager)
      * @summary Get stock history for a product
      * @param {string} id Product ID
@@ -1066,6 +1432,38 @@ export class ProductsApi extends BaseAPI {
      */
     public productsIdStockHistoryGet(id: string, page?: number, limit?: number, options?: RawAxiosRequestConfig) {
         return ProductsApiFp(this.configuration).productsIdStockHistoryGet(id, page, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Import product prices
+     * @param {File} [file] CSV file (sku/product_id, cost_price, price)
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public productsImportPricesPost(file?: File, options?: RawAxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).productsImportPricesPost(file, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Download import prices template
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public productsImportPricesTemplateGet(options?: RawAxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).productsImportPricesTemplateGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Lookup product by barcode or SKU
+     * @param {string} code Barcode or SKU
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public productsLookupGet(code: string, options?: RawAxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).productsLookupGet(code, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1115,6 +1513,16 @@ export class ProductsApi extends BaseAPI {
      */
     public productsProductIdOptionsPost(productId: string, body: InternalProductsCreateProductOptionRequestStandalone, options?: RawAxiosRequestConfig) {
         return ProductsApiFp(this.configuration).productsProductIdOptionsPost(productId, body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Export product prices
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public productsSearchGet(options?: RawAxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).productsSearchGet(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

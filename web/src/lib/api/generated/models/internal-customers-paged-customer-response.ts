@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { InternalCustomersCustomerResponse } from './internal-customers-customer-response';
+import type { DinosaurusPosInternalCommonPaginationPagination } from './dinosaurus-pos-internal-common-pagination-pagination';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalCommonPaginationPagination } from './poskasir-internal-common-pagination-pagination';
+import type { InternalCustomersCustomerResponse } from './internal-customers-customer-response';
 
 export interface InternalCustomersPagedCustomerResponse {
     'customers'?: Array<InternalCustomersCustomerResponse>;
-    'pagination'?: POSKasirInternalCommonPaginationPagination;
+    'pagination'?: DinosaurusPosInternalCommonPaginationPagination;
 }
 

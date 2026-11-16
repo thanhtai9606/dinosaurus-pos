@@ -1,9 +1,9 @@
+import { OrderType, OrderStatus } from '@/lib/api/domain'
 import { ShoppingBag, Utensils, User, Clock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { DataTableSkeleton } from '@/components/ui/list-skeletons'
 import { useFormatMoney } from '@/context/MoneyContext'
-import { POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 import { cn } from '@/lib/utils'
 
 type OrderRow = {
@@ -109,7 +109,7 @@ export function SalesOrdersCardGrid({
                             <div className="flex items-center justify-between border-t pt-2">
                                 <span className="text-xs text-muted-foreground">
                                     {order.is_paid ||
-                                    status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid
+                                    status === OrderStatus.OrderStatusPaid
                                         ? t('transactions.status_badge.paid', 'Paid')
                                         : t('transactions.status_badge.unpaid', 'Unpaid')}
                                 </span>

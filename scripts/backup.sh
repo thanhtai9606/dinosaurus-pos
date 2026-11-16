@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PostgreSQL backup for POS Kasir.
+# PostgreSQL backup for Dinosaurus POS.
 
 set -e
 
@@ -18,7 +18,7 @@ BACKUP_DIR="$REPO_ROOT/backups"
 mkdir -p "$BACKUP_DIR"
 
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-BACKUP_NAME="pos_kasir_backup_${TIMESTAMP}"
+BACKUP_NAME="${BACKUP_FILE_PREFIX}_${TIMESTAMP}"
 DB_BACKUP_FILE="${BACKUP_DIR}/${BACKUP_NAME}_database.sql"
 
 echo -e "${GREEN}💾 Creating database backup...${NC}"
@@ -35,7 +35,7 @@ DB_SIZE=$(du -h "$DB_BACKUP_FILE" | cut -f1)
 MANIFEST_FILE="${BACKUP_DIR}/${BACKUP_NAME}_manifest.txt"
 
 cat >"$MANIFEST_FILE" <<EOF
-POS Kasir backup
+Dinosaurus POS backup
 Created: $(date)
 Database: ${DB_NAME}
 User: ${DB_USER}

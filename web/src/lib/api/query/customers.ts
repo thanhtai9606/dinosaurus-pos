@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient, queryOptions, keepPreviousData } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { useTranslation } from "react-i18next";
 import { axiosInstance, customersApi } from "../../api/client.ts"
 import {
@@ -6,7 +7,6 @@ import {
     InternalCustomersUpdateCustomerRequest,
     InternalCustomersCustomerResponse,
     InternalCustomersPagedCustomerResponse,
-    POSKasirInternalCommonErrorResponse,
 } from "../generated"
 import { toast } from "sonner";
 import { AxiosError } from "axios";
@@ -28,7 +28,7 @@ export type CustomerProfile = InternalCustomersCustomerResponse & {
 export const customersListQueryOptions = (params?: CustomersListParams) =>
     queryOptions<
         InternalCustomersPagedCustomerResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['customers', 'list', params],
         queryFn: async () => {
@@ -52,7 +52,7 @@ export const useCustomersListQuery = (params?: CustomersListParams) => {
 export const customerDetailQueryOptions = (id: string) =>
     queryOptions<
         InternalCustomersCustomerResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['customers', 'detail', id],
         queryFn: async () => {
@@ -90,7 +90,7 @@ export const useCreateCustomerMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['customers', 'list'] })
                 toast.success(t('customers.messages.create_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.error || "Unknown error";
                 toast.error(t('customers.messages.create_failed', { message: msg }))
             }
@@ -122,7 +122,7 @@ export const useUpdateCustomerMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['customers', 'detail', variables.id] })
                 toast.success(t('customers.messages.update_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.error || "Unknown error";
                 toast.error(t('customers.messages.update_failed', { message: msg }))
             }
@@ -147,7 +147,7 @@ export const useDeleteCustomerMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['customers', 'list'] })
                 toast.success(t('customers.messages.delete_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.error || "Unknown error";
                 toast.error(t('customers.messages.delete_failed', { message: msg }))
             }

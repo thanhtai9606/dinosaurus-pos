@@ -10,13 +10,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import { UserRole } from '@/lib/api/domain'
 import type { DashboardSessionUser } from '@/components/dashboard/types'
 
 interface DashboardUserMenuProps {
     t: (key: string) => string
     user: DashboardSessionUser | null | undefined
-    userRole?: POSKasirInternalUserRepositoryUserRole | string
+    userRole?: UserRole | string
     handleLogout: () => void
 }
 
@@ -26,11 +26,11 @@ export function DashboardUserMenu({ t, user, userRole, handleLogout }: Dashboard
     const userAvatar = user?.avatar
 
     const canSettings =
-        userRole === POSKasirInternalUserRepositoryUserRole.UserRoleAdmin ||
-        userRole === POSKasirInternalUserRepositoryUserRole.UserRoleManager ||
-        userRole === POSKasirInternalUserRepositoryUserRole.UserRoleCashier
+        userRole === UserRole.UserRoleAdmin ||
+        userRole === UserRole.UserRoleManager ||
+        userRole === UserRole.UserRoleCashier
 
-    const canActivityLogs = userRole === POSKasirInternalUserRepositoryUserRole.UserRoleAdmin
+    const canActivityLogs = userRole === UserRole.UserRoleAdmin
 
     return (
         <DropdownMenu>

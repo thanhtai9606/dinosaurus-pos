@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient, queryOptions, keepPreviousData } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { usersApi } from "../../api/client.ts"
 import {
     InternalUserCreateUserRequest,
@@ -9,7 +10,6 @@ import {
     UsersGetSortByEnum,
     UsersGetSortOrderEnum,
     UsersGetStatusEnum,
-    POSKasirInternalCommonErrorResponse,
 } from "../generated"
 import { toast } from "sonner";
 import { AxiosError } from "axios";
@@ -33,7 +33,7 @@ export type UsersListParams = {
 export const usersListQueryOptions = (params?: UsersListParams) =>
     queryOptions<
         InternalUserUsersResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['users', 'list', params],
         queryFn: async () => {
@@ -67,7 +67,7 @@ export const useUsersListQuery = (params?: UsersListParams) => {
 export const userDetailQueryOptions = (id: string) =>
     queryOptions<
         InternalUserProfileResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['users', 'detail', id],
         queryFn: async () => {
@@ -106,7 +106,7 @@ export const useCreateUserMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['users', 'list'] })
                 toast.success(i18n.t('users.messages.create_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.error || "Unknown error";
                 toast.error(i18n.t('users.messages.create_failed', { message: msg }))
             }
@@ -131,7 +131,7 @@ export const useUpdateUserMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['users', 'detail', data.id] })
                 toast.success(i18n.t('users.messages.update_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.error || "Unknown error";
                 toast.error(i18n.t('users.messages.update_failed', { message: msg }))
             }
@@ -155,7 +155,7 @@ export const useDeleteUserMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['users', 'list'] })
                 toast.success(i18n.t('users.messages.delete_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.error || "Unknown error";
                 toast.error(i18n.t('users.messages.delete_failed', { message: msg }))
             }
@@ -180,7 +180,7 @@ export const useToggleUserStatusMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['users', 'detail', id] })
                 toast.success(i18n.t('users.messages.update_status_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 console.error("Masuk ke onError Mutation:", error)
 
                 const errorMessage = error.response?.data?.error || "Unknown error";

@@ -5,13 +5,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data** | [**InternalActivitylogActivityLogListResponse**](InternalActivitylogActivityLogListResponse.md) |  | [optional] [default to undefined]
+**data** | [**InternalActivityLogActivityLogListResponse**](InternalActivityLogActivityLogListResponse.md) |  | [optional] [default to undefined]
 **message** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { ActivityLogsGet200Response } from 'restClient';
+import { ActivityLogsGet200Response } from 'dinosaurus-pos-api';
 
 const instance: ActivityLogsGet200Response = {
     data,

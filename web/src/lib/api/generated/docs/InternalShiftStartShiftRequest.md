@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalShiftStartShiftRequest } from 'restClient';
+import { InternalShiftStartShiftRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalShiftStartShiftRequest = {
     password,

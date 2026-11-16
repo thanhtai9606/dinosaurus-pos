@@ -7,13 +7,13 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **email** | **string** |  | [optional] [default to undefined]
 **is_active** | **boolean** |  | [optional] [default to undefined]
-**role** | [**POSKasirInternalUserRepositoryUserRole**](POSKasirInternalUserRepositoryUserRole.md) |  | [optional] [default to undefined]
+**role** | [**DinosaurusPosInternalUserRepositoryUserRole**](DinosaurusPosInternalUserRepositoryUserRole.md) |  | [optional] [default to undefined]
 **username** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalUserUpdateUserRequest } from 'restClient';
+import { InternalUserUpdateUserRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalUserUpdateUserRequest = {
     email,

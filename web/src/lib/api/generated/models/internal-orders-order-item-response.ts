@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -24,8 +24,8 @@ export interface InternalOrdersOrderItemResponse {
     'net_subtotal'?: number;
     'options'?: Array<InternalOrdersOrderItemOptionResponse>;
     'price_at_sale'?: number;
-    'product_id'?: string;
     'product_code'?: string;
+    'product_id'?: string;
     'product_name'?: string;
     'quantity'?: number;
     'sale_unit_name'?: string;

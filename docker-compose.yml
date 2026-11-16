@@ -1,7 +1,7 @@
 services:
   app:
     image: ghcr.io/agpprastyo/pos-kasir:latest
-    container_name: pos-kasir
+    container_name: ${APP_CONTAINER:-dinosaur-app}
     env_file:
       - .env
     environment:
@@ -11,7 +11,7 @@ services:
     ports:
       - "${APP_PORT:-8080}:8080"
     networks:
-      - pos-network
+      - dinosaur-network
     restart: always
     depends_on:
       postgres:
@@ -26,27 +26,27 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    container_name: pos-postgres
+    container_name: ${POSTGRES_CONTAINER:-dinosaur-postgres}
     restart: always
     environment:
-      POSTGRES_USER: ${DB_USER:-pos_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-pos_password}
-      POSTGRES_DB: ${DB_NAME:-pos_kasir}
+      POSTGRES_USER: ${DB_USER:-dinosaur}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dinosaur_dev}
+      POSTGRES_DB: ${DB_NAME:-dinosaur_pos}
     ports:
       - "${DB_PUBLISH_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - pos-network
+      - dinosaur-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-pos_user} -d ${DB_NAME:-pos_kasir}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dinosaur} -d ${DB_NAME:-dinosaur_pos}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   minio:
     image: minio/minio:latest
-    container_name: pos-minio
+    container_name: ${MINIO_CONTAINER:-dinosaur-minio}
     restart: always
     environment:
       MINIO_ROOT_USER: ${R2_ACCESS_KEY:-minioadmin}
@@ -58,16 +58,16 @@ services:
     volumes:
       - minio_data:/data
     networks:
-      - pos-network
+      - dinosaur-network
 
   redis:
     image: redis:7-alpine
-    container_name: pos-redis
+    container_name: ${REDIS_CONTAINER:-dinosaur-redis}
     restart: always
     ports:
       - "6379:6379"
     networks:
-      - pos-network
+      - dinosaur-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -79,5 +79,5 @@ volumes:
   minio_data:
 
 networks:
-  pos-network:
+  dinosaur-network:
     driver: bridge

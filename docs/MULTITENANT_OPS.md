@@ -39,7 +39,7 @@ make backup
 # hoặc scripts/backup.sh
 ```
 
-Backup là **cả database** (`pos_kasir`), gồm mọi tenant trên tier shared.
+Backup là **cả database** (`dinosaur_pos`), gồm mọi tenant trên tier shared.
 
 ### Export logic theo một tenant (shared tier)
 
@@ -47,7 +47,7 @@ Không có snapshot per-tenant native. Dùng logical export (ví dụ tenant `de
 
 ```bash
 TENANT_ID='00000000-0000-0000-0000-000000000001'
-docker exec pos-postgres psql -U pos_user -d pos_kasir -c \
+docker exec dinosaur-postgres psql -U dinosaur -d dinosaur_pos -c \
   "COPY (SELECT * FROM orders WHERE tenant_id = '$TENANT_ID') TO STDOUT CSV HEADER" > orders_tenant.csv
 ```
 
@@ -87,7 +87,7 @@ User tạo bởi biến `POSTGRES_USER` trong Docker **là superuser** và **b�
 
 ```sql
 CREATE ROLE pos_app LOGIN PASSWORD 'change_me' NOSUPERUSER NOBYPASSRLS;
-GRANT CONNECT ON DATABASE pos_kasir TO pos_app;
+GRANT CONNECT ON DATABASE dinosaur_pos TO dinosaur_app;
 GRANT USAGE ON SCHEMA public TO pos_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO pos_app;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO pos_app;
@@ -104,4 +104,4 @@ make test-integration
 INTEGRATION_TEST=1 INTEGRATION_DB_HOST=127.0.0.1 go test -tags=integration ./pkg/database/ -count=1 -v
 ```
 
-Cần Postgres local; test **skip** nếu user hiện tại `BYPASSRLS` (mặc định `pos_user` trong Docker).
+Cần Postgres local; test **skip** nếu user hiện tại `BYPASSRLS` (mặc định `dinosaur` trong Docker).

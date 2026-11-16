@@ -1,7 +1,7 @@
 import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { axiosInstance, productsApi } from '../../api/client'
 import {
-    POSKasirInternalCommonErrorResponse,
     InternalProductsCreateProductOptionRequestStandalone,
     InternalProductsCreateProductRequest,
     InternalProductsListProductsResponse,
@@ -44,7 +44,7 @@ export type ProductsListParams = {
 export const productsListQueryOptions = (params?: ProductsListParams) =>
     queryOptions<
         ProductListResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['products', 'list', params],
         queryFn: async () => {
@@ -73,7 +73,7 @@ export const useProductsListQuery = (params?: ProductsListParams) => {
 export const productDetailQueryOptions = (id: string) =>
     queryOptions<
         Product,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['products', 'detail', id],
         queryFn: async () => {
@@ -102,7 +102,7 @@ export const useCreateProductMutation = () => {
 
     const mutation = useMutation<
         Product,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         InternalProductsCreateProductRequest
     >({
         mutationKey: ['products', 'create'],
@@ -131,7 +131,7 @@ export const useUpdateProductMutation = () => {
 
     const mutation = useMutation<
         Product,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalProductsUpdateProductRequest }
     >({
         mutationKey: ['products', 'update'],
@@ -162,7 +162,7 @@ export const usePatchProductPricesMutation = () => {
 
     const mutation = useMutation<
         Product,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; cost_price?: number; price?: number; wholesale_price?: number }
     >({
         mutationKey: ['products', 'patch-prices'],
@@ -195,7 +195,7 @@ export const useDeleteProductMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         string
     >({
         mutationKey: ['products', 'delete'],
@@ -224,7 +224,7 @@ export const useUploadProductImageMutation = () => {
 
     const mutation = useMutation<
         Product,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; file: File }
     >({
         mutationKey: ['products', 'upload-image'],
@@ -254,7 +254,7 @@ export const useCreateProductOptionMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { productId: string; body: InternalProductsCreateProductOptionRequestStandalone }
     >({
         mutationKey: ['products', 'create-option'],
@@ -283,7 +283,7 @@ export const useUpdateProductOptionMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { productId: string; optionId: string; body: InternalProductsUpdateProductOptionRequest }
     >({
         mutationKey: ['products', 'update-option'],
@@ -311,7 +311,7 @@ export const useUploadProductOptionImageMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { productId: string; optionId: string; file: File }
     >({
         mutationKey: ['products', 'upload-option-image'],
@@ -334,7 +334,7 @@ export const useUploadProductOptionImageMutation = () => {
 export const trashProductsListQueryOptions = (params?: ProductsListParams, enabled: boolean = true) =>
     queryOptions<
         ProductListResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['products', 'trash', params],
         queryFn: async () => {
@@ -367,7 +367,7 @@ export const useRestoreProductMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         string
     >({
         mutationKey: ['products', 'restore'],
@@ -397,7 +397,7 @@ export const useRestoreBulkProductMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         InternalProductsRestoreBulkRequest
     >({
         mutationKey: ['products', 'restore-bulk'],
@@ -426,7 +426,7 @@ export type StockHistoryParams = {
 export const stockHistoryQueryOptions = (productId: string, params?: StockHistoryParams) =>
     queryOptions<
         InternalProductsPagedStockHistoryResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['products', 'stock-history', productId, params],
         queryFn: async () => {

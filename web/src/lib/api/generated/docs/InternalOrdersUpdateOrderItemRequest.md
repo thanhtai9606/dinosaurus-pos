@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalOrdersUpdateOrderItemRequest } from 'restClient';
+import { InternalOrdersUpdateOrderItemRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersUpdateOrderItemRequest = {
     _options,

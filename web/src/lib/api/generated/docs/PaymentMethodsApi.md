@@ -17,7 +17,7 @@ Get a list of all active payment methods (e.g., Cash, QRIS)
 import {
     PaymentMethodsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PaymentMethodsApi(configuration);

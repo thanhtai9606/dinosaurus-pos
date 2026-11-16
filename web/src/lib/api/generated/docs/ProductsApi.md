@@ -4,20 +4,69 @@ All URIs are relative to *http://localhost:8080/api/v1*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
+|[**productsExportPricesGet**](#productsexportpricesget) | **GET** /products/export-prices | Export product prices|
 |[**productsGet**](#productsget) | **GET** /products | List products|
 |[**productsIdDelete**](#productsiddelete) | **DELETE** /products/{id} | Delete a product|
 |[**productsIdGet**](#productsidget) | **GET** /products/{id} | Get a product by ID|
 |[**productsIdImagePost**](#productsidimagepost) | **POST** /products/{id}/image | Upload an image for a product|
 |[**productsIdPatch**](#productsidpatch) | **PATCH** /products/{id} | Update a product|
+|[**productsIdSaleUnitsPut**](#productsidsaleunitsput) | **PUT** /products/{id}/sale-units | Replace product sale units|
 |[**productsIdStockHistoryGet**](#productsidstockhistoryget) | **GET** /products/{id}/stock-history | Get stock history for a product|
+|[**productsImportPricesPost**](#productsimportpricespost) | **POST** /products/import-prices | Import product prices|
+|[**productsImportPricesTemplateGet**](#productsimportpricestemplateget) | **GET** /products/import-prices/template | Download import prices template|
+|[**productsLookupGet**](#productslookupget) | **GET** /products/lookup | Lookup product by barcode or SKU|
 |[**productsPost**](#productspost) | **POST** /products | Create a new product|
 |[**productsProductIdOptionsOptionIdImagePost**](#productsproductidoptionsoptionidimagepost) | **POST** /products/{product_id}/options/{option_id}/image | Upload product option image|
 |[**productsProductIdOptionsOptionIdPatch**](#productsproductidoptionsoptionidpatch) | **PATCH** /products/{product_id}/options/{option_id} | Update a product option|
 |[**productsProductIdOptionsPost**](#productsproductidoptionspost) | **POST** /products/{product_id}/options | Create a product option|
+|[**productsSearchGet**](#productssearchget) | **GET** /products/search | Export product prices|
 |[**productsTrashGet**](#productstrashget) | **GET** /products/trash | List deleted products|
 |[**productsTrashIdGet**](#productstrashidget) | **GET** /products/trash/{id} | Get a deleted product|
 |[**productsTrashIdRestorePost**](#productstrashidrestorepost) | **POST** /products/trash/{id}/restore | Restore a deleted product|
 |[**productsTrashRestoreBulkPost**](#productstrashrestorebulkpost) | **POST** /products/trash/restore-bulk | Bulk restore deleted products|
+
+# **productsExportPricesGet**
+> File productsExportPricesGet()
+
+
+### Example
+
+```typescript
+import {
+    ProductsApi,
+    Configuration
+} from 'dinosaurus-pos-api';
+
+const configuration = new Configuration();
+const apiInstance = new ProductsApi(configuration);
+
+const { status, data } = await apiInstance.productsExportPricesGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**File**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Excel export |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsGet**
 > ProductsGet200Response productsGet()
@@ -30,7 +79,7 @@ Get a list of products with filtering by category and search term (Roles: authen
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -82,7 +131,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsIdDelete**
-> POSKasirInternalCommonSuccessResponse productsIdDelete()
+> DinosaurusPosInternalCommonSuccessResponse productsIdDelete()
 
 Delete a product by its ID (Roles: admin)
 
@@ -92,7 +141,7 @@ Delete a product by its ID (Roles: admin)
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -113,7 +162,7 @@ const { status, data } = await apiInstance.productsIdDelete(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -146,7 +195,7 @@ Retrieve detailed information of a specific product by its ID (Roles: admin, man
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -200,7 +249,7 @@ Upload an image for a product by ID (Roles: admin, manager)
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -258,7 +307,7 @@ import {
     ProductsApi,
     Configuration,
     InternalProductsUpdateProductRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -304,6 +353,60 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **productsIdSaleUnitsPut**
+> ProductsPost201Response productsIdSaleUnitsPut(body)
+
+
+### Example
+
+```typescript
+import {
+    ProductsApi,
+    Configuration,
+    InternalProductsReplaceSaleUnitsRequest
+} from 'dinosaurus-pos-api';
+
+const configuration = new Configuration();
+const apiInstance = new ProductsApi(configuration);
+
+let id: string; //Product ID (default to undefined)
+let body: InternalProductsReplaceSaleUnitsRequest; //Sale units
+
+const { status, data } = await apiInstance.productsIdSaleUnitsPut(
+    id,
+    body
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **body** | **InternalProductsReplaceSaleUnitsRequest**| Sale units | |
+| **id** | [**string**] | Product ID | defaults to undefined|
+
+
+### Return type
+
+**ProductsPost201Response**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **productsIdStockHistoryGet**
 > ProductsIdStockHistoryGet200Response productsIdStockHistoryGet()
 
@@ -315,7 +418,7 @@ Get stock history for a specific product by its ID with pagination (Roles: admin
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -364,6 +467,149 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **productsImportPricesPost**
+> ProductsImportPricesPost200Response productsImportPricesPost()
+
+
+### Example
+
+```typescript
+import {
+    ProductsApi,
+    Configuration
+} from 'dinosaurus-pos-api';
+
+const configuration = new Configuration();
+const apiInstance = new ProductsApi(configuration);
+
+let file: File; //CSV file (sku/product_id, cost_price, price) (optional) (default to undefined)
+
+const { status, data } = await apiInstance.productsImportPricesPost(
+    file
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **file** | [**File**] | CSV file (sku/product_id, cost_price, price) | (optional) defaults to undefined|
+
+
+### Return type
+
+**ProductsImportPricesPost200Response**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: multipart/form-data, application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **productsImportPricesTemplateGet**
+> File productsImportPricesTemplateGet()
+
+
+### Example
+
+```typescript
+import {
+    ProductsApi,
+    Configuration
+} from 'dinosaurus-pos-api';
+
+const configuration = new Configuration();
+const apiInstance = new ProductsApi(configuration);
+
+const { status, data } = await apiInstance.productsImportPricesTemplateGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**File**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Excel template |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **productsLookupGet**
+> ProductsPost201Response productsLookupGet()
+
+
+### Example
+
+```typescript
+import {
+    ProductsApi,
+    Configuration
+} from 'dinosaurus-pos-api';
+
+const configuration = new Configuration();
+const apiInstance = new ProductsApi(configuration);
+
+let code: string; //Barcode or SKU (default to undefined)
+
+const { status, data } = await apiInstance.productsLookupGet(
+    code
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **code** | [**string**] | Barcode or SKU | defaults to undefined|
+
+
+### Return type
+
+**ProductsPost201Response**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **productsPost**
 > ProductsPost201Response productsPost(body)
 
@@ -376,7 +622,7 @@ import {
     ProductsApi,
     Configuration,
     InternalProductsCreateProductRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -430,7 +676,7 @@ Upload image for a specific product option (Roles: admin, manager)
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -491,7 +737,7 @@ import {
     ProductsApi,
     Configuration,
     InternalProductsUpdateProductOptionRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -552,7 +798,7 @@ import {
     ProductsApi,
     Configuration,
     InternalProductsCreateProductOptionRequestStandalone
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -598,6 +844,49 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **productsSearchGet**
+> File productsSearchGet()
+
+
+### Example
+
+```typescript
+import {
+    ProductsApi,
+    Configuration
+} from 'dinosaurus-pos-api';
+
+const configuration = new Configuration();
+const apiInstance = new ProductsApi(configuration);
+
+const { status, data } = await apiInstance.productsSearchGet();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**File**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Excel export |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **productsTrashGet**
 > ProductsGet200Response productsTrashGet()
 
@@ -609,7 +898,7 @@ Get a list of deleted products with pagination and filtering (Roles: admin)
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -671,7 +960,7 @@ Retrieve detailed information of a specific deleted product by its ID (Roles: ad
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -715,7 +1004,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsTrashIdRestorePost**
-> POSKasirInternalCommonSuccessResponse productsTrashIdRestorePost()
+> DinosaurusPosInternalCommonSuccessResponse productsTrashIdRestorePost()
 
 Restore a specific deleted product by its ID (Roles: admin)
 
@@ -725,7 +1014,7 @@ Restore a specific deleted product by its ID (Roles: admin)
 import {
     ProductsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -746,7 +1035,7 @@ const { status, data } = await apiInstance.productsTrashIdRestorePost(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -769,7 +1058,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **productsTrashRestoreBulkPost**
-> POSKasirInternalCommonSuccessResponse productsTrashRestoreBulkPost(body)
+> DinosaurusPosInternalCommonSuccessResponse productsTrashRestoreBulkPost(body)
 
 Restore multiple deleted products by their IDs (Roles: admin)
 
@@ -780,7 +1069,7 @@ import {
     ProductsApi,
     Configuration,
     InternalProductsRestoreBulkRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ProductsApi(configuration);
@@ -801,7 +1090,7 @@ const { status, data } = await apiInstance.productsTrashRestoreBulkPost(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 

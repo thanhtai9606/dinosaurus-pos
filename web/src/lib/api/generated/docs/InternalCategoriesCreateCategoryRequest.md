@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalCategoriesCreateCategoryRequest } from 'restClient';
+import { InternalCategoriesCreateCategoryRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalCategoriesCreateCategoryRequest = {
     name,

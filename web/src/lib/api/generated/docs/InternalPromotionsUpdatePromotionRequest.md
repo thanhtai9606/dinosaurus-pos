@@ -6,21 +6,21 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **description** | **string** |  | [optional] [default to undefined]
-**discount_type** | [**POSKasirInternalPromotionsRepositoryDiscountType**](POSKasirInternalPromotionsRepositoryDiscountType.md) |  | [default to undefined]
+**discount_type** | [**DinosaurusPosInternalPromotionsRepositoryDiscountType**](DinosaurusPosInternalPromotionsRepositoryDiscountType.md) |  | [default to undefined]
 **discount_value** | **number** |  | [default to undefined]
 **end_date** | **string** |  | [default to undefined]
 **is_active** | **boolean** |  | [optional] [default to undefined]
 **max_discount_amount** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [default to undefined]
 **rules** | [**Array&lt;InternalPromotionsCreatePromotionRuleRequest&gt;**](InternalPromotionsCreatePromotionRuleRequest.md) |  | [optional] [default to undefined]
-**scope** | [**POSKasirInternalPromotionsRepositoryPromotionScope**](POSKasirInternalPromotionsRepositoryPromotionScope.md) |  | [default to undefined]
+**scope** | [**DinosaurusPosInternalPromotionsRepositoryPromotionScope**](DinosaurusPosInternalPromotionsRepositoryPromotionScope.md) |  | [default to undefined]
 **start_date** | **string** |  | [default to undefined]
 **targets** | [**Array&lt;InternalPromotionsCreatePromotionTargetRequest&gt;**](InternalPromotionsCreatePromotionTargetRequest.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalPromotionsUpdatePromotionRequest } from 'restClient';
+import { InternalPromotionsUpdatePromotionRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalPromotionsUpdatePromotionRequest = {
     description,

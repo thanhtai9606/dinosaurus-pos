@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { reportsApi } from "../../api/client"
 import {
-    POSKasirInternalCommonErrorResponse,
     InternalReportCancellationReportResponse,
     InternalReportCashierPerformanceResponse,
     InternalReportDashboardSummaryResponse,
@@ -20,7 +20,7 @@ import { useRBAC } from '@/lib/auth/rbac'
 export const dashboardSummaryQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportDashboardSummaryResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'dashboard-summary', startDate, endDate],
         queryFn: async () => {
@@ -42,7 +42,7 @@ export const useDashboardSummaryQuery = (startDate: string, endDate: string) => 
 export const salesReportQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportSalesReport[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'sales', startDate, endDate],
         queryFn: async () => {
@@ -64,7 +64,7 @@ export const useSalesReportQuery = (startDate: string, endDate: string) => {
 export const productPerformanceQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportProductPerformanceResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'products', startDate, endDate],
         queryFn: async () => {
@@ -86,7 +86,7 @@ export const useProductPerformanceQuery = (startDate: string, endDate: string) =
 export const paymentMethodPerformanceQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportPaymentMethodPerformanceResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'payment-methods', startDate, endDate],
         queryFn: async () => {
@@ -108,7 +108,7 @@ export const usePaymentMethodPerformanceQuery = (startDate: string, endDate: str
 export const cashierPerformanceQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportCashierPerformanceResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'cashier-performance', startDate, endDate],
         queryFn: async () => {
@@ -130,7 +130,7 @@ export const useCashierPerformanceQuery = (startDate: string, endDate: string) =
 export const cancellationReportsQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportCancellationReportResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'cancellations', startDate, endDate],
         queryFn: async () => {
@@ -151,7 +151,7 @@ export const useCancellationReportsQuery = (startDate: string, endDate: string) 
 export const profitSummaryQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportProfitSummaryResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'profit-summary', startDate, endDate],
         queryFn: async () => {
@@ -173,7 +173,7 @@ export const useProfitSummaryQuery = (startDate: string, endDate: string) => {
 export const productProfitReportsQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportProductProfitResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'profit-products', startDate, endDate],
         queryFn: async () => {
@@ -195,7 +195,7 @@ export const useProductProfitReportsQuery = (startDate: string, endDate: string)
 export const lowStockReportQueryOptions = (threshold?: number) =>
     queryOptions<
         InternalReportLowStockProductResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'low-stock', threshold],
         queryFn: async () => {
@@ -219,7 +219,7 @@ export const useLowStockReportQuery = (threshold?: number) => {
 export const promotionsReportQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalPromotionsPromotionResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'promotions', startDate, endDate],
         queryFn: async () => {
@@ -241,7 +241,7 @@ export const usePromotionsReportQuery = (startDate: string, endDate: string) => 
 export const shiftSummaryReportQueryOptions = (startDate: string, endDate: string) =>
     queryOptions<
         InternalReportShiftSummaryResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['reports', 'shift-summary', startDate, endDate],
         queryFn: async () => {

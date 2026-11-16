@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -22,13 +22,13 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
+// @ts-ignore
+import type { DinosaurusPosInternalCommonSuccessResponse } from '../models';
+// @ts-ignore
 import type { InternalPromotionsCreatePromotionRequest } from '../models';
 // @ts-ignore
 import type { InternalPromotionsUpdatePromotionRequest } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonSuccessResponse } from '../models';
 // @ts-ignore
 import type { PromotionsGet200Response } from '../models';
 // @ts-ignore
@@ -292,7 +292,7 @@ export const PromotionsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async promotionsIdDelete(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async promotionsIdDelete(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.promotionsIdDelete(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PromotionsApi.promotionsIdDelete']?.[localVarOperationServerIndex]?.url;
@@ -332,7 +332,7 @@ export const PromotionsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async promotionsIdRestorePost(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async promotionsIdRestorePost(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.promotionsIdRestorePost(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['PromotionsApi.promotionsIdRestorePost']?.[localVarOperationServerIndex]?.url;
@@ -379,7 +379,7 @@ export const PromotionsApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        promotionsIdDelete(id: string, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        promotionsIdDelete(id: string, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.promotionsIdDelete(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -410,7 +410,7 @@ export const PromotionsApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        promotionsIdRestorePost(id: string, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        promotionsIdRestorePost(id: string, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.promotionsIdRestorePost(id, options).then((request) => request(axios, basePath));
         },
         /**

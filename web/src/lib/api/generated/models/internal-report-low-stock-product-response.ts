@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,8 +15,10 @@
 
 
 export interface InternalReportLowStockProductResponse {
+    'min_stock'?: number;
     'product_id'?: string;
     'product_name'?: string;
+    'sku'?: string;
     'stock'?: number;
 }
 

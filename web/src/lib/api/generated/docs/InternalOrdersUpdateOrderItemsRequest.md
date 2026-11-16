@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalOrdersUpdateOrderItemsRequest } from 'restClient';
+import { InternalOrdersUpdateOrderItemsRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersUpdateOrderItemsRequest = {
     items,

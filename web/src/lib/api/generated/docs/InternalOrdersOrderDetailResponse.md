@@ -15,12 +15,13 @@ Name | Type | Description | Notes
 **id** | **string** |  | [optional] [default to undefined]
 **items** | [**Array&lt;InternalOrdersOrderItemResponse&gt;**](InternalOrdersOrderItemResponse.md) |  | [optional] [default to undefined]
 **net_total** | **number** |  | [optional] [default to undefined]
+**order_no** | **string** |  | [optional] [default to undefined]
 **payment_gateway_reference** | **string** |  | [optional] [default to undefined]
 **payment_method_id** | **number** |  | [optional] [default to undefined]
 **service_charge_amount** | **number** |  | [optional] [default to undefined]
-**status** | [**POSKasirInternalOrdersRepositoryOrderStatus**](POSKasirInternalOrdersRepositoryOrderStatus.md) |  | [optional] [default to undefined]
+**status** | [**DinosaurusPosInternalOrdersRepositoryOrderStatus**](DinosaurusPosInternalOrdersRepositoryOrderStatus.md) |  | [optional] [default to undefined]
 **tax_amount** | **number** |  | [optional] [default to undefined]
-**type** | [**POSKasirInternalOrdersRepositoryOrderType**](POSKasirInternalOrdersRepositoryOrderType.md) |  | [optional] [default to undefined]
+**type** | [**DinosaurusPosInternalOrdersRepositoryOrderType**](DinosaurusPosInternalOrdersRepositoryOrderType.md) |  | [optional] [default to undefined]
 **updated_at** | **string** |  | [optional] [default to undefined]
 **user_id** | **string** |  | [optional] [default to undefined]
 **version** | **number** |  | [optional] [default to undefined]
@@ -28,7 +29,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalOrdersOrderDetailResponse } from 'restClient';
+import { InternalOrdersOrderDetailResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersOrderDetailResponse = {
     applied_promotion_id,
@@ -41,6 +42,7 @@ const instance: InternalOrdersOrderDetailResponse = {
     id,
     items,
     net_total,
+    order_no,
     payment_gateway_reference,
     payment_method_id,
     service_charge_amount,

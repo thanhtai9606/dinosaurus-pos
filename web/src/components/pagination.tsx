@@ -11,12 +11,12 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import { ApiPagination } from '@/lib/api/domain'
 import { getPaginationRange } from '@/lib/pagination-range'
 import { cn } from '@/lib/utils'
 
 export interface ListPaginationProps {
-    pagination: POSKasirInternalCommonPaginationPagination | undefined
+    pagination: ApiPagination | undefined
     onPageChange: (page: number) => void
     onLimitChange?: (limit: number) => void
     pageSizeOptions?: number[]
@@ -179,7 +179,7 @@ export function ListPagination({
 
 /** @deprecated Prefer ListPagination with onPageChange */
 interface NewPaginationProps {
-    pagination: POSKasirInternalCommonPaginationPagination | undefined
+    pagination: ApiPagination | undefined
     onClickPrev: () => void
     onClickNext: () => void
 }

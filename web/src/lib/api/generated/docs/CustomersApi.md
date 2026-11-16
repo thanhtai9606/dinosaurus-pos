@@ -21,7 +21,7 @@ List customers with pagination and search
 import {
     CustomersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CustomersApi(configuration);
@@ -70,7 +70,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **customersIdDelete**
-> POSKasirInternalCommonSuccessResponse customersIdDelete()
+> DinosaurusPosInternalCommonSuccessResponse customersIdDelete()
 
 Delete customer by ID
 
@@ -80,7 +80,7 @@ Delete customer by ID
 import {
     CustomersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CustomersApi(configuration);
@@ -101,7 +101,7 @@ const { status, data } = await apiInstance.customersIdDelete(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -134,7 +134,7 @@ Get customer by ID
 import {
     CustomersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CustomersApi(configuration);
@@ -189,7 +189,7 @@ import {
     CustomersApi,
     Configuration,
     InternalCustomersUpdateCustomerRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CustomersApi(configuration);
@@ -247,7 +247,7 @@ import {
     CustomersApi,
     Configuration,
     InternalCustomersCreateCustomerRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CustomersApi(configuration);

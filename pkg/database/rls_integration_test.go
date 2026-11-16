@@ -21,9 +21,9 @@ func requireIntegrationDB(t *testing.T) *pgxpool.Pool {
 	}
 	host := envOr("INTEGRATION_DB_HOST", "127.0.0.1")
 	port := envOr("DB_PUBLISH_PORT", "5433")
-	user := envOr("DB_USER", "pos_user")
-	pass := envOr("DB_PASSWORD", "pos_password")
-	name := envOr("DB_NAME", "pos_kasir")
+	user := envOr("DB_USER", "dinosaur")
+	pass := envOr("DB_PASSWORD", "dinosaur_dev")
+	name := envOr("DB_NAME", "dinosaur_pos")
 	dsn := "postgres://" + user + ":" + pass + "@" + host + ":" + port + "/" + name + "?sslmode=disable"
 	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {

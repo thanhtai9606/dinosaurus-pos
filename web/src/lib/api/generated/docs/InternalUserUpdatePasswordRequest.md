@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalUserUpdatePasswordRequest } from 'restClient';
+import { InternalUserUpdatePasswordRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalUserUpdatePasswordRequest = {
     new_password,

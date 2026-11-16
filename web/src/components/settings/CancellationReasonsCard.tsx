@@ -5,16 +5,16 @@ import { Ban } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { useTranslation } from 'react-i18next';
-import type { POSKasirInternalDtoCancellationReasonResponse } from '@/lib/api/generated/models/poskasir-internal-dto-cancellation-reason-response';
+import type { InternalCancellationReasonsCancellationReasonResponse } from '@/lib/api/generated'
 
 
 export function CancellationReasonsCard() {
     const { t } = useTranslation()
     const { data: reasons } = useSuspenseQuery(cancellationReasonsListQueryOptions())
-    const reasonsList: POSKasirInternalDtoCancellationReasonResponse[] =
+    const reasonsList: InternalCancellationReasonsCancellationReasonResponse[] =
         Array.isArray(reasons)
-            ? (reasons as POSKasirInternalDtoCancellationReasonResponse[])
-            : ((reasons as { data?: POSKasirInternalDtoCancellationReasonResponse[] })?.data ?? [])
+            ? (reasons as InternalCancellationReasonsCancellationReasonResponse[])
+            : ((reasons as { data?: InternalCancellationReasonsCancellationReasonResponse[] })?.data ?? [])
 
     return (
         <Card>
@@ -44,7 +44,7 @@ export function CancellationReasonsCard() {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                reasonsList.map((item: POSKasirInternalDtoCancellationReasonResponse) => (
+                                reasonsList.map((item: InternalCancellationReasonsCancellationReasonResponse) => (
                                     <TableRow key={item.id}>
                                         <TableCell className="font-medium">{item.reason}</TableCell>
                                         <TableCell>{item.description || '-'}</TableCell>

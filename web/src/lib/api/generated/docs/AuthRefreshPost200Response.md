@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { AuthRefreshPost200Response } from 'restClient';
+import { AuthRefreshPost200Response } from 'dinosaurus-pos-api';
 
 const instance: AuthRefreshPost200Response = {
     data,

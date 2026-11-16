@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalReportSalesReport } from 'restClient';
+import { InternalReportSalesReport } from 'dinosaurus-pos-api';
 
 const instance: InternalReportSalesReport = {
     date,

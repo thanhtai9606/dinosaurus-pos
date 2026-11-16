@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/common.sh"
 
 usage() {
   echo "Usage: $0 --code CODE --name NAME --dbname DBNAME --env-key TENANT_DSN_KEY"
-  echo "Example: $0 --code acme --name 'ACME Corp' --dbname pos_tenant_acme --env-key TENANT_DSN_ACME"
+  echo "Example: $0 --code acme --name 'ACME Corp' --dbname dinosaur_tenant_acme --env-key TENANT_DSN_ACME"
   exit 1
 }
 

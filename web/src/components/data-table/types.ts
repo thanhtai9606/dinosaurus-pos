@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { SortDirection } from '@/components/data-table/TableColumnHeader'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 
 export type DataGridColumnFilterOption = { value: string; label: string }
 
@@ -29,7 +29,7 @@ export type DataGridColumnDef<T> = {
 }
 
 export type DataGridServerState = {
-  pagination?: POSKasirInternalCommonPaginationPagination
+  pagination?: ApiPagination
   onPageChange?: (page: number) => void
   onLimitChange?: (limit: number) => void
   isFetching?: boolean

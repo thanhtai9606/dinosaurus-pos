@@ -1,3 +1,4 @@
+import { OrderType } from '@/lib/api/domain'
 import { ShoppingCart, Trash2, Minus, Plus, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -7,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Product } from '@/lib/api/query/products'
 import type { ProductSaleUnit } from '@/lib/retail-pos/productUnits'
-import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
+import { InternalProductsProductOptionResponse } from '@/lib/api/generated'
 
 export interface CartItem {
     product: Product
@@ -25,8 +26,8 @@ interface CartContentProps {
     customers: any[]
     selectedCustomerId: string | null
     setSelectedCustomerId: (id: string | null) => void
-    selectedOrderType: POSKasirInternalOrdersRepositoryOrderType
-    setSelectedOrderType: (type: POSKasirInternalOrdersRepositoryOrderType) => void
+    selectedOrderType: OrderType
+    setSelectedOrderType: (type: OrderType) => void
     updateQuantity: (id: string, delta: number, variantId?: string) => void
     removeFromCart: (id: string, variantId?: string) => void
     calculateTotal: () => number
@@ -74,10 +75,10 @@ export function CartContent({
                     </SelectContent>
                 </Select>
 
-                <Tabs value={selectedOrderType} onValueChange={(v) => setSelectedOrderType(v as POSKasirInternalOrdersRepositoryOrderType)} className="w-full">
+                <Tabs value={selectedOrderType} onValueChange={(v) => setSelectedOrderType(v as OrderType)} className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value={POSKasirInternalOrdersRepositoryOrderType.OrderTypeDineIn}>{t('order.order_type.dine_in')}</TabsTrigger>
-                        <TabsTrigger value={POSKasirInternalOrdersRepositoryOrderType.OrderTypeTakeaway}>{t('order.order_type.take_away')}</TabsTrigger>
+                        <TabsTrigger value={OrderType.OrderTypeDineIn}>{t('order.order_type.dine_in')}</TabsTrigger>
+                        <TabsTrigger value={OrderType.OrderTypeTakeaway}>{t('order.order_type.take_away')}</TabsTrigger>
                     </TabsList>
                 </Tabs>
             </div>

@@ -28,6 +28,10 @@ MIGRATIONS_PATH := ./sqlc/migrations
 
 -include .env
 
+POSTGRES_CONTAINER ?= dinosaur-postgres
+REDIS_CONTAINER ?= dinosaur-redis
+MINIO_CONTAINER ?= dinosaur-minio
+APP_CONTAINER ?= dinosaur-app
 DB_PUBLISH_PORT ?= 5433
 # Migrations/cli từ máy host → Docker Postgres (published port)
 LOCAL_DB_URL := postgres://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PUBLISH_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
@@ -211,11 +215,11 @@ create-demo-users:
 
 list-users:
 	@echo "$(GREEN)👥 Users in $(DB_NAME):$(NC)"
-	@if [ -z "$$(docker ps -q -f name=pos-postgres)" ]; then \
+	@if [ -z "$$(docker ps -q -f name=$(POSTGRES_CONTAINER))" ]; then \
 		echo "$(RED)❌ Run 'make up' first.$(NC)"; \
 		exit 1; \
 	fi
-	@docker exec pos-postgres psql -U $(DB_USER) -d $(DB_NAME) -c \
+	@docker exec $(POSTGRES_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME) -c \
 		"SELECT id, username, email, role, is_active, created_at FROM users ORDER BY role, username;"
 
 create-admin:
@@ -232,11 +236,11 @@ restore:
 
 db-shell:
 	@echo "$(GREEN)🐘 PostgreSQL shell ($(DB_NAME))$(NC)"
-	@if [ -z "$$(docker ps -q -f name=pos-postgres)" ]; then \
+	@if [ -z "$$(docker ps -q -f name=$(POSTGRES_CONTAINER))" ]; then \
 		echo "$(RED)❌ Run 'make up' first.$(NC)"; \
 		exit 1; \
 	fi
-	@docker exec -it pos-postgres psql -U $(DB_USER) -d $(DB_NAME)
+	@docker exec -it $(POSTGRES_CONTAINER) psql -U $(DB_USER) -d $(DB_NAME)
 
 db-reset:
 	@./scripts/db-reset.sh
@@ -252,12 +256,12 @@ logs-db:
 status:
 	@echo "$(GREEN)📊 Service status$(NC)"
 	@echo ""
-	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" -f name=pos- || echo "No pos-* containers"
+	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" -f name=dinosaur- || echo "No dinosaur-* containers"
 	@echo ""
-	@if [ -n "$$(docker ps -q -f name=pos-postgres)" ]; then echo "✅ Postgres"; else echo "❌ Postgres"; fi
-	@if [ -n "$$(docker ps -q -f name=pos-redis)" ]; then echo "✅ Redis"; else echo "❌ Redis"; fi
-	@if [ -n "$$(docker ps -q -f name=pos-minio)" ]; then echo "✅ MinIO"; else echo "❌ MinIO"; fi
-	@if [ -n "$$(docker ps -q -f name=pos-kasir)" ]; then echo "✅ App (prod)"; else echo "— App (run locally or make prod)"; fi
+	@if [ -n "$$(docker ps -q -f name=$(POSTGRES_CONTAINER))" ]; then echo "✅ Postgres"; else echo "❌ Postgres"; fi
+	@if [ -n "$$(docker ps -q -f name=$(REDIS_CONTAINER))" ]; then echo "✅ Redis"; else echo "❌ Redis"; fi
+	@if [ -n "$$(docker ps -q -f name=$(MINIO_CONTAINER))" ]; then echo "✅ MinIO"; else echo "❌ MinIO"; fi
+	@if [ -n "$$(docker ps -q -f name=$(APP_CONTAINER))" ]; then echo "✅ App (prod)"; else echo "— App (run locally or make prod)"; fi
 
 clean:
 	@echo "$(RED)⚠️  Removes infra/prod volumes. Type YES to continue.$(NC)"

@@ -10,7 +10,7 @@ import {
 } from '@/lib/api/query/products'
 import { useFormatMoney, useMoney } from '@/context/MoneyContext'
 import { formatProductListCodes } from '@/lib/products/productListCodes'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 import { cn } from '@/lib/utils'
 
 function InlineMoneyInput({
@@ -59,7 +59,7 @@ function InlineMoneyInput({
 type Props = {
     products: ProductListItem[]
     emptyMessage: string
-    pagination?: POSKasirInternalCommonPaginationPagination
+    pagination?: ApiPagination
     onPageChange?: (page: number) => void
     onLimitChange?: (limit: number) => void
     isFetching?: boolean

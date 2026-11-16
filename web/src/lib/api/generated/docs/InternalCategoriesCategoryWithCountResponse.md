@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalCategoriesCategoryWithCountResponse } from 'restClient';
+import { InternalCategoriesCategoryWithCountResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalCategoriesCategoryWithCountResponse = {
     created_at,

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -18,11 +18,16 @@
 import type { InternalProductsCreateProductOptionRequest } from './internal-products-create-product-option-request';
 
 export interface InternalProductsCreateProductRequest {
+    'barcode'?: string;
     'category_ids'?: Array<number>;
     'cost_price': number;
+    'default_supplier_id'?: string;
+    'min_stock'?: number;
     'name': string;
     'options'?: Array<InternalProductsCreateProductOptionRequest>;
     'price': number;
+    'sku'?: string;
     'stock': number;
+    'unit'?: string;
 }
 

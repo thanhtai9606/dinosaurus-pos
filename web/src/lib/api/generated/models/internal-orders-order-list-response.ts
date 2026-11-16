@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { DinosaurusPosInternalOrdersRepositoryOrderStatus } from './dinosaurus-pos-internal-orders-repository-order-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DinosaurusPosInternalOrdersRepositoryOrderType } from './dinosaurus-pos-internal-orders-repository-order-type';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { InternalOrdersOrderItemResponse } from './internal-orders-order-item-response';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalOrdersRepositoryOrderStatus } from './poskasir-internal-orders-repository-order-status';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalOrdersRepositoryOrderType } from './poskasir-internal-orders-repository-order-type';
 
 export interface InternalOrdersOrderListResponse {
     'created_at'?: string;
@@ -31,8 +31,8 @@ export interface InternalOrdersOrderListResponse {
     'net_total'?: number;
     'order_no'?: string;
     'queue_number'?: string;
-    'status'?: POSKasirInternalOrdersRepositoryOrderStatus;
-    'type'?: POSKasirInternalOrdersRepositoryOrderType;
+    'status'?: DinosaurusPosInternalOrdersRepositoryOrderStatus;
+    'type'?: DinosaurusPosInternalOrdersRepositoryOrderType;
     'user_id'?: string;
 }
 

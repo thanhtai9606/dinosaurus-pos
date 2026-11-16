@@ -11,6 +11,7 @@ All URIs are relative to *http://localhost:8080/api/v1*
 |[**authMeGet**](#authmeget) | **GET** /auth/me | Get current profile|
 |[**authMePasswordPut**](#authmepasswordput) | **PUT** /auth/me/password | Update password|
 |[**authRefreshPost**](#authrefreshpost) | **POST** /auth/refresh | Refresh token|
+|[**authSwitchTenantPost**](#authswitchtenantpost) | **POST** /auth/switch-tenant | Switch tenant|
 
 # **authAddPost**
 > AuthAddPost200Response authAddPost(request)
@@ -24,7 +25,7 @@ import {
     AuthApi,
     Configuration,
     InternalUserRegisterRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new AuthApi(configuration);
@@ -80,7 +81,7 @@ import {
     AuthApi,
     Configuration,
     InternalUserLoginRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new AuthApi(configuration);
@@ -124,7 +125,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authLogoutPost**
-> POSKasirInternalCommonSuccessResponse authLogoutPost()
+> DinosaurusPosInternalCommonSuccessResponse authLogoutPost()
 
 Clear access and refresh token cookies (Roles: authenticated)
 
@@ -134,7 +135,7 @@ Clear access and refresh token cookies (Roles: authenticated)
 import {
     AuthApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new AuthApi(configuration);
@@ -148,7 +149,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -180,7 +181,7 @@ Upload and update the profile picture for the current user (Roles: authenticated
 import {
     AuthApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new AuthApi(configuration);
@@ -234,7 +235,7 @@ Get detailed profile information for the authenticated user session (Roles: auth
 import {
     AuthApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new AuthApi(configuration);
@@ -270,7 +271,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authMePasswordPut**
-> POSKasirInternalCommonSuccessResponse authMePasswordPut(request)
+> DinosaurusPosInternalCommonSuccessResponse authMePasswordPut(request)
 
 Update the password for the current user session (Roles: authenticated)
 
@@ -281,7 +282,7 @@ import {
     AuthApi,
     Configuration,
     InternalUserUpdatePasswordRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new AuthApi(configuration);
@@ -302,7 +303,7 @@ const { status, data } = await apiInstance.authMePasswordPut(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -335,7 +336,7 @@ Issue a new access token using a valid refresh token cookie (Roles: public/authe
 import {
     AuthApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new AuthApi(configuration);
@@ -367,6 +368,58 @@ No authorization required
 |**200** | Token refreshed successfully |  -  |
 |**401** | Invalid or expired session |  -  |
 |**500** | Internal server error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authSwitchTenantPost**
+> DinosaurusPosInternalCommonSuccessResponse authSwitchTenantPost(request)
+
+
+### Example
+
+```typescript
+import {
+    AuthApi,
+    Configuration,
+    InternalUserSwitchTenantRequest
+} from 'dinosaurus-pos-api';
+
+const configuration = new Configuration();
+const apiInstance = new AuthApi(configuration);
+
+let request: InternalUserSwitchTenantRequest; //Target tenant
+
+const { status, data } = await apiInstance.authSwitchTenantPost(
+    request
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **request** | **InternalUserSwitchTenantRequest**| Target tenant | |
+
+
+### Return type
+
+**DinosaurusPosInternalCommonSuccessResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**403** | Forbidden |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

@@ -1,7 +1,7 @@
 import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { axiosInstance, ordersApi, printerApi } from "../../api/client"
 import {
-    POSKasirInternalCommonErrorResponse,
     InternalOrdersApplyPromotionRequest,
     InternalOrdersCancelOrderRequest,
     InternalOrdersConfirmManualPaymentRequest,
@@ -31,7 +31,7 @@ export type OrdersListParams = {
 export const ordersListQueryOptions = (params?: OrdersListParams) =>
     queryOptions<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['orders', 'list', params],
         queryFn: async () => {
@@ -74,7 +74,7 @@ export const useOrdersListQuery = (params?: OrdersListParams) => {
 export const orderDetailQueryOptions = (id: string) =>
     queryOptions<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['orders', 'detail', id],
         queryFn: async () => {
@@ -86,7 +86,7 @@ export const orderDetailQueryOptions = (id: string) =>
 
 import { UseQueryOptions } from '@tanstack/react-query'
 
-export const useOrderDetailQuery = (id: string, options?: Omit<UseQueryOptions<any, AxiosError<POSKasirInternalCommonErrorResponse>>, 'queryKey' | 'queryFn'>) => {
+export const useOrderDetailQuery = (id: string, options?: Omit<UseQueryOptions<any, AxiosError<ApiErrorBody>>, 'queryKey' | 'queryFn'>) => {
     const { canAccessApi } = useRBAC();
     const isAllowed = canAccessApi('GET', '/orders/{id}');
     const defaultOptions = orderDetailQueryOptions(id);
@@ -105,7 +105,7 @@ export const useApplyPromotionMutation = () => {
 
     const mutation = useMutation<
         InternalOrdersOrderDetailResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalOrdersApplyPromotionRequest }
     >({
         mutationKey: ['orders', 'apply-promotion'],
@@ -134,7 +134,7 @@ export const useCancelOrderMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalOrdersCancelOrderRequest }
     >({
         mutationKey: ['orders', 'cancel'],
@@ -163,7 +163,7 @@ export const useConfirmManualPaymentMutation = () => {
 
     const mutation = useMutation<
         InternalOrdersOrderDetailResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalOrdersConfirmManualPaymentRequest }
     >({
         mutationKey: ['orders', 'complete-manual-payment'],
@@ -196,7 +196,7 @@ export const useInitiateMidtransPaymentMutation = () => {
 
     const mutation = useMutation<
         InternalOrdersMidtransPaymentResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string }
     >({
         mutationKey: ['orders', 'process-payment'],
@@ -225,7 +225,7 @@ export const useUpdateOrderStatusMutation = () => {
 
     const mutation = useMutation<
         InternalOrdersOrderDetailResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalOrdersUpdateOrderStatusRequest }
     >({
         mutationKey: ['orders', 'update-status'],
@@ -254,7 +254,7 @@ export const useCreateOrderMutation = () => {
 
     const mutation = useMutation<
         InternalOrdersOrderDetailResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         InternalOrdersCreateOrderRequest
     >({
         mutationKey: ['orders', 'create'],
@@ -285,7 +285,7 @@ export const useUpdateOrderItemsMutation = () => {
 
     const mutation = useMutation<
         InternalOrdersOrderDetailResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalOrdersUpdateOrderItemsRequest }
     >({
         mutationKey: ['orders', 'update-items'],
@@ -314,7 +314,7 @@ export const usePrintInvoiceMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string }
     >({
         mutationKey: ['orders', 'print'],
@@ -341,7 +341,7 @@ export const useRefundOrderMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: string; body: InternalOrdersRefundOrderRequest }
     >({
         mutationKey: ['orders', 'refund'],

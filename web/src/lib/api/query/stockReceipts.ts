@@ -4,7 +4,7 @@ import { axiosInstance } from '../client'
 import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
-import { POSKasirInternalCommonErrorResponse } from '../generated'
+import { ApiErrorBody } from '../domain'
 
 export type StockReceiptItem = {
     id?: string
@@ -49,7 +49,7 @@ export type StockReceiptsListParams = {
 }
 
 export const stockReceiptsListQueryOptions = (params?: StockReceiptsListParams) =>
-    queryOptions<PagedStockReceipts, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<PagedStockReceipts, AxiosError<ApiErrorBody>>({
         queryKey: ['stock-receipts', 'list', params],
         queryFn: async () => {
             const res = await axiosInstance.get('/stock-receipts', { params })
@@ -65,7 +65,7 @@ export const useStockReceiptsListQuery = (params?: StockReceiptsListParams) => {
 }
 
 export const stockReceiptDetailQueryOptions = (id: string) =>
-    queryOptions<StockReceipt, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<StockReceipt, AxiosError<ApiErrorBody>>({
         queryKey: ['stock-receipts', 'detail', id],
         queryFn: async () => {
             const res = await axiosInstance.get(`/stock-receipts/${id}`)

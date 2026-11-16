@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -28,15 +28,17 @@ import type { AuthLoginPost200Response } from '../models';
 // @ts-ignore
 import type { AuthRefreshPost200Response } from '../models';
 // @ts-ignore
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
+// @ts-ignore
+import type { DinosaurusPosInternalCommonSuccessResponse } from '../models';
+// @ts-ignore
 import type { InternalUserLoginRequest } from '../models';
 // @ts-ignore
 import type { InternalUserRegisterRequest } from '../models';
 // @ts-ignore
+import type { InternalUserSwitchTenantRequest } from '../models';
+// @ts-ignore
 import type { InternalUserUpdatePasswordRequest } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonSuccessResponse } from '../models';
 /**
  * AuthApi - axios parameter creator
  */
@@ -281,6 +283,42 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Switch tenant
+         * @param {InternalUserSwitchTenantRequest} request Target tenant
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authSwitchTenantPost: async (request: InternalUserSwitchTenantRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'request' is not null or undefined
+            assertParamExists('authSwitchTenantPost', 'request', request)
+            const localVarPath = `/auth/switch-tenant`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -322,7 +360,7 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authLogoutPost(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async authLogoutPost(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.authLogoutPost(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.authLogoutPost']?.[localVarOperationServerIndex]?.url;
@@ -360,7 +398,7 @@ export const AuthApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async authMePasswordPut(request: InternalUserUpdatePasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async authMePasswordPut(request: InternalUserUpdatePasswordRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.authMePasswordPut(request, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.authMePasswordPut']?.[localVarOperationServerIndex]?.url;
@@ -376,6 +414,19 @@ export const AuthApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.authRefreshPost(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AuthApi.authRefreshPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Switch tenant
+         * @param {InternalUserSwitchTenantRequest} request Target tenant
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authSwitchTenantPost(request: InternalUserSwitchTenantRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authSwitchTenantPost(request, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AuthApi.authSwitchTenantPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -413,7 +464,7 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authLogoutPost(options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        authLogoutPost(options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.authLogoutPost(options).then((request) => request(axios, basePath));
         },
         /**
@@ -442,7 +493,7 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        authMePasswordPut(request: InternalUserUpdatePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        authMePasswordPut(request: InternalUserUpdatePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.authMePasswordPut(request, options).then((request) => request(axios, basePath));
         },
         /**
@@ -453,6 +504,16 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
          */
         authRefreshPost(options?: RawAxiosRequestConfig): AxiosPromise<AuthRefreshPost200Response> {
             return localVarFp.authRefreshPost(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Switch tenant
+         * @param {InternalUserSwitchTenantRequest} request Target tenant
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authSwitchTenantPost(request: InternalUserSwitchTenantRequest, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
+            return localVarFp.authSwitchTenantPost(request, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -533,6 +594,17 @@ export class AuthApi extends BaseAPI {
      */
     public authRefreshPost(options?: RawAxiosRequestConfig) {
         return AuthApiFp(this.configuration).authRefreshPost(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Switch tenant
+     * @param {InternalUserSwitchTenantRequest} request Target tenant
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public authSwitchTenantPost(request: InternalUserSwitchTenantRequest, options?: RawAxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authSwitchTenantPost(request, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

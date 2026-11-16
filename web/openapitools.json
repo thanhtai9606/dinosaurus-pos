@@ -8,9 +8,10 @@
         "generatorName": "typescript-axios",
         "output": "src/lib/api/generated",
         "glob": "api-docs/swagger.json",
+        "skipValidateSpec": true,
         "additionalProperties": {
           "supportsES6": "true",
-          "npmName": "restClient",
+          "npmName": "dinosaurus-pos-api",
           "withSeparateModelsAndApi": "true",
           "apiPackage": "api",
           "modelPackage": "models"

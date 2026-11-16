@@ -11,13 +11,13 @@ Name | Type | Description | Notes
 **description** | **string** |  | [optional] [default to undefined]
 **id** | **string** |  | [optional] [default to undefined]
 **shift_id** | **string** |  | [optional] [default to undefined]
-**type** | [**POSKasirInternalShiftRepositoryCashTransactionType**](POSKasirInternalShiftRepositoryCashTransactionType.md) |  | [optional] [default to undefined]
+**type** | [**DinosaurusPosInternalShiftRepositoryCashTransactionType**](DinosaurusPosInternalShiftRepositoryCashTransactionType.md) |  | [optional] [default to undefined]
 **user_id** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalShiftCashTransactionResponse } from 'restClient';
+import { InternalShiftCashTransactionResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalShiftCashTransactionResponse = {
     amount,

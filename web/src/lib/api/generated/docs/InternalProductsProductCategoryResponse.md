@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalProductsProductCategoryResponse } from 'restClient';
+import { InternalProductsProductCategoryResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalProductsProductCategoryResponse = {
     id,

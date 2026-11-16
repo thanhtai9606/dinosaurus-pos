@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { AxiosError } from 'axios'
-import type { POSKasirInternalCommonErrorResponse } from '@/lib/api/generated'
+import type { ApiErrorBody } from '@/lib/api/domain'
 import {
     Dialog,
     DialogContent,
@@ -171,7 +171,7 @@ function PaymentDialogForm({ open, onOpenChange, orderId, onPaymentSuccess, mode
     }, [paymentMethods, selectedPaymentMethod])
 
     const apiErrorMessage = (error: unknown, fallback: string) => {
-        const ax = error as AxiosError<POSKasirInternalCommonErrorResponse>
+        const ax = error as AxiosError<ApiErrorBody>
         return ax.response?.data?.message || ax.response?.data?.error || fallback
     }
 

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,15 +15,17 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { InternalOrdersCreateOrderItemRequest } from './internal-orders-create-order-item-request';
+import type { DinosaurusPosInternalOrdersRepositoryOrderType } from './dinosaurus-pos-internal-orders-repository-order-type';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalOrdersRepositoryOrderType } from './poskasir-internal-orders-repository-order-type';
+import type { InternalOrdersCreateOrderItemRequest } from './internal-orders-create-order-item-request';
 
 export interface InternalOrdersCreateOrderRequest {
     'customer_id'?: string;
+    'dining_table_id'?: string;
+    'discount_amount'?: number;
     'items': Array<InternalOrdersCreateOrderItemRequest>;
-    'type': POSKasirInternalOrdersRepositoryOrderType;
+    'type': DinosaurusPosInternalOrdersRepositoryOrderType;
 }
 
 

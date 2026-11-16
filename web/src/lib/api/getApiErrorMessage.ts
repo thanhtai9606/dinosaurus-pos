@@ -1,8 +1,8 @@
 import type { AxiosError } from 'axios'
-import type { POSKasirInternalCommonErrorResponse } from '@/lib/api/generated'
+import type { ApiErrorBody } from '@/lib/api/domain'
 
 export function getApiErrorMessage(error: unknown, fallback: string): string {
-    const ax = error as AxiosError<POSKasirInternalCommonErrorResponse>
+    const ax = error as AxiosError<ApiErrorBody>
     const data = ax.response?.data
     if (data?.error) {
         return data.error

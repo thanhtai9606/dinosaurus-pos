@@ -1,5 +1,5 @@
 import type { CartItem } from '@/components/orders/CartContent'
-import { POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
+import type { OrderType } from '@/lib/api/domain'
 import { posStorageScope } from '@/lib/pos/sessionScope'
 
 const KEY_PREFIX = 'order_pos_draft_v1'
@@ -9,7 +9,7 @@ export type OrderPosDraftSnapshot = {
     savedAt: number
     cart: CartItem[]
     selectedCustomerId: string | null
-    selectedOrderType: POSKasirInternalOrdersRepositoryOrderType
+    selectedOrderType: OrderType
 }
 
 function storageKey(scope = posStorageScope()) {

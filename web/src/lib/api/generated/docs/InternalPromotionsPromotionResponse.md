@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **created_at** | **string** |  | [optional] [default to undefined]
 **deleted_at** | **string** |  | [optional] [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
-**discount_type** | [**POSKasirInternalPromotionsRepositoryDiscountType**](POSKasirInternalPromotionsRepositoryDiscountType.md) |  | [optional] [default to undefined]
+**discount_type** | [**DinosaurusPosInternalPromotionsRepositoryDiscountType**](DinosaurusPosInternalPromotionsRepositoryDiscountType.md) |  | [optional] [default to undefined]
 **discount_value** | **number** |  | [optional] [default to undefined]
 **end_date** | **string** |  | [optional] [default to undefined]
 **id** | **string** |  | [optional] [default to undefined]
@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 **max_discount_amount** | **number** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
 **rules** | [**Array&lt;InternalPromotionsPromotionRuleResponse&gt;**](InternalPromotionsPromotionRuleResponse.md) |  | [optional] [default to undefined]
-**scope** | [**POSKasirInternalPromotionsRepositoryPromotionScope**](POSKasirInternalPromotionsRepositoryPromotionScope.md) |  | [optional] [default to undefined]
+**scope** | [**DinosaurusPosInternalPromotionsRepositoryPromotionScope**](DinosaurusPosInternalPromotionsRepositoryPromotionScope.md) |  | [optional] [default to undefined]
 **start_date** | **string** |  | [optional] [default to undefined]
 **targets** | [**Array&lt;InternalPromotionsPromotionTargetResponse&gt;**](InternalPromotionsPromotionTargetResponse.md) |  | [optional] [default to undefined]
 **updated_at** | **string** |  | [optional] [default to undefined]
@@ -24,7 +24,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalPromotionsPromotionResponse } from 'restClient';
+import { InternalPromotionsPromotionResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalPromotionsPromotionResponse = {
     created_at,

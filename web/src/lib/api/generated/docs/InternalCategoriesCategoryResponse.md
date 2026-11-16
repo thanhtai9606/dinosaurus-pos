@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalCategoriesCategoryResponse } from 'restClient';
+import { InternalCategoriesCategoryResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalCategoriesCategoryResponse = {
     created_at,

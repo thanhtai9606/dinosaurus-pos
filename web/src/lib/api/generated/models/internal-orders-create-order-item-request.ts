@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -20,6 +20,8 @@ import type { InternalOrdersCreateOrderItemOptionRequest } from './internal-orde
 export interface InternalOrdersCreateOrderItemRequest {
     'options'?: Array<InternalOrdersCreateOrderItemOptionRequest>;
     'product_id': string;
+    'product_unit_id'?: string;
     'quantity': number;
+    'unit_price'?: number;
 }
 

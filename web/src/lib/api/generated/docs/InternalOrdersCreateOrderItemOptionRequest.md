@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalOrdersCreateOrderItemOptionRequest } from 'restClient';
+import { InternalOrdersCreateOrderItemOptionRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersCreateOrderItemOptionRequest = {
     product_option_id,

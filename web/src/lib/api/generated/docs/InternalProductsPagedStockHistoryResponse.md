@@ -6,12 +6,12 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **history** | [**Array&lt;InternalProductsStockHistoryResponse&gt;**](InternalProductsStockHistoryResponse.md) |  | [optional] [default to undefined]
-**pagination** | [**POSKasirInternalCommonPaginationPagination**](POSKasirInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
+**pagination** | [**DinosaurusPosInternalCommonPaginationPagination**](DinosaurusPosInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalProductsPagedStockHistoryResponse } from 'restClient';
+import { InternalProductsPagedStockHistoryResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalProductsPagedStockHistoryResponse = {
     history,

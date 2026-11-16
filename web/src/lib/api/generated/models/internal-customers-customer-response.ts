@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,9 +15,11 @@
 
 
 export interface InternalCustomersCustomerResponse {
-    'code'?: string;
     'address'?: string;
+    'code'?: string;
     'created_at'?: string;
+    'customer_group_id'?: string;
+    'customer_group_name'?: string;
     'email'?: string;
     'id'?: string;
     'name'?: string;

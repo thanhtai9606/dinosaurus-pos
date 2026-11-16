@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalPaymentMethodsPaymentMethodResponse } from 'restClient';
+import { InternalPaymentMethodsPaymentMethodResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalPaymentMethodsPaymentMethodResponse = {
     created_at,

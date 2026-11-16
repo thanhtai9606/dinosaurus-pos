@@ -1,7 +1,7 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { paymentMethodsApi } from "../client"
 import {
-    POSKasirInternalCommonErrorResponse,
     InternalPaymentMethodsPaymentMethodResponse,
 } from "../generated"
 import { AxiosError } from "axios"
@@ -10,7 +10,7 @@ import { useRBAC } from "@/lib/auth/rbac"
 export const paymentMethodsListQueryOptions = () =>
     queryOptions<
         InternalPaymentMethodsPaymentMethodResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['payment-methods', 'list'],
         queryFn: async () => {

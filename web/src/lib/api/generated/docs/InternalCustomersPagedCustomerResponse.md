@@ -6,12 +6,12 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **customers** | [**Array&lt;InternalCustomersCustomerResponse&gt;**](InternalCustomersCustomerResponse.md) |  | [optional] [default to undefined]
-**pagination** | [**POSKasirInternalCommonPaginationPagination**](POSKasirInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
+**pagination** | [**DinosaurusPosInternalCommonPaginationPagination**](DinosaurusPosInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalCustomersPagedCustomerResponse } from 'restClient';
+import { InternalCustomersPagedCustomerResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalCustomersPagedCustomerResponse = {
     customers,

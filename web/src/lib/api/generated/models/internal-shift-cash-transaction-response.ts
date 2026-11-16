@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalShiftRepositoryCashTransactionType } from './poskasir-internal-shift-repository-cash-transaction-type';
+import type { DinosaurusPosInternalShiftRepositoryCashTransactionType } from './dinosaurus-pos-internal-shift-repository-cash-transaction-type';
 
 export interface InternalShiftCashTransactionResponse {
     'amount'?: number;
@@ -24,7 +24,7 @@ export interface InternalShiftCashTransactionResponse {
     'description'?: string;
     'id'?: string;
     'shift_id'?: string;
-    'type'?: POSKasirInternalShiftRepositoryCashTransactionType;
+    'type'?: DinosaurusPosInternalShiftRepositoryCashTransactionType;
     'user_id'?: string;
 }
 

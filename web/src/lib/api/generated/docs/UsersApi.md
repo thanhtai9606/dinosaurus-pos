@@ -22,7 +22,7 @@ Retrieve a list of users with pagination, filtering, and sorting (Roles: admin, 
 import {
     UsersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new UsersApi(configuration);
@@ -86,7 +86,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **usersIdDelete**
-> POSKasirInternalCommonSuccessResponse usersIdDelete()
+> DinosaurusPosInternalCommonSuccessResponse usersIdDelete()
 
 Hard delete a user from the system by their ID (Roles: admin)
 
@@ -96,7 +96,7 @@ Hard delete a user from the system by their ID (Roles: admin)
 import {
     UsersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new UsersApi(configuration);
@@ -117,7 +117,7 @@ const { status, data } = await apiInstance.usersIdDelete(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -150,7 +150,7 @@ Retrieve detailed profile for a specific user by their ID (Roles: admin, manager
 import {
     UsersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new UsersApi(configuration);
@@ -205,7 +205,7 @@ import {
     UsersApi,
     Configuration,
     InternalUserUpdateUserRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new UsersApi(configuration);
@@ -254,7 +254,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **usersIdToggleStatusPost**
-> POSKasirInternalCommonSuccessResponse usersIdToggleStatusPost()
+> DinosaurusPosInternalCommonSuccessResponse usersIdToggleStatusPost()
 
 Toggle the is_active status of a user (Roles: admin)
 
@@ -264,7 +264,7 @@ Toggle the is_active status of a user (Roles: admin)
 import {
     UsersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new UsersApi(configuration);
@@ -285,7 +285,7 @@ const { status, data } = await apiInstance.usersIdToggleStatusPost(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -319,7 +319,7 @@ import {
     UsersApi,
     Configuration,
     InternalUserCreateUserRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new UsersApi(configuration);

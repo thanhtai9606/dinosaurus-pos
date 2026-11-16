@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalOrdersCancelOrderRequest } from 'restClient';
+import { InternalOrdersCancelOrderRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersCancelOrderRequest = {
     cancellation_notes,

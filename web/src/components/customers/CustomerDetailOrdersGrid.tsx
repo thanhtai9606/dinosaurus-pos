@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Calendar, CircleDollarSign, Hash } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 
 export type CustomerOrderRow = {
     id?: string
@@ -21,7 +21,7 @@ type Props = {
     onOrderClick?: (order: CustomerOrderRow) => void
     storageKey?: string
     server?: {
-        pagination?: POSKasirInternalCommonPaginationPagination
+        pagination?: ApiPagination
         onPageChange?: (page: number) => void
         onLimitChange?: (limit: number) => void
         isFetching?: boolean

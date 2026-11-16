@@ -1,8 +1,9 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 
 import {
     InternalCancellationReasonsCancellationReasonResponse,
-    POSKasirInternalCommonErrorResponse
+    ApiErrorBody
 } from "../generated"
 import { AxiosError } from "axios"
 import { cancellationReasonsApi } from "@/lib/api/client.ts";
@@ -12,7 +13,7 @@ import { useRBAC } from '@/lib/auth/rbac';
 export const cancellationReasonsListQueryOptions = () =>
     queryOptions<
         InternalCancellationReasonsCancellationReasonResponse[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['cancellation-reasons', 'list'],
         queryFn: async () => {

@@ -8,12 +8,12 @@ Name | Type | Description | Notes
 **amount** | **number** |  | [default to undefined]
 **category** | **string** |  | [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
-**type** | [**POSKasirInternalShiftRepositoryCashTransactionType**](POSKasirInternalShiftRepositoryCashTransactionType.md) |  | [default to undefined]
+**type** | [**DinosaurusPosInternalShiftRepositoryCashTransactionType**](DinosaurusPosInternalShiftRepositoryCashTransactionType.md) |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalShiftCashTransactionRequest } from 'restClient';
+import { InternalShiftCashTransactionRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalShiftCashTransactionRequest = {
     amount,

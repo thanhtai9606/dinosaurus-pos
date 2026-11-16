@@ -27,7 +27,7 @@ Get statistics on order cancellations grouped by reason (Roles: admin, manager, 
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -83,7 +83,7 @@ Get order counts and sales totals handled by each cashier (Roles: admin, manager
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -139,7 +139,7 @@ Get high-level summary metrics (totals) for the dashboard (Roles: admin, manager
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -195,7 +195,7 @@ Get products with stock below threshold
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -250,7 +250,7 @@ Get usage counts and totals for each payment method (Roles: admin, manager, cash
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -306,7 +306,7 @@ Get sales performance metrics for each product (Roles: admin, manager, cashier)
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -362,7 +362,7 @@ Get profitability metrics for each product sold (Roles: admin, manager, cashier)
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -418,7 +418,7 @@ Get gross profit analytics grouped by date (Roles: admin, manager, cashier)
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -474,7 +474,7 @@ Get metrics of promotions usage
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -533,7 +533,7 @@ Get aggregated sales data grouped by date within a specified range (Roles: admin
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);
@@ -589,7 +589,7 @@ Get historical shifts and their cash differences
 import {
     ReportsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ReportsApi(configuration);

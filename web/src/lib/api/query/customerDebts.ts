@@ -4,7 +4,7 @@ import { axiosInstance } from '../client'
 import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
-import { POSKasirInternalCommonErrorResponse } from '../generated'
+import { ApiErrorBody } from '../domain'
 import type { DebtStatus, SupplierDebtPayment } from './supplierDebts'
 
 export type { DebtStatus }
@@ -41,7 +41,7 @@ export type CustomerDebtsListParams = {
 }
 
 export const customerDebtsListQueryOptions = (params?: CustomerDebtsListParams) =>
-    queryOptions<PagedCustomerDebts, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<PagedCustomerDebts, AxiosError<ApiErrorBody>>({
         queryKey: ['customer-debts', 'list', params],
         queryFn: async () => {
             const res = await axiosInstance.get('/customer-debts', { params })
@@ -57,7 +57,7 @@ export const useCustomerDebtsListQuery = (params?: CustomerDebtsListParams) => {
 }
 
 export const customerDebtDetailQueryOptions = (id: string) =>
-    queryOptions<CustomerDebt, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<CustomerDebt, AxiosError<ApiErrorBody>>({
         queryKey: ['customer-debts', 'detail', id],
         queryFn: async () => {
             const res = await axiosInstance.get(`/customer-debts/${id}`)
@@ -93,7 +93,7 @@ export const useCreateCustomerDebtMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['customer-debts'] })
                 toast.success(t('customerDebts.messages.create_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('customerDebts.messages.create_failed', { message: error.response?.data?.message || '' }))
             },
         }),

@@ -4,7 +4,7 @@ import { axiosInstance } from '../client'
 import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
-import { POSKasirInternalCommonErrorResponse } from '../generated'
+import { ApiErrorBody } from '../domain'
 
 export type CustomerGroup = {
     id: string
@@ -23,7 +23,7 @@ export type PagedCustomerGroups = {
 export type CustomerGroupsListParams = { page?: number; limit?: number; search?: string }
 
 export const customerGroupsListQueryOptions = (params?: CustomerGroupsListParams) =>
-    queryOptions<PagedCustomerGroups, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<PagedCustomerGroups, AxiosError<ApiErrorBody>>({
         queryKey: ['customer-groups', 'list', params],
         queryFn: async () => {
             const res = await axiosInstance.get('/customer-groups', { params })
@@ -53,7 +53,7 @@ export const useCreateCustomerGroupMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['customer-groups', 'list'] })
                 toast.success(t('customerGroups.messages.create_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('customerGroups.messages.create_failed', { message: error.response?.data?.message || '' }))
             },
         }),
@@ -76,7 +76,7 @@ export const useUpdateCustomerGroupMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['customer-groups', 'list'] })
                 toast.success(t('customerGroups.messages.update_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('customerGroups.messages.update_failed', { message: error.response?.data?.message || '' }))
             },
         }),
@@ -98,7 +98,7 @@ export const useDeleteCustomerGroupMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['customer-groups', 'list'] })
                 toast.success(t('customerGroups.messages.delete_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('customerGroups.messages.delete_failed', { message: error.response?.data?.message || '' }))
             },
         }),

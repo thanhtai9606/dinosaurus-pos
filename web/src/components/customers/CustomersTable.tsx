@@ -2,10 +2,10 @@ import { useMemo } from 'react'
 import { Users, Phone, Mail, MapPin, Hash, Settings2, Tags } from 'lucide-react'
 import type { CustomerProfile } from '@/lib/api/query/customers'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 
 type ServerState = {
-    pagination?: POSKasirInternalCommonPaginationPagination
+    pagination?: ApiPagination
     onPageChange?: (page: number) => void
     onLimitChange?: (limit: number) => void
     isFetching?: boolean

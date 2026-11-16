@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import { UserRole } from '@/lib/api/domain'
 import {
     activityLogsListQueryOptions,
     type ActivityLogsSearch,
@@ -18,8 +18,8 @@ import { ActivityLogsTable } from '@/components/activity-logs/ActivityLogsTable'
 export const Route = createFileRoute('/_dashboard/activity-logs')({
     beforeLoad: async ({ context: { queryClient } }) => {
         const user = await queryClient.ensureQueryData(meQueryOptions())
-        const allowedRoles: POSKasirInternalUserRepositoryUserRole[] = [
-            POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
+        const allowedRoles: UserRole[] = [
+            UserRole.UserRoleAdmin,
         ]
         if (!user || !user.role || !allowedRoles.includes(user.role)) {
             throw redirect({

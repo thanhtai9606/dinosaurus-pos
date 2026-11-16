@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalReportPromotionPerformanceResponse } from 'restClient';
+import { InternalReportPromotionPerformanceResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalReportPromotionPerformanceResponse = {
     promotion_id,

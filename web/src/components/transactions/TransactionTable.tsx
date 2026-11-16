@@ -1,3 +1,4 @@
+import { OrderStatus } from '@/lib/api/domain'
 import { Loader2, Utensils, ShoppingBag, CheckCircle, XCircle, Banknote, Hash, User, List, CircleDot, Settings2 } from 'lucide-react'
 import { DataTableSkeleton } from '@/components/ui/list-skeletons'
 import { TableColumnHeader } from '@/components/data-table/TableColumnHeader'
@@ -18,14 +19,13 @@ import {
     SelectTrigger,
 } from "@/components/ui/select"
 import { useFormatMoney } from '@/context/MoneyContext'
-import { POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
 
 interface TransactionTableProps {
     orders: any[]
     isLoading: boolean
     userMap: Map<string, string>
     mutatingOrderId: string | null
-    handleStatusUpdate: (id: string, newStatus: POSKasirInternalOrdersRepositoryOrderStatus) => void
+    handleStatusUpdate: (id: string, newStatus: OrderStatus) => void
     handleOpenPayment: (order: any) => void
     handleOpenCancel: (order: any) => void
     handleOpenRefund: (order: any) => void
@@ -139,10 +139,10 @@ export function TransactionTable({
                             <TableCell>
                                 <Select
                                     value={order.status}
-                                    disabled={!canUpdateStatus || mutatingOrderId === order.id || order.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid || order.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled}
+                                    disabled={!canUpdateStatus || mutatingOrderId === order.id || order.status === OrderStatus.OrderStatusPaid || order.status === OrderStatus.OrderStatusCancelled}
                                     onValueChange={(val) => {
-                                        if (order.id && val !== POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid && val !== POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled) {
-                                            handleStatusUpdate(order.id, val as POSKasirInternalOrdersRepositoryOrderStatus)
+                                        if (order.id && val !== OrderStatus.OrderStatusPaid && val !== OrderStatus.OrderStatusCancelled) {
+                                            handleStatusUpdate(order.id, val as OrderStatus)
                                         } else {
                                             // Optional: Alerting that specific status needs separate action
                                         }
@@ -150,7 +150,7 @@ export function TransactionTable({
                                 >
                                     <SelectTrigger className="w-[140px] h-8 border-none bg-transparent hover:bg-muted focus:ring-0 p-0">
                                         <Badge
-                                            variant={order.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid ? 'default' : order.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled ? 'destructive' : 'secondary'}
+                                            variant={order.status === OrderStatus.OrderStatusPaid ? 'default' : order.status === OrderStatus.OrderStatusCancelled ? 'destructive' : 'secondary'}
                                             className={`capitalize cursor-pointer w-full justify-center gap-2`}
                                         >
                                             {mutatingOrderId === order.id && <Loader2 className="h-3 w-3 animate-spin" />}
@@ -158,39 +158,39 @@ export function TransactionTable({
                                         </Badge>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value={POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusOpen}>{t('transactions.status.open')}</SelectItem>
-                                        <SelectItem value={POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusInProgress}>{t('transactions.status.in_progress')}</SelectItem>
-                                        <SelectItem value={POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusServed}>{t('transactions.status.served')}</SelectItem>
+                                        <SelectItem value={OrderStatus.OrderStatusOpen}>{t('transactions.status.open')}</SelectItem>
+                                        <SelectItem value={OrderStatus.OrderStatusInProgress}>{t('transactions.status.in_progress')}</SelectItem>
+                                        <SelectItem value={OrderStatus.OrderStatusServed}>{t('transactions.status.served')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </TableCell>
                             <TableCell className="text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                    {canPay && !order.is_paid && order.status !== POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled && (
+                                    {canPay && !order.is_paid && order.status !== OrderStatus.OrderStatusCancelled && (
                                         <Button size="sm" variant="default" className="h-8 gap-1" onClick={() => handleOpenPayment(order)}>
                                             <Banknote className="h-3.5 w-3.5" />
                                             {t('transactions.actions_button.pay')}
                                         </Button>
                                     )}
-                                    {canUpdateStatus && order.is_paid && order.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusInProgress && (
-                                        <Button size="sm" variant="outline" className="h-8 gap-1 border-primary text-primary hover:bg-primary/10" onClick={() => handleStatusUpdate(order.id!, POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusServed)} disabled={mutatingOrderId === order.id}>
+                                    {canUpdateStatus && order.is_paid && order.status === OrderStatus.OrderStatusInProgress && (
+                                        <Button size="sm" variant="outline" className="h-8 gap-1 border-primary text-primary hover:bg-primary/10" onClick={() => handleStatusUpdate(order.id!, OrderStatus.OrderStatusServed)} disabled={mutatingOrderId === order.id}>
                                             <Utensils className="h-3.5 w-3.5" />
                                             {t('transactions.status.served')}
                                         </Button>
                                     )}
-                                    {canUpdateStatus && order.is_paid && order.status === POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusServed && (
+                                    {canUpdateStatus && order.is_paid && order.status === OrderStatus.OrderStatusServed && (
                                         <Button size="sm" variant="default" className="h-8 gap-1" onClick={() => handleFinish(order)} disabled={mutatingOrderId === order.id}>
                                             <CheckCircle className="h-3.5 w-3.5" />
                                             {t('transactions.actions_button.complete')}
                                         </Button>
                                     )}
-                                    {canCancel && (!order.is_paid && order.status !== POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled && order.status !== POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid) && (
+                                    {canCancel && (!order.is_paid && order.status !== OrderStatus.OrderStatusCancelled && order.status !== OrderStatus.OrderStatusPaid) && (
                                         <Button size="sm" variant="destructive" className="h-8 gap-1" onClick={() => handleOpenCancel(order)}>
                                             <XCircle className="h-3.5 w-3.5" />
                                             {t('transactions.actions_button.cancel')}
                                         </Button>
                                     )}
-                                    {canRefund && order.is_paid && order.status !== POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusCancelled && (
+                                    {canRefund && order.is_paid && order.status !== OrderStatus.OrderStatusCancelled && (
                                         <Button size="sm" variant="destructive" className="h-8 gap-1" onClick={() => handleOpenRefund(order)}>
                                             <XCircle className="h-3.5 w-3.5" />
                                             {t('transactions.actions_button.refund', 'Refund')}

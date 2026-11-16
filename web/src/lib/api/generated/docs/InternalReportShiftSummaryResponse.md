@@ -18,7 +18,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalReportShiftSummaryResponse } from 'restClient';
+import { InternalReportShiftSummaryResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalReportShiftSummaryResponse = {
     actual_cash_end,

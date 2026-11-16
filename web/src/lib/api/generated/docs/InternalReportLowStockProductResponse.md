@@ -5,18 +5,22 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**min_stock** | **number** |  | [optional] [default to undefined]
 **product_id** | **string** |  | [optional] [default to undefined]
 **product_name** | **string** |  | [optional] [default to undefined]
+**sku** | **string** |  | [optional] [default to undefined]
 **stock** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalReportLowStockProductResponse } from 'restClient';
+import { InternalReportLowStockProductResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalReportLowStockProductResponse = {
+    min_stock,
     product_id,
     product_name,
+    sku,
     stock,
 };
 ```

@@ -10,7 +10,7 @@ All URIs are relative to *http://localhost:8080/api/v1*
 |[**settingsPrinterTestPost**](#settingsprintertestpost) | **POST** /settings/printer/test | Test printer connection|
 
 # **ordersIdPrintDataGet**
-> POSKasirInternalCommonSuccessResponse ordersIdPrintDataGet()
+> DinosaurusPosInternalCommonSuccessResponse ordersIdPrintDataGet()
 
 Get raw invoice print data for FE printing (Roles: admin, manager, cashier)
 
@@ -20,7 +20,7 @@ Get raw invoice print data for FE printing (Roles: admin, manager, cashier)
 import {
     PrinterApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PrinterApi(configuration);
@@ -41,7 +41,7 @@ const { status, data } = await apiInstance.ordersIdPrintDataGet(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -63,7 +63,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ordersIdPrintPost**
-> POSKasirInternalCommonSuccessResponse ordersIdPrintPost()
+> DinosaurusPosInternalCommonSuccessResponse ordersIdPrintPost()
 
 Trigger printing of invoice for a specific order (Roles: admin, manager, cashier)
 
@@ -73,7 +73,7 @@ Trigger printing of invoice for a specific order (Roles: admin, manager, cashier
 import {
     PrinterApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PrinterApi(configuration);
@@ -94,7 +94,7 @@ const { status, data } = await apiInstance.ordersIdPrintPost(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -116,7 +116,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **settingsPrinterDiscoverGet**
-> POSKasirInternalCommonSuccessResponse settingsPrinterDiscoverGet()
+> DinosaurusPosInternalCommonSuccessResponse settingsPrinterDiscoverGet()
 
 Scan local network for thermal printers on port 9100 (Roles: admin)
 
@@ -126,7 +126,7 @@ Scan local network for thermal printers on port 9100 (Roles: admin)
 import {
     PrinterApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PrinterApi(configuration);
@@ -140,7 +140,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -161,7 +161,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **settingsPrinterTestPost**
-> POSKasirInternalCommonSuccessResponse settingsPrinterTestPost()
+> DinosaurusPosInternalCommonSuccessResponse settingsPrinterTestPost()
 
 Send a test print command to the configured printer (Roles: admin)
 
@@ -171,7 +171,7 @@ Send a test print command to the configured printer (Roles: admin)
 import {
     PrinterApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PrinterApi(configuration);
@@ -185,7 +185,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 

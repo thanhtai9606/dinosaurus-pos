@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalOrdersRefundOrderRequest } from 'restClient';
+import { InternalOrdersRefundOrderRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersRefundOrderRequest = {
     reason,

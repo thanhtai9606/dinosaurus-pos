@@ -1,7 +1,7 @@
 import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { categoriesApi } from "../../api/client"
 import {
-    POSKasirInternalCommonErrorResponse,
     InternalCategoriesCategoryResponse,
     InternalCategoriesCreateCategoryRequest
 } from "../generated"
@@ -22,7 +22,7 @@ export type CategoriesListParams = {
 export const categoriesListQueryOptions = (params?: CategoriesListParams) =>
     queryOptions<
         Category[],
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['categories', 'list', params],
         queryFn: async () => {
@@ -51,7 +51,7 @@ export const useCategoriesListQuery = (params?: CategoriesListParams) => {
 export const categoryDetailQueryOptions = (id: number) =>
     queryOptions<
         Category,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['categories', 'detail', id],
         queryFn: async () => {
@@ -79,7 +79,7 @@ export const useCreateCategoryMutation = () => {
 
     const mutation = useMutation<
         Category,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         InternalCategoriesCreateCategoryRequest
     >({
         mutationKey: ['categories', 'create'],
@@ -110,7 +110,7 @@ export const useUpdateCategoryMutation = () => {
 
     const mutation = useMutation<
         Category,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         { id: number; body: InternalCategoriesCreateCategoryRequest }
     >({
         mutationKey: ['categories', 'update'],
@@ -141,7 +141,7 @@ export const useDeleteCategoryMutation = () => {
 
     const mutation = useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         number
     >({
         mutationKey: ['categories', 'delete'],

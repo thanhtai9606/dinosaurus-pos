@@ -5,12 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | [**POSKasirInternalOrdersRepositoryOrderStatus**](POSKasirInternalOrdersRepositoryOrderStatus.md) |  | [default to undefined]
+**status** | [**DinosaurusPosInternalOrdersRepositoryOrderStatus**](DinosaurusPosInternalOrdersRepositoryOrderStatus.md) |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalOrdersUpdateOrderStatusRequest } from 'restClient';
+import { InternalOrdersUpdateOrderStatusRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersUpdateOrderStatusRequest = {
     status,

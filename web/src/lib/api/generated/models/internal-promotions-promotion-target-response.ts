@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,12 +15,12 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalPromotionsRepositoryPromotionTargetType } from './poskasir-internal-promotions-repository-promotion-target-type';
+import type { DinosaurusPosInternalPromotionsRepositoryPromotionTargetType } from './dinosaurus-pos-internal-promotions-repository-promotion-target-type';
 
 export interface InternalPromotionsPromotionTargetResponse {
     'id'?: string;
     'target_id'?: string;
-    'target_type'?: POSKasirInternalPromotionsRepositoryPromotionTargetType;
+    'target_type'?: DinosaurusPosInternalPromotionsRepositoryPromotionTargetType;
 }
 
 

@@ -37,31 +37,31 @@ import {
     useUpdatePromotionMutation
 } from '@/lib/api/query/promotions'
 import {
-    POSKasirInternalPromotionsRepositoryDiscountType,
-    POSKasirInternalPromotionsRepositoryPromotionScope,
-    POSKasirInternalPromotionsRepositoryPromotionRuleType,
-    POSKasirInternalPromotionsRepositoryPromotionTargetType
-} from '@/lib/api/generated'
+    DiscountType,
+    PromotionScope,
+    PromotionRuleType,
+    PromotionTargetType
+} from '@/lib/api/domain'
 import { useProductsListQuery } from '@/lib/api/query/products'
 import { useCategoriesListQuery } from '@/lib/api/query/categories'
 
 const promotionSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     description: z.string().optional(),
-    scope: z.nativeEnum(POSKasirInternalPromotionsRepositoryPromotionScope),
-    discount_type: z.nativeEnum(POSKasirInternalPromotionsRepositoryDiscountType),
+    scope: z.nativeEnum(PromotionScope),
+    discount_type: z.nativeEnum(DiscountType),
     discount_value: z.coerce.number().min(0),
     max_discount_amount: z.coerce.number().optional(),
     start_date: z.date(),
     end_date: z.date(),
     is_active: z.boolean().default(true),
     rules: z.array(z.object({
-        rule_type: z.nativeEnum(POSKasirInternalPromotionsRepositoryPromotionRuleType),
+        rule_type: z.nativeEnum(PromotionRuleType),
         rule_value: z.string().min(1, "Value required"),
         description: z.string().optional()
     })).default([]),
     targets: z.array(z.object({
-        target_type: z.nativeEnum(POSKasirInternalPromotionsRepositoryPromotionTargetType),
+        target_type: z.nativeEnum(PromotionTargetType),
         target_id: z.string().min(1, "ID required")
     })).default([])
 })
@@ -87,20 +87,20 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
         defaultValues: {
             name: '',
             description: '' as string | undefined,
-            scope: POSKasirInternalPromotionsRepositoryPromotionScope.PromotionScopeORDER as POSKasirInternalPromotionsRepositoryPromotionScope,
-            discount_type: POSKasirInternalPromotionsRepositoryDiscountType.DiscountTypePercentage as POSKasirInternalPromotionsRepositoryDiscountType,
+            scope: PromotionScope.PromotionScopeORDER as PromotionScope,
+            discount_type: DiscountType.DiscountTypePercentage as DiscountType,
             discount_value: 0,
             max_discount_amount: 0 as number | undefined,
             start_date: new Date(),
             end_date: new Date(),
             is_active: true,
             rules: [] as {
-                rule_type: POSKasirInternalPromotionsRepositoryPromotionRuleType;
+                rule_type: PromotionRuleType;
                 rule_value: string;
                 description?: string;
             }[],
             targets: [] as {
-                target_type: POSKasirInternalPromotionsRepositoryPromotionTargetType;
+                target_type: PromotionTargetType;
                 target_id: string;
             }[]
         },
@@ -153,8 +153,8 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                 form.reset({
                     name: '',
                     description: '',
-                    scope: POSKasirInternalPromotionsRepositoryPromotionScope.PromotionScopeORDER,
-                    discount_type: POSKasirInternalPromotionsRepositoryDiscountType.DiscountTypePercentage,
+                    scope: PromotionScope.PromotionScopeORDER,
+                    discount_type: DiscountType.DiscountTypePercentage,
                     discount_value: 0,
                     max_discount_amount: 0,
                     start_date: new Date(),
@@ -211,13 +211,13 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                             children={(field) => (
                                 <div className="space-y-2">
                                     <Label htmlFor={field.name}>{t('promotions.form.scope')}</Label>
-                                    <Select onValueChange={(val) => field.handleChange(val as POSKasirInternalPromotionsRepositoryPromotionScope)} value={field.state.value}>
+                                    <Select onValueChange={(val) => field.handleChange(val as PromotionScope)} value={field.state.value}>
                                         <SelectTrigger id={field.name}>
                                             <SelectValue placeholder={t('promotions.form.select_scope')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value={POSKasirInternalPromotionsRepositoryPromotionScope.PromotionScopeORDER}>{t('promotions.scope.ORDER')}</SelectItem>
-                                            <SelectItem value={POSKasirInternalPromotionsRepositoryPromotionScope.PromotionScopeITEM}>{t('promotions.scope.ITEM')}</SelectItem>
+                                            <SelectItem value={PromotionScope.PromotionScopeORDER}>{t('promotions.scope.ORDER')}</SelectItem>
+                                            <SelectItem value={PromotionScope.PromotionScopeITEM}>{t('promotions.scope.ITEM')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {field.state.meta.errors.length > 0 && (
@@ -253,13 +253,13 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                             children={(field) => (
                                 <div className="space-y-2">
                                     <Label htmlFor={field.name}>{t('promotions.form.discount_type')}</Label>
-                                    <Select onValueChange={(val) => field.handleChange(val as POSKasirInternalPromotionsRepositoryDiscountType)} value={field.state.value}>
+                                    <Select onValueChange={(val) => field.handleChange(val as DiscountType)} value={field.state.value}>
                                         <SelectTrigger id={field.name}>
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value={POSKasirInternalPromotionsRepositoryDiscountType.DiscountTypePercentage}>{t('promotions.types.percentage')}</SelectItem>
-                                            <SelectItem value={POSKasirInternalPromotionsRepositoryDiscountType.DiscountTypeFixedAmount}>{t('promotions.types.fixed_amount')}</SelectItem>
+                                            <SelectItem value={DiscountType.DiscountTypePercentage}>{t('promotions.types.percentage')}</SelectItem>
+                                            <SelectItem value={DiscountType.DiscountTypeFixedAmount}>{t('promotions.types.fixed_amount')}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {field.state.meta.errors.length > 0 && (
@@ -390,7 +390,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-medium">{t('promotions.form.rules')}</h3>
                                     <Button type="button" variant="outline" size="sm" onClick={() => field.pushValue({
-                                        rule_type: POSKasirInternalPromotionsRepositoryPromotionRuleType.PromotionRuleTypeMINIMUMORDERAMOUNT,
+                                        rule_type: PromotionRuleType.PromotionRuleTypeMINIMUMORDERAMOUNT,
                                         rule_value: '0'
                                     })}>
                                         <Plus className="mr-2 h-4 w-4" /> {t('promotions.form.add_rule')}
@@ -403,14 +403,14 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                             children={(typeField) => (
                                                 <div className="flex-1 space-y-2">
                                                     <Label className="text-sm">{t('promotions.form.rule_type')}</Label>
-                                                    <Select onValueChange={(val) => typeField.handleChange(val as POSKasirInternalPromotionsRepositoryPromotionRuleType)} value={typeField.state.value}>
+                                                    <Select onValueChange={(val) => typeField.handleChange(val as PromotionRuleType)} value={typeField.state.value}>
                                                         <SelectTrigger>
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value={POSKasirInternalPromotionsRepositoryPromotionRuleType.PromotionRuleTypeMINIMUMORDERAMOUNT}>{t('promotions.form.rule_min_order_amount')}</SelectItem>
-                                                            <SelectItem value={POSKasirInternalPromotionsRepositoryPromotionRuleType.PromotionRuleTypeREQUIREDPRODUCT}>{t('promotions.form.rule_required_product')}</SelectItem>
-                                                            <SelectItem value={POSKasirInternalPromotionsRepositoryPromotionRuleType.PromotionRuleTypeREQUIREDCATEGORY}>{t('promotions.form.rule_required_category')}</SelectItem>
+                                                            <SelectItem value={PromotionRuleType.PromotionRuleTypeMINIMUMORDERAMOUNT}>{t('promotions.form.rule_min_order_amount')}</SelectItem>
+                                                            <SelectItem value={PromotionRuleType.PromotionRuleTypeREQUIREDPRODUCT}>{t('promotions.form.rule_required_product')}</SelectItem>
+                                                            <SelectItem value={PromotionRuleType.PromotionRuleTypeREQUIREDCATEGORY}>{t('promotions.form.rule_required_category')}</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
@@ -419,9 +419,9 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                         <form.Field
                                             name={`rules[${index}].rule_value`}
                                             children={(valField) => {
-                                                const ruleType = form.getFieldValue(`rules[${index}].rule_type`) as POSKasirInternalPromotionsRepositoryPromotionRuleType
+                                                const ruleType = form.getFieldValue(`rules[${index}].rule_type`) as PromotionRuleType
 
-                                                if (ruleType === POSKasirInternalPromotionsRepositoryPromotionRuleType.PromotionRuleTypeREQUIREDPRODUCT) {
+                                                if (ruleType === PromotionRuleType.PromotionRuleTypeREQUIREDPRODUCT) {
                                                     return (
                                                         <div className="flex-1 space-y-2">
                                                             <Label className="text-sm">{t('promotions.form.rule_value')}</Label>
@@ -439,7 +439,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                                     )
                                                 }
 
-                                                if (ruleType === POSKasirInternalPromotionsRepositoryPromotionRuleType.PromotionRuleTypeREQUIREDCATEGORY) {
+                                                if (ruleType === PromotionRuleType.PromotionRuleTypeREQUIREDCATEGORY) {
                                                     return (
                                                         <div className="flex-1 space-y-2">
                                                             <Label className="text-sm">{t('promotions.form.rule_value')}</Label>
@@ -487,7 +487,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-medium">{t('promotions.form.targets')}</h3>
                                     <Button type="button" variant="outline" size="sm" onClick={() => field.pushValue({
-                                        target_type: POSKasirInternalPromotionsRepositoryPromotionTargetType.PromotionTargetTypePRODUCT,
+                                        target_type: PromotionTargetType.PromotionTargetTypePRODUCT,
                                         target_id: ''
                                     })}>
                                         <Plus className="mr-2 h-4 w-4" /> {t('promotions.form.add_target')}
@@ -500,13 +500,13 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                             children={(typeField) => (
                                                 <div className="flex-1 space-y-2">
                                                     <Label className="text-sm">{t('promotions.form.target_type')}</Label>
-                                                    <Select onValueChange={(val) => typeField.handleChange(val as POSKasirInternalPromotionsRepositoryPromotionTargetType)} value={typeField.state.value}>
+                                                    <Select onValueChange={(val) => typeField.handleChange(val as PromotionTargetType)} value={typeField.state.value}>
                                                         <SelectTrigger>
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value={POSKasirInternalPromotionsRepositoryPromotionTargetType.PromotionTargetTypePRODUCT}>{t('promotions.types.product')}</SelectItem>
-                                                            <SelectItem value={POSKasirInternalPromotionsRepositoryPromotionTargetType.PromotionTargetTypeCATEGORY}>{t('promotions.types.category')}</SelectItem>
+                                                            <SelectItem value={PromotionTargetType.PromotionTargetTypePRODUCT}>{t('promotions.types.product')}</SelectItem>
+                                                            <SelectItem value={PromotionTargetType.PromotionTargetTypeCATEGORY}>{t('promotions.types.category')}</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
@@ -515,9 +515,9 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                         <form.Field
                                             name={`targets[${index}].target_id`}
                                             children={(idField) => {
-                                                const targetType = form.getFieldValue(`targets[${index}].target_type`) as POSKasirInternalPromotionsRepositoryPromotionTargetType
+                                                const targetType = form.getFieldValue(`targets[${index}].target_type`) as PromotionTargetType
 
-                                                if (targetType === POSKasirInternalPromotionsRepositoryPromotionTargetType.PromotionTargetTypePRODUCT) {
+                                                if (targetType === PromotionTargetType.PromotionTargetTypePRODUCT) {
                                                     return (
                                                         <div className="flex-1 space-y-2">
                                                             <Label className="text-sm">{t('promotions.form.target_id')}</Label>
@@ -535,7 +535,7 @@ export function PromotionFormDialog({ open, onOpenChange, promotionToEdit }: Pro
                                                     )
                                                 }
 
-                                                if (targetType === POSKasirInternalPromotionsRepositoryPromotionTargetType.PromotionTargetTypeCATEGORY) {
+                                                if (targetType === PromotionTargetType.PromotionTargetTypeCATEGORY) {
                                                     return (
                                                         <div className="flex-1 space-y-2">
                                                             <Label className="text-sm">{t('promotions.form.target_id')}</Label>

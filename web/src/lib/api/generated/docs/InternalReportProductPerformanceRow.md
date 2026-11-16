@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalReportProductPerformanceRow } from 'restClient';
+import { InternalReportProductPerformanceRow } from 'dinosaurus-pos-api';
 
 const instance: InternalReportProductPerformanceRow = {
     product_id,

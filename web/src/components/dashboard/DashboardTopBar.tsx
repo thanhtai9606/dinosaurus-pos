@@ -6,14 +6,14 @@ import { StoreWelcome } from '@/components/dashboard/StoreWelcome'
 import { DashboardMobileNav } from '@/components/dashboard/DashboardMobileNav'
 import type { DashboardBranding, DashboardSessionUser } from '@/components/dashboard/types'
 import type { DashboardMenuEntry } from '@/hooks/useNavigationMenu'
-import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import { UserRole } from '@/lib/api/domain'
 import { PosStatusIndicator } from '@/components/dashboard/PosStatusIndicator'
 
 type Props = {
   branding?: DashboardBranding
   filteredMenu: DashboardMenuEntry[]
   user: DashboardSessionUser | null | undefined
-  userRole?: POSKasirInternalUserRepositoryUserRole | string
+  userRole?: UserRole | string
   isSuperAdmin: boolean
   handleLogout: () => void
 }

@@ -21,3 +21,4 @@ Always-on project rules: `.cursor/rules/*.mdc` (Zustand list state, DataGrid, Go
 - **Commits / push:** only when the user asks explicitly.
 - **Scope:** match existing patterns in `internal/` and `web/`; i18n vi/en/id for UI strings.
 - **Verify:** `go build ./cmd/app/...`, `pnpm run build` in `web/` before claiming done.
+- **OpenAPI client:** after Go API/swagger changes run `make swag` (cleans `web/src/lib/api/generated/{models,api,docs}` via `pnpm api:gen`). UI code should import enums/errors/pagination from `web/src/lib/api/domain.ts`, not long `DinosaurusPos*` names.

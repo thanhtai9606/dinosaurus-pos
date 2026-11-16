@@ -1,9 +1,9 @@
-import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import { UserRole } from '@/lib/api/domain'
 
 export type TenantRole =
-    | POSKasirInternalUserRepositoryUserRole.UserRoleAdmin
-    | POSKasirInternalUserRepositoryUserRole.UserRoleManager
-    | POSKasirInternalUserRepositoryUserRole.UserRoleCashier
+    | UserRole.UserRoleAdmin
+    | UserRole.UserRoleManager
+    | UserRole.UserRoleCashier
 
 export type MenuCatalogItem = {
     key: string

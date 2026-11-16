@@ -7,12 +7,12 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [optional] [default to undefined]
 **target_id** | **string** |  | [optional] [default to undefined]
-**target_type** | [**POSKasirInternalPromotionsRepositoryPromotionTargetType**](POSKasirInternalPromotionsRepositoryPromotionTargetType.md) |  | [optional] [default to undefined]
+**target_type** | [**DinosaurusPosInternalPromotionsRepositoryPromotionTargetType**](DinosaurusPosInternalPromotionsRepositoryPromotionTargetType.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalPromotionsPromotionTargetResponse } from 'restClient';
+import { InternalPromotionsPromotionTargetResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalPromotionsPromotionTargetResponse = {
     id,

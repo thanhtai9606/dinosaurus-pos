@@ -1404,6 +1404,444 @@ const docTemplate = `{
                 ]
             }
         },
+        "/measurement-units": {
+            "get": {
+                "tags": [
+                    "MeasurementUnits"
+                ],
+                "summary": "List measurement units",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "MeasurementUnits"
+                ],
+                "summary": "Create measurement unit",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/measurement-units/{id}": {
+            "get": {
+                "tags": [
+                    "MeasurementUnits"
+                ],
+                "summary": "Get measurement unit",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "MeasurementUnits"
+                ],
+                "summary": "Update measurement unit",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "MeasurementUnits"
+                ],
+                "summary": "Delete measurement unit",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/notification-channels": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "List notification channels",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Create notification channel",
+                "parameters": [
+                    {
+                        "description": "channel",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_notifications.CreateChannelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/notification-channels/{id}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Update notification channel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "channel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "channel",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_notifications.UpdateChannelRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Delete notification channel",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "channel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/notification-channels/{id}/test": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Send test notification",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "channel ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/notification-deliveries": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Notification delivery log",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/notification-devices": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Unregister FCM device token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            }
+        },
+        "/notification-devices/register": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Register FCM device token",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            }
+        },
+        "/notification-event-types": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "List notification event types",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            }
+        },
+        "/notification-subscriptions/me": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "My notification subscriptions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Update my notification subscriptions",
+                "parameters": [
+                    {
+                        "description": "items",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_notifications.UpdateSubscriptionsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            }
+        },
+        "/notifications/config": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Notification tenant settings",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Update notification tenant settings",
+                "parameters": [
+                    {
+                        "description": "config",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_notifications.UpdateTenantConfigRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
+        "/notifications/reports/test": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Send test scheduled report email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "daily|monthly|yearly",
+                        "name": "period",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
         "/orders": {
             "get": {
                 "description": "Get a list of orders with filtering by status and user (Roles: admin, manager, cashier)",
@@ -5088,6 +5526,88 @@ const docTemplate = `{
                 ]
             }
         },
+        "/settings/menu-access": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Get menu role access",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_settings.MenuRoleAccessResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Update menu role access",
+                "parameters": [
+                    {
+                        "description": "Menu overrides",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_settings.UpdateMenuRoleAccessRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dinosaurus-pos_internal_common.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/internal_settings.MenuRoleAccessResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-roles": [
+                    "admin"
+                ]
+            }
+        },
         "/settings/printer": {
             "get": {
                 "description": "Retrieve printer settings like connection string and paper width (Roles: authenticated)",
@@ -5516,6 +6036,80 @@ const docTemplate = `{
                 ]
             }
         },
+        "/stock-adjustments": {
+            "get": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "List stock adjustments",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Create stock adjustment",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-adjustments/{id}": {
+            "get": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Get stock adjustment",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Update stock adjustment draft",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-adjustments/{id}/complete": {
+            "post": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Complete stock adjustment",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-movements": {
+            "get": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "List stock movements",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
         "/stock-receipts": {
             "get": {
                 "tags": [
@@ -5772,6 +6366,128 @@ const docTemplate = `{
                         }
                     }
                 },
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-takes": {
+            "get": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "List stock takes",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Create stock take",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-takes/{id}": {
+            "get": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Get stock take",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Update stock take draft",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-takes/{id}/post": {
+            "post": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Post stock take",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-transfers": {
+            "get": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "List stock transfers",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Create stock transfer",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-transfers/{id}": {
+            "get": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Get stock transfer",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Update stock transfer draft",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/stock-transfers/{id}/complete": {
+            "post": {
+                "tags": [
+                    "StockOps"
+                ],
+                "summary": "Complete stock transfer",
+                "responses": {},
                 "x-roles": [
                     "admin",
                     "manager"
@@ -6436,6 +7152,81 @@ const docTemplate = `{
                     "admin"
                 ]
             }
+        },
+        "/warehouses": {
+            "get": {
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "List warehouses",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "Create warehouse",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/warehouses/{id}": {
+            "get": {
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "Get warehouse",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "Update warehouse",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "Delete warehouse",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager"
+                ]
+            }
+        },
+        "/warehouses/{id}/stock": {
+            "get": {
+                "tags": [
+                    "Warehouses"
+                ],
+                "summary": "List stock by warehouse",
+                "responses": {},
+                "x-roles": [
+                    "admin",
+                    "manager",
+                    "cashier"
+                ]
+            }
         }
     },
     "definitions": {
@@ -6915,6 +7706,147 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_notifications.CreateChannelRequest": {
+            "type": "object",
+            "required": [
+                "channel_type",
+                "name"
+            ],
+            "properties": {
+                "channel_type": {
+                    "type": "string",
+                    "enum": [
+                        "email",
+                        "msteams_webhook",
+                        "telegram",
+                        "sms",
+                        "firebase"
+                    ]
+                },
+                "config": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 120
+                }
+            }
+        },
+        "internal_notifications.ReportScheduleSlot": {
+            "type": "object",
+            "properties": {
+                "day": {
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "hour": {
+                    "type": "integer"
+                },
+                "minute": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                }
+            }
+        },
+        "internal_notifications.ReportSchedulesConfig": {
+            "type": "object",
+            "properties": {
+                "daily": {
+                    "$ref": "#/definitions/internal_notifications.ReportScheduleSlot"
+                },
+                "monthly": {
+                    "$ref": "#/definitions/internal_notifications.ReportScheduleSlot"
+                },
+                "yearly": {
+                    "$ref": "#/definitions/internal_notifications.ReportScheduleSlot"
+                }
+            }
+        },
+        "internal_notifications.SubscriptionItem": {
+            "type": "object",
+            "required": [
+                "channel_id",
+                "event_type"
+            ],
+            "properties": {
+                "channel_id": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "event_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_notifications.UpdateChannelRequest": {
+            "type": "object",
+            "required": [
+                "config",
+                "name"
+            ],
+            "properties": {
+                "config": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 120
+                }
+            }
+        },
+        "internal_notifications.UpdateSubscriptionsRequest": {
+            "type": "object",
+            "required": [
+                "items"
+            ],
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_notifications.SubscriptionItem"
+                    }
+                }
+            }
+        },
+        "internal_notifications.UpdateTenantConfigRequest": {
+            "type": "object",
+            "properties": {
+                "report_recipient_emails": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "report_schedules": {
+                    "$ref": "#/definitions/internal_notifications.ReportSchedulesConfig"
+                },
+                "stock_low_threshold": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "timezone": {
+                    "type": "string"
+                }
+            }
+        },
         "internal_orders.ApplyPromotionRequest": {
             "type": "object",
             "required": [
@@ -7007,6 +7939,9 @@ const docTemplate = `{
             ],
             "properties": {
                 "customer_id": {
+                    "type": "string"
+                },
+                "dining_table_id": {
                     "type": "string"
                 },
                 "discount_amount": {
@@ -7547,6 +8482,9 @@ const docTemplate = `{
                 },
                 "unit": {
                     "type": "string"
+                },
+                "wholesale_price": {
+                    "type": "number"
                 }
             }
         },
@@ -7653,6 +8591,12 @@ const docTemplate = `{
                 "is_base": {
                     "type": "boolean"
                 },
+                "measurement_unit_code": {
+                    "type": "string"
+                },
+                "measurement_unit_id": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -7664,6 +8608,9 @@ const docTemplate = `{
                 },
                 "sort_order": {
                     "type": "integer"
+                },
+                "wholesale_price": {
+                    "type": "number"
                 }
             }
         },
@@ -7701,7 +8648,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "factor_to_base",
-                "name",
+                "measurement_unit_id",
                 "sell_price"
             ],
             "properties": {
@@ -7718,10 +8665,12 @@ const docTemplate = `{
                 "is_base": {
                     "type": "boolean"
                 },
+                "measurement_unit_id": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string",
-                    "maxLength": 50,
-                    "minLength": 1
+                    "maxLength": 50
                 },
                 "sell_price": {
                     "type": "number",
@@ -7733,6 +8682,10 @@ const docTemplate = `{
                 },
                 "sort_order": {
                     "type": "integer"
+                },
+                "wholesale_price": {
+                    "type": "number",
+                    "minimum": 0
                 }
             }
         },
@@ -7842,6 +8795,10 @@ const docTemplate = `{
                 "unit": {
                     "type": "string",
                     "maxLength": 20
+                },
+                "wholesale_price": {
+                    "type": "number",
+                    "minimum": 0
                 }
             }
         },
@@ -8424,6 +9381,9 @@ const docTemplate = `{
                 "currency": {
                     "type": "string"
                 },
+                "pos_quick_cash": {
+                    "$ref": "#/definitions/internal_settings.QuickCashSettings"
+                },
                 "service_charge_rate": {
                     "type": "number"
                 },
@@ -8455,6 +9415,61 @@ const docTemplate = `{
                 }
             }
         },
+        "internal_settings.MenuCatalogEntry": {
+            "type": "object",
+            "properties": {
+                "admin_lock": {
+                    "type": "boolean"
+                },
+                "default_roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "key": {
+                    "type": "string"
+                },
+                "label_key": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "section_key": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_settings.MenuRoleAccessResponse": {
+            "type": "object",
+            "properties": {
+                "catalog": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_settings.MenuCatalogEntry"
+                    }
+                },
+                "defaults": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "items": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "internal_settings.PrinterSettingsResponse": {
             "type": "object",
             "properties": {
@@ -8469,6 +9484,23 @@ const docTemplate = `{
                 },
                 "print_method": {
                     "type": "string"
+                }
+            }
+        },
+        "internal_settings.QuickCashSettings": {
+            "type": "object",
+            "properties": {
+                "retail": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "stock_receipt": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -8501,6 +9533,9 @@ const docTemplate = `{
             "properties": {
                 "currency": {
                     "type": "string"
+                },
+                "pos_quick_cash": {
+                    "$ref": "#/definitions/internal_settings.QuickCashSettings"
                 },
                 "service_charge_rate": {
                     "type": "number",
@@ -8541,6 +9576,20 @@ const docTemplate = `{
                 },
                 "show_tax_on_receipt": {
                     "type": "boolean"
+                }
+            }
+        },
+        "internal_settings.UpdateMenuRoleAccessRequest": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -8715,6 +9764,9 @@ const docTemplate = `{
         },
         "internal_stock_receipts.CreateStockReceiptRequest": {
             "type": "object",
+            "required": [
+                "items"
+            ],
             "properties": {
                 "amount_paid": {
                     "type": "number",
@@ -8722,6 +9774,7 @@ const docTemplate = `{
                 },
                 "items": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "$ref": "#/definitions/internal_stock_receipts.ReceiptItemInput"
                     }
@@ -8741,6 +9794,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "supplier_id": {
+                    "type": "string"
+                },
+                "warehouse_id": {
                     "type": "string"
                 }
             }
@@ -8763,8 +9819,7 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "product_id",
-                "quantity",
-                "unit_cost"
+                "quantity"
             ],
             "properties": {
                 "product_id": {
@@ -8893,6 +9948,9 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "warehouse_id": {
                     "type": "string"
                 }
             }

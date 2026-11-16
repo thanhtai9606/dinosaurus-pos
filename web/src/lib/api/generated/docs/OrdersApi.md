@@ -27,7 +27,7 @@ Get a list of orders with filtering by status and user (Roles: admin, manager, c
 import {
     OrdersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -90,7 +90,7 @@ import {
     OrdersApi,
     Configuration,
     InternalOrdersApplyPromotionRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -137,7 +137,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ordersIdCancelPost**
-> POSKasirInternalCommonSuccessResponse ordersIdCancelPost(request)
+> DinosaurusPosInternalCommonSuccessResponse ordersIdCancelPost(request)
 
 Cancel an existing order with a reason (Roles: admin, manager, cashier)
 
@@ -148,7 +148,7 @@ import {
     OrdersApi,
     Configuration,
     InternalOrdersCancelOrderRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -172,7 +172,7 @@ const { status, data } = await apiInstance.ordersIdCancelPost(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -206,7 +206,7 @@ Retrieve detailed information of a specific order by its ID (Roles: admin, manag
 import {
     OrdersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -261,7 +261,7 @@ import {
     OrdersApi,
     Configuration,
     InternalOrdersUpdateOrderItemsRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -320,7 +320,7 @@ import {
     OrdersApi,
     Configuration,
     InternalOrdersConfirmManualPaymentRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -378,7 +378,7 @@ Create a QRIS/Gopay payment session via Midtrans for an existing order (Roles: a
 import {
     OrdersApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -433,7 +433,7 @@ import {
     OrdersApi,
     Configuration,
     InternalOrdersRefundOrderRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -491,7 +491,7 @@ import {
     OrdersApi,
     Configuration,
     InternalOrdersUpdateOrderStatusRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -550,7 +550,7 @@ import {
     OrdersApi,
     Configuration,
     InternalOrdersCreateOrderRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
@@ -593,7 +593,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **ordersWebhookMidtransPost**
-> POSKasirInternalCommonSuccessResponse ordersWebhookMidtransPost(payload)
+> DinosaurusPosInternalCommonSuccessResponse ordersWebhookMidtransPost(payload)
 
 Webhook for Midtrans to notify order payment status updates
 
@@ -603,13 +603,13 @@ Webhook for Midtrans to notify order payment status updates
 import {
     OrdersApi,
     Configuration,
-    POSKasirPkgPaymentMidtransNotificationPayload
-} from 'restClient';
+    DinosaurusPosPkgPaymentMidtransNotificationPayload
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new OrdersApi(configuration);
 
-let payload: POSKasirPkgPaymentMidtransNotificationPayload; //Midtrans Notification Payload
+let payload: DinosaurusPosPkgPaymentMidtransNotificationPayload; //Midtrans Notification Payload
 
 const { status, data } = await apiInstance.ordersWebhookMidtransPost(
     payload
@@ -620,12 +620,12 @@ const { status, data } = await apiInstance.ordersWebhookMidtransPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **payload** | **POSKasirPkgPaymentMidtransNotificationPayload**| Midtrans Notification Payload | |
+| **payload** | **DinosaurusPosPkgPaymentMidtransNotificationPayload**| Midtrans Notification Payload | |
 
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 

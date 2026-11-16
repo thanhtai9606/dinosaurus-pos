@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
+import type { ApiPagination } from '@/lib/api/domain'
 
 export function useDataGridClientPagination(totalItems: number, defaultPageSize = 10) {
   const [page, setPage] = useState(1)
@@ -8,7 +8,7 @@ export function useDataGridClientPagination(totalItems: number, defaultPageSize 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize) || 1)
   const safePage = Math.min(page, totalPages)
 
-  const pagination: POSKasirInternalCommonPaginationPagination = useMemo(
+  const pagination: ApiPagination = useMemo(
     () => ({
       current_page: safePage,
       per_page: pageSize,

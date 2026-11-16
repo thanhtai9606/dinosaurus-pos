@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient, queryOptions } from '@tanstack/react-query'
+import type { ApiErrorBody } from '../domain'
 import { authApi } from "../../api/client.ts";
 import {
     InternalUserLoginRequest,
     InternalUserUpdatePasswordRequest,
     InternalUserProfileResponse,
     InternalUserLoginResponse,
-    POSKasirInternalCommonErrorResponse
+    ApiErrorBody
 } from "@/lib/api/generated";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
@@ -15,7 +16,7 @@ import i18n from "@/lib/i18n";
 export const meQueryOptions = () =>
     queryOptions<
         InternalUserProfileResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>
+        AxiosError<ApiErrorBody>
     >({
         queryKey: ['auth', 'me'],
         queryFn: async () => {
@@ -37,7 +38,7 @@ export const useLoginMutation = () => {
 
     return useMutation<
         InternalUserLoginResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         InternalUserLoginRequest
     >({
         mutationKey: ['auth', 'login'],
@@ -59,7 +60,7 @@ export const useLogoutMutation = () => {
 
     return useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         void
     >({
         mutationKey: ['auth', 'logout'],
@@ -71,7 +72,7 @@ export const useLogoutMutation = () => {
             qc.setQueryData(['auth', 'me'], null);
             await qc.invalidateQueries({ queryKey: ['auth', 'me'] })
         },
-        onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+        onError: (error: AxiosError<ApiErrorBody>) => {
             const msg = error.response?.data?.error || "Unknown error";
             toast.error(i18n.t('auth.logout_failed', { message: msg }));
         }
@@ -85,7 +86,7 @@ export const useUpdateAvatarMutation = () => {
 
     return useMutation<
         InternalUserProfileResponse,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         File
     >({
         mutationKey: ['auth', 'update-avatar'],
@@ -97,7 +98,7 @@ export const useUpdateAvatarMutation = () => {
             qc.setQueryData(['auth', 'me'], newData);
             return qc.invalidateQueries({ queryKey: ['auth', 'me'] })
         },
-        onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+        onError: (error: AxiosError<ApiErrorBody>) => {
             const msg = error.response?.data?.error || "Unknown error";
             toast.error(i18n.t('auth.update_avatar_failed', { message: msg }));
         }
@@ -109,7 +110,7 @@ export const useUpdateAvatarMutation = () => {
 export const useUpdatePasswordMutation = () => {
     return useMutation<
         any,
-        AxiosError<POSKasirInternalCommonErrorResponse>,
+        AxiosError<ApiErrorBody>,
         InternalUserUpdatePasswordRequest
     >({
         mutationKey: ['auth', 'update-password'],
@@ -120,7 +121,7 @@ export const useUpdatePasswordMutation = () => {
         onSuccess: async () => {
             toast.success(i18n.t('auth.update_password_success'))
         },
-        onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+        onError: (error: AxiosError<ApiErrorBody>) => {
             const msg = error.response?.data?.error || "Unknown error";
             toast.error(i18n.t('auth.update_password_failed', { message: msg }));
         }

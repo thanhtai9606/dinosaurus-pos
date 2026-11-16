@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -21,6 +21,12 @@ import globalAxios from 'axios';
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+// @ts-ignore
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
+// @ts-ignore
+import type { DinosaurusPosInternalCommonSuccessResponse } from '../models';
+// @ts-ignore
+import type { DinosaurusPosPkgPaymentMidtransNotificationPayload } from '../models';
 // @ts-ignore
 import type { InternalOrdersApplyPromotionRequest } from '../models';
 // @ts-ignore
@@ -41,12 +47,6 @@ import type { OrdersGet200Response } from '../models';
 import type { OrdersIdPayMidtransPost200Response } from '../models';
 // @ts-ignore
 import type { OrdersPost201Response } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
-// @ts-ignore
-import type { POSKasirInternalCommonSuccessResponse } from '../models';
-// @ts-ignore
-import type { POSKasirPkgPaymentMidtransNotificationPayload } from '../models';
 /**
  * OrdersApi - axios parameter creator
  */
@@ -449,11 +449,11 @@ export const OrdersApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Webhook for Midtrans to notify order payment status updates
          * @summary Midtrans Payment Notification Callback
-         * @param {POSKasirPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
+         * @param {DinosaurusPosPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ordersWebhookMidtransPost: async (payload: POSKasirPkgPaymentMidtransNotificationPayload, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        ordersWebhookMidtransPost: async (payload: DinosaurusPosPkgPaymentMidtransNotificationPayload, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'payload' is not null or undefined
             assertParamExists('ordersWebhookMidtransPost', 'payload', payload)
             const localVarPath = `/orders/webhook/midtrans`;
@@ -529,7 +529,7 @@ export const OrdersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async ordersIdCancelPost(id: string, request: InternalOrdersCancelOrderRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async ordersIdCancelPost(id: string, request: InternalOrdersCancelOrderRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.ordersIdCancelPost(id, request, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['OrdersApi.ordersIdCancelPost']?.[localVarOperationServerIndex]?.url;
@@ -633,11 +633,11 @@ export const OrdersApiFp = function(configuration?: Configuration) {
         /**
          * Webhook for Midtrans to notify order payment status updates
          * @summary Midtrans Payment Notification Callback
-         * @param {POSKasirPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
+         * @param {DinosaurusPosPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async ordersWebhookMidtransPost(payload: POSKasirPkgPaymentMidtransNotificationPayload, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<POSKasirInternalCommonSuccessResponse>> {
+        async ordersWebhookMidtransPost(payload: DinosaurusPosPkgPaymentMidtransNotificationPayload, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DinosaurusPosInternalCommonSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.ordersWebhookMidtransPost(payload, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['OrdersApi.ordersWebhookMidtransPost']?.[localVarOperationServerIndex]?.url;
@@ -684,7 +684,7 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ordersIdCancelPost(id: string, request: InternalOrdersCancelOrderRequest, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        ordersIdCancelPost(id: string, request: InternalOrdersCancelOrderRequest, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.ordersIdCancelPost(id, request, options).then((request) => request(axios, basePath));
         },
         /**
@@ -764,11 +764,11 @@ export const OrdersApiFactory = function (configuration?: Configuration, basePat
         /**
          * Webhook for Midtrans to notify order payment status updates
          * @summary Midtrans Payment Notification Callback
-         * @param {POSKasirPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
+         * @param {DinosaurusPosPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ordersWebhookMidtransPost(payload: POSKasirPkgPaymentMidtransNotificationPayload, options?: RawAxiosRequestConfig): AxiosPromise<POSKasirInternalCommonSuccessResponse> {
+        ordersWebhookMidtransPost(payload: DinosaurusPosPkgPaymentMidtransNotificationPayload, options?: RawAxiosRequestConfig): AxiosPromise<DinosaurusPosInternalCommonSuccessResponse> {
             return localVarFp.ordersWebhookMidtransPost(payload, options).then((request) => request(axios, basePath));
         },
     };
@@ -900,11 +900,11 @@ export class OrdersApi extends BaseAPI {
     /**
      * Webhook for Midtrans to notify order payment status updates
      * @summary Midtrans Payment Notification Callback
-     * @param {POSKasirPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
+     * @param {DinosaurusPosPkgPaymentMidtransNotificationPayload} payload Midtrans Notification Payload
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public ordersWebhookMidtransPost(payload: POSKasirPkgPaymentMidtransNotificationPayload, options?: RawAxiosRequestConfig) {
+    public ordersWebhookMidtransPost(payload: DinosaurusPosPkgPaymentMidtransNotificationPayload, options?: RawAxiosRequestConfig) {
         return OrdersApiFp(this.configuration).ordersWebhookMidtransPost(payload, options).then((request) => request(this.axios, this.basePath));
     }
 }

@@ -17,7 +17,7 @@ Get a list of all active cancellation reasons for orders
 import {
     CancellationReasonsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new CancellationReasonsApi(configuration);

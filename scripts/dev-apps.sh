@@ -75,7 +75,7 @@ echo -e "${YELLOW}⏳ Waiting for backend /healthz...${NC}"
 health_deadline=$((SECONDS + 90))
 until curl -sf "http://127.0.0.1:${APP_PORT}/healthz" >/dev/null 2>&1; do
 	if ! kill -0 "$BACKEND_PID" 2>/dev/null; then
-		echo -e "${RED}❌ Backend exited. Check DB_PASSWORD in .env matches Docker (pos_password).${NC}"
+		echo -e "${RED}❌ Backend exited. Check DB_PASSWORD in .env matches Docker (default: dinosaur_dev).${NC}"
 		exit 1
 	fi
 	if (( SECONDS > health_deadline )); then

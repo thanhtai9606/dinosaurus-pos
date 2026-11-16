@@ -4,7 +4,7 @@ import { axiosInstance } from '../client'
 import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
-import { POSKasirInternalCommonErrorResponse } from '../generated'
+import { ApiErrorBody } from '../domain'
 
 export type Supplier = {
     id: string
@@ -28,7 +28,7 @@ export type PagedSuppliers = {
 export type SuppliersListParams = { page?: number; limit?: number; search?: string }
 
 export const suppliersListQueryOptions = (params?: SuppliersListParams) =>
-    queryOptions<PagedSuppliers, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<PagedSuppliers, AxiosError<ApiErrorBody>>({
         queryKey: ['suppliers', 'list', params],
         queryFn: async () => {
             const res = await axiosInstance.get('/suppliers', { params })
@@ -58,7 +58,7 @@ export const useCreateSupplierMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['suppliers', 'list'] })
                 toast.success(t('suppliers.messages.create_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('suppliers.messages.create_failed', { message: error.response?.data?.message || '' }))
             },
         }),
@@ -81,7 +81,7 @@ export const useUpdateSupplierMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['suppliers', 'list'] })
                 toast.success(t('suppliers.messages.update_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('suppliers.messages.update_failed', { message: error.response?.data?.message || '' }))
             },
         }),
@@ -103,7 +103,7 @@ export const useDeleteSupplierMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['suppliers', 'list'] })
                 toast.success(t('suppliers.messages.delete_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 toast.error(t('suppliers.messages.delete_failed', { message: error.response?.data?.message || '' }))
             },
         }),

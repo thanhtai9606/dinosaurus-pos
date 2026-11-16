@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -18,7 +18,11 @@ export * from './api/activity-logs-api';
 export * from './api/auth-api';
 export * from './api/cancellation-reasons-api';
 export * from './api/categories-api';
+export * from './api/customer-groups-api';
 export * from './api/customers-api';
+export * from './api/default-api';
+export * from './api/measurement-units-api';
+export * from './api/notifications-api';
 export * from './api/orders-api';
 export * from './api/payment-methods-api';
 export * from './api/printer-api';
@@ -27,5 +31,9 @@ export * from './api/promotions-api';
 export * from './api/reports-api';
 export * from './api/settings-api';
 export * from './api/shifts-api';
+export * from './api/stock-ops-api';
+export * from './api/stock-receipts-api';
+export * from './api/suppliers-api';
 export * from './api/users-api';
+export * from './api/warehouses-api';
 

@@ -17,7 +17,7 @@ Get a list of activity logs with filtering and pagination (Roles: admin)
 import {
     ActivityLogsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new ActivityLogsApi(configuration);

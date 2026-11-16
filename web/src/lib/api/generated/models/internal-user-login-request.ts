@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -17,5 +17,6 @@
 export interface InternalUserLoginRequest {
     'email': string;
     'password': string;
+    'tenant_code': string;
 }
 

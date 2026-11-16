@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -22,15 +22,29 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { DinosaurusPosInternalCommonErrorResponse } from '../models';
+// @ts-ignore
 import type { InternalSettingsUpdateBrandingRequest } from '../models';
+// @ts-ignore
+import type { InternalSettingsUpdateFinancialSettingsRequest } from '../models';
+// @ts-ignore
+import type { InternalSettingsUpdateInvoiceSettingsRequest } from '../models';
+// @ts-ignore
+import type { InternalSettingsUpdateMenuRoleAccessRequest } from '../models';
 // @ts-ignore
 import type { InternalSettingsUpdatePrinterSettingsRequest } from '../models';
 // @ts-ignore
-import type { POSKasirInternalCommonErrorResponse } from '../models';
+import type { InternalSettingsUpdateSupportedCurrenciesRequest } from '../models';
 // @ts-ignore
 import type { SettingsBrandingGet200Response } from '../models';
 // @ts-ignore
 import type { SettingsBrandingLogoPost200Response } from '../models';
+// @ts-ignore
+import type { SettingsFinancialGet200Response } from '../models';
+// @ts-ignore
+import type { SettingsInvoiceGet200Response } from '../models';
+// @ts-ignore
+import type { SettingsMenuAccessGet200Response } from '../models';
 // @ts-ignore
 import type { SettingsPrinterGet200Response } from '../models';
 /**
@@ -120,6 +134,240 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
             // verify required parameter 'request' is not null or undefined
             assertParamExists('settingsBrandingPut', 'request', request)
             const localVarPath = `/settings/branding`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * JSON list of currencies for multi-region deployments (Roles: admin)
+         * @summary Update supported currencies
+         * @param {InternalSettingsUpdateSupportedCurrenciesRequest} request Currency list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsFinancialCurrenciesPut: async (request: InternalSettingsUpdateSupportedCurrenciesRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'request' is not null or undefined
+            assertParamExists('settingsFinancialCurrenciesPut', 'request', request)
+            const localVarPath = `/settings/financial/currencies`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Currency, tax rate, and service charge (Roles: authenticated)
+         * @summary Get financial settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsFinancialGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/settings/financial`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Update currency, tax, and service charge (Roles: admin)
+         * @summary Update financial settings
+         * @param {InternalSettingsUpdateFinancialSettingsRequest} request Financial settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsFinancialPut: async (request: InternalSettingsUpdateFinancialSettingsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'request' is not null or undefined
+            assertParamExists('settingsFinancialPut', 'request', request)
+            const localVarPath = `/settings/financial`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Receipt headers, footers, and legal text (Roles: authenticated)
+         * @summary Get invoice settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsInvoiceGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/settings/invoice`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Customize printed invoices (Roles: admin)
+         * @summary Update invoice settings
+         * @param {InternalSettingsUpdateInvoiceSettingsRequest} request Invoice settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsInvoicePut: async (request: InternalSettingsUpdateInvoiceSettingsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'request' is not null or undefined
+            assertParamExists('settingsInvoicePut', 'request', request)
+            const localVarPath = `/settings/invoice`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get menu role access
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsMenuAccessGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/settings/menu-access`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update menu role access
+         * @param {InternalSettingsUpdateMenuRoleAccessRequest} request Menu overrides
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsMenuAccessPut: async (request: InternalSettingsUpdateMenuRoleAccessRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'request' is not null or undefined
+            assertParamExists('settingsMenuAccessPut', 'request', request)
+            const localVarPath = `/settings/menu-access`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -259,6 +507,94 @@ export const SettingsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * JSON list of currencies for multi-region deployments (Roles: admin)
+         * @summary Update supported currencies
+         * @param {InternalSettingsUpdateSupportedCurrenciesRequest} request Currency list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async settingsFinancialCurrenciesPut(request: InternalSettingsUpdateSupportedCurrenciesRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingsFinancialGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.settingsFinancialCurrenciesPut(request, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SettingsApi.settingsFinancialCurrenciesPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Currency, tax rate, and service charge (Roles: authenticated)
+         * @summary Get financial settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async settingsFinancialGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingsFinancialGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.settingsFinancialGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SettingsApi.settingsFinancialGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Update currency, tax, and service charge (Roles: admin)
+         * @summary Update financial settings
+         * @param {InternalSettingsUpdateFinancialSettingsRequest} request Financial settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async settingsFinancialPut(request: InternalSettingsUpdateFinancialSettingsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingsFinancialGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.settingsFinancialPut(request, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SettingsApi.settingsFinancialPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Receipt headers, footers, and legal text (Roles: authenticated)
+         * @summary Get invoice settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async settingsInvoiceGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingsInvoiceGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.settingsInvoiceGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SettingsApi.settingsInvoiceGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Customize printed invoices (Roles: admin)
+         * @summary Update invoice settings
+         * @param {InternalSettingsUpdateInvoiceSettingsRequest} request Invoice settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async settingsInvoicePut(request: InternalSettingsUpdateInvoiceSettingsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingsInvoiceGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.settingsInvoicePut(request, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SettingsApi.settingsInvoicePut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get menu role access
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async settingsMenuAccessGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingsMenuAccessGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.settingsMenuAccessGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SettingsApi.settingsMenuAccessGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Update menu role access
+         * @param {InternalSettingsUpdateMenuRoleAccessRequest} request Menu overrides
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async settingsMenuAccessPut(request: InternalSettingsUpdateMenuRoleAccessRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingsMenuAccessGet200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.settingsMenuAccessPut(request, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SettingsApi.settingsMenuAccessPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Retrieve printer settings like connection string and paper width (Roles: authenticated)
          * @summary Get printer settings
          * @param {*} [options] Override http request option.
@@ -322,6 +658,73 @@ export const SettingsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.settingsBrandingPut(request, options).then((request) => request(axios, basePath));
         },
         /**
+         * JSON list of currencies for multi-region deployments (Roles: admin)
+         * @summary Update supported currencies
+         * @param {InternalSettingsUpdateSupportedCurrenciesRequest} request Currency list
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsFinancialCurrenciesPut(request: InternalSettingsUpdateSupportedCurrenciesRequest, options?: RawAxiosRequestConfig): AxiosPromise<SettingsFinancialGet200Response> {
+            return localVarFp.settingsFinancialCurrenciesPut(request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Currency, tax rate, and service charge (Roles: authenticated)
+         * @summary Get financial settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsFinancialGet(options?: RawAxiosRequestConfig): AxiosPromise<SettingsFinancialGet200Response> {
+            return localVarFp.settingsFinancialGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update currency, tax, and service charge (Roles: admin)
+         * @summary Update financial settings
+         * @param {InternalSettingsUpdateFinancialSettingsRequest} request Financial settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsFinancialPut(request: InternalSettingsUpdateFinancialSettingsRequest, options?: RawAxiosRequestConfig): AxiosPromise<SettingsFinancialGet200Response> {
+            return localVarFp.settingsFinancialPut(request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Receipt headers, footers, and legal text (Roles: authenticated)
+         * @summary Get invoice settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsInvoiceGet(options?: RawAxiosRequestConfig): AxiosPromise<SettingsInvoiceGet200Response> {
+            return localVarFp.settingsInvoiceGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Customize printed invoices (Roles: admin)
+         * @summary Update invoice settings
+         * @param {InternalSettingsUpdateInvoiceSettingsRequest} request Invoice settings
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsInvoicePut(request: InternalSettingsUpdateInvoiceSettingsRequest, options?: RawAxiosRequestConfig): AxiosPromise<SettingsInvoiceGet200Response> {
+            return localVarFp.settingsInvoicePut(request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get menu role access
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsMenuAccessGet(options?: RawAxiosRequestConfig): AxiosPromise<SettingsMenuAccessGet200Response> {
+            return localVarFp.settingsMenuAccessGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update menu role access
+         * @param {InternalSettingsUpdateMenuRoleAccessRequest} request Menu overrides
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        settingsMenuAccessPut(request: InternalSettingsUpdateMenuRoleAccessRequest, options?: RawAxiosRequestConfig): AxiosPromise<SettingsMenuAccessGet200Response> {
+            return localVarFp.settingsMenuAccessPut(request, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieve printer settings like connection string and paper width (Roles: authenticated)
          * @summary Get printer settings
          * @param {*} [options] Override http request option.
@@ -377,6 +780,80 @@ export class SettingsApi extends BaseAPI {
      */
     public settingsBrandingPut(request: InternalSettingsUpdateBrandingRequest, options?: RawAxiosRequestConfig) {
         return SettingsApiFp(this.configuration).settingsBrandingPut(request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * JSON list of currencies for multi-region deployments (Roles: admin)
+     * @summary Update supported currencies
+     * @param {InternalSettingsUpdateSupportedCurrenciesRequest} request Currency list
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public settingsFinancialCurrenciesPut(request: InternalSettingsUpdateSupportedCurrenciesRequest, options?: RawAxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).settingsFinancialCurrenciesPut(request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Currency, tax rate, and service charge (Roles: authenticated)
+     * @summary Get financial settings
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public settingsFinancialGet(options?: RawAxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).settingsFinancialGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update currency, tax, and service charge (Roles: admin)
+     * @summary Update financial settings
+     * @param {InternalSettingsUpdateFinancialSettingsRequest} request Financial settings
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public settingsFinancialPut(request: InternalSettingsUpdateFinancialSettingsRequest, options?: RawAxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).settingsFinancialPut(request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Receipt headers, footers, and legal text (Roles: authenticated)
+     * @summary Get invoice settings
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public settingsInvoiceGet(options?: RawAxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).settingsInvoiceGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Customize printed invoices (Roles: admin)
+     * @summary Update invoice settings
+     * @param {InternalSettingsUpdateInvoiceSettingsRequest} request Invoice settings
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public settingsInvoicePut(request: InternalSettingsUpdateInvoiceSettingsRequest, options?: RawAxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).settingsInvoicePut(request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get menu role access
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public settingsMenuAccessGet(options?: RawAxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).settingsMenuAccessGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update menu role access
+     * @param {InternalSettingsUpdateMenuRoleAccessRequest} request Menu overrides
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public settingsMenuAccessPut(request: InternalSettingsUpdateMenuRoleAccessRequest, options?: RawAxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).settingsMenuAccessPut(request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

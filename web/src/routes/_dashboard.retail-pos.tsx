@@ -1,3 +1,4 @@
+import { OrderType } from '@/lib/api/domain'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -17,7 +18,7 @@ import { usePosCatalog } from '@/hooks/usePosCatalog'
 import { useConfirmManualPaymentMutation, useCreateOrderMutation } from '@/lib/api/query/orders'
 import { usePaymentMethodsListQuery } from '@/lib/api/query/payment-methods'
 import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
-import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
+import { InternalProductsProductOptionResponse } from '@/lib/api/generated'
 import { useQueryClient } from '@tanstack/react-query'
 import { catalogUnitPrice, lineSubtotal, type PriceTier } from '@/lib/retail-pos/pricing'
 import {
@@ -351,7 +352,7 @@ function RetailPosPage() {
     }
 
     const buildOrderPayload = () => ({
-        type: POSKasirInternalOrdersRepositoryOrderType.OrderTypeTakeaway,
+        type: OrderType.OrderTypeTakeaway,
         customer_id: selectedCustomerId || undefined,
         discount_amount: orderDiscount > 0 ? orderDiscount : undefined,
         items: cart.map((item) => {

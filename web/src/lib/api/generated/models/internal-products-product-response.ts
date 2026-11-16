@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -19,18 +19,29 @@ import type { InternalProductsProductCategoryResponse } from './internal-product
 // May contain unused imports in some cases
 // @ts-ignore
 import type { InternalProductsProductOptionResponse } from './internal-products-product-option-response';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { InternalProductsProductSaleUnitResponse } from './internal-products-product-sale-unit-response';
 
 export interface InternalProductsProductResponse {
+    'barcode'?: string;
     'categories'?: Array<InternalProductsProductCategoryResponse>;
+    'code'?: string;
     'cost_price'?: number;
     'created_at'?: string;
+    'default_supplier_id'?: string;
     'deleted_at'?: string;
     'id'?: string;
     'image_url'?: string;
+    'matched_sale_unit_id'?: string;
+    'min_stock'?: number;
     'name'?: string;
     'options'?: Array<InternalProductsProductOptionResponse>;
     'price'?: number;
+    'sale_units'?: Array<InternalProductsProductSaleUnitResponse>;
+    'sku'?: string;
     'stock'?: number;
+    'unit'?: string;
     'updated_at'?: string;
 }
 

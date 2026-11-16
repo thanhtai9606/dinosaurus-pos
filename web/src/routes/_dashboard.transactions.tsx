@@ -1,3 +1,4 @@
+import { OrderStatus } from '@/lib/api/domain'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { ordersListQueryOptions, useUpdateOrderStatusMutation, useCancelOrderMutation, useRefundOrderMutation, useConfirmManualPaymentMutation, useInitiateMidtransPaymentMutation } from '@/lib/api/query/orders'
@@ -8,7 +9,7 @@ import { useDebounce } from '@/hooks/use-debounce'
 import { useServerListState } from '@/hooks/use-server-list-state'
 import { LIST_SCOPES } from '@/stores/list-scopes'
 import { toast } from 'sonner'
-import { InternalOrdersOrderListResponse, POSKasirInternalOrdersRepositoryOrderStatus } from '@/lib/api/generated'
+import { InternalOrdersOrderListResponse } from '@/lib/api/generated'
 import { useTranslation } from 'react-i18next'
 import { ListPagination } from '@/components/pagination'
 import { PaymentDialog } from "@/components/payment/PaymentDialog"
@@ -128,7 +129,7 @@ function TransactionsPage() {
 
     const [mutatingOrderId, setMutatingOrderId] = useState<string | null>(null)
 
-    const handleStatusUpdate = async (id: string, newStatus: POSKasirInternalOrdersRepositoryOrderStatus) => {
+    const handleStatusUpdate = async (id: string, newStatus: OrderStatus) => {
         setMutatingOrderId(id)
         const promise = updateOrderStatusMutation.mutateAsync({
             id,
@@ -206,7 +207,7 @@ function TransactionsPage() {
 
     const handleFinish = async (order: OrderWithItems) => {
         if (!order.id) return;
-        handleStatusUpdate(order.id, POSKasirInternalOrdersRepositoryOrderStatus.OrderStatusPaid)
+        handleStatusUpdate(order.id, OrderStatus.OrderStatusPaid)
     }
 
 

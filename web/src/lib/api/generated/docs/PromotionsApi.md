@@ -22,7 +22,7 @@ Get a list of promotions with pagination and optional trash filter (Roles: admin
 import {
     PromotionsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PromotionsApi(configuration);
@@ -71,7 +71,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **promotionsIdDelete**
-> POSKasirInternalCommonSuccessResponse promotionsIdDelete()
+> DinosaurusPosInternalCommonSuccessResponse promotionsIdDelete()
 
 Soft delete a promotion by its ID (Roles: admin, manager)
 
@@ -81,7 +81,7 @@ Soft delete a promotion by its ID (Roles: admin, manager)
 import {
     PromotionsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PromotionsApi(configuration);
@@ -102,7 +102,7 @@ const { status, data } = await apiInstance.promotionsIdDelete(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -134,7 +134,7 @@ Retrieve details of a specific promotion by its ID (Roles: admin, manager, cashi
 import {
     PromotionsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PromotionsApi(configuration);
@@ -189,7 +189,7 @@ import {
     PromotionsApi,
     Configuration,
     InternalPromotionsUpdatePromotionRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PromotionsApi(configuration);
@@ -236,7 +236,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **promotionsIdRestorePost**
-> POSKasirInternalCommonSuccessResponse promotionsIdRestorePost()
+> DinosaurusPosInternalCommonSuccessResponse promotionsIdRestorePost()
 
 Restore a soft-deleted promotion by its ID (Roles: admin, manager)
 
@@ -246,7 +246,7 @@ Restore a soft-deleted promotion by its ID (Roles: admin, manager)
 import {
     PromotionsApi,
     Configuration
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PromotionsApi(configuration);
@@ -267,7 +267,7 @@ const { status, data } = await apiInstance.promotionsIdRestorePost(
 
 ### Return type
 
-**POSKasirInternalCommonSuccessResponse**
+**DinosaurusPosInternalCommonSuccessResponse**
 
 ### Authorization
 
@@ -300,7 +300,7 @@ import {
     PromotionsApi,
     Configuration,
     InternalPromotionsCreatePromotionRequest
-} from 'restClient';
+} from 'dinosaurus-pos-api';
 
 const configuration = new Configuration();
 const apiInstance = new PromotionsApi(configuration);

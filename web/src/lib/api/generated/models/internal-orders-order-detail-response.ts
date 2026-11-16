@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { DinosaurusPosInternalOrdersRepositoryOrderStatus } from './dinosaurus-pos-internal-orders-repository-order-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { DinosaurusPosInternalOrdersRepositoryOrderType } from './dinosaurus-pos-internal-orders-repository-order-type';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { InternalOrdersOrderItemResponse } from './internal-orders-order-item-response';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalOrdersRepositoryOrderStatus } from './poskasir-internal-orders-repository-order-status';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { POSKasirInternalOrdersRepositoryOrderType } from './poskasir-internal-orders-repository-order-type';
 
 export interface InternalOrdersOrderDetailResponse {
     'applied_promotion_id'?: string;
@@ -32,15 +32,15 @@ export interface InternalOrdersOrderDetailResponse {
     'discount_amount'?: number;
     'gross_total'?: number;
     'id'?: string;
-    'order_no'?: string;
     'items'?: Array<InternalOrdersOrderItemResponse>;
     'net_total'?: number;
+    'order_no'?: string;
     'payment_gateway_reference'?: string;
     'payment_method_id'?: number;
     'service_charge_amount'?: number;
-    'status'?: POSKasirInternalOrdersRepositoryOrderStatus;
+    'status'?: DinosaurusPosInternalOrdersRepositoryOrderStatus;
     'tax_amount'?: number;
-    'type'?: POSKasirInternalOrdersRepositoryOrderType;
+    'type'?: DinosaurusPosInternalOrdersRepositoryOrderType;
     'updated_at'?: string;
     'user_id'?: string;
     'version'?: number;

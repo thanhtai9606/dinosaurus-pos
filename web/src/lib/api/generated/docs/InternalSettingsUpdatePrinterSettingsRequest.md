@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalSettingsUpdatePrinterSettingsRequest } from 'restClient';
+import { InternalSettingsUpdatePrinterSettingsRequest } from 'dinosaurus-pos-api';
 
 const instance: InternalSettingsUpdatePrinterSettingsRequest = {
     auto_print,

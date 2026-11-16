@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalUserRepositoryUserRole } from './poskasir-internal-user-repository-user-role';
+import type { DinosaurusPosInternalUserRepositoryUserRole } from './dinosaurus-pos-internal-user-repository-user-role';
 
 export interface InternalUserCreateUserRequest {
     'email': string;
     'is_active'?: boolean;
     'password': string;
-    'role': POSKasirInternalUserRepositoryUserRole;
+    'role': DinosaurusPosInternalUserRepositoryUserRole;
     'username': string;
 }
 

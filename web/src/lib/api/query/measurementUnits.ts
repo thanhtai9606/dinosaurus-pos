@@ -4,7 +4,7 @@ import { axiosInstance } from '../client'
 import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
-import { POSKasirInternalCommonErrorResponse } from '../generated'
+import { ApiErrorBody } from '../domain'
 
 export type MeasurementUnit = {
     id: string
@@ -29,7 +29,7 @@ export const measurementUnitsCatalogQueryOptions = () =>
     measurementUnitsListQueryOptions({ page: 1, limit: MEASUREMENT_UNITS_LIST_MAX })
 
 export const measurementUnitsListQueryOptions = (params?: MeasurementUnitsListParams) =>
-    queryOptions<PagedMeasurementUnits, AxiosError<POSKasirInternalCommonErrorResponse>>({
+    queryOptions<PagedMeasurementUnits, AxiosError<ApiErrorBody>>({
         queryKey: ['measurement-units', 'list', params],
         queryFn: async () => {
             const res = await axiosInstance.get('/measurement-units', { params })
@@ -59,7 +59,7 @@ export const useCreateMeasurementUnitMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['measurement-units', 'list'] })
                 toast.success(t('measurementUnits.messages.create_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.message || ''
                 if (error.response?.status === 409) {
                     toast.error(
@@ -91,7 +91,7 @@ export const useUpdateMeasurementUnitMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['measurement-units', 'list'] })
                 toast.success(t('measurementUnits.messages.update_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.message || ''
                 if (error.response?.status === 409) {
                     toast.error(
@@ -122,7 +122,7 @@ export const useDeleteMeasurementUnitMutation = () => {
                 await qc.invalidateQueries({ queryKey: ['measurement-units', 'list'] })
                 toast.success(t('measurementUnits.messages.delete_success'))
             },
-            onError: (error: AxiosError<POSKasirInternalCommonErrorResponse>) => {
+            onError: (error: AxiosError<ApiErrorBody>) => {
                 const msg = error.response?.data?.message || ''
                 toast.error(t('measurementUnits.messages.delete_failed', { message: msg }))
             },

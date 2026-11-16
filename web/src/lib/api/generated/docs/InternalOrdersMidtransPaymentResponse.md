@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { InternalOrdersMidtransPaymentResponse } from 'restClient';
+import { InternalOrdersMidtransPaymentResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalOrdersMidtransPaymentResponse = {
     actions,

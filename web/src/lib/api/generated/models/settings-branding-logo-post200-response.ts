@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,11 +15,11 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalCommonSuccessResponse } from './poskasir-internal-common-success-response';
+import type { DinosaurusPosInternalCommonSuccessResponse } from './dinosaurus-pos-internal-common-success-response';
 
 /**
  * @type SettingsBrandingLogoPost200Response
  */
-export type SettingsBrandingLogoPost200Response = POSKasirInternalCommonSuccessResponse;
+export type SettingsBrandingLogoPost200Response = DinosaurusPosInternalCommonSuccessResponse;
 
 

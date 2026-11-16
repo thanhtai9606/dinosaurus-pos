@@ -28,11 +28,11 @@ import {
     Scale,
     BadgeDollarSign,
 } from 'lucide-react'
-import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import { UserRole } from '@/lib/api/domain'
 import { effectiveRolesForKey, type TenantRole } from '@/lib/auth/menuCatalog'
 import { useMenuAccessQuery } from '@/lib/api/query/menuAccess'
 
-type Role = POSKasirInternalUserRepositoryUserRole | 'super_admin'
+type Role = UserRole | 'super_admin'
 
 type DashboardMenuLinkBase = {
     label: string
@@ -57,14 +57,14 @@ export type DashboardMenuGroup = {
 export type DashboardMenuEntry = DashboardMenuLink | DashboardMenuGroup
 
 const cashierRoles: Role[] = [
-    POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-    POSKasirInternalUserRepositoryUserRole.UserRoleManager,
-    POSKasirInternalUserRepositoryUserRole.UserRoleCashier,
+    UserRole.UserRoleAdmin,
+    UserRole.UserRoleManager,
+    UserRole.UserRoleCashier,
 ]
 
 const managerRoles: Role[] = [
-    POSKasirInternalUserRepositoryUserRole.UserRoleAdmin,
-    POSKasirInternalUserRepositoryUserRole.UserRoleManager,
+    UserRole.UserRoleAdmin,
+    UserRole.UserRoleManager,
 ]
 
 function resolvedRoles(menuKey: string | undefined, fallback: Role[], overrides?: Record<string, TenantRole[]>, defaults?: Record<string, TenantRole[]>): Role[] {
@@ -354,7 +354,7 @@ export function useNavigationMenu(userRole?: string) {
             icon: ActivityIcon,
             to: '/activity-logs',
             menuKey: 'activity_logs',
-            allowedRoles: [POSKasirInternalUserRepositoryUserRole.UserRoleAdmin],
+            allowedRoles: [UserRole.UserRoleAdmin],
         },
     ]
 

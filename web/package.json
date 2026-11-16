@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "api:gen": "openapi-generator-cli generate",
+    "api:gen": "rm -rf src/lib/api/generated/models src/lib/api/generated/api src/lib/api/generated/docs && openapi-generator-cli generate",
     "rbac:gen": "tsx scripts/gen-rbac.ts",
     "check:i18n": "tsx scripts/scan-i18n.ts",
     "debug:java": "echo PATH=$PATH && which java && java -version"

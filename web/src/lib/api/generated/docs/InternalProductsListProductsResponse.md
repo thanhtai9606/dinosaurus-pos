@@ -5,13 +5,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**pagination** | [**POSKasirInternalCommonPaginationPagination**](POSKasirInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
+**pagination** | [**DinosaurusPosInternalCommonPaginationPagination**](DinosaurusPosInternalCommonPaginationPagination.md) |  | [optional] [default to undefined]
 **products** | [**Array&lt;InternalProductsProductListResponse&gt;**](InternalProductsProductListResponse.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { InternalProductsListProductsResponse } from 'restClient';
+import { InternalProductsListProductsResponse } from 'dinosaurus-pos-api';
 
 const instance: InternalProductsListProductsResponse = {
     pagination,

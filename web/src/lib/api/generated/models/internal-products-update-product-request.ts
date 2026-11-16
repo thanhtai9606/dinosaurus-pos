@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,13 +15,19 @@
 
 
 export interface InternalProductsUpdateProductRequest {
+    'barcode'?: string;
     'category_ids'?: Array<number>;
     'change_type'?: InternalProductsUpdateProductRequestChangeTypeEnum;
     'cost_price'?: number;
+    'default_supplier_id'?: string;
+    'min_stock'?: number;
     'name'?: string;
     'note'?: string;
     'price'?: number;
+    'sku'?: string;
     'stock'?: number;
+    'unit'?: string;
+    'wholesale_price'?: number;
 }
 
 export const InternalProductsUpdateProductRequestChangeTypeEnum = {

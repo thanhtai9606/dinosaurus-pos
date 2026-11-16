@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * POS Kasir API
- * POS Kasir API
+ * Dinosaurus POS API
+ * Dinosaurus POS API
  *
  * The version of the OpenAPI document: 1.0
  * 
@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { POSKasirInternalOrdersRepositoryOrderStatus } from './poskasir-internal-orders-repository-order-status';
+import type { DinosaurusPosInternalOrdersRepositoryOrderStatus } from './dinosaurus-pos-internal-orders-repository-order-status';
 
 export interface InternalOrdersUpdateOrderStatusRequest {
-    'status': POSKasirInternalOrdersRepositoryOrderStatus;
+    'status': DinosaurusPosInternalOrdersRepositoryOrderStatus;
 }
 
 

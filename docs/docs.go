@@ -113,7 +113,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_activitylog.ActivityLogListResponse"
+                                            "$ref": "#/definitions/internal_activity_log.ActivityLogListResponse"
                                         }
                                     }
                                 }
@@ -5534,7 +5534,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_stockreceipts.PagedStockReceiptResponse"
+                                            "$ref": "#/definitions/internal_stock_receipts.PagedStockReceiptResponse"
                                         }
                                     }
                                 }
@@ -5559,7 +5559,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_stockreceipts.CreateStockReceiptRequest"
+                            "$ref": "#/definitions/internal_stock_receipts.CreateStockReceiptRequest"
                         }
                     }
                 ],
@@ -5575,7 +5575,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                            "$ref": "#/definitions/internal_stock_receipts.StockReceiptResponse"
                                         }
                                     }
                                 }
@@ -5616,7 +5616,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                            "$ref": "#/definitions/internal_stock_receipts.StockReceiptResponse"
                                         }
                                     }
                                 }
@@ -5655,7 +5655,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                            "$ref": "#/definitions/internal_stock_receipts.StockReceiptResponse"
                                         }
                                     }
                                 }
@@ -5723,7 +5723,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                            "$ref": "#/definitions/internal_stock_receipts.StockReceiptResponse"
                                         }
                                     }
                                 }
@@ -5764,7 +5764,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal_stockreceipts.StockReceiptResponse"
+                                            "$ref": "#/definitions/internal_stock_receipts.StockReceiptResponse"
                                         }
                                     }
                                 }
@@ -6439,7 +6439,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dinosaurus-pos_internal_activitylog_repository.LogActionType": {
+        "dinosaurus-pos_internal_activity_log_repository.LogActionType": {
             "type": "string",
             "enum": [
                 "CREATE",
@@ -6470,7 +6470,7 @@ const docTemplate = `{
                 "LogActionTypeRESTORE"
             ]
         },
-        "dinosaurus-pos_internal_activitylog_repository.LogEntityType": {
+        "dinosaurus-pos_internal_activity_log_repository.LogEntityType": {
             "type": "string",
             "enum": [
                 "PRODUCT",
@@ -6691,7 +6691,7 @@ const docTemplate = `{
             "type": "object",
             "additionalProperties": {}
         },
-        "internal_activitylog.ActivityLogListResponse": {
+        "internal_activity_log.ActivityLogListResponse": {
             "type": "object",
             "properties": {
                 "limit": {
@@ -6700,7 +6700,7 @@ const docTemplate = `{
                 "logs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_activitylog.ActivityLogResponse"
+                        "$ref": "#/definitions/internal_activity_log.ActivityLogResponse"
                     }
                 },
                 "page": {
@@ -6714,11 +6714,11 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_activitylog.ActivityLogResponse": {
+        "internal_activity_log.ActivityLogResponse": {
             "type": "object",
             "properties": {
                 "action_type": {
-                    "$ref": "#/definitions/dinosaurus-pos_internal_activitylog_repository.LogActionType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_activity_log_repository.LogActionType"
                 },
                 "created_at": {
                     "type": "string"
@@ -6731,7 +6731,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "entity_type": {
-                    "$ref": "#/definitions/dinosaurus-pos_internal_activitylog_repository.LogEntityType"
+                    "$ref": "#/definitions/dinosaurus-pos_internal_activity_log_repository.LogEntityType"
                 },
                 "id": {
                     "type": "string"
@@ -8713,7 +8713,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_stockreceipts.CreateStockReceiptRequest": {
+        "internal_stock_receipts.CreateStockReceiptRequest": {
             "type": "object",
             "properties": {
                 "amount_paid": {
@@ -8723,7 +8723,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_stockreceipts.ReceiptItemInput"
+                        "$ref": "#/definitions/internal_stock_receipts.ReceiptItemInput"
                     }
                 },
                 "note": {
@@ -8745,7 +8745,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_stockreceipts.PagedStockReceiptResponse": {
+        "internal_stock_receipts.PagedStockReceiptResponse": {
             "type": "object",
             "properties": {
                 "pagination": {
@@ -8754,12 +8754,12 @@ const docTemplate = `{
                 "receipts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_stockreceipts.StockReceiptListItem"
+                        "$ref": "#/definitions/internal_stock_receipts.StockReceiptListItem"
                     }
                 }
             }
         },
-        "internal_stockreceipts.ReceiptItemInput": {
+        "internal_stock_receipts.ReceiptItemInput": {
             "type": "object",
             "required": [
                 "product_id",
@@ -8783,7 +8783,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_stockreceipts.StockReceiptItemResponse": {
+        "internal_stock_receipts.StockReceiptItemResponse": {
             "type": "object",
             "properties": {
                 "id": {
@@ -8821,7 +8821,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_stockreceipts.StockReceiptListItem": {
+        "internal_stock_receipts.StockReceiptListItem": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -8850,7 +8850,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_stockreceipts.StockReceiptResponse": {
+        "internal_stock_receipts.StockReceiptResponse": {
             "type": "object",
             "properties": {
                 "amount_paid": {
@@ -8865,7 +8865,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_stockreceipts.StockReceiptItemResponse"
+                        "$ref": "#/definitions/internal_stock_receipts.StockReceiptItemResponse"
                     }
                 },
                 "note": {

@@ -1,8 +1,8 @@
 package settings
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/settings/repository"
@@ -34,14 +34,14 @@ type ISettingsService interface {
 }
 
 type SettingsService struct {
-	activitylog activitylog.IActivityService
+	activitylog activity_log.IActivityService
 	repo        repository.Querier
 	store       store.Store
 	r2Client    cloudflarer2.IR2
 	log         logger.ILogger
 }
 
-func NewSettingsService(store store.Store, activitylog activitylog.IActivityService, repo repository.Querier, r2Client cloudflarer2.IR2, log logger.ILogger) ISettingsService {
+func NewSettingsService(store store.Store, activitylog activity_log.IActivityService, repo repository.Querier, r2Client cloudflarer2.IR2, log logger.ILogger) ISettingsService {
 	return &SettingsService{
 		activitylog: activitylog,
 		repo:        repo,
@@ -133,8 +133,8 @@ func (s *SettingsService) UpdateBranding(ctx context.Context, req UpdateBranding
 	s.activitylog.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypeSETTINGS,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypeSETTINGS,
 		"settings",
 		logDetails,
 	)
@@ -178,8 +178,8 @@ func (s *SettingsService) UpdateLogo(ctx context.Context, data []byte, filename 
 	s.activitylog.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypeSETTINGS,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypeSETTINGS,
 		"settings",
 		map[string]interface{}{"app_logo": url},
 	)
@@ -281,8 +281,8 @@ func (s *SettingsService) UpdatePrinterSettings(ctx context.Context, req UpdateP
 	s.activitylog.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypeSETTINGS,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypeSETTINGS,
 		"settings",
 		map[string]interface{}{"printer_connection": req.Connection, "printer_paper_width": req.PaperWidth, "printer_auto_print": req.AutoPrint, "printer_method": req.PrintMethod},
 	)
@@ -397,7 +397,7 @@ func (s *SettingsService) UpdateFinancialSettings(ctx context.Context, req Updat
 	if req.PosQuickCash != nil {
 		logPayload["pos_quick_cash"] = true
 	}
-	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", logPayload)
+	s.activitylog.Log(ctx, actorID, activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypeSETTINGS, "settings", logPayload)
 
 	return s.GetFinancialSettings(ctx)
 }
@@ -500,7 +500,7 @@ func (s *SettingsService) UpdateInvoiceSettings(ctx context.Context, req UpdateI
 	}
 
 	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
-	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
+	s.activitylog.Log(ctx, actorID, activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
 		"invoice_prefix": req.InvoicePrefix,
 	})
 

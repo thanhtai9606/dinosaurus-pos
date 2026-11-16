@@ -11,6 +11,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const deleteSetting = `-- name: DeleteSetting :exec
+DELETE FROM settings WHERE key = $1
+`
+
+func (q *Queries) DeleteSetting(ctx context.Context, key string) error {
+	_, err := q.db.Exec(ctx, deleteSetting, key)
+	return err
+}
+
 const getSettingByKey = `-- name: GetSettingByKey :one
 SELECT key, value, description, updated_at
 FROM settings
@@ -143,13 +152,4 @@ func (q *Queries) UpsertSetting(ctx context.Context, arg UpsertSettingParams) (U
 		&i.UpdatedAt,
 	)
 	return i, err
-}
-
-const deleteSetting = `-- name: DeleteSetting :exec
-DELETE FROM settings WHERE key = $1
-`
-
-func (q *Queries) DeleteSetting(ctx context.Context, key string) error {
-	_, err := q.db.Exec(ctx, deleteSetting, key)
-	return err
 }

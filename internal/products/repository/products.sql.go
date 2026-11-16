@@ -48,42 +48,6 @@ func (q *Queries) AddProductStock(ctx context.Context, arg AddProductStockParams
 	return i, err
 }
 
-const setProductStock = `-- name: SetProductStock :one
-UPDATE products
-SET stock = $2, updated_at = NOW()
-WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
-`
-
-type SetProductStockParams struct {
-	ID    uuid.UUID `json:"id"`
-	Stock int32     `json:"stock"`
-}
-
-func (q *Queries) SetProductStock(ctx context.Context, arg SetProductStockParams) (Product, error) {
-	row := q.db.QueryRow(ctx, setProductStock, arg.ID, arg.Stock)
-	var i Product
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.ImageUrl,
-		&i.Price,
-		&i.Stock,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.DeletedAt,
-		&i.CostPrice,
-		&i.Sku,
-		&i.Barcode,
-		&i.Unit,
-		&i.MinStock,
-		&i.DefaultSupplierID,
-		&i.Code,
-		&i.TenantID,
-	)
-	return i, err
-}
-
 const assignProductCategory = `-- name: AssignProductCategory :exec
 INSERT INTO product_categories (product_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING
 `
@@ -1023,20 +987,20 @@ type ListProductsParams struct {
 }
 
 type ListProductsRow struct {
-	ID                uuid.UUID      `json:"id"`
-	Name              string         `json:"name"`
-	Price             int64          `json:"price"`
-	Stock             int32          `json:"stock"`
-	ImageUrl          *string        `json:"image_url"`
-	Code              *string        `json:"code"`
-	Sku               *string        `json:"sku"`
-	Barcode           *string        `json:"barcode"`
-	Unit              string         `json:"unit"`
-	MinStock          int32          `json:"min_stock"`
-	CostPrice            pgtype.Numeric `json:"cost_price"`
-	DefaultSupplierID    pgtype.UUID    `json:"default_supplier_id"`
-	BaseWholesalePrice   int64          `json:"base_wholesale_price"`
-	Categories           interface{}    `json:"categories"`
+	ID                 uuid.UUID      `json:"id"`
+	Name               string         `json:"name"`
+	Price              int64          `json:"price"`
+	Stock              int32          `json:"stock"`
+	ImageUrl           *string        `json:"image_url"`
+	Code               *string        `json:"code"`
+	Sku                *string        `json:"sku"`
+	Barcode            *string        `json:"barcode"`
+	Unit               string         `json:"unit"`
+	MinStock           int32          `json:"min_stock"`
+	CostPrice          pgtype.Numeric `json:"cost_price"`
+	DefaultSupplierID  pgtype.UUID    `json:"default_supplier_id"`
+	BaseWholesalePrice int64          `json:"base_wholesale_price"`
+	Categories         interface{}    `json:"categories"`
 }
 
 // Lists products with filtering and pagination.
@@ -1264,6 +1228,42 @@ type SetProductSellPriceParams struct {
 
 func (q *Queries) SetProductSellPrice(ctx context.Context, arg SetProductSellPriceParams) (Product, error) {
 	row := q.db.QueryRow(ctx, setProductSellPrice, arg.ID, arg.Price)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ImageUrl,
+		&i.Price,
+		&i.Stock,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CostPrice,
+		&i.Sku,
+		&i.Barcode,
+		&i.Unit,
+		&i.MinStock,
+		&i.DefaultSupplierID,
+		&i.Code,
+		&i.TenantID,
+	)
+	return i, err
+}
+
+const setProductStock = `-- name: SetProductStock :one
+UPDATE products
+SET stock = $2, updated_at = NOW()
+WHERE id = $1 AND deleted_at IS NULL
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
+`
+
+type SetProductStockParams struct {
+	ID    uuid.UUID `json:"id"`
+	Stock int32     `json:"stock"`
+}
+
+func (q *Queries) SetProductStock(ctx context.Context, arg SetProductStockParams) (Product, error) {
+	row := q.db.QueryRow(ctx, setProductStock, arg.ID, arg.Stock)
 	var i Product
 	err := row.Scan(
 		&i.ID,

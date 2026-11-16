@@ -4,7 +4,7 @@ import (
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/user"
 	user_repo "dinosaurus-pos/internal/user/repository"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/mocks"
 	"context"
@@ -32,7 +32,7 @@ func TestDeleteUser(t *testing.T) {
 		userID := uuid.New()
 
 		mockRepo.EXPECT().DeleteUser(ctx, userID).Return(nil)
-		mockActivity.EXPECT().Log(ctx, gomock.Any(), activitylog_repo.LogActionTypeDELETE, activitylog_repo.LogEntityTypeUSER, userID.String(), gomock.Any()).Times(1)
+		mockActivity.EXPECT().Log(ctx, gomock.Any(), activity_log_repo.LogActionTypeDELETE, activity_log_repo.LogEntityTypeUSER, userID.String(), gomock.Any()).Times(1)
 
 		err := service.DeleteUser(ctx, userID)
 		assert.NoError(t, err)
@@ -91,7 +91,7 @@ func TestToggleUserStatus(t *testing.T) {
 		userID := uuid.New()
 
 		mockRepo.EXPECT().ToggleUserActiveStatus(ctx, userID).Return(uuid.Nil, nil)
-		mockActivity.EXPECT().Log(ctx, gomock.Any(), activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeUSER, userID.String(), gomock.Any()).Times(1)
+		mockActivity.EXPECT().Log(ctx, gomock.Any(), activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypeUSER, userID.String(), gomock.Any()).Times(1)
 
 		err := service.ToggleUserStatus(ctx, userID)
 		assert.NoError(t, err)
@@ -285,7 +285,7 @@ func TestUpdateUser(t *testing.T) {
 		mockRepo.EXPECT().GetUserByID(ctx, userID).Return(existingUser, nil)
 		mockRepo.EXPECT().CheckUserExistence(ctx, gomock.Any()).Return(user_repo.CheckUserExistenceRow{UsernameExists: false, EmailExists: false}, nil).Times(2)
 		mockRepo.EXPECT().UpdateUser(ctx, gomock.Any()).Return(updatedUser, nil)
-		mockActivity.EXPECT().Log(ctx, gomock.Any(), activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeUSER, userID.String(), gomock.Any()).Times(1)
+		mockActivity.EXPECT().Log(ctx, gomock.Any(), activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypeUSER, userID.String(), gomock.Any()).Times(1)
 
 		resp, err := service.UpdateUser(ctx, userID, req)
 		assert.NoError(t, err)
@@ -491,7 +491,7 @@ func TestCreateUser(t *testing.T) {
 			IsActive: true,
 		}
 		mockRepo.EXPECT().CreateUser(ctx, gomock.Any()).Return(newUser, nil)
-		mockActivity.EXPECT().Log(ctx, gomock.Any(), activitylog_repo.LogActionTypeCREATE, activitylog_repo.LogEntityTypeUSER, gomock.Any(), gomock.Any()).Times(1)
+		mockActivity.EXPECT().Log(ctx, gomock.Any(), activity_log_repo.LogActionTypeCREATE, activity_log_repo.LogEntityTypeUSER, gomock.Any(), gomock.Any()).Times(1)
 
 		resp, err := service.CreateUser(ctx, req)
 		assert.NoError(t, err)

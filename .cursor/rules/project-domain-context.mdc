@@ -21,11 +21,17 @@ alwaysApply: true
 
 ## Debt ledgers MVP (v1)
 
-- Packages: `internal/supplierdebts`, `internal/customerdebts`; routes `/supplier-debts`, `/customer-debts` (manager+).
+- Packages: `internal/supplier_debts`, `internal/customer_debts`; routes `/supplier-debts`, `/customer-debts` (manager+).
 - FE: `_dashboard.supplier-debts.tsx`, `_dashboard.customer-debts.tsx`, queries `supplierDebts.ts` / `customerDebts.ts`, shared sheet `components/debts/PartnerDebtDetailSheet.tsx`.
 - Status: `open|partial|settled|void`; partial payments + manual entries + void; summary endpoints per partner.
 - **Orders:** create unpaid + customer → `customer_debts`; cancel → void debt; Transactions full pay → `RecordOrderPaymentTx` (avoid duplicate with debt-module pay).
 - **Out of scope v1:** aging, credit limits, accounting/cash drawer sync, backfill old receipt notes.
+
+## Notifications (multi-channel)
+
+- Package: `internal/notifications`; migration `000014_notifications`.
+- Admin: `/notification-channels`, test send, `/notifications/config` (`stock_low_threshold`).
+- User: `/notification-subscriptions/me`. Event hooks: orders, stock_receipts complete, product stock low.
 
 ## Conventions when changing this area
 

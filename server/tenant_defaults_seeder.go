@@ -3,16 +3,16 @@ package server
 import (
 	"context"
 
-	"dinosaurus-pos/internal/customergroups"
-	"dinosaurus-pos/internal/measurementunits"
+	"dinosaurus-pos/internal/customer_groups"
+	"dinosaurus-pos/internal/measurement_units"
 	"dinosaurus-pos/internal/warehouse"
 
 	"github.com/google/uuid"
 )
 
 type tenantDefaultsSeeder struct {
-	customerGroups   customergroups.ICustomerGroupService
-	measurementUnits measurementunits.IService
+	customerGroups   customer_groups.ICustomerGroupService
+	measurementUnits measurement_units.IService
 	warehouses       warehouse.IService
 }
 

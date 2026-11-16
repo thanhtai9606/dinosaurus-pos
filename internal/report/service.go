@@ -1,7 +1,7 @@
 package report
 
 import (
-	"dinosaurus-pos/internal/activitylog"
+	"dinosaurus-pos/internal/activity_log"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/report/repository"
@@ -31,7 +31,7 @@ type IRptService interface {
 	GetShiftSummaryReport(ctx context.Context, req *SalesReportServiceRequest) (*[]ShiftSummaryResponse, error)
 }
 
-func NewRptService(store store.Store, repo repository.Querier, activityLogService activitylog.IActivityService, log logger.ILogger, redisCache cache.Cache) IRptService {
+func NewRptService(store store.Store, repo repository.Querier, activityLogService activity_log.IActivityService, log logger.ILogger, redisCache cache.Cache) IRptService {
 	return &RptService{
 		repo:               repo,
 		Store:              store,
@@ -44,7 +44,7 @@ func NewRptService(store store.Store, repo repository.Querier, activityLogServic
 type RptService struct {
 	repo               repository.Querier
 	Store              store.Store
-	ActivityLogService activitylog.IActivityService
+	ActivityLogService activity_log.IActivityService
 	Log                logger.ILogger
 	Cache              cache.Cache
 }

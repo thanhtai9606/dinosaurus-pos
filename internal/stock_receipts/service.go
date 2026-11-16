@@ -1,0 +1,541 @@
+package stock_receipts
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"time"
+
+	"dinosaurus-pos/internal/common"
+	"dinosaurus-pos/internal/common/pagination"
+	"dinosaurus-pos/internal/common/store"
+	"dinosaurus-pos/internal/inventory"
+	"dinosaurus-pos/internal/notifications"
+	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/internal/tenant"
+	wh_repo "dinosaurus-pos/internal/warehouse/repository"
+	"dinosaurus-pos/internal/supplier_debts"
+	sd_repo "dinosaurus-pos/internal/supplier_debts/repository"
+	sr_repo "dinosaurus-pos/internal/stock_receipts/repository"
+	"dinosaurus-pos/pkg/logger"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
+type IStockReceiptService interface {
+	Create(ctx context.Context, req CreateStockReceiptRequest) (*StockReceiptResponse, error)
+	Get(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error)
+	List(ctx context.Context, req ListStockReceiptsRequest) (*PagedStockReceiptResponse, error)
+	UpdateDraft(ctx context.Context, id uuid.UUID, req UpdateStockReceiptRequest) (*StockReceiptResponse, error)
+	Complete(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error)
+	Cancel(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error)
+	Delete(ctx context.Context, id uuid.UUID) error
+}
+
+type StockReceiptService struct {
+	repo   sr_repo.Querier
+	store  store.Store
+	log    logger.ILogger
+	events notifications.EventPublisher
+}
+
+func NewStockReceiptService(repo sr_repo.Querier, st store.Store, log logger.ILogger, events notifications.EventPublisher) IStockReceiptService {
+	return &StockReceiptService{repo: repo, store: st, log: log, events: events}
+}
+
+func (s *StockReceiptService) Create(ctx context.Context, req CreateStockReceiptRequest) (*StockReceiptResponse, error) {
+	var receipt sr_repo.StockReceipt
+
+	err := s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		qtx := sr_repo.New(tx)
+		receiptNo, err := nextReceiptNo(ctx, qtx)
+		if err != nil {
+			return err
+		}
+
+		receivedAt := time.Now()
+		if req.ReceivedAt != nil {
+			receivedAt = *req.ReceivedAt
+		}
+
+		var createdBy pgtype.UUID
+		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
+			createdBy = pgtype.UUID{Bytes: actorID, Valid: true}
+		}
+
+		supplierID := pgtype.UUID{}
+		if req.SupplierID != nil {
+			supplierID = pgtype.UUID{Bytes: *req.SupplierID, Valid: true}
+		}
+
+		whRepo := wh_repo.New(tx)
+		warehouseID := pgtype.UUID{}
+		if req.WarehouseID != nil {
+			warehouseID = pgtype.UUID{Bytes: *req.WarehouseID, Valid: true}
+		} else {
+			tid, ok := tenant.IDFromContext(ctx)
+			if !ok {
+				return common.ErrUnauthorized
+			}
+			dw, err := whRepo.GetDefaultWarehouse(ctx, tid)
+			if err != nil {
+				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+			}
+			warehouseID = pgtype.UUID{Bytes: dw.ID, Valid: true}
+		}
+
+		receipt, err = qtx.CreateStockReceipt(ctx, sr_repo.CreateStockReceiptParams{
+			ReceiptNo:   receiptNo,
+			SupplierID:  supplierID,
+			ReceivedAt:  pgtype.Timestamptz{Time: receivedAt, Valid: true},
+			Note:        req.Note,
+			CreatedBy:   createdBy,
+			WarehouseID: warehouseID,
+		})
+		if err != nil {
+			return err
+		}
+
+		if err := insertReceiptItems(ctx, qtx, receipt.ID, req.Items); err != nil {
+			return err
+		}
+		return applyReceiptPayment(ctx, qtx, receipt.ID, req.PaymentMode, req.AmountPaid)
+	})
+	if err != nil {
+		s.log.Errorf("CreateStockReceipt failed", "error", err)
+		return nil, err
+	}
+
+	return s.Get(ctx, receipt.ID)
+}
+
+func (s *StockReceiptService) Get(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error) {
+	receipt, err := s.repo.GetStockReceiptByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, common.ErrNotFound
+		}
+		return nil, err
+	}
+
+	items, err := s.repo.ListStockReceiptItems(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	total, err := s.repo.SumReceiptLineTotal(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapReceiptDetail(receipt, items, total), nil
+}
+
+func (s *StockReceiptService) List(ctx context.Context, req ListStockReceiptsRequest) (*PagedStockReceiptResponse, error) {
+	req.SetDefaults()
+	limit := req.Limit
+	offset := (req.Page - 1) * limit
+
+	params := sr_repo.ListStockReceiptsParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	}
+	countParams := sr_repo.CountStockReceiptsParams{}
+
+	if req.Status != nil {
+		st := sr_repo.StockReceiptStatus(*req.Status)
+		params.Status = &st
+		countParams.Status = &st
+	}
+	if req.SupplierID != nil {
+		sid := pgtype.UUID{Bytes: *req.SupplierID, Valid: true}
+		params.SupplierID = sid
+		countParams.SupplierID = sid
+	}
+	if req.FromDate != nil {
+		params.FromDate = pgtype.Timestamptz{Time: *req.FromDate, Valid: true}
+		countParams.FromDate = params.FromDate
+	}
+	if req.ToDate != nil {
+		params.ToDate = pgtype.Timestamptz{Time: *req.ToDate, Valid: true}
+		countParams.ToDate = params.ToDate
+	}
+
+	rows, err := s.repo.ListStockReceipts(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+
+	count, err := s.repo.CountStockReceipts(ctx, countParams)
+	if err != nil {
+		return nil, err
+	}
+
+	var list []StockReceiptListItem
+	for _, row := range rows {
+		total, _ := s.repo.SumReceiptLineTotal(ctx, row.ID)
+		list = append(list, mapReceiptListRow(row, total))
+	}
+
+	return &PagedStockReceiptResponse{
+		Receipts:   list,
+		Pagination: pagination.BuildPagination(req.Page, int(count), limit),
+	}, nil
+}
+
+func (s *StockReceiptService) UpdateDraft(ctx context.Context, id uuid.UUID, req UpdateStockReceiptRequest) (*StockReceiptResponse, error) {
+	receipt, err := s.repo.GetStockReceiptByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, common.ErrNotFound
+		}
+		return nil, err
+	}
+	if receipt.Status != sr_repo.StockReceiptStatusDraft {
+		return nil, common.ErrInvalidState
+	}
+
+	receivedAt := receipt.ReceivedAt.Time
+	if req.ReceivedAt != nil {
+		receivedAt = *req.ReceivedAt
+	}
+
+	supplierID := receipt.SupplierID
+	if req.SupplierID != nil {
+		supplierID = pgtype.UUID{Bytes: *req.SupplierID, Valid: true}
+	} else if req.SupplierID == nil && req.Items != nil {
+		// keep existing supplier when only updating items
+	}
+
+	note := receipt.Note
+	if req.Note != nil {
+		note = req.Note
+	}
+
+	err = s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		qtx := sr_repo.New(tx)
+		_, err := qtx.UpdateStockReceiptDraft(ctx, sr_repo.UpdateStockReceiptDraftParams{
+			ID:         id,
+			SupplierID: supplierID,
+			ReceivedAt: pgtype.Timestamptz{Time: receivedAt, Valid: true},
+			Note:       note,
+		})
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return common.ErrInvalidState
+			}
+			return err
+		}
+		if err := qtx.DeleteStockReceiptItems(ctx, id); err != nil {
+			return err
+		}
+		if err := insertReceiptItems(ctx, qtx, id, req.Items); err != nil {
+			return err
+		}
+		return applyReceiptPayment(ctx, qtx, id, req.PaymentMode, req.AmountPaid)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return s.Get(ctx, id)
+}
+
+func applyReceiptPayment(ctx context.Context, q sr_repo.Querier, id uuid.UUID, mode *string, paid *float64) error {
+	pm := sr_repo.StockReceiptPaymentModeCash
+	if mode != nil && *mode == "credit" {
+		pm = sr_repo.StockReceiptPaymentModeCredit
+	}
+	amount := 0.0
+	if paid != nil {
+		amount = *paid
+	}
+	var n pgtype.Numeric
+	_ = n.Scan(fmt.Sprintf("%f", amount))
+	return q.UpdateStockReceiptPayment(ctx, sr_repo.UpdateStockReceiptPaymentParams{
+		ID:          id,
+		PaymentMode: pm,
+		AmountPaid:  n,
+	})
+}
+
+func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error) {
+	receipt, err := s.repo.GetStockReceiptByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, common.ErrNotFound
+		}
+		return nil, err
+	}
+	if receipt.Status != sr_repo.StockReceiptStatusDraft {
+		return nil, common.ErrInvalidState
+	}
+
+	items, err := s.repo.ListStockReceiptItems(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if len(items) == 0 {
+		return nil, common.ErrInvalidInput
+	}
+
+	err = s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		qtx := sr_repo.New(tx)
+		prd := products_repo.New(tx)
+		wh := wh_repo.New(tx)
+
+		warehouseID := uuid.UUID(receipt.WarehouseID.Bytes)
+		if !receipt.WarehouseID.Valid {
+			tid, ok := tenant.IDFromContext(ctx)
+			if !ok {
+				return common.ErrUnauthorized
+			}
+			dw, err := wh.GetDefaultWarehouse(ctx, tid)
+			if err != nil {
+				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+			}
+			warehouseID = dw.ID
+		}
+
+		var createdBy pgtype.UUID
+		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
+			createdBy = pgtype.UUID{Bytes: actorID, Valid: true}
+		}
+
+		refID := pgtype.UUID{Bytes: id, Valid: true}
+		note := fmt.Sprintf("Stock receipt %s", receipt.ReceiptNo)
+
+		for _, line := range items {
+			if _, err := prd.GetProductByID(ctx, line.ProductID); err != nil {
+				if errors.Is(err, pgx.ErrNoRows) {
+					return fmt.Errorf("%w: product not found", common.ErrInvalidInput)
+				}
+				return err
+			}
+
+			if err := inventory.ApplyWarehouseDelta(ctx, prd, wh, warehouseID, line.ProductID, line.Quantity, products_repo.StockChangeTypeRestock, refID, &note, createdBy); err != nil {
+				return err
+			}
+
+			cost := line.UnitCost
+			if _, err := prd.SetProductCostPrice(ctx, products_repo.SetProductCostPriceParams{
+				ID:        line.ProductID,
+				CostPrice: cost,
+			}); err != nil {
+				return err
+			}
+
+			if line.UnitSellPrice.Valid {
+				sellF, _ := line.UnitSellPrice.Float64Value()
+				if sellF.Valid && sellF.Float64 > 0 {
+					sellPrice := int64(sellF.Float64)
+					if _, err := prd.SetProductSellPrice(ctx, products_repo.SetProductSellPriceParams{
+						ID:    line.ProductID,
+						Price: sellPrice,
+					}); err != nil {
+						return err
+					}
+				}
+			}
+
+		}
+
+		_, err = qtx.SetStockReceiptStatus(ctx, sr_repo.SetStockReceiptStatusParams{
+			ID:     id,
+			Status: sr_repo.StockReceiptStatusCompleted,
+		})
+		if err != nil {
+			return err
+		}
+
+		rec, err := qtx.GetStockReceiptByID(ctx, id)
+		if err != nil {
+			return err
+		}
+		lineTotal, err := qtx.SumReceiptLineTotal(ctx, id)
+		if err != nil {
+			return err
+		}
+		totalF := numericToFloat(lineTotal)
+		paidF := numericToFloat(rec.AmountPaid)
+		if rec.SupplierID.Valid {
+			sdq := sd_repo.New(tx)
+			return supplier_debts.CreateDebtFromStockReceiptTx(ctx, sdq, supplier_debts.FromStockReceiptParams{
+				SupplierID: uuid.UUID(rec.SupplierID.Bytes),
+				ReceiptID:  id,
+				ReceiptNo:  rec.ReceiptNo,
+				Total:      totalF,
+				AmountPaid: paidF,
+				CreatedBy:  createdBy,
+			})
+		}
+		return nil
+	})
+	if err != nil {
+		s.log.Errorf("CompleteStockReceipt failed", "error", err)
+		return nil, err
+	}
+
+	resp, getErr := s.Get(ctx, id)
+	if s.events != nil && getErr == nil {
+		subject := fmt.Sprintf("Stock receipt %s completed", resp.ReceiptNo)
+		s.events.PublishAsync(ctx, notifications.EventStockReceiptCompleted, subject, subject)
+		if resp.SupplierID != nil && resp.TotalAmount-resp.AmountPaid > 0.0001 {
+			debtSubject := fmt.Sprintf("Supplier debt from receipt %s", resp.ReceiptNo)
+			s.events.PublishAsync(ctx, notifications.EventSupplierDebtCreated, debtSubject, debtSubject)
+		}
+	}
+	if getErr != nil {
+		return nil, getErr
+	}
+	return resp, nil
+}
+
+func (s *StockReceiptService) Cancel(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error) {
+	receipt, err := s.repo.GetStockReceiptByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, common.ErrNotFound
+		}
+		return nil, err
+	}
+	if receipt.Status != sr_repo.StockReceiptStatusDraft {
+		return nil, common.ErrInvalidState
+	}
+
+	_, err = s.repo.SetStockReceiptStatus(ctx, sr_repo.SetStockReceiptStatusParams{
+		ID:     id,
+		Status: sr_repo.StockReceiptStatusCancelled,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return s.Get(ctx, id)
+}
+
+func (s *StockReceiptService) Delete(ctx context.Context, id uuid.UUID) error {
+	receipt, err := s.repo.GetStockReceiptByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return common.ErrNotFound
+		}
+		return err
+	}
+	if receipt.Status != sr_repo.StockReceiptStatusDraft && receipt.Status != sr_repo.StockReceiptStatusCancelled {
+		return common.ErrInvalidState
+	}
+
+	if err := s.repo.DeleteStockReceipt(ctx, id); err != nil {
+		s.log.Errorf("DeleteStockReceipt failed", "error", err, "id", id)
+		return err
+	}
+	return nil
+}
+
+func nextReceiptNo(ctx context.Context, q *sr_repo.Queries) (string, error) {
+	now := time.Now()
+	d := pgtype.Date{Time: now, Valid: true}
+	count, err := q.CountStockReceiptsOnDate(ctx, d)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("GR-%s-%03d", now.Format("20060102"), count+1), nil
+}
+
+func insertReceiptItems(ctx context.Context, q *sr_repo.Queries, receiptID uuid.UUID, items []ReceiptItemInput) error {
+	for _, it := range items {
+		var cost pgtype.Numeric
+		if err := cost.Scan(fmt.Sprintf("%f", it.UnitCost)); err != nil {
+			return err
+		}
+		var sellPrice pgtype.Numeric
+		if it.UnitSellPrice != nil {
+			if err := sellPrice.Scan(fmt.Sprintf("%f", *it.UnitSellPrice)); err != nil {
+				return err
+			}
+		}
+		_, err := q.InsertStockReceiptItem(ctx, sr_repo.InsertStockReceiptItemParams{
+			ReceiptID:     receiptID,
+			ProductID:     it.ProductID,
+			Quantity:      it.Quantity,
+			UnitCost:      cost,
+			UnitSellPrice: sellPrice,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func mapReceiptDetail(r sr_repo.StockReceipt, items []sr_repo.ListStockReceiptItemsRow, total pgtype.Numeric) *StockReceiptResponse {
+	resp := &StockReceiptResponse{
+		ID:          r.ID,
+		ReceiptNo:   r.ReceiptNo,
+		Status:      string(r.Status),
+		ReceivedAt:  r.ReceivedAt.Time,
+		Note:        r.Note,
+		PaymentMode: string(r.PaymentMode),
+		AmountPaid:  numericToFloat(r.AmountPaid),
+		TotalAmount: numericToFloat(total),
+		CreatedAt:   r.CreatedAt.Time,
+		UpdatedAt:   r.UpdatedAt.Time,
+	}
+	if r.SupplierID.Valid {
+		sid := uuid.UUID(r.SupplierID.Bytes)
+		resp.SupplierID = &sid
+	}
+	if r.WarehouseID.Valid {
+		wid := uuid.UUID(r.WarehouseID.Bytes)
+		resp.WarehouseID = &wid
+	}
+	for _, it := range items {
+		var sellPtr *float64
+		if it.UnitSellPrice.Valid {
+			v := numericToFloat(it.UnitSellPrice)
+			sellPtr = &v
+		}
+		resp.Items = append(resp.Items, StockReceiptItemResponse{
+			ID:               it.ID,
+			ProductID:        it.ProductID,
+			ProductName:      it.ProductName,
+			ProductSku:       it.ProductSku,
+			ProductBarcode:   it.ProductBarcode,
+			Quantity:         it.Quantity,
+			UnitCost:         numericToFloat(it.UnitCost),
+			UnitSellPrice:    sellPtr,
+			LineTotal:        numericToFloat(it.LineTotal),
+			ProductCostPrice: numericToFloat(it.ProductCostPrice),
+			ProductSellPrice: float64(it.ProductSellPrice),
+		})
+	}
+	return resp
+}
+
+func mapReceiptListRow(row sr_repo.ListStockReceiptsRow, total pgtype.Numeric) StockReceiptListItem {
+	item := StockReceiptListItem{
+		ID:          row.ID,
+		ReceiptNo:   row.ReceiptNo,
+		Status:      string(row.Status),
+		ReceivedAt:  row.ReceivedAt.Time,
+		SupplierName: row.SupplierName,
+		TotalAmount: numericToFloat(total),
+		CreatedAt:   row.CreatedAt.Time,
+	}
+	if row.SupplierID.Valid {
+		sid := uuid.UUID(row.SupplierID.Bytes)
+		item.SupplierID = &sid
+	}
+	return item
+}
+
+func numericToFloat(n pgtype.Numeric) float64 {
+	if !n.Valid {
+		return 0
+	}
+	f, _ := n.Float64Value()
+	return f.Float64
+}

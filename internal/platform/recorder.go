@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"dinosaurus-pos/internal/platformaudit"
+	"dinosaurus-pos/internal/platform_audit"
 
 	"github.com/google/uuid"
 )
@@ -17,7 +17,7 @@ type recorder struct {
 	repo auditRepo
 }
 
-func NewRecorder(repo auditRepo) platformaudit.Recorder {
+func NewRecorder(repo auditRepo) platform_audit.Recorder {
 	return &recorder{repo: repo}
 }
 

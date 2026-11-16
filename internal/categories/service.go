@@ -1,8 +1,8 @@
 package categories
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	categories_repo "dinosaurus-pos/internal/categories/repository"
 	"dinosaurus-pos/internal/common"
 
@@ -18,7 +18,7 @@ import (
 type CtgService struct {
 	repo            categories_repo.Querier
 	log             logger.ILogger
-	activityService activitylog.IActivityService
+	activityService activity_log.IActivityService
 }
 
 type ICtgService interface {
@@ -30,7 +30,7 @@ type ICtgService interface {
 	GetCategoryWithProductCount(ctx context.Context) (*[]CategoryWithCountResponse, error)
 }
 
-func NewCtgService(repo categories_repo.Querier, log logger.ILogger, activityService activitylog.IActivityService) ICtgService {
+func NewCtgService(repo categories_repo.Querier, log logger.ILogger, activityService activity_log.IActivityService) ICtgService {
 	return &CtgService{
 		repo:            repo,
 		log:             log,
@@ -124,8 +124,8 @@ func (s *CtgService) DeleteCategory(ctx context.Context, categoryID int32) error
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeDELETE,
-		activitylog_repo.LogEntityTypeCATEGORY,
+		activity_log_repo.LogActionTypeDELETE,
+		activity_log_repo.LogEntityTypeCATEGORY,
 		strconv.Itoa(int(categoryID)),
 		logDetails,
 	)
@@ -170,8 +170,8 @@ func (s *CtgService) UpdateCategory(ctx context.Context, categoryID int32, req C
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypeCATEGORY,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypeCATEGORY,
 		strconv.Itoa(int(categoryID)),
 		logDetails,
 	)
@@ -232,8 +232,8 @@ func (s *CtgService) CreateCategory(ctx context.Context, req CreateCategoryReque
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeCREATE,
-		activitylog_repo.LogEntityTypeCATEGORY,
+		activity_log_repo.LogActionTypeCREATE,
+		activity_log_repo.LogEntityTypeCATEGORY,
 		strconv.FormatUint(uint64(category.ID), 10),
 		logDetails,
 	)

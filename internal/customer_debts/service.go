@@ -24,6 +24,7 @@ type ICustomerDebtService interface {
 	CreateManual(ctx context.Context, req CreateManualCustomerDebtRequest) (*CustomerDebtResponse, error)
 	RecordPayment(ctx context.Context, id uuid.UUID, req RecordCustomerDebtPaymentRequest) (*CustomerDebtResponse, error)
 	Void(ctx context.Context, id uuid.UUID) (*CustomerDebtResponse, error)
+	ExportExcel(ctx context.Context, req ListCustomerDebtsRequest) ([]byte, error)
 }
 
 type CustomerDebtService struct {
@@ -48,8 +49,9 @@ func (s *CustomerDebtService) List(ctx context.Context, req ListCustomerDebtsReq
 		countParams.CustomerID = params.CustomerID
 	}
 	if req.Status != nil {
-		params.Status = sd_repo.NullDebtStatus{DebtStatus: sd_repo.DebtStatus(*req.Status), Valid: true}
-		countParams.Status = params.Status
+		s := sd_repo.DebtStatus(*req.Status)
+		params.Status = &s
+		countParams.Status = &s
 	}
 	rows, err := s.repo.ListCustomerDebts(ctx, params)
 	if err != nil {
@@ -78,7 +80,7 @@ func (s *CustomerDebtService) Get(ctx context.Context, id uuid.UUID) (*CustomerD
 		return nil, err
 	}
 	payments, _ := s.repo.ListCustomerDebtPayments(ctx, id)
-	resp := mapListRow(row)
+	resp := mapDetailRow(row)
 	resp.Payments = mapPayments(payments)
 	return &resp, nil
 }
@@ -179,7 +181,7 @@ func (s *CustomerDebtService) RecordPayment(ctx context.Context, id uuid.UUID, r
 			return err
 		}
 		payments, _ := qtx.ListCustomerDebtPayments(ctx, id)
-		mapped := mapListRow(row)
+		mapped := mapDetailRow(row)
 		mapped.Payments = mapPayments(payments)
 		result = &mapped
 		return nil
@@ -204,14 +206,49 @@ func (s *CustomerDebtService) Void(ctx context.Context, id uuid.UUID) (*Customer
 	if debt.Status == sd_repo.DebtStatusSettled {
 		return nil, common.ErrInvalidState
 	}
-	_, err = s.repo.SetCustomerDebtStatus(ctx, id, sd_repo.DebtStatusVoid)
+	_, err = s.repo.SetCustomerDebtStatus(ctx, sd_repo.SetCustomerDebtStatusParams{
+		ID: id, Status: sd_repo.DebtStatusVoid,
+	})
 	if err != nil {
 		return nil, err
 	}
 	return s.Get(ctx, id)
 }
 
-func mapListRow(r sd_repo.CustomerDebtListRow) CustomerDebtResponse {
+func mapDetailRow(r sd_repo.GetCustomerDebtByIDRow) CustomerDebtResponse {
+	total := sd_repo.NumericToFloat(r.TotalAmount)
+	paid := sd_repo.NumericToFloat(r.AmountPaid)
+	var orderID *uuid.UUID
+	if r.OrderID.Valid {
+		id := uuid.UUID(r.OrderID.Bytes)
+		orderID = &id
+	}
+	age := 0
+	if r.IssuedAt.Valid {
+		age = int(time.Since(r.IssuedAt.Time).Hours() / 24)
+		if age < 0 {
+			age = 0
+		}
+	}
+	return CustomerDebtResponse{
+		ID:           r.ID,
+		CustomerID:   r.CustomerID,
+		CustomerName: r.CustomerName,
+		OrderID:      orderID,
+		ReferenceNo:  r.ReferenceNo,
+		TotalAmount:  total,
+		AmountPaid:   paid,
+		BalanceDue:   total - paid,
+		Status:       string(r.Status),
+		AgeDays:      age,
+		Note:         r.Note,
+		IssuedAt:     r.IssuedAt.Time,
+		CreatedAt:    r.CreatedAt.Time,
+		UpdatedAt:    r.UpdatedAt.Time,
+	}
+}
+
+func mapListRow(r sd_repo.ListCustomerDebtsRow) CustomerDebtResponse {
 	total := sd_repo.NumericToFloat(r.TotalAmount)
 	paid := sd_repo.NumericToFloat(r.AmountPaid)
 	var orderID *uuid.UUID

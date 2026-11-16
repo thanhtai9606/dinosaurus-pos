@@ -24,8 +24,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Plus } from 'lucide-react'
+import { FileSpreadsheet, Plus } from 'lucide-react'
 import { useFormatMoney } from '@/context/MoneyContext'
+import { axiosInstance } from '@/lib/api/client'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_dashboard/customer-debts')({
     component: CustomerDebtsPage,
@@ -66,6 +68,24 @@ function CustomerDebtsPage() {
 
     const customers = customersData?.customers || []
 
+    const handleExport = async () => {
+        try {
+            const res = await axiosInstance.get('/customer-debts/export', {
+                params: { customer_id: customerId, status },
+                responseType: 'blob',
+            })
+            const url = URL.createObjectURL(res.data as Blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'customer_debts.xlsx'
+            a.click()
+            URL.revokeObjectURL(url)
+            toast.success(t('customerDebts.messages.export_success', { defaultValue: 'Exported' }))
+        } catch {
+            toast.error(t('customerDebts.messages.export_failed', { defaultValue: 'Export failed' }))
+        }
+    }
+
     return (
         <div className="space-y-4 p-4">
             <Card>
@@ -82,6 +102,10 @@ function CustomerDebtsPage() {
                             <Link to="/customers">
                                 {t('customerDebts.actions.view_customers')}
                             </Link>
+                        </Button>
+                        <Button variant="outline" onClick={() => void handleExport()}>
+                            <FileSpreadsheet className="mr-2 h-4 w-4" />
+                            {t('customerDebts.actions.export_excel')}
                         </Button>
                     </div>
                 </CardHeader>

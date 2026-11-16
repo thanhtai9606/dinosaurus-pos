@@ -108,7 +108,7 @@ func (q *Queries) CountUsers(ctx context.Context, arg CountUsersParams) (int64, 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id,username, email, password_hash, avatar, role, is_active)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token
+RETURNING id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token, phone
 `
 
 type CreateUserParams struct {
@@ -145,6 +145,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.IsActive,
 		&i.DeletedAt,
 		&i.RefreshToken,
+		&i.Phone,
 	)
 	return i, err
 }
@@ -162,7 +163,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token
+SELECT id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token, phone
 FROM users
 WHERE email = $1 AND deleted_at IS NULL
 LIMIT 1
@@ -184,12 +185,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.IsActive,
 		&i.DeletedAt,
 		&i.RefreshToken,
+		&i.Phone,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token
+SELECT id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token, phone
 FROM users
 WHERE id = $1 AND deleted_at IS NULL
 LIMIT 1
@@ -211,12 +213,13 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.IsActive,
 		&i.DeletedAt,
 		&i.RefreshToken,
+		&i.Phone,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token
+SELECT id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token, phone
 FROM users
 WHERE username = $1 AND deleted_at IS NULL
 LIMIT 1
@@ -238,6 +241,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.IsActive,
 		&i.DeletedAt,
 		&i.RefreshToken,
+		&i.Phone,
 	)
 	return i, err
 }
@@ -382,7 +386,7 @@ SET
     role = COALESCE($6, role)
 
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token
+RETURNING id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token, phone
 `
 
 type UpdateUserParams struct {
@@ -417,6 +421,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.IsActive,
 		&i.DeletedAt,
 		&i.RefreshToken,
+		&i.Phone,
 	)
 	return i, err
 }
@@ -442,7 +447,7 @@ const updateUserRole = `-- name: UpdateUserRole :one
 UPDATE users
 SET role = $2
 WHERE id = $1 AND deleted_at IS NULL
-RETURNING id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token
+RETURNING id, username, email, password_hash, created_at, updated_at, avatar, role, is_active, deleted_at, refresh_token, phone
 `
 
 type UpdateUserRoleParams struct {
@@ -467,6 +472,7 @@ func (q *Queries) UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) 
 		&i.IsActive,
 		&i.DeletedAt,
 		&i.RefreshToken,
+		&i.Phone,
 	)
 	return i, err
 }

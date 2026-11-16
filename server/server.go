@@ -31,6 +31,10 @@ import (
 	sd_debts_repo "dinosaurus-pos/internal/supplier_debts/repository"
 	"dinosaurus-pos/internal/customer_debts"
 	cd_debts_repo "dinosaurus-pos/internal/customer_debts/repository"
+	"dinosaurus-pos/internal/dining"
+	dining_repo "dinosaurus-pos/internal/dining/repository"
+	"dinosaurus-pos/internal/einvoice"
+	ei_repo "dinosaurus-pos/internal/einvoice/repository"
 	"dinosaurus-pos/internal/orders"
 	orders_repo "dinosaurus-pos/internal/orders/repository"
 	"dinosaurus-pos/internal/payment_methods"
@@ -134,6 +138,8 @@ type AppContainer struct {
 	PlatformHandler           *platform.Handler
 	NotificationHandler       notifications.IHandler
 	NotificationService       notifications.INotificationService
+	DiningHandler             dining.IHandler
+	EInvoiceHandler           einvoice.IHandler
 	ShiftRepo                 shift_repo.Querier
 	ShiftService              shift.Service
 	WSHub                     *ws.Hub
@@ -293,8 +299,10 @@ func BuildAppContainer(app *App) *AppContainer {
 	stockReceiptService := stock_receipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger, notificationService)
 	stockReceiptHandler := stock_receipts.NewStockReceiptHandler(stockReceiptService, app.Logger)
 
+	shiftRepo := shift_repo.New(tenantDB)
+
 	supplierDebtRepo := sd_debts_repo.New(tenantDB)
-	supplierDebtService := supplier_debts.NewSupplierDebtService(supplierDebtRepo, app.Store, app.Logger)
+	supplierDebtService := supplier_debts.NewSupplierDebtService(supplierDebtRepo, shiftRepo, app.Store, app.Logger)
 	supplierDebtHandler := supplier_debts.NewSupplierDebtHandler(supplierDebtService, app.Logger)
 
 	customerDebtRepo := cd_debts_repo.New(tenantDB)
@@ -344,9 +352,6 @@ func BuildAppContainer(app *App) *AppContainer {
 	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService, productIndexer, productListCache, notificationService)
 	prdHandler := products.NewPrdHandler(prdService, app.Logger)
 
-	// Shift Module Repo
-	shiftRepo := shift_repo.New(tenantDB)
-
 	// Settings Module (needed by orders & printer)
 	settingsService := settings.NewSettingsService(app.Store, activityService, settingsRepo, app.R2, app.Logger)
 	settingsHandler := settings.NewSettingsHandler(settingsService, app.Logger)
@@ -382,6 +387,14 @@ func BuildAppContainer(app *App) *AppContainer {
 	shiftService := shift.NewService(shiftRepo, app.Logger, app.Cache)
 	shiftHandler := shift.NewHandler(shiftService, app.Logger)
 
+	diningRepo := dining_repo.New(tenantDB)
+	diningService := dining.NewService(diningRepo, app.Logger)
+	diningHandler := dining.NewHandler(diningService, app.Logger)
+
+	eiRepo := ei_repo.New(tenantDB)
+	einvoiceService := einvoice.NewService(eiRepo, ordersRepo, settingsService, app.Logger)
+	einvoiceHandler := einvoice.NewHandler(einvoiceService, app.Logger)
+
 	return &AppContainer{
 		AuthHandler:               authHandler,
 		UserHandler:               userHandler,
@@ -409,6 +422,8 @@ func BuildAppContainer(app *App) *AppContainer {
 		PlatformHandler:           platformHandler,
 		NotificationHandler:       notificationHandler,
 		NotificationService:       notificationService,
+		DiningHandler:             diningHandler,
+		EInvoiceHandler:           einvoiceHandler,
 		ShiftRepo:                 shiftRepo,
 		ShiftService:              shiftService,
 		WSHub:                     wsHub,

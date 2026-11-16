@@ -190,6 +190,7 @@ sqlc: query debt nằm trong `internal/*/sql/` và repository `*.sql.go`; nếu 
 
 ## Commit gần đây (tham chiếu)
 
+- Migration `000017` — F&B (`dining_*`, `kitchen_status`), e-invoice (`e_invoices`), SMS thật, export Excel công nợ, trả NCC ↔ `cash_transactions`, offline queue POS `/order`.
 - `c6a4a45` — Debt ledgers MVP + stock receipt `payment_mode` / `amount_paid` + trang công nợ + luồng tạo phiếu nhập mới.
 - Trước đó: stock receipts UX (modal rộng, bulk, delete API, barcode dòng).
 

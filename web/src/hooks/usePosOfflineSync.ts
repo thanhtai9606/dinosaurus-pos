@@ -62,7 +62,7 @@ async function processEntry(entry: PosQueueEntry) {
         headers: { 'X-Idempotency-Key': entry.idempotencyKey },
     })
     const order = (orderRes.data as { data: { id?: string; version?: number } }).data
-    if (entry.kind === 'retail_debt' || !entry.payment) {
+    if (entry.kind === 'retail_debt' || entry.kind === 'pos_debt' || !entry.payment) {
         return
     }
     if (!order?.id) throw new Error('no order id')

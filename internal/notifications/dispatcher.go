@@ -66,6 +66,11 @@ func (d *Dispatcher) deliverOne(ctx context.Context, ev DispatchEvent, sub notif
 		ToEmail:   sub.UserEmail,
 		EventType: ev.EventType,
 	}
+	if sub.ChannelType == notif_repo.NotificationChannelTypeSms {
+		if sub.UserPhone != nil {
+			msg.ToPhone = strings.TrimSpace(*sub.UserPhone)
+		}
+	}
 	sendErr := sender.Send(ctx, msg)
 	status := notif_repo.NotificationDeliveryStatusSent
 	if sendErr != nil {

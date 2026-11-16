@@ -16,9 +16,10 @@ type CreateManualSupplierDebtRequest struct {
 }
 
 type RecordSupplierDebtPaymentRequest struct {
-	Amount float64    `json:"amount" validate:"required,gt=0"`
-	PaidAt *time.Time `json:"paid_at"`
-	Note   *string    `json:"note" validate:"omitempty,max=500"`
+	Amount         float64    `json:"amount" validate:"required,gt=0"`
+	PaidAt         *time.Time `json:"paid_at"`
+	Note           *string    `json:"note" validate:"omitempty,max=500"`
+	DeductFromCash *bool      `json:"deduct_from_cash"`
 }
 
 type ListSupplierDebtsRequest struct {

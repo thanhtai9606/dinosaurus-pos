@@ -30,7 +30,7 @@ func CreateDebtFromStockReceiptTx(ctx context.Context, q *sd_repo.Queries, p Fro
 	if p.SupplierID == uuid.Nil {
 		return nil
 	}
-	_, err := q.GetSupplierDebtByStockReceiptID(ctx, p.ReceiptID)
+	_, err := q.GetSupplierDebtByStockReceiptID(ctx, pgtype.UUID{Bytes: p.ReceiptID, Valid: true})
 	if err == nil {
 		return nil
 	}

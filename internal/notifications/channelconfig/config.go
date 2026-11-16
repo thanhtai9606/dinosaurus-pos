@@ -26,9 +26,13 @@ type TelegramConfig struct {
 }
 
 type SMSConfig struct {
-	Provider string `json:"provider"`
-	APIKey   string `json:"api_key,omitempty"`
-	SenderID string `json:"sender_id"`
+	Provider     string `json:"provider"`
+	APIKey       string `json:"api_key,omitempty"`
+	APISecret    string `json:"api_secret,omitempty"`
+	AccountSID   string `json:"account_sid,omitempty"`
+	BaseURL      string `json:"base_url,omitempty"`
+	SenderID     string `json:"sender_id"`
+	DefaultPhone string `json:"default_phone,omitempty"`
 }
 
 func mergeStringSecret(incoming, existing string) string {
@@ -63,6 +67,9 @@ func maskTelegramConfig(c TelegramConfig) TelegramConfig {
 func maskSMSConfig(c SMSConfig) SMSConfig {
 	if c.APIKey != "" {
 		c.APIKey = SecretMask
+	}
+	if c.APISecret != "" {
+		c.APISecret = SecretMask
 	}
 	return c
 }
@@ -107,7 +114,11 @@ func MergeConfigJSON(channelType string, incoming, existing []byte) ([]byte, err
 		}
 		ex.Provider = strings.TrimSpace(in.Provider)
 		ex.APIKey = mergeStringSecret(in.APIKey, ex.APIKey)
+		ex.APISecret = mergeStringSecret(in.APISecret, ex.APISecret)
+		ex.AccountSID = strings.TrimSpace(in.AccountSID)
+		ex.BaseURL = strings.TrimSpace(in.BaseURL)
 		ex.SenderID = strings.TrimSpace(in.SenderID)
+		ex.DefaultPhone = strings.TrimSpace(in.DefaultPhone)
 		return json.Marshal(ex)
 	case "firebase":
 		return existing, nil

@@ -536,6 +536,10 @@ export const RBAC_RULES: Record<string, string[]> = {
         "admin",
         "manager"
     ],
+    "GET /supplier-debts/export": [
+        "admin",
+        "manager"
+    ],
     "POST /supplier-debts": [
         "admin",
         "manager"
@@ -557,6 +561,43 @@ export const RBAC_RULES: Record<string, string[]> = {
         "manager"
     ],
     "GET /customer-debts/summary": [
+        "admin",
+        "manager"
+    ],
+    "GET /customer-debts/export": [
+        "admin",
+        "manager"
+    ],
+    "GET /dining/tables": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /dining/areas": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PATCH /dining/tables/{id}/status": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /kitchen/tickets": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PATCH /orders/{id}/kitchen-status": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "POST /orders/{id}/e-invoice": [
+        "admin",
+        "manager"
+    ],
+    "GET /orders/{id}/e-invoice": [
         "admin",
         "manager"
     ],

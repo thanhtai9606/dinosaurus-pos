@@ -135,6 +135,8 @@
         "supplier_debts": "Công nợ NCC",
         "customer_debts": "Công nợ khách",
         "retail_pos": "Bán hàng POS",
+        "dining_tables": "Bàn ăn",
+        "kitchen": "Bếp / KDS",
         "tenants_admin": "Quản lý cửa hàng",
         "platform": "Nền tảng",
         "platform_overview": "Tổng quan",
@@ -366,6 +368,36 @@
             "void": "Hủy khoản nợ"
         }
     },
+    "kitchen": {
+        "title": "Màn hình bếp",
+        "refresh": "Làm mới",
+        "empty": "Không có phiếu bếp đang chờ",
+        "table": "Bàn",
+        "status": {
+            "pending": "Chờ bếp",
+            "preparing": "Đang làm",
+            "ready": "Sẵn sàng",
+            "served": "Đã ra"
+        },
+        "advance_to": {
+            "preparing": "Bắt đầu làm",
+            "ready": "Hoàn tất",
+            "served": "Đã phục vụ"
+        },
+        "errors": {
+            "update_failed": "Cập nhật trạng thái bếp thất bại"
+        }
+    },
+    "dining": {
+        "title": "Sơ đồ bàn",
+        "seats": "{{count}} chỗ",
+        "status": {
+            "available": "Trống",
+            "occupied": "Có khách",
+            "reserved": "Đặt trước",
+            "dirty": "Cần dọn"
+        }
+    },
     "supplierDebts": {
         "title": "Công nợ nhà cung cấp",
         "fields": {
@@ -377,7 +409,8 @@
         },
         "actions": {
             "add_manual": "Thêm khoản nợ",
-            "view_suppliers": "Danh sách NCC"
+            "view_suppliers": "Danh sách NCC",
+            "export_excel": "Xuất Excel"
         },
         "messages": {
             "create_success": "Đã tạo khoản nợ NCC",
@@ -399,7 +432,8 @@
         },
         "actions": {
             "add_manual": "Thêm khoản nợ thủ công",
-            "view_customers": "Danh sách khách"
+            "view_customers": "Danh sách khách",
+            "export_excel": "Xuất Excel"
         },
         "messages": {
             "create_success": "Đã tạo khoản phải thu",

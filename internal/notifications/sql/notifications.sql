@@ -33,7 +33,8 @@ WHERE user_id = $1;
 -- name: ListEnabledSubscriptionsForEvent :many
 SELECT ns.id, ns.tenant_id, ns.user_id, ns.event_type, ns.channel_id, ns.enabled, ns.created_at, ns.updated_at,
        nc.channel_type, nc.config_json, nc.name AS channel_name,
-       u.email AS user_email
+       u.email AS user_email,
+       u.phone AS user_phone
 FROM notification_subscriptions ns
 JOIN notification_channels nc ON nc.id = ns.channel_id AND nc.enabled = true
 JOIN users u ON u.id = ns.user_id

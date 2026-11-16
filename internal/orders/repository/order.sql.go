@@ -160,7 +160,7 @@ SET
     cancellation_notes = $3
 WHERE
     id = $1 AND status = 'open'
-RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id
+RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
 `
 
 type CancelOrderParams struct {
@@ -201,6 +201,8 @@ func (q *Queries) CancelOrder(ctx context.Context, arg CancelOrderParams) (Order
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
@@ -268,17 +270,18 @@ func (q *Queries) CountOrdersOnDate(ctx context.Context, dollar_1 pgtype.Timesta
 }
 
 const createOrder = `-- name: CreateOrder :one
-INSERT INTO orders (user_id, type, customer_id, order_no, shift_id)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id
+INSERT INTO orders (user_id, type, customer_id, order_no, shift_id, dining_table_id)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
 `
 
 type CreateOrderParams struct {
-	UserID     pgtype.UUID `json:"user_id"`
-	Type       OrderType   `json:"type"`
-	CustomerID pgtype.UUID `json:"customer_id"`
-	OrderNo    string      `json:"order_no"`
-	ShiftID    pgtype.UUID `json:"shift_id"`
+	UserID        pgtype.UUID `json:"user_id"`
+	Type          OrderType   `json:"type"`
+	CustomerID    pgtype.UUID `json:"customer_id"`
+	OrderNo       string      `json:"order_no"`
+	ShiftID       pgtype.UUID `json:"shift_id"`
+	DiningTableID pgtype.UUID `json:"dining_table_id"`
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
@@ -288,6 +291,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		arg.CustomerID,
 		arg.OrderNo,
 		arg.ShiftID,
+		arg.DiningTableID,
 	)
 	var i Order
 	err := row.Scan(
@@ -317,6 +321,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
@@ -563,7 +569,7 @@ func (q *Queries) GetOptionsForProducts(ctx context.Context, dollar_1 []uuid.UUI
 }
 
 const getOrderByGatewayRef = `-- name: GetOrderByGatewayRef :one
-SELECT id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id FROM orders
+SELECT id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status FROM orders
 WHERE payment_gateway_reference = $1
 LIMIT 1
 `
@@ -599,12 +605,14 @@ func (q *Queries) GetOrderByGatewayRef(ctx context.Context, paymentGatewayRefere
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
 
 const getOrderForUpdate = `-- name: GetOrderForUpdate :one
-SELECT id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id FROM orders
+SELECT id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status FROM orders
 WHERE id = $1
 LIMIT 1
     FOR UPDATE
@@ -642,6 +650,48 @@ func (q *Queries) GetOrderForUpdate(ctx context.Context, id uuid.UUID) (Order, e
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
+	)
+	return i, err
+}
+
+const getOrderHeaderByID = `-- name: GetOrderHeaderByID :one
+SELECT id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status FROM orders WHERE id = $1
+`
+
+func (q *Queries) GetOrderHeaderByID(ctx context.Context, id uuid.UUID) (Order, error) {
+	row := q.db.QueryRow(ctx, getOrderHeaderByID, id)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Type,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.GrossTotal,
+		&i.DiscountAmount,
+		&i.NetTotal,
+		&i.AppliedPromotionID,
+		&i.PaymentMethodID,
+		&i.PaymentGatewayReference,
+		&i.CashReceived,
+		&i.ChangeDue,
+		&i.CancellationReasonID,
+		&i.CancellationNotes,
+		&i.PaymentUrl,
+		&i.PaymentToken,
+		&i.Version,
+		&i.TaxAmount,
+		&i.ServiceChargeAmount,
+		&i.CustomerID,
+		&i.OrderNo,
+		&i.TenantID,
+		&i.FulfillmentWarehouseID,
+		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
@@ -716,7 +766,7 @@ func (q *Queries) GetOrderItemsByOrderID(ctx context.Context, orderID uuid.UUID)
 
 const getOrderWithDetails = `-- name: GetOrderWithDetails :one
 SELECT
-    o.id, o.user_id, o.type, o.status, o.created_at, o.updated_at, o.gross_total, o.discount_amount, o.net_total, o.applied_promotion_id, o.payment_method_id, o.payment_gateway_reference, o.cash_received, o.change_due, o.cancellation_reason_id, o.cancellation_notes, o.payment_url, o.payment_token, o.version, o.tax_amount, o.service_charge_amount, o.customer_id, o.order_no, o.tenant_id, o.fulfillment_warehouse_id, o.shift_id,
+    o.id, o.user_id, o.type, o.status, o.created_at, o.updated_at, o.gross_total, o.discount_amount, o.net_total, o.applied_promotion_id, o.payment_method_id, o.payment_gateway_reference, o.cash_received, o.change_due, o.cancellation_reason_id, o.cancellation_notes, o.payment_url, o.payment_token, o.version, o.tax_amount, o.service_charge_amount, o.customer_id, o.order_no, o.tenant_id, o.fulfillment_warehouse_id, o.shift_id, o.dining_table_id, o.kitchen_status,
     COALESCE(
             (SELECT json_agg(items)
              FROM (
@@ -736,33 +786,35 @@ LIMIT 1
 `
 
 type GetOrderWithDetailsRow struct {
-	ID                      uuid.UUID          `json:"id"`
-	UserID                  pgtype.UUID        `json:"user_id"`
-	Type                    OrderType          `json:"type"`
-	Status                  OrderStatus        `json:"status"`
-	CreatedAt               pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt               pgtype.Timestamptz `json:"updated_at"`
-	GrossTotal              int64              `json:"gross_total"`
-	DiscountAmount          int64              `json:"discount_amount"`
-	NetTotal                int64              `json:"net_total"`
-	AppliedPromotionID      pgtype.UUID        `json:"applied_promotion_id"`
-	PaymentMethodID         *int32             `json:"payment_method_id"`
-	PaymentGatewayReference *string            `json:"payment_gateway_reference"`
-	CashReceived            *int64             `json:"cash_received"`
-	ChangeDue               *int64             `json:"change_due"`
-	CancellationReasonID    *int32             `json:"cancellation_reason_id"`
-	CancellationNotes       *string            `json:"cancellation_notes"`
-	PaymentUrl              *string            `json:"payment_url"`
-	PaymentToken            *string            `json:"payment_token"`
-	Version                 int32              `json:"version"`
-	TaxAmount               int64              `json:"tax_amount"`
-	ServiceChargeAmount     int64              `json:"service_charge_amount"`
-	CustomerID              pgtype.UUID        `json:"customer_id"`
-	OrderNo                 string             `json:"order_no"`
-	TenantID                uuid.UUID          `json:"tenant_id"`
-	FulfillmentWarehouseID  pgtype.UUID        `json:"fulfillment_warehouse_id"`
-	ShiftID                 pgtype.UUID        `json:"shift_id"`
-	Items                   interface{}        `json:"items"`
+	ID                      uuid.UUID           `json:"id"`
+	UserID                  pgtype.UUID         `json:"user_id"`
+	Type                    OrderType           `json:"type"`
+	Status                  OrderStatus         `json:"status"`
+	CreatedAt               pgtype.Timestamptz  `json:"created_at"`
+	UpdatedAt               pgtype.Timestamptz  `json:"updated_at"`
+	GrossTotal              int64               `json:"gross_total"`
+	DiscountAmount          int64               `json:"discount_amount"`
+	NetTotal                int64               `json:"net_total"`
+	AppliedPromotionID      pgtype.UUID         `json:"applied_promotion_id"`
+	PaymentMethodID         *int32              `json:"payment_method_id"`
+	PaymentGatewayReference *string             `json:"payment_gateway_reference"`
+	CashReceived            *int64              `json:"cash_received"`
+	ChangeDue               *int64              `json:"change_due"`
+	CancellationReasonID    *int32              `json:"cancellation_reason_id"`
+	CancellationNotes       *string             `json:"cancellation_notes"`
+	PaymentUrl              *string             `json:"payment_url"`
+	PaymentToken            *string             `json:"payment_token"`
+	Version                 int32               `json:"version"`
+	TaxAmount               int64               `json:"tax_amount"`
+	ServiceChargeAmount     int64               `json:"service_charge_amount"`
+	CustomerID              pgtype.UUID         `json:"customer_id"`
+	OrderNo                 string              `json:"order_no"`
+	TenantID                uuid.UUID           `json:"tenant_id"`
+	FulfillmentWarehouseID  pgtype.UUID         `json:"fulfillment_warehouse_id"`
+	ShiftID                 pgtype.UUID         `json:"shift_id"`
+	DiningTableID           pgtype.UUID         `json:"dining_table_id"`
+	KitchenStatus           KitchenTicketStatus `json:"kitchen_status"`
+	Items                   interface{}         `json:"items"`
 }
 
 // Mengambil detail lengkap pesanan, termasuk item dan opsinya dalam format JSON.
@@ -796,6 +848,8 @@ func (q *Queries) GetOrderWithDetails(ctx context.Context, id uuid.UUID) (GetOrd
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 		&i.Items,
 	)
 	return i, err
@@ -1040,6 +1094,61 @@ func (q *Queries) GetPromotionTargets(ctx context.Context, promotionID uuid.UUID
 	return items, nil
 }
 
+const listKitchenTickets = `-- name: ListKitchenTickets :many
+SELECT
+    o.id,
+    o.order_no,
+    o.kitchen_status,
+    o.status AS order_status,
+    o.created_at,
+    o.dining_table_id,
+    dt.name AS table_name
+FROM orders o
+LEFT JOIN dining_tables dt ON dt.id = o.dining_table_id
+WHERE o.status NOT IN ('cancelled', 'paid')
+  AND o.kitchen_status <> 'served'
+ORDER BY o.created_at ASC
+LIMIT $1
+`
+
+type ListKitchenTicketsRow struct {
+	ID            uuid.UUID           `json:"id"`
+	OrderNo       string              `json:"order_no"`
+	KitchenStatus KitchenTicketStatus `json:"kitchen_status"`
+	OrderStatus   OrderStatus         `json:"order_status"`
+	CreatedAt     pgtype.Timestamptz  `json:"created_at"`
+	DiningTableID pgtype.UUID         `json:"dining_table_id"`
+	TableName     *string             `json:"table_name"`
+}
+
+func (q *Queries) ListKitchenTickets(ctx context.Context, limit int32) ([]ListKitchenTicketsRow, error) {
+	rows, err := q.db.Query(ctx, listKitchenTickets, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListKitchenTicketsRow{}
+	for rows.Next() {
+		var i ListKitchenTicketsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderNo,
+			&i.KitchenStatus,
+			&i.OrderStatus,
+			&i.CreatedAt,
+			&i.DiningTableID,
+			&i.TableName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listOrders = `-- name: ListOrders :many
 SELECT
     id,
@@ -1151,7 +1260,7 @@ SET
     version = version + 1
 WHERE
     id = $1
-RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id
+RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
 `
 
 func (q *Queries) RefundOrder(ctx context.Context, id uuid.UUID) (Order, error) {
@@ -1184,6 +1293,8 @@ func (q *Queries) RefundOrder(ctx context.Context, id uuid.UUID) (Order, error) 
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
@@ -1251,6 +1362,51 @@ func (q *Queries) UpdateOrderItemQuantity(ctx context.Context, arg UpdateOrderIt
 	return i, err
 }
 
+const updateOrderKitchenStatus = `-- name: UpdateOrderKitchenStatus :one
+UPDATE orders SET kitchen_status = $2, updated_at = NOW() WHERE id = $1 RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
+`
+
+type UpdateOrderKitchenStatusParams struct {
+	ID            uuid.UUID           `json:"id"`
+	KitchenStatus KitchenTicketStatus `json:"kitchen_status"`
+}
+
+func (q *Queries) UpdateOrderKitchenStatus(ctx context.Context, arg UpdateOrderKitchenStatusParams) (Order, error) {
+	row := q.db.QueryRow(ctx, updateOrderKitchenStatus, arg.ID, arg.KitchenStatus)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Type,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.GrossTotal,
+		&i.DiscountAmount,
+		&i.NetTotal,
+		&i.AppliedPromotionID,
+		&i.PaymentMethodID,
+		&i.PaymentGatewayReference,
+		&i.CashReceived,
+		&i.ChangeDue,
+		&i.CancellationReasonID,
+		&i.CancellationNotes,
+		&i.PaymentUrl,
+		&i.PaymentToken,
+		&i.Version,
+		&i.TaxAmount,
+		&i.ServiceChargeAmount,
+		&i.CustomerID,
+		&i.OrderNo,
+		&i.TenantID,
+		&i.FulfillmentWarehouseID,
+		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
+	)
+	return i, err
+}
+
 const updateOrderManualPayment = `-- name: UpdateOrderManualPayment :one
 UPDATE orders
 SET
@@ -1262,7 +1418,7 @@ SET
     version = version + 1
 WHERE
     id = $1 AND version = $5
-RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id
+RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
 `
 
 type UpdateOrderManualPaymentParams struct {
@@ -1313,6 +1469,8 @@ func (q *Queries) UpdateOrderManualPayment(ctx context.Context, arg UpdateOrderM
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
@@ -1363,7 +1521,7 @@ const updateOrderStatus = `-- name: UpdateOrderStatus :one
 UPDATE orders
 SET status = $2
 WHERE id = $1
-RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id
+RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
 `
 
 type UpdateOrderStatusParams struct {
@@ -1403,6 +1561,8 @@ func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusPa
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
@@ -1414,7 +1574,7 @@ SET
     payment_method_id = COALESCE($3, payment_method_id),
     version = version + 1
 WHERE payment_gateway_reference = $1 AND status <> 'paid' -- Mencegah update ganda
-RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id
+RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
 `
 
 type UpdateOrderStatusByGatewayRefParams struct {
@@ -1454,6 +1614,8 @@ func (q *Queries) UpdateOrderStatusByGatewayRef(ctx context.Context, arg UpdateO
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }
@@ -1469,7 +1631,7 @@ SET
     version = version + 1
 WHERE
     id = $1 AND version = $7
-RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id
+RETURNING id, user_id, type, status, created_at, updated_at, gross_total, discount_amount, net_total, applied_promotion_id, payment_method_id, payment_gateway_reference, cash_received, change_due, cancellation_reason_id, cancellation_notes, payment_url, payment_token, version, tax_amount, service_charge_amount, customer_id, order_no, tenant_id, fulfillment_warehouse_id, shift_id, dining_table_id, kitchen_status
 `
 
 type UpdateOrderTotalsParams struct {
@@ -1521,6 +1683,8 @@ func (q *Queries) UpdateOrderTotals(ctx context.Context, arg UpdateOrderTotalsPa
 		&i.TenantID,
 		&i.FulfillmentWarehouseID,
 		&i.ShiftID,
+		&i.DiningTableID,
+		&i.KitchenStatus,
 	)
 	return i, err
 }

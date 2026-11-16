@@ -7,6 +7,7 @@ type Message struct {
 	Body      string
 	HTMLBody  string
 	ToEmail   string
+	ToPhone   string
 	EventType string
 	Data      map[string]string
 }

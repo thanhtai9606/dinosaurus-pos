@@ -27,6 +27,9 @@ import {
 } from '@/lib/orders/orderDraftStorage'
 import { notifyPosDraftChanged } from '@/lib/pos/sessionScope'
 import { getCachedPosProducts } from '@/lib/pos/posCatalogStore'
+import { OfflinePosBanner } from '@/components/retail-pos/OfflinePosBanner'
+import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
+import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
 
 export const Route = createFileRoute('/_dashboard/order')({
     component: OrderPage,
@@ -147,6 +150,7 @@ function OrderPage() {
     const [productForVariantSelection, setProductForVariantSelection] = useState<Product | null>(null)
 
     const createOrderMutation = useCreateOrderMutation()
+    const { online, pending, syncing, flush } = usePosOfflineSync()
     const canCreateOrder = createOrderMutation.isAllowed
 
     const addToCart = async (product: Product) => {
@@ -242,19 +246,32 @@ function OrderPage() {
             customer_id: selectedCustomerId || undefined
         }
 
-        toast.promise(createOrderMutation.mutateAsync(orderData), {
-            loading: t('order.success.creating'),
-            success: (data) => {
+        createOrderMutation
+            .mutateAsync(orderData)
+            .then((data) => {
                 setCreatedOrderId(data.id || null)
                 setIsPaymentOpen(true)
-                return t('order.success.created')
-            },
-            error: (err) => getApiErrorMessage(err, t('order.errors.create_failed')),
-        })
+                toast.success(t('order.success.created'))
+            })
+            .catch((err) => {
+                if (isNetworkError(err)) {
+                    enqueuePosOp({
+                        idempotencyKey: crypto.randomUUID(),
+                        kind: selectedCustomerId ? 'pos_debt' : 'pos_cash',
+                        orderBody: orderData as Record<string, unknown>,
+                    })
+                    toast.info(t('retailPos.offline.queued'))
+                    setCart([])
+                    return
+                }
+                toast.error(getApiErrorMessage(err, t('order.errors.create_failed')))
+            })
     }
 
     return (
-        <div className="relative flex h-[calc(100vh-4rem)] overflow-hidden rounded-xl border bg-muted/20">
+        <div className="relative flex h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-xl border bg-muted/20">
+            <OfflinePosBanner online={online} pending={pending} syncing={syncing} onSync={() => void flush()} t={t} />
+            <div className="relative flex min-h-0 flex-1 overflow-hidden">
             <aside className="hidden w-56 shrink-0 lg:block xl:w-64">
                 <CategorySidebar
                     categories={categories}
@@ -362,6 +379,7 @@ function OrderPage() {
                 onSelect={addCartItem}
                 t={t}
             />
+            </div>
         </div>
     )
 }

@@ -14,6 +14,7 @@ import (
 type ICustomerDebtHandler interface {
 	ListHandler(c fiber.Ctx) error
 	SummaryHandler(c fiber.Ctx) error
+	ExportHandler(c fiber.Ctx) error
 	GetHandler(c fiber.Ctx) error
 	CreateHandler(c fiber.Ctx) error
 	PaymentHandler(c fiber.Ctx) error
@@ -39,6 +40,20 @@ func (h *CustomerDebtHandler) ListHandler(c fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to list customer debts"})
 	}
 	return c.JSON(common.SuccessResponse{Message: "OK", Data: resp})
+}
+
+func (h *CustomerDebtHandler) ExportHandler(c fiber.Ctx) error {
+	var req ListCustomerDebtsRequest
+	if err := c.Bind().Query(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid query parameters"})
+	}
+	data, err := h.service.ExportExcel(c.RequestCtx(), req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to export"})
+	}
+	c.Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	c.Set("Content-Disposition", "attachment; filename=customer_debts.xlsx")
+	return c.Send(data)
 }
 
 func (h *CustomerDebtHandler) SummaryHandler(c fiber.Ctx) error {

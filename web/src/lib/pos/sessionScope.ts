@@ -1,6 +1,7 @@
 const SCOPE_KEY = 'pos_storage_scope_v1'
 export const POS_QUEUE_CHANGED_EVENT = 'pos-offline-queue-changed'
 export const POS_DRAFT_CHANGED_EVENT = 'pos-draft-changed'
+export const POS_CATALOG_CHANGED_EVENT = 'pos-catalog-changed'
 
 export function setPosStorageScope(scope: string) {
     const next = scope.trim() || 'default'
@@ -29,4 +30,9 @@ export function notifyPosQueueChanged() {
 export function notifyPosDraftChanged() {
     if (typeof window === 'undefined') return
     window.dispatchEvent(new Event(POS_DRAFT_CHANGED_EVENT))
+}
+
+export function notifyPosCatalogChanged() {
+    if (typeof window === 'undefined') return
+    window.dispatchEvent(new Event(POS_CATALOG_CHANGED_EVENT))
 }

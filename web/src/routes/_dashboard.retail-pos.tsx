@@ -12,7 +12,8 @@ import { RetailCheckoutPanel, RetailSettlementMode } from '@/components/retail-p
 import { RetailPriceEditDialog } from '@/components/retail-pos/RetailPriceEditDialog'
 import { Product, useUpdateProductMutation } from '@/lib/api/query/products'
 import { axiosInstance } from '@/lib/api/client'
-import { fetchProductByCode } from '@/lib/products/lookupProduct'
+import { fetchProductByCode, fetchProductDetail } from '@/lib/products/lookupProduct'
+import { usePosCatalog } from '@/hooks/usePosCatalog'
 import { useConfirmManualPaymentMutation, useCreateOrderMutation } from '@/lib/api/query/orders'
 import { useCustomersListQuery } from '@/lib/api/query/customers'
 import { usePaymentMethodsListQuery } from '@/lib/api/query/payment-methods'
@@ -73,6 +74,7 @@ function RetailPosPage() {
     const [priceEditItem, setPriceEditItem] = useState<CartItem | null>(null)
     const [returnOpen, setReturnOpen] = useState(false)
     const { online, pending, syncing, flush, refresh: refreshQueue } = usePosOfflineSync()
+    const posCatalog = usePosCatalog()
 
     const activeTab = tabs.find((tab) => tab.id === activeTabId) ?? tabs[0]
     const cart = activeTab?.cart ?? []
@@ -172,8 +174,7 @@ function RetailPosPage() {
     const ensureProductDetail = async (product: Product): Promise<Product> => {
         if (!product.id) return product
         try {
-            const res = await axiosInstance.get(`/products/${product.id}`)
-            return (res.data as { data: Product }).data
+            return await fetchProductDetail(product.id)
         } catch {
             return product
         }
@@ -235,7 +236,11 @@ function RetailPosPage() {
             const product = await fetchProductByCode(code)
             await addProductToCartFlow(product, product.matched_sale_unit_id)
         } catch {
-            toast.error(t('retailPos.product_not_found'))
+            if (!online && posCatalog.count === 0) {
+                toast.error(t('posCatalog.offline_no_cache'))
+            } else {
+                toast.error(t('retailPos.product_not_found'))
+            }
         } finally {
             setScanning(false)
         }
@@ -474,7 +479,23 @@ function RetailPosPage() {
                     {t('retailPos.return.button')}
                 </Button>
             </header>
-            <OfflinePosBanner online={online} pending={pending} syncing={syncing} onSync={() => void flush()} t={t} />
+            <OfflinePosBanner
+                online={online}
+                pending={pending}
+                syncing={syncing}
+                onSync={() => void flush()}
+                t={t}
+                catalogCount={posCatalog.count}
+                catalogStale={posCatalog.stale}
+                catalogSyncing={posCatalog.syncing}
+                onCatalogSync={() =>
+                    toast.promise(posCatalog.sync(), {
+                        loading: t('posCatalog.syncing'),
+                        success: t('posCatalog.sync_done'),
+                        error: t('posCatalog.sync_failed'),
+                    })
+                }
+            />
 
             <div className="flex min-h-0 flex-1">
                 <div className="flex min-w-0 flex-1 flex-col">

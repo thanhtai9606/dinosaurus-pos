@@ -1193,6 +1193,18 @@
             "delete_success": "Promotion deleted successfully"
         }
     },
+    "posCatalog": {
+        "download": "Download offline catalog",
+        "syncing": "Downloading products…",
+        "sync_starting": "Downloading offline product catalog…",
+        "sync_done": "Catalog saved on this device",
+        "sync_failed": "Could not download catalog — check your connection",
+        "cached_count": "{{count}} product(s) on device",
+        "empty": "No offline catalog yet",
+        "stale": "catalog outdated",
+        "offline_mode": "scan/search uses local copy",
+        "offline_no_cache": "Offline with no catalog — go online once to download products"
+    },
     "posStatus": {
         "title": "Local sales status",
         "pending_sync": "{{count}} sale(s) not sent to server",

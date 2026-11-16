@@ -14,6 +14,7 @@ import { DashboardTopBar } from "@/components/dashboard/DashboardTopBar"
 import { useAppWebSocket } from '@/hooks/useAppWebSocket'
 import { useQueryClient } from '@tanstack/react-query'
 import { PosStorageScopeEffect } from '@/components/dashboard/PosStorageScopeEffect'
+import { PosCatalogBootstrap } from '@/components/dashboard/PosCatalogBootstrap'
 
 export const Route = createFileRoute('/_dashboard')({
     loader: async ({ context: { queryClient } }) => {
@@ -108,6 +109,7 @@ function DashboardLayout() {
                 {!isSuperAdmin && (
                     <>
                         <PosStorageScopeEffect />
+                        <PosCatalogBootstrap />
                         <OpenShiftModal />
                         <CloseShiftModal />
                     </>

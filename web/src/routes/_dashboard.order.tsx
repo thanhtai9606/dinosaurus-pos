@@ -26,6 +26,7 @@ import {
     saveOrderPosDraft,
 } from '@/lib/orders/orderDraftStorage'
 import { notifyPosDraftChanged } from '@/lib/pos/sessionScope'
+import { getCachedPosProducts } from '@/lib/pos/posCatalogStore'
 
 export const Route = createFileRoute('/_dashboard/order')({
     component: OrderPage,
@@ -59,7 +60,32 @@ function OrderPage() {
             search: debouncedSearch || undefined,
             category: Number.isFinite(categoryFilter) ? categoryFilter : undefined,
         })
-    const products = productsData?.products || []
+    const [offlineProducts, setOfflineProducts] = useState<Product[] | null>(null)
+
+    const [netOnline, setNetOnline] = useState(
+        typeof navigator !== 'undefined' ? navigator.onLine : true,
+    )
+    useEffect(() => {
+        const on = () => setNetOnline(true)
+        const off = () => setNetOnline(false)
+        window.addEventListener('online', on)
+        window.addEventListener('offline', off)
+        return () => {
+            window.removeEventListener('online', on)
+            window.removeEventListener('offline', off)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (netOnline) {
+            setOfflineProducts(null)
+            return
+        }
+        void getCachedPosProducts().then((list) => setOfflineProducts(list.length ? list : null))
+    }, [netOnline])
+
+    const products =
+        !netOnline && offlineProducts?.length ? offlineProducts : productsData?.products || []
     const { data: categoriesFromApi, isLoading: categoriesLoading } = useCategoriesListQuery({ limit: 100 })
 
     const { data: customersData } = useCustomersListQuery({ limit: 100 })

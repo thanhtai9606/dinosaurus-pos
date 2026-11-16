@@ -1182,6 +1182,18 @@
             "delete_success": "Promosi berhasil dihapus"
         }
     },
+    "posCatalog": {
+        "download": "Unduh katalog offline",
+        "syncing": "Mengunduh produk…",
+        "sync_starting": "Mengunduh katalog produk offline…",
+        "sync_done": "Katalog disimpan di perangkat",
+        "sync_failed": "Gagal mengunduh katalog — periksa koneksi",
+        "cached_count": "{{count}} produk di perangkat",
+        "empty": "Belum ada katalog offline",
+        "stale": "katalog kedaluwarsa",
+        "offline_mode": "pindai/cari dari salinan lokal",
+        "offline_no_cache": "Offline tanpa katalog — online sekali untuk mengunduh produk"
+    },
     "posStatus": {
         "title": "Status penjualan lokal",
         "pending_sync": "{{count}} transaksi belum ke server",

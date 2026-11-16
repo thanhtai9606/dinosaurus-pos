@@ -1199,6 +1199,18 @@
             "delete_success": "khuyễn mãi đã được xóa thành công"
         }
     },
+    "posCatalog": {
+        "download": "Tải danh mục offline",
+        "syncing": "Đang tải sản phẩm…",
+        "sync_starting": "Đang tải danh mục offline (lần đầu hoặc đã cũ)…",
+        "sync_done": "Đã lưu danh mục trên máy",
+        "sync_failed": "Không tải được danh mục — kiểm tra mạng",
+        "cached_count": "{{count}} SP trên máy",
+        "empty": "Chưa có danh mục offline",
+        "stale": "danh mục cũ",
+        "offline_mode": "quét/tìm từ bản đã lưu",
+        "offline_no_cache": "Mất mạng và chưa có danh mục — đăng nhập khi có mạng để tải SP xuống máy"
+    },
     "posStatus": {
         "title": "Bán hàng cục bộ",
         "pending_sync": "{{count}} đơn chưa gửi lên server",

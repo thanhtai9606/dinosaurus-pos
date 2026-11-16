@@ -10,14 +10,18 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { usePosStatusSummary } from '@/hooks/usePosStatusSummary'
 import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
+import { usePosCatalog } from '@/hooks/usePosCatalog'
 import { cn } from '@/lib/utils'
 
 export function PosStatusIndicator() {
     const { t } = useTranslation()
     const { online, pendingSync, draftTabs, orderDraftLines, hasDrafts, visible } = usePosStatusSummary()
     const { syncing, flush } = usePosOfflineSync()
+    const catalog = usePosCatalog()
 
-    if (!visible) return null
+    const catalogVisible = !online || catalog.count === 0 || catalog.stale
+
+    if (!visible && !catalogVisible) return null
 
     const badgeCount = pendingSync > 0 ? pendingSync : hasDrafts ? draftTabs + (orderDraftLines > 0 ? 1 : 0) : 0
 
@@ -78,6 +82,26 @@ export function PosStatusIndicator() {
                 )}
                 {orderDraftLines > 0 && (
                     <p className="text-xs">{t('posStatus.order_draft', { count: orderDraftLines })}</p>
+                )}
+                {catalogVisible && (
+                    <div className="flex items-center justify-between gap-2 border-t pt-2">
+                        <p className="text-xs">
+                            {catalog.count > 0
+                                ? t('posCatalog.cached_count', { count: catalog.count })
+                                : t('posCatalog.empty')}
+                            {catalog.stale && catalog.count > 0 ? ` (${t('posCatalog.stale')})` : ''}
+                        </p>
+                        {online && (
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={catalog.syncing}
+                                onClick={() => void catalog.sync()}
+                            >
+                                {t('posCatalog.download')}
+                            </Button>
+                        )}
+                    </div>
                 )}
                 <div className="flex flex-wrap gap-2 pt-1">
                     {draftTabs > 0 && (

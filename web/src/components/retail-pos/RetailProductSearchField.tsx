@@ -7,6 +7,8 @@ import { useFormatMoney } from '@/context/MoneyContext'
 import { axiosInstance } from '@/lib/api/client'
 import { Product } from '@/lib/api/query/products'
 import { cn } from '@/lib/utils'
+import { isNetworkError } from '@/lib/offline/posQueue'
+import { searchProductsOffline } from '@/lib/pos/posCatalogStore'
 
 type Props = {
     value: string
@@ -45,9 +47,19 @@ export function RetailProductSearchField({
     const minChars = 2
     const canSuggest = debounced.length >= minChars
 
+    const online = typeof navigator !== 'undefined' ? navigator.onLine : true
+
     const { data: suggestions = [], isFetching } = useQuery({
-        queryKey: ['products', 'search', 'suggest', debounced],
-        queryFn: () => searchProducts(debounced, 12),
+        queryKey: ['products', 'search', 'suggest', debounced, online],
+        queryFn: async () => {
+            if (!online) return searchProductsOffline(debounced, 12)
+            try {
+                return await searchProducts(debounced, 12)
+            } catch (e) {
+                if (isNetworkError(e)) return searchProductsOffline(debounced, 12)
+                throw e
+            }
+        },
         enabled: canSuggest && open,
         staleTime: 30_000,
     })

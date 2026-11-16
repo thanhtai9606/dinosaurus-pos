@@ -39,12 +39,12 @@ import {
     useRetailPosDraftPersistence,
 } from '@/hooks/useRetailPosDraftPersistence'
 import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
+import { FALLBACK_POS_QUICK_CASH } from '@/lib/money/quickCash'
 
 export const Route = createFileRoute('/_dashboard/retail-pos')({
     component: RetailPosPage,
 })
 
-const QUICK_CASH = [10000, 20000, 50000, 100000, 200000]
 const MAX_TABS = 10
 
 function readInitialRetail() {
@@ -124,6 +124,11 @@ function RetailPosPage() {
     const cashMethodId = useMemo(
         () => paymentMethods?.find((m) => m.name?.toLowerCase().includes('cash'))?.id,
         [paymentMethods],
+    )
+
+    const quickCashAmounts = useMemo(
+        () => fin?.pos_quick_cash?.retail?.length ? fin.pos_quick_cash.retail : [...FALLBACK_POS_QUICK_CASH.retail],
+        [fin?.pos_quick_cash?.retail],
     )
 
     const subtotal = cart.reduce((sum, item) => sum + lineSubtotal(item, priceTier), 0)
@@ -561,7 +566,11 @@ function RetailPosPage() {
                         onOtherPayment={() => void handleOtherPayment()}
                         canPay={canPay}
                         paying={manualPayMutation.isPending}
-                        quickAmounts={QUICK_CASH}
+                        quickAmounts={quickCashAmounts}
+                        currencyCode={fin?.currency}
+                        currencyFractionDigits={
+                            fin?.available_currencies?.find((c) => c.code === fin.currency)?.fraction_digits ?? 0
+                        }
                     />
                 </div>
             </div>

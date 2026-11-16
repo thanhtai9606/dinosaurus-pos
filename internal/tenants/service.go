@@ -33,16 +33,25 @@ type DemoCatalogSeeder interface {
 	SeedDemoCatalog(ctx context.Context, tenantID uuid.UUID, market, vertical string) error
 }
 
-type Service struct {
-	repo            *Repository
-	users           user_repo.Querier
-	log             logger.ILogger
-	groupSeeder     CustomerGroupSeeder
-	catalogSeeder   DemoCatalogSeeder
+// PosQuickCashSeeder seeds default quick-cash denominations per tenant market.
+type PosQuickCashSeeder interface {
+	SeedIfMissing(ctx context.Context, tenantID uuid.UUID, market string) error
 }
 
-func NewService(repo *Repository, users user_repo.Querier, log logger.ILogger, groupSeeder CustomerGroupSeeder, catalogSeeder DemoCatalogSeeder) *Service {
-	return &Service{repo: repo, users: users, log: log, groupSeeder: groupSeeder, catalogSeeder: catalogSeeder}
+type Service struct {
+	repo              *Repository
+	users             user_repo.Querier
+	log               logger.ILogger
+	groupSeeder       CustomerGroupSeeder
+	catalogSeeder     DemoCatalogSeeder
+	quickCashSeeder   PosQuickCashSeeder
+}
+
+func NewService(repo *Repository, users user_repo.Querier, log logger.ILogger, groupSeeder CustomerGroupSeeder, catalogSeeder DemoCatalogSeeder, quickCashSeeder PosQuickCashSeeder) *Service {
+	return &Service{
+		repo: repo, users: users, log: log,
+		groupSeeder: groupSeeder, catalogSeeder: catalogSeeder, quickCashSeeder: quickCashSeeder,
+	}
 }
 
 type CreateTenantRequest struct {
@@ -119,6 +128,11 @@ func (s *Service) Create(ctx context.Context, req CreateTenantRequest) (Summary,
 	if s.groupSeeder != nil {
 		if err := s.groupSeeder.SeedDefaults(ctx, row.ID); err != nil {
 			s.log.Warnf("seed customer groups for tenant %s: %v", row.ID, err)
+		}
+	}
+	if s.quickCashSeeder != nil {
+		if err := s.quickCashSeeder.SeedIfMissing(ctx, row.ID, market); err != nil {
+			s.log.Warnf("seed pos quick cash for tenant %s: %v", row.ID, err)
 		}
 	}
 	if seedDemo && s.catalogSeeder != nil {

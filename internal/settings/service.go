@@ -9,6 +9,7 @@ import (
 	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
 	"dinosaurus-pos/pkg/logger"
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strconv"
@@ -351,6 +352,7 @@ func (s *SettingsService) GetFinancialSettings(ctx context.Context) (*FinancialS
 		ServiceChargeRate:   parseFloatSetting(m["service_charge_rate"], 0),
 		TaxEnabled:          parseBoolSetting(m["tax_enabled"], true),
 		AvailableCurrencies: currencies,
+		PosQuickCash:        resolveQuickCash(m[settingKeyPosQuickCash], currency),
 	}, nil
 }
 
@@ -382,17 +384,39 @@ func (s *SettingsService) UpdateFinancialSettings(ctx context.Context, req Updat
 				return err
 			}
 		}
+		if req.PosQuickCash != nil {
+			cfg := QuickCashSettings{
+				Retail:       sortQuickCashAmounts(req.PosQuickCash.Retail),
+				StockReceipt: sortQuickCashAmounts(req.PosQuickCash.StockReceipt),
+			}
+			raw, merr := marshalQuickCashSettings(cfg)
+			if merr != nil {
+				return merr
+			}
+			if _, err := qtx.UpsertSetting(ctx, repository.UpsertSettingParams{
+				Key: settingKeyPosQuickCash, Value: raw,
+			}); err != nil {
+				return err
+			}
+		}
 		return nil
 	})
 	if txErr != nil {
 		s.log.Error("Failed to update financial settings", "error", txErr)
+		if errors.Is(txErr, common.ErrBadRequest) {
+			return nil, txErr
+		}
 		return nil, txErr
 	}
 
 	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
-	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
+	logPayload := map[string]interface{}{
 		"currency": req.Currency, "tax_rate": req.TaxRate, "service_charge_rate": req.ServiceChargeRate,
-	})
+	}
+	if req.PosQuickCash != nil {
+		logPayload["pos_quick_cash"] = true
+	}
+	s.activitylog.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeSETTINGS, "settings", logPayload)
 
 	return s.GetFinancialSettings(ctx)
 }

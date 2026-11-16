@@ -749,7 +749,12 @@
             "save_currencies": "Lưu danh sách tiền tệ",
             "currencies_save_success": "Đã lưu danh sách tiền tệ.",
             "currencies_save_error": "Không lưu được danh sách tiền tệ.",
-            "currencies_min_one": "Cần ít nhất một loại tiền."
+            "currencies_min_one": "Cần ít nhất một loại tiền.",
+            "quick_cash_title": "Nút thu tiền nhanh",
+            "quick_cash_help": "Nhập các mệnh giá cách nhau bằng dấu phẩy, theo đơn vị nhỏ nhất của cửa hàng (VD: đồng với VND). Tối đa 8 nút cho POS bán lẻ và nhập kho.",
+            "quick_cash_retail": "POS bán lẻ",
+            "quick_cash_stock": "Nhập kho",
+            "quick_cash_validation": "Mỗi danh sách cần từ 1–8 số nguyên dương, cách nhau bằng dấu phẩy."
         },
         "invoice": {
             "title": "Hóa đơn & Biên lai",

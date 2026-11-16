@@ -232,7 +232,9 @@ func BuildAppContainer(app *App) *AppContainer {
 		customerGroups:   customerGroupService,
 		measurementUnits: measurementUnitService,
 	}
-	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger, tenantDefaults, tenantCatalogSeeder)
+	settingsRepoForSeed := settings_repo.New(tenantDB)
+	posQuickCashSeeder := settings.NewQuickCashSeeder(settingsRepoForSeed, app.Logger)
+	tenantService := tenants.NewService(tenantRepo, userRepo, app.Logger, tenantDefaults, tenantCatalogSeeder, posQuickCashSeeder)
 	tenantLookupCache := tenants.NewLookupCache(app.RedisCache)
 	tenantHandler := tenants.NewHandler(tenantRepo, tenantService, app.Logger, platformAudit, tenantLookupCache, platformOverviewCache)
 	userService := user.NewUsrService(userRepo, tenantRepo, app.Logger, activityService, userAvatarRepo)

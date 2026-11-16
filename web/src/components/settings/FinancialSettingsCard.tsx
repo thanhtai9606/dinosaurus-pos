@@ -14,6 +14,11 @@ import {
     type FinancialSettings,
 } from '@/lib/api/query/settings'
 import { SupportedCurrenciesEditor } from '@/components/settings/SupportedCurrenciesEditor'
+import {
+    FALLBACK_POS_QUICK_CASH,
+    formatQuickCashAmountList,
+    parseQuickCashAmountList,
+} from '@/lib/money/quickCash'
 
 export function FinancialSettingsCard() {
     const { t } = useTranslation()
@@ -27,18 +32,36 @@ export function FinancialSettingsCard() {
         service_charge_rate: 0,
         tax_enabled: true,
     })
+    const [quickCashRetailInput, setQuickCashRetailInput] = useState(
+        formatQuickCashAmountList([...FALLBACK_POS_QUICK_CASH.retail])
+    )
+    const [quickCashStockInput, setQuickCashStockInput] = useState(
+        formatQuickCashAmountList([...FALLBACK_POS_QUICK_CASH.stock_receipt])
+    )
 
     useEffect(() => {
-        if (data) setForm(data)
+        if (data) {
+            setForm(data)
+            const qc = data.pos_quick_cash
+            if (qc?.retail?.length) setQuickCashRetailInput(formatQuickCashAmountList(qc.retail))
+            if (qc?.stock_receipt?.length) setQuickCashStockInput(formatQuickCashAmountList(qc.stock_receipt))
+        }
     }, [data])
 
     const handleSave = () => {
+        const retail = parseQuickCashAmountList(quickCashRetailInput)
+        const stock_receipt = parseQuickCashAmountList(quickCashStockInput)
+        if (retail.length === 0 || retail.length > 8 || stock_receipt.length === 0 || stock_receipt.length > 8) {
+            toast.error(t('settings.financial.quick_cash_validation'))
+            return
+        }
         updateMutation.mutate(
             {
                 currency: form.currency,
                 tax_rate: form.tax_rate,
                 service_charge_rate: form.service_charge_rate,
                 tax_enabled: form.tax_enabled,
+                pos_quick_cash: { retail, stock_receipt },
             },
             {
                 onSuccess: () => toast.success(t('settings.financial.update_success')),
@@ -126,6 +149,34 @@ export function FinancialSettingsCard() {
                             }
                             disabled={!canEdit}
                         />
+                    </div>
+                </div>
+                <div className="space-y-4 rounded-lg border p-4">
+                    <div>
+                        <p className="font-medium">{t('settings.financial.quick_cash_title')}</p>
+                        <p className="text-xs text-muted-foreground">{t('settings.financial.quick_cash_help')}</p>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="quick_cash_retail">{t('settings.financial.quick_cash_retail')}</Label>
+                            <Input
+                                id="quick_cash_retail"
+                                value={quickCashRetailInput}
+                                onChange={(e) => setQuickCashRetailInput(e.target.value)}
+                                disabled={!canEdit}
+                                placeholder="10000, 20000, 50000"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="quick_cash_stock">{t('settings.financial.quick_cash_stock')}</Label>
+                            <Input
+                                id="quick_cash_stock"
+                                value={quickCashStockInput}
+                                onChange={(e) => setQuickCashStockInput(e.target.value)}
+                                disabled={!canEdit}
+                                placeholder="100000, 200000, 500000"
+                            />
+                        </div>
                     </div>
                 </div>
                 <SupportedCurrenciesEditor currencies={data?.available_currencies ?? []} />

@@ -743,7 +743,12 @@
             "save_currencies": "Save currency list",
             "currencies_save_success": "Currency list saved.",
             "currencies_save_error": "Failed to save currency list.",
-            "currencies_min_one": "At least one currency is required."
+            "currencies_min_one": "At least one currency is required.",
+            "quick_cash_title": "Quick cash buttons",
+            "quick_cash_help": "Comma-separated amounts in the store's minor unit (e.g. đồng for VND). Up to 8 values each for retail POS and stock receipts.",
+            "quick_cash_retail": "Retail POS",
+            "quick_cash_stock": "Stock receipts",
+            "quick_cash_validation": "Enter 1–8 positive whole numbers for each quick-cash list, separated by commas."
         },
         "invoice": {
             "title": "Invoice & Receipt",

@@ -45,6 +45,7 @@ type FinancialSettingsResponse struct {
 	ServiceChargeRate     float64          `json:"service_charge_rate"`
 	TaxEnabled            bool             `json:"tax_enabled"`
 	AvailableCurrencies   []CurrencyOption `json:"available_currencies"`
+	PosQuickCash          QuickCashSettings `json:"pos_quick_cash"`
 }
 
 type UpdateFinancialSettingsRequest struct {
@@ -52,6 +53,7 @@ type UpdateFinancialSettingsRequest struct {
 	TaxRate             float64  `json:"tax_rate" validate:"gte=0,lte=100"`
 	ServiceChargeRate   float64  `json:"service_charge_rate" validate:"gte=0,lte=100"`
 	TaxEnabled          *bool    `json:"tax_enabled" validate:"required"`
+	PosQuickCash        *QuickCashSettings `json:"pos_quick_cash,omitempty"`
 }
 
 type UpdateSupportedCurrenciesRequest struct {

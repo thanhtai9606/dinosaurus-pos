@@ -16,12 +16,18 @@ export type CurrencyOption = {
     fraction_digits: number
 }
 
+export type PosQuickCashSettings = {
+    retail: number[]
+    stock_receipt: number[]
+}
+
 export type FinancialSettings = {
     currency: string
     tax_rate: number
     service_charge_rate: number
     tax_enabled: boolean
     available_currencies?: CurrencyOption[]
+    pos_quick_cash?: PosQuickCashSettings
 }
 
 async function putSettingsWithFallback<T>(path: string, data: T): Promise<AxiosResponse> {

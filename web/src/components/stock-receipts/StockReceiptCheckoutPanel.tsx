@@ -5,12 +5,13 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useFormatMoney } from '@/context/MoneyContext'
+import { useFormatMoney, useMoney } from '@/context/MoneyContext'
 import type { StockReceiptPaymentMode } from '@/lib/stock-receipts/paymentNote'
 import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
-
-const QUICK_CASH = [100000, 200000, 500000, 1000000, 2000000, 5000000]
+import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
+import { FALLBACK_POS_QUICK_CASH, formatQuickCashLabel } from '@/lib/money/quickCash'
+import { useMemo } from 'react'
 
 type Supplier = { id: string; name: string }
 
@@ -67,6 +68,17 @@ export function StockReceiptCheckoutPanel({
     completing,
 }: Props) {
     const formatMoney = useFormatMoney()
+    const { currencyCode } = useMoney()
+    const { data: fin } = useFinancialSettingsQuery()
+    const quickAmounts = useMemo(
+        () =>
+            fin?.pos_quick_cash?.stock_receipt?.length
+                ? fin.pos_quick_cash.stock_receipt
+                : [...FALLBACK_POS_QUICK_CASH.stock_receipt],
+        [fin?.pos_quick_cash?.stock_receipt],
+    )
+    const fractionDigits =
+        fin?.available_currencies?.find((c) => c.code === (fin?.currency ?? currencyCode))?.fraction_digits ?? 0
     const debt = Math.max(0, subtotal - amountPaid)
     const creditNeedsSupplier = paymentMode === 'credit' && !supplierId
 
@@ -128,7 +140,7 @@ export function StockReceiptCheckoutPanel({
                         onChange={(e) => onAmountPaidChange(Math.floor(Number(e.target.value) || 0))}
                     />
                     <div className="flex flex-wrap gap-1.5">
-                        {QUICK_CASH.map((amt) => (
+                        {quickAmounts.map((amt) => (
                             <Button
                                 key={amt}
                                 type="button"
@@ -137,7 +149,7 @@ export function StockReceiptCheckoutPanel({
                                 className="h-8 text-xs"
                                 onClick={() => onAmountPaidChange(amt)}
                             >
-                                {formatQuickLabel(amt)}
+                                {formatQuickCashLabel(amt, fin?.currency ?? currencyCode, fractionDigits)}
                             </Button>
                         ))}
                         <Button type="button" variant="secondary" size="sm" className="h-8 text-xs" onClick={() => onAmountPaidChange(subtotal)}>
@@ -175,10 +187,4 @@ export function StockReceiptCheckoutPanel({
             </div>
         </div>
     )
-}
-
-function formatQuickLabel(amt: number) {
-    if (amt >= 1_000_000) return `${amt / 1_000_000}M`
-    if (amt >= 1_000) return `${amt / 1_000}k`
-    return String(amt)
 }

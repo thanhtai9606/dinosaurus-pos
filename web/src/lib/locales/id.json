@@ -749,7 +749,12 @@
             "save_currencies": "Simpan daftar mata uang",
             "currencies_save_success": "Daftar mata uang disimpan.",
             "currencies_save_error": "Gagal menyimpan daftar mata uang.",
-            "currencies_min_one": "Minimal satu mata uang diperlukan."
+            "currencies_min_one": "Minimal satu mata uang diperlukan.",
+            "quick_cash_title": "Tombol uang cepat",
+            "quick_cash_help": "Jumlah dipisah koma dalam satuan terkecil toko (mis. rupiah untuk IDR). Maksimal 8 nilai untuk POS retail dan penerimaan stok.",
+            "quick_cash_retail": "POS retail",
+            "quick_cash_stock": "Penerimaan stok",
+            "quick_cash_validation": "Masukkan 1–8 bilangan bulat positif untuk setiap daftar, dipisah koma."
         },
         "invoice": {
             "title": "Faktur & Struk",

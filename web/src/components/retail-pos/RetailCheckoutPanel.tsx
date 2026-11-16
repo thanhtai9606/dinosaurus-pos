@@ -8,6 +8,7 @@ import { useFormatMoney, useMoney } from '@/context/MoneyContext'
 import { cn } from '@/lib/utils'
 import { CustomerSearchCombobox } from '@/components/customers/CustomerSearchCombobox'
 import type { PriceTier } from '@/lib/retail-pos/pricing'
+import { formatQuickCashLabel } from '@/lib/money/quickCash'
 
 export type RetailSettlementMode = 'cash' | 'debt'
 
@@ -36,6 +37,8 @@ type Props = {
     canPay: boolean
     paying: boolean
     quickAmounts: number[]
+    currencyCode?: string
+    currencyFractionDigits?: number
 }
 
 export function RetailCheckoutPanel({
@@ -63,9 +66,12 @@ export function RetailCheckoutPanel({
     canPay,
     paying,
     quickAmounts,
+    currencyCode: quickCashCurrency,
+    currencyFractionDigits = 0,
 }: Props) {
     const formatMoney = useFormatMoney()
-    const { currencyCode } = useMoney()
+    const { currencyCode: contextCurrency } = useMoney()
+    const labelCurrency = quickCashCurrency ?? contextCurrency
     const changeDue = Math.max(0, cashReceived - grandTotal)
     const cashShort = settlementMode === 'cash' && cashReceived > 0 && cashReceived < grandTotal
 
@@ -110,7 +116,7 @@ export function RetailCheckoutPanel({
                     <Tabs value={discountMode} onValueChange={(v) => onDiscountModeChange(v as 'amount' | 'percent')}>
                         <TabsList className="grid w-full grid-cols-2 h-8">
                             <TabsTrigger value="amount" className="text-xs">
-                                {currencyCode}
+                                {contextCurrency}
                             </TabsTrigger>
                             <TabsTrigger value="percent" className="text-xs">
                                 %
@@ -144,7 +150,7 @@ export function RetailCheckoutPanel({
                                 className="h-8 text-xs"
                                 onClick={() => onCashReceivedChange(amt)}
                             >
-                                {formatQuickLabel(amt)}
+                                {formatQuickCashLabel(amt, labelCurrency, currencyFractionDigits)}
                             </Button>
                         ))}
                         <Button type="button" variant="secondary" size="sm" className="h-8 text-xs" onClick={() => onCashReceivedChange(grandTotal)}>
@@ -235,12 +241,6 @@ function PriceTierToggle({
 
 function cartEmptyGuard(canPay: boolean) {
     return !canPay
-}
-
-function formatQuickLabel(amt: number): string {
-    if (amt >= 1000000) return `${amt / 1000000}tr`
-    if (amt >= 1000) return `${amt / 1000}k`
-    return String(amt)
 }
 
 function Row({ label, value, bold = true }: { label: string; value: string; bold?: boolean }) {

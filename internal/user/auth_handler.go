@@ -4,7 +4,7 @@ import (
 	"dinosaurus-pos/config"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/middleware"
-	"dinosaurus-pos/internal/platformaudit"
+	"dinosaurus-pos/internal/platform_audit"
 	"dinosaurus-pos/internal/tenants"
 	"dinosaurus-pos/pkg/logger"
 
@@ -35,10 +35,10 @@ type AthHandler struct {
 	Service   IAuthService
 	Log       logger.ILogger
 	Validator validator.Validator
-	audit     platformaudit.Recorder
+	audit     platform_audit.Recorder
 }
 
-func NewAuthHandler(service IAuthService, log logger.ILogger, validator validator.Validator, cfg *config.AppConfig, audit platformaudit.Recorder) IAuthHandler {
+func NewAuthHandler(service IAuthService, log logger.ILogger, validator validator.Validator, cfg *config.AppConfig, audit platform_audit.Recorder) IAuthHandler {
 	return &AthHandler{
 		Service:   service,
 		Log:       log,

@@ -1,11 +1,11 @@
 package products
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
-	"dinosaurus-pos/internal/docno"
+	"dinosaurus-pos/internal/doc_no"
 	"dinosaurus-pos/internal/common/store"
 	products_repo "dinosaurus-pos/internal/products/repository"
 	"dinosaurus-pos/internal/tenant"
@@ -60,12 +60,12 @@ type PrdService struct {
 	store           store.Store
 	repo            products_repo.Querier
 	prdRepo         IProductImageRepository
-	activityService activitylog.IActivityService
+	activityService activity_log.IActivityService
 	search          productsearch.Indexer
 	listCache       *ListCache
 }
 
-func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activitylog.IActivityService, search productsearch.Indexer, listCache *ListCache) IPrdService {
+func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activity_log.IActivityService, search productsearch.Indexer, listCache *ListCache) IPrdService {
 	return &PrdService{
 		store:           store,
 		repo:            repo,
@@ -104,8 +104,8 @@ func (s *PrdService) DeleteProductOption(ctx context.Context, productID, optionI
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeDELETE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeDELETE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		optionID.String(),
 		logDetails,
 	)
@@ -150,8 +150,8 @@ func (s *PrdService) UpdateProductOption(ctx context.Context, productID, optionI
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		optionID.String(),
 		logDetails,
 	)
@@ -223,8 +223,8 @@ func (s *PrdService) UploadProductOptionImage(ctx context.Context, productID uui
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		optionID.String(),
 		logDetails,
 	)
@@ -277,8 +277,8 @@ func (s *PrdService) CreateProductOption(ctx context.Context, productID uuid.UUI
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeCREATE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeCREATE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		newOption.ID.String(),
 		logDetails,
 	)
@@ -316,8 +316,8 @@ func (s *PrdService) DeleteProduct(ctx context.Context, productID uuid.UUID) err
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeDELETE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeDELETE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		productID.String(),
 		logDetails,
 	)
@@ -484,8 +484,8 @@ func (s *PrdService) UpdateProduct(ctx context.Context, productID uuid.UUID, req
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		productID.String(),
 		logDetails,
 	)
@@ -806,7 +806,7 @@ func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest
 		if err != nil {
 			return err
 		}
-		code := docno.ProductCode(productCount + 1)
+		code := doc_no.ProductCode(productCount + 1)
 		productParams := products_repo.CreateProductParams{
 			Name:              req.Name,
 			Price:             price,
@@ -876,8 +876,8 @@ func (s *PrdService) CreateProduct(ctx context.Context, req CreateProductRequest
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeCREATE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeCREATE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		newProduct.ID.String(),
 		logDetails,
 	)
@@ -928,8 +928,8 @@ func (s *PrdService) UploadProductImage(ctx context.Context, productID uuid.UUID
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypePRODUCT,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypePRODUCT,
 		productID.String(),
 		logDetails,
 	)
@@ -1147,7 +1147,7 @@ func (s *PrdService) RestoreProduct(ctx context.Context, productID uuid.UUID) er
 
 	// Log activity
 	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
-	s.activityService.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypePRODUCT, productID.String(), map[string]interface{}{
+	s.activityService.Log(ctx, actorID, activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypePRODUCT, productID.String(), map[string]interface{}{
 		"action": "restore",
 	})
 	s.syncProductToSearch(ctx, productID)
@@ -1175,7 +1175,7 @@ func (s *PrdService) RestoreProductsBulk(ctx context.Context, req RestoreBulkReq
 
 	// Log activity (maybe one log for all or individually? One log is cleaner)
 	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
-	s.activityService.Log(ctx, actorID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypePRODUCT, "bulk", map[string]interface{}{
+	s.activityService.Log(ctx, actorID, activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypePRODUCT, "bulk", map[string]interface{}{
 		"action": "restore_bulk",
 		"count":  len(ids),
 		"ids":    req.ProductIDs,

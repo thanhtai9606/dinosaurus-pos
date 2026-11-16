@@ -1,7 +1,7 @@
 package user_test
 
 import (
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/user"
 	user_repo "dinosaurus-pos/internal/user/repository"
@@ -49,7 +49,7 @@ func TestAuthService_Login_Extended(t *testing.T) {
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(userObj, nil)
-		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
+		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activity_log_repo.LogActionTypeLOGINSUCCESS, activity_log_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
 		mockToken.EXPECT().GenerateToken(userObj.Username, userObj.Email, userObj.ID, string(userObj.Role), gomock.Any()).Return("", time.Time{}, errors.New("token error"))
 		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
 
@@ -71,7 +71,7 @@ func TestAuthService_Login_Extended(t *testing.T) {
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(userObj, nil)
-		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
+		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activity_log_repo.LogActionTypeLOGINSUCCESS, activity_log_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
 		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("access_token", time.Now().Add(time.Hour), nil)
 		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("", time.Time{}, errors.New("refresh token error"))
 		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).Times(1)
@@ -94,7 +94,7 @@ func TestAuthService_Login_Extended(t *testing.T) {
 		ctx := context.Background()
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(userObj, nil)
-		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
+		mockActivity.EXPECT().Log(gomock.Any(), userObj.ID, activity_log_repo.LogActionTypeLOGINSUCCESS, activity_log_repo.LogEntityTypeUSER, userObj.ID.String(), gomock.Any()).Times(1)
 		mockToken.EXPECT().GenerateToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("access_token", time.Now().Add(time.Hour), nil)
 		mockToken.EXPECT().GenerateRefreshToken(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return("refresh_token", time.Now().Add(time.Hour*24), nil)
 

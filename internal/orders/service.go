@@ -1,15 +1,15 @@
 package orders
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activity_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/common/store"
-	"dinosaurus-pos/internal/customerdebts"
-	"dinosaurus-pos/internal/docno"
+	"dinosaurus-pos/internal/customer_debts"
+	"dinosaurus-pos/internal/doc_no"
 	"dinosaurus-pos/internal/inventory"
-	cd_repo "dinosaurus-pos/internal/customerdebts/repository"
+	cd_repo "dinosaurus-pos/internal/customer_debts/repository"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	orders_repo "dinosaurus-pos/internal/orders/repository"
 	prdunits "dinosaurus-pos/internal/products"
@@ -55,13 +55,13 @@ type OrderService struct {
 	ordersRepo       orders_repo.Querier
 	productsRepo     products_repo.Querier
 	midtransService  payment.IMidtrans
-	activityService  activitylog.IActivityService
+	activityService  activity_log.IActivityService
 	settingsService  settings.ISettingsService
 	log              logger.ILogger
 	wsHub            *ws.Hub
 }
 
-func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activitylog.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub) IOrderService {
+func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activity_log.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub) IOrderService {
 	return &OrderService{
 		store:            store,
 		ordersRepo:       ordersRepo,
@@ -455,7 +455,7 @@ func (s *OrderService) ConfirmManualPayment(ctx context.Context, orderID uuid.UU
 
 		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
 			cdq := cd_repo.New(tx)
-			_ = customerdebts.RecordOrderPaymentTx(ctx, cdq, orderID, float64(netTotal), pgtype.UUID{Bytes: actorID, Valid: true})
+			_ = customer_debts.RecordOrderPaymentTx(ctx, cdq, orderID, float64(netTotal), pgtype.UUID{Bytes: actorID, Valid: true})
 		}
 
 		finalOrder, err = qtx.GetOrderWithDetails(ctx, orderID)
@@ -961,7 +961,7 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID uuid.UUID, req C
 		}
 
 		cdq := cd_repo.New(tx)
-		if err := customerdebts.VoidDebtByOrderTx(ctx, cdq, orderID); err != nil {
+		if err := customer_debts.VoidDebtByOrderTx(ctx, cdq, orderID); err != nil {
 			return err
 		}
 		return nil
@@ -1265,7 +1265,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		if err != nil {
 			return fmt.Errorf("failed to allocate order number: %w", err)
 		}
-		orderNo := docno.OrderNo(now, countToday+1)
+		orderNo := doc_no.OrderNo(now, countToday+1)
 
 		orderHeader, err := qtx.CreateOrder(ctx, orders_repo.CreateOrderParams{
 			UserID:     pgtype.UUID{Bytes: actorID, Valid: ok},
@@ -1530,7 +1530,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		if nullCustomerID.Valid && netTotal > 0 {
 			cdq := cd_repo.New(tx)
 			ref := fmt.Sprintf("ORD-%s", newOrderID.String()[:8])
-			if err := customerdebts.CreateDebtFromOrderTx(ctx, cdq, customerdebts.FromOrderParams{
+			if err := customer_debts.CreateDebtFromOrderTx(ctx, cdq, customer_debts.FromOrderParams{
 				CustomerID:  uuid.UUID(nullCustomerID.Bytes),
 				OrderID:     newOrderID,
 				ReferenceNo: ref,

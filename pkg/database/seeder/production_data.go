@@ -5,7 +5,7 @@ package seeder
 
 import (
 	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
-	"dinosaurus-pos/internal/docno"
+	"dinosaurus-pos/internal/doc_no"
 	"dinosaurus-pos/pkg/database"
 	"dinosaurus-pos/pkg/database/seeder/catalog"
 	"dinosaurus-pos/pkg/database/seeder/catalog/vn"
@@ -212,7 +212,7 @@ func seedCustomers(ctx context.Context, db *database.TenantDB, log logger.ILogge
 
 	var ids []string
 	for i, c := range customers {
-		code := docno.CustomerCode(int64(i + 1))
+		code := doc_no.CustomerCode(int64(i + 1))
 		var id string
 		err := db.QueryRow(ctx,
 			`INSERT INTO customers (name, phone, email, address, code)

@@ -2,8 +2,8 @@ package server
 
 import (
 	"dinosaurus-pos/config"
-	"dinosaurus-pos/internal/activitylog"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/cancellation_reasons"
 	cancellation_reasons_repo "dinosaurus-pos/internal/cancellation_reasons/repository"
 	"dinosaurus-pos/internal/categories"
@@ -12,22 +12,22 @@ import (
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/customers"
 	customers_repo "dinosaurus-pos/internal/customers/repository"
-	"dinosaurus-pos/internal/customergroups"
-	customergroups_repo "dinosaurus-pos/internal/customergroups/repository"
-	"dinosaurus-pos/internal/measurementunits"
-	measurementunits_repo "dinosaurus-pos/internal/measurementunits/repository"
-	"dinosaurus-pos/internal/stockops"
-	ops_repo "dinosaurus-pos/internal/stockops/repository"
-	"dinosaurus-pos/internal/stockreceipts"
-	sr_repo "dinosaurus-pos/internal/stockreceipts/repository"
+	"dinosaurus-pos/internal/customer_groups"
+	customer_groups_repo "dinosaurus-pos/internal/customer_groups/repository"
+	"dinosaurus-pos/internal/measurement_units"
+	measurement_units_repo "dinosaurus-pos/internal/measurement_units/repository"
+	"dinosaurus-pos/internal/stock_ops"
+	ops_repo "dinosaurus-pos/internal/stock_ops/repository"
+	"dinosaurus-pos/internal/stock_receipts"
+	sr_repo "dinosaurus-pos/internal/stock_receipts/repository"
 	"dinosaurus-pos/internal/warehouse"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	"dinosaurus-pos/internal/suppliers"
 	suppliers_repo "dinosaurus-pos/internal/suppliers/repository"
-	"dinosaurus-pos/internal/supplierdebts"
-	sd_debts_repo "dinosaurus-pos/internal/supplierdebts/repository"
-	"dinosaurus-pos/internal/customerdebts"
-	cd_debts_repo "dinosaurus-pos/internal/customerdebts/repository"
+	"dinosaurus-pos/internal/supplier_debts"
+	sd_debts_repo "dinosaurus-pos/internal/supplier_debts/repository"
+	"dinosaurus-pos/internal/customer_debts"
+	cd_debts_repo "dinosaurus-pos/internal/customer_debts/repository"
 	"dinosaurus-pos/internal/orders"
 	orders_repo "dinosaurus-pos/internal/orders/repository"
 	"dinosaurus-pos/internal/payment_methods"
@@ -109,21 +109,21 @@ type AppContainer struct {
 	UserHandler               user.IUsrHandler
 	CategoryHandler           categories.ICtgHandler
 	CustomerHandler           customers.ICustomerHandler
-	CustomerGroupHandler      customergroups.ICustomerGroupHandler
-	MeasurementUnitHandler    measurementunits.IHandler
+	CustomerGroupHandler      customer_groups.ICustomerGroupHandler
+	MeasurementUnitHandler    measurement_units.IHandler
 	SupplierHandler           suppliers.ISupplierHandler
-	StockReceiptHandler       stockreceipts.IStockReceiptHandler
+	StockReceiptHandler       stock_receipts.IStockReceiptHandler
 	WarehouseHandler          warehouse.IHandler
-	StockOpsHandler           stockops.IHandler
-	SupplierDebtHandler       supplierdebts.ISupplierDebtHandler
-	CustomerDebtHandler       customerdebts.ICustomerDebtHandler
+	StockOpsHandler           stock_ops.IHandler
+	SupplierDebtHandler       supplier_debts.ISupplierDebtHandler
+	CustomerDebtHandler       customer_debts.ICustomerDebtHandler
 	ProductHandler            products.IPrdHandler
 	OrderHandler              orders.IOrderHandler
 	PaymentMethodHandler      payment_methods.IPaymentMethodHandler
 	CancellationReasonHandler cancellation_reasons.ICancellationReasonHandler
 	ReportHandler             report.IRptHandler
 	PromotionHandler          promotions.IPromotionHandler
-	ActivityLogHandler        *activitylog.ActivityLogHandler
+	ActivityLogHandler        *activity_log.ActivityLogHandler
 	SettingsHandler           *settings.SettingsHandler
 	PrinterHandler            *printer.PrinterHandler
 	ShiftHandler              shift.Handler
@@ -218,28 +218,28 @@ func BuildAppContainer(app *App) *AppContainer {
 	platformAudit := platform.NewRecorder(platformRepo)
 
 	// Activity Log IActivityService
-	activityLogRepo := activitylog_repo.New(tenantDB)
-	activityService := activitylog.NewActivityService(activityLogRepo, app.Logger)
-	activityLogHandler := activitylog.NewActivityLogHandler(activityService, app.Logger)
+	activityLogRepo := activity_log_repo.New(tenantDB)
+	activityService := activity_log.NewActivityService(activityLogRepo, app.Logger)
+	activityLogHandler := activity_log.NewActivityLogHandler(activityService, app.Logger)
 
 	// User Module
 	userAvatarRepo := user.NewAuthRepo(app.Logger, app.R2)
 	userRepo := user_repo.New(pool)
-	customerGroupRepo := customergroups_repo.New(tenantDB)
-	customerGroupService := customergroups.NewService(customerGroupRepo, app.Logger)
-	customerGroupHandler := customergroups.NewHandler(customerGroupService, app.Logger)
+	customerGroupRepo := customer_groups_repo.New(tenantDB)
+	customerGroupService := customer_groups.NewService(customerGroupRepo, app.Logger)
+	customerGroupHandler := customer_groups.NewHandler(customerGroupService, app.Logger)
 
-	measurementUnitRepo := measurementunits_repo.New(tenantDB)
-	measurementUnitService := measurementunits.NewService(measurementUnitRepo, app.Logger)
-	measurementUnitHandler := measurementunits.NewHandler(measurementUnitService, app.Logger)
+	measurementUnitRepo := measurement_units_repo.New(tenantDB)
+	measurementUnitService := measurement_units.NewService(measurementUnitRepo, app.Logger)
+	measurementUnitHandler := measurement_units.NewHandler(measurementUnitService, app.Logger)
 
 	warehouseRepo := wh_repo.New(tenantDB)
 	warehouseService := warehouse.NewService(warehouseRepo, app.Logger)
 	warehouseHandler := warehouse.NewHandler(warehouseService, app.Logger)
 
 	stockOpsRepo := ops_repo.New(tenantDB)
-	stockOpsService := stockops.NewService(stockOpsRepo, app.Store, app.Logger)
-	stockOpsHandler := stockops.NewHandler(stockOpsService, app.Logger)
+	stockOpsService := stock_ops.NewService(stockOpsRepo, app.Store, app.Logger)
+	stockOpsHandler := stock_ops.NewHandler(stockOpsService, app.Logger)
 
 	tenantCatalogSeeder := catalog.NewTenantCatalogSeeder(tenantDB, app.R2, app.Logger)
 	tenantDefaults := &tenantDefaultsSeeder{
@@ -276,16 +276,16 @@ func BuildAppContainer(app *App) *AppContainer {
 
 	// Stock receipt Module
 	stockReceiptRepo := sr_repo.New(tenantDB)
-	stockReceiptService := stockreceipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger)
-	stockReceiptHandler := stockreceipts.NewStockReceiptHandler(stockReceiptService, app.Logger)
+	stockReceiptService := stock_receipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger)
+	stockReceiptHandler := stock_receipts.NewStockReceiptHandler(stockReceiptService, app.Logger)
 
 	supplierDebtRepo := sd_debts_repo.New(tenantDB)
-	supplierDebtService := supplierdebts.NewSupplierDebtService(supplierDebtRepo, app.Store, app.Logger)
-	supplierDebtHandler := supplierdebts.NewSupplierDebtHandler(supplierDebtService, app.Logger)
+	supplierDebtService := supplier_debts.NewSupplierDebtService(supplierDebtRepo, app.Store, app.Logger)
+	supplierDebtHandler := supplier_debts.NewSupplierDebtHandler(supplierDebtService, app.Logger)
 
 	customerDebtRepo := cd_debts_repo.New(tenantDB)
-	customerDebtService := customerdebts.NewCustomerDebtService(customerDebtRepo, app.Store, app.Logger)
-	customerDebtHandler := customerdebts.NewCustomerDebtHandler(customerDebtService, app.Logger)
+	customerDebtService := customer_debts.NewCustomerDebtService(customerDebtRepo, app.Store, app.Logger)
+	customerDebtHandler := customer_debts.NewCustomerDebtHandler(customerDebtService, app.Logger)
 
 	productListCache := products.NewListCache(app.RedisCache)
 

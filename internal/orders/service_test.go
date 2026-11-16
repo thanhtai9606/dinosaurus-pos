@@ -18,7 +18,7 @@ import (
 	"testing"
 	"time"
 
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -285,7 +285,7 @@ func TestOrderService_CreateOrder(t *testing.T) {
 			))
 
 		// Activity Log (returns nothing)
-		mockActivity.EXPECT().Log(gomock.Any(), userID, activitylog_repo.LogActionTypeCREATE, activitylog_repo.LogEntityTypeORDER, newOrderID.String(), gomock.Any())
+		mockActivity.EXPECT().Log(gomock.Any(), userID, activity_log_repo.LogActionTypeCREATE, activity_log_repo.LogEntityTypeORDER, newOrderID.String(), gomock.Any())
 
 		resp, err := service.CreateOrder(ctx, req)
 
@@ -870,8 +870,8 @@ func TestOrderService_CancelOrder(t *testing.T) {
 		mockActivity.EXPECT().Log(
 			gomock.Any(),
 			userID,
-			activitylog_repo.LogActionTypeCANCEL,
-			activitylog_repo.LogEntityTypeORDER,
+			activity_log_repo.LogActionTypeCANCEL,
+			activity_log_repo.LogEntityTypeORDER,
 			orderID.String(),
 			gomock.Any(),
 		)
@@ -1215,8 +1215,8 @@ func TestOrderService_ConfirmManualPayment(t *testing.T) {
 		mockActivity.EXPECT().Log(
 			gomock.Any(),
 			userID,
-			activitylog_repo.LogActionTypePROCESSPAYMENT,
-			activitylog_repo.LogEntityTypeORDER,
+			activity_log_repo.LogActionTypePROCESSPAYMENT,
+			activity_log_repo.LogEntityTypeORDER,
 			orderID.String(),
 			gomock.Any(),
 		)
@@ -1498,8 +1498,8 @@ func TestOrderService_ApplyPromotion(t *testing.T) {
 		mockActivity.EXPECT().Log(
 			gomock.Any(),
 			userID,
-			activitylog_repo.LogActionTypeAPPLYPROMOTION,
-			activitylog_repo.LogEntityTypeORDER,
+			activity_log_repo.LogActionTypeAPPLYPROMOTION,
+			activity_log_repo.LogEntityTypeORDER,
 			orderID.String(),
 			gomock.Any(),
 		)

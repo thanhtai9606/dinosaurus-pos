@@ -1,7 +1,7 @@
 package categories_test
 
 import (
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/categories"
 	categories_repo "dinosaurus-pos/internal/categories/repository"
 	"dinosaurus-pos/internal/common"
@@ -84,7 +84,7 @@ func TestCtgService_CreateCategory(t *testing.T) {
 		}
 
 		mockRepo.EXPECT().CreateCategory(ctx, req.Name).Return(repoCategory, nil)
-		mockActivity.EXPECT().Log(ctx, userID, activitylog_repo.LogActionTypeCREATE, activitylog_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
+		mockActivity.EXPECT().Log(ctx, userID, activity_log_repo.LogActionTypeCREATE, activity_log_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
 
 		resp, err := service.CreateCategory(ctx, req)
 
@@ -109,7 +109,7 @@ func TestCtgService_CreateCategory(t *testing.T) {
 
 		mockRepo.EXPECT().CreateCategory(ctxNoActor, req.Name).Return(repoCategory, nil)
 		mockLogger.EXPECT().Warnf(gomock.Any()).Times(1)
-		mockActivity.EXPECT().Log(ctxNoActor, uuid.Nil, activitylog_repo.LogActionTypeCREATE, activitylog_repo.LogEntityTypeCATEGORY, "2", gomock.Any())
+		mockActivity.EXPECT().Log(ctxNoActor, uuid.Nil, activity_log_repo.LogActionTypeCREATE, activity_log_repo.LogEntityTypeCATEGORY, "2", gomock.Any())
 
 		resp, err := service.CreateCategory(ctxNoActor, req)
 
@@ -166,7 +166,7 @@ func TestCtgService_UpdateCategory(t *testing.T) {
 		repoCategory := categories_repo.Category{ID: 1, Name: req.Name, CreatedAt: pgtype.Timestamptz{Time: now, Valid: true}, UpdatedAt: pgtype.Timestamptz{Time: now, Valid: true}}
 
 		mockRepo.EXPECT().UpdateCategory(ctx, categories_repo.UpdateCategoryParams{ID: 1, Name: "Updated"}).Return(repoCategory, nil)
-		mockActivity.EXPECT().Log(ctx, userID, activitylog_repo.LogActionTypeUPDATE, activitylog_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
+		mockActivity.EXPECT().Log(ctx, userID, activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
 
 		resp, err := service.UpdateCategory(ctx, 1, req)
 
@@ -204,7 +204,7 @@ func TestCtgService_DeleteCategory(t *testing.T) {
 		mockRepo.EXPECT().ExistsCategory(ctx, int32(1)).Return(true, nil)
 		mockRepo.EXPECT().CountProductsInCategory(ctx, gomock.Any()).Return(int64(0), nil)
 		mockRepo.EXPECT().DeleteCategory(ctx, int32(1)).Return(nil)
-		mockActivity.EXPECT().Log(ctx, userID, activitylog_repo.LogActionTypeDELETE, activitylog_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
+		mockActivity.EXPECT().Log(ctx, userID, activity_log_repo.LogActionTypeDELETE, activity_log_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
 
 		err := service.DeleteCategory(ctx, 1)
 
@@ -277,7 +277,7 @@ func TestCtgService_DeleteCategory(t *testing.T) {
 		mockRepo.EXPECT().CountProductsInCategory(ctxNoActor, gomock.Any()).Return(int64(0), nil)
 		mockRepo.EXPECT().DeleteCategory(ctxNoActor, int32(1)).Return(nil)
 		mockLogger.EXPECT().Warnf(gomock.Any()).Times(1)
-		mockActivity.EXPECT().Log(ctxNoActor, uuid.Nil, activitylog_repo.LogActionTypeDELETE, activitylog_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
+		mockActivity.EXPECT().Log(ctxNoActor, uuid.Nil, activity_log_repo.LogActionTypeDELETE, activity_log_repo.LogEntityTypeCATEGORY, "1", gomock.Any())
 
 		err := service.DeleteCategory(ctxNoActor, 1)
 

@@ -1,8 +1,8 @@
 package user
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/tenant"
@@ -33,7 +33,7 @@ type UsrService struct {
 	repo           user_repo.Querier
 	tenants        *tenants.Repository
 	log            logger.ILogger
-	activityLogger activitylog.IActivityService
+	activityLogger activity_log.IActivityService
 	avatar         IAthRepo
 }
 
@@ -83,8 +83,8 @@ func (s *UsrService) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 	s.activityLogger.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeDELETE,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeDELETE,
+		activity_log_repo.LogEntityTypeUSER,
 		userID.String(),
 		logDetails,
 	)
@@ -119,8 +119,8 @@ func (s *UsrService) ToggleUserStatus(ctx context.Context, userID uuid.UUID) err
 	s.activityLogger.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypeUSER,
 		userID.String(),
 		logDetails,
 	)
@@ -212,8 +212,8 @@ func (s *UsrService) UpdateUser(ctx context.Context, userID uuid.UUID, req Updat
 	s.activityLogger.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypeUSER,
 		user.ID.String(),
 		logDetails,
 	)
@@ -351,8 +351,8 @@ func (s *UsrService) CreateUser(ctx context.Context, req CreateUserRequest) (*Pr
 	s.activityLogger.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeCREATE,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeCREATE,
+		activity_log_repo.LogEntityTypeUSER,
 		newUser.ID.String(),
 		logDetails,
 	)
@@ -371,7 +371,7 @@ func (s *UsrService) CreateUser(ctx context.Context, req CreateUserRequest) (*Pr
 	return &response, nil
 }
 
-func NewUsrService(repo user_repo.Querier, tenantsRepo *tenants.Repository, log logger.ILogger, actLog activitylog.IActivityService, avatar IAthRepo) IUsrService {
+func NewUsrService(repo user_repo.Querier, tenantsRepo *tenants.Repository, log logger.ILogger, actLog activity_log.IActivityService, avatar IAthRepo) IUsrService {
 	return &UsrService{
 		repo:           repo,
 		tenants:        tenantsRepo,

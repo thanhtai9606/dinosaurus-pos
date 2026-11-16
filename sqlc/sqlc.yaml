@@ -1,13 +1,13 @@
 version: "2"
 sql:
-## Activity Log | internal/activitylog/sql/activity_log.sql
+## Activity Log | internal/activity_log/sql/activity_log.sql
   - engine: "postgresql"
-    queries: "../internal/activitylog/sql/"
+    queries: "../internal/activity_log/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/activitylog/repository"
+        out: "../internal/activity_log/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true
@@ -63,14 +63,14 @@ sql:
               import: "github.com/google/uuid"
               type: "UUID"
 
-## Customer groups | internal/customergroups/sql/customer_groups.sql
+## Customer groups | internal/customer_groups/sql/customer_groups.sql
   - engine: "postgresql"
-    queries: "../internal/customergroups/sql/"
+    queries: "../internal/customer_groups/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/customergroups/repository"
+        out: "../internal/customer_groups/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true
@@ -84,14 +84,14 @@ sql:
               import: "github.com/google/uuid"
               type: "UUID"
 
-## Measurement units | internal/measurementunits/sql/measurement_units.sql
+## Measurement units | internal/measurement_units/sql/measurement_units.sql
   - engine: "postgresql"
-    queries: "../internal/measurementunits/sql/"
+    queries: "../internal/measurement_units/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/measurementunits/repository"
+        out: "../internal/measurement_units/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true
@@ -168,14 +168,14 @@ sql:
               import: "github.com/google/uuid"
               type: "UUID"
 
-## Stock receipts | internal/stockreceipts/sql/stock_receipts.sql
+## Stock receipts | internal/stock_receipts/sql/stock_receipts.sql
   - engine: "postgresql"
-    queries: "../internal/stockreceipts/sql/"
+    queries: "../internal/stock_receipts/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/stockreceipts/repository"
+        out: "../internal/stock_receipts/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true

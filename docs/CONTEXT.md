@@ -84,9 +84,9 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 
 **Legacy:** phiếu cũ có thể chỉ có metadata JSON trong `note` với marker `__payment__` — parse qua `web/src/lib/stock-receipts/paymentNote.ts` (`stripPaymentFromNote` / `embedPaymentInNote`). **Không backfill** sang cột DB trong MVP.
 
-**FE gửi API:** create/update gửi `payment_mode`, `amount_paid` và `note` thuần (không nhúng payment vào note trên luồng mới). File: `_dashboard.stock-receipts.new.tsx`, `StockReceiptEditorDialog.tsx`, DTO `internal/stockreceipts/dto.go`.
+**FE gửi API:** create/update gửi `payment_mode`, `amount_paid` và `note` thuần (không nhúng payment vào note trên luồng mới). File: `_dashboard.stock-receipts.new.tsx`, `StockReceiptEditorDialog.tsx`, DTO `internal/stock_receipts/dto.go`.
 
-**BE:** `applyReceiptPayment` trong `internal/stockreceipts/service.go`; khi **`Complete`**, nếu `total - amount_paid > 0` → tạo **một** `supplier_debts` gắn `stock_receipt_id` (`internal/supplierdebts/integrate.go`).
+**BE:** `applyReceiptPayment` trong `internal/stock_receipts/service.go`; khi **`Complete`**, nếu `total - amount_paid > 0` → tạo **một** `supplier_debts` gắn `stock_receipt_id` (`internal/supplier_debts/integrate.go`).
 
 **Kho (đa kho):** migration `000013_warehouses_stock_ops` — `warehouses`, `warehouse_stock` (nguồn tồn theo kho); `products.stock` = tổng các kho. Nhập/bán/điều chỉnh/chuyển/kiểm kê ghi `stock_history.warehouse_id`. Helper: `internal/inventory/stockmovement.go` (`ApplyWarehouseDelta`). API: `/warehouses`, `/stock-adjustments`, `/stock-transfers`, `/stock-takes`, `/stock-movements`. FE menu **Kho hàng** (`useNavigationMenu`). Seed kho `MAIN` khi tạo tenant.
 
@@ -120,7 +120,7 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 | NCC | `GET/POST /supplier-debts`, `GET /supplier-debts/summary`, `GET /supplier-debts/:id`, `POST .../payments`, `POST .../void` |
 | Khách | `GET/POST /customer-debts`, `GET /customer-debts/summary`, `GET /customer-debts/:id`, `POST .../payments`, `POST .../void` |
 
-Package Go mirror: `internal/supplierdebts`, `internal/customerdebts` — wire trong `server/server.go`, `server/routes.go`.
+Package Go mirror: `internal/supplier_debts`, `internal/customer_debts` — wire trong `server/server.go`, `server/routes.go`.
 
 ### Tích hợp sự kiện (orders + receipts)
 

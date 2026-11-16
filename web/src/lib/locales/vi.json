@@ -1423,7 +1423,8 @@
         "actions": {
             "add": "Tạo phiếu",
             "add_line": "Thêm dòng",
-            "complete": "Hoàn tất nhập"
+            "complete": "Hoàn tất nhập",
+            "cancel": "Hủy phiếu nháp"
         },
         "checkout": {
             "subtitle": "Quét hàng bên trái — tổng & thanh toán / công nợ NCC bên phải.",
@@ -1474,6 +1475,7 @@
             "create_title": "Phiếu nhập mới",
             "edit_title": "Sửa phiếu nhập",
             "view_title": "Chi tiết phiếu nhập",
+            "readonly_hint": "Phiếu đã nhập chỉ xem, không sửa. Chỉ xóa được phiếu nháp hoặc đã hủy.",
             "search_placeholder": "Quét mã vạch / SKU / tên — gợi ý khi gõ, Enter để thêm",
             "scan_hint": "Giống bán lẻ: quét hoặc tìm hàng — mỗi lần thêm tăng SL nếu trùng mã.",
             "empty_lines": "Quét hoặc tìm hàng để thêm vào phiếu",

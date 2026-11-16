@@ -1404,7 +1404,8 @@
         "actions": {
             "add": "Buat penerimaan",
             "add_line": "Tambah baris",
-            "complete": "Selesaikan"
+            "complete": "Selesaikan",
+            "cancel": "Batalkan draf"
         },
         "checkout": {
             "subtitle": "Pindai kiri — total & bayar supplier kanan.",
@@ -1455,6 +1456,7 @@
             "create_title": "Penerimaan baru",
             "edit_title": "Edit penerimaan",
             "view_title": "Detail penerimaan",
+            "readonly_hint": "Penerimaan selesai hanya bisa dilihat. Hanya draf atau dibatalkan yang bisa diubah/dihapus.",
             "search_placeholder": "Pindai barcode / SKU / nama — Enter untuk tambah",
             "scan_hint": "Seperti POS: pindai atau cari — item sama menambah qty.",
             "empty_lines": "Pindai atau cari produk untuk penerimaan ini",

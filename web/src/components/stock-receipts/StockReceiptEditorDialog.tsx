@@ -1,11 +1,25 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScanBarcode } from 'lucide-react'
-import { useUpdateStockReceiptMutation, useStockReceiptDetailQuery } from '@/lib/api/query/stockReceipts'
+import {
+    useUpdateStockReceiptMutation,
+    useDeleteStockReceiptMutation,
+    useStockReceiptDetailQuery,
+} from '@/lib/api/query/stockReceipts'
 import { stripPaymentFromNote, type StockReceiptPaymentMeta, type StockReceiptPaymentMode } from '@/lib/stock-receipts/paymentNote'
 import type { StockReceipt } from '@/lib/api/query/stockReceipts'
 import { useSuppliersListQuery } from '@/lib/api/query/suppliers'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,14 +44,18 @@ export function StockReceiptEditorDialog({
     const { t } = useTranslation()
     const formatMoney = useFormatMoney()
     const updateMutation = useUpdateStockReceiptMutation()
+    const deleteMutation = useDeleteStockReceiptMutation()
     const { data: detail, isFetching } = useStockReceiptDetailQuery(receiptId || '')
     const { data: suppliersData } = useSuppliersListQuery({ limit: 100 })
 
     const readOnly = Boolean(receiptId && detail && detail.status !== 'draft')
+    const canDelete =
+        Boolean(detail && (detail.status === 'draft' || detail.status === 'cancelled')) && deleteMutation.isAllowed
 
     const [supplierId, setSupplierId] = useState<string>('')
     const [note, setNote] = useState('')
     const [paymentMeta, setPaymentMeta] = useState<StockReceiptPaymentMeta | undefined>()
+    const [deleteOpen, setDeleteOpen] = useState(false)
 
     const draft = useStockReceiptDraft({ open, receiptId, detail, readOnly, t })
 
@@ -63,6 +81,7 @@ export function StockReceiptEditorDialog({
             : 0
 
     const handleSave = async () => {
+        if (!updateMutation.isAllowed) return
         const body: Record<string, unknown> = {
             supplier_id: supplierId || undefined,
             note: note || undefined,
@@ -76,9 +95,17 @@ export function StockReceiptEditorDialog({
         onOpenChange(false)
     }
 
+    const handleDelete = async () => {
+        if (!receiptId || !canDelete) return
+        await deleteMutation.mutateAsync(receiptId)
+        setDeleteOpen(false)
+        onOpenChange(false)
+    }
+
     const title = readOnly ? t('stockReceipts.form.view_title') : t('stockReceipts.form.edit_title')
 
     return (
+        <>
         <Dialog open={open && !!receiptId} onOpenChange={onOpenChange}>
             <DialogContent size="full" dismissible className="flex flex-col gap-4 p-6" scrollable>
                 <DialogHeader>
@@ -93,7 +120,9 @@ export function StockReceiptEditorDialog({
                             </Badge>
                         )}
                     </div>
-                    {!readOnly && (
+                    {readOnly ? (
+                        <DialogDescription>{t('stockReceipts.form.readonly_hint')}</DialogDescription>
+                    ) : (
                         <DialogDescription className="space-y-1 text-left">
                             <p>{t('stockReceipts.form.scan_hint')}</p>
                             <p>{t('stockReceipts.form.cost_note')}</p>
@@ -191,18 +220,53 @@ export function StockReceiptEditorDialog({
                             </span>
                         </div>
 
-                        {!readOnly && (
-                            <DialogFooter>
-                                <Button onClick={handleSave} disabled={pending || items.length === 0}>
-                                    {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    {t('common.save')}
+                        <DialogFooter className="gap-2 sm:justify-between">
+                            {canDelete ? (
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    disabled={deleteMutation.isPending}
+                                    onClick={() => setDeleteOpen(true)}
+                                >
+                                    {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    {t('stockReceipts.bulk.delete')}
                                 </Button>
-                            </DialogFooter>
-                        )}
+                            ) : (
+                                <span />
+                            )}
+                            <div className="flex gap-2">
+                                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                                    {t('common.close', 'Close')}
+                                </Button>
+                                {!readOnly && updateMutation.isAllowed && (
+                                    <Button
+                                        type="button"
+                                        onClick={handleSave}
+                                        disabled={pending || items.length === 0}
+                                    >
+                                        {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        {t('common.save')}
+                                    </Button>
+                                )}
+                            </div>
+                        </DialogFooter>
                     </>
                 )}
             </DialogContent>
         </Dialog>
+        <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{t('stockReceipts.bulk.delete_confirm_title')}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('stockReceipts.bulk.delete_confirm_body')}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>{t('stockReceipts.bulk.delete')}</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+        </>
     )
 }
 

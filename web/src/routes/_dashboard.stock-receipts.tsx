@@ -21,7 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Plus, Check, X, Printer, FileSpreadsheet, Trash2, Loader2 } from 'lucide-react'
+import { Plus, Check, X, Printer, FileSpreadsheet, Trash2, Loader2, Pencil } from 'lucide-react'
 import { useFormatMoney } from '@/context/MoneyContext'
 import { printStockReceiptBarcodes } from '@/lib/stock-receipts/printBarcodes'
 import { downloadStockReceiptsSpreadsheet } from '@/lib/stock-receipts/exportReceiptsSpreadsheet'
@@ -61,6 +61,7 @@ function StockReceiptsPage() {
     const [selected, setSelected] = useState<Set<string>>(new Set())
     const [bulkBusy, setBulkBusy] = useState(false)
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+    const [deleteSingleId, setDeleteSingleId] = useState<string | null>(null)
 
     const receipts = data?.receipts || []
     const pageIds = useMemo(() => receipts.map((r) => r.id), [receipts])
@@ -146,6 +147,19 @@ function StockReceiptsPage() {
             setSelected(new Set())
             setDeleteConfirmOpen(false)
         })
+
+    const handleConfirmDeleteSingle = async () => {
+        if (!deleteSingleId) return
+        try {
+            await deleteMutation.mutateAsync(deleteSingleId)
+            setDeleteSingleId(null)
+        } catch {
+            /* toast from mutation */
+        }
+    }
+
+    const canDeleteReceipt = (status: string) =>
+        deleteMutation.isAllowed && (status === 'draft' || status === 'cancelled')
 
     const selectedCount = selectedIds.length
     const canDeleteSelection =
@@ -235,30 +249,54 @@ function StockReceiptsPage() {
                                     </TableCell>
                                     <TableCell className="text-right">{formatMoney(r.total_amount)}</TableCell>
                                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                                        {r.status === 'draft' && (
-                                            <div className="inline-flex gap-1">
-                                                {completeMutation.isAllowed && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        title={t('stockReceipts.actions.complete')}
-                                                        onClick={() => completeMutation.mutate(r.id)}
-                                                    >
-                                                        <Check className="h-4 w-4 text-green-600" />
-                                                    </Button>
-                                                )}
-                                                {cancelMutation.isAllowed && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        title={t('stockReceipts.status.cancelled')}
-                                                        onClick={() => cancelMutation.mutate(r.id)}
-                                                    >
-                                                        <X className="h-4 w-4 text-destructive" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        )}
+                                        <div className="inline-flex gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                title={
+                                                    r.status === 'draft'
+                                                        ? t('stockReceipts.form.edit_title')
+                                                        : t('stockReceipts.form.view_title')
+                                                }
+                                                onClick={() => openReceipt(r.id)}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            {canDeleteReceipt(r.status) && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    title={t('stockReceipts.bulk.delete')}
+                                                    onClick={() => setDeleteSingleId(r.id)}
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            )}
+                                            {r.status === 'draft' && (
+                                                <>
+                                                    {completeMutation.isAllowed && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            title={t('stockReceipts.actions.complete')}
+                                                            onClick={() => completeMutation.mutate(r.id)}
+                                                        >
+                                                            <Check className="h-4 w-4 text-green-600" />
+                                                        </Button>
+                                                    )}
+                                                    {cancelMutation.isAllowed && (
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            title={t('stockReceipts.actions.cancel', 'Cancel draft')}
+                                                            onClick={() => cancelMutation.mutate(r.id)}
+                                                        >
+                                                            <X className="h-4 w-4 text-destructive" />
+                                                        </Button>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -301,6 +339,18 @@ function StockReceiptsPage() {
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={handleConfirmDelete}>{t('stockReceipts.bulk.delete')}</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog open={!!deleteSingleId} onOpenChange={(o) => !o && setDeleteSingleId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('stockReceipts.bulk.delete_confirm_title')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('stockReceipts.bulk.delete_confirm_body')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmDeleteSingle}>{t('stockReceipts.bulk.delete')}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

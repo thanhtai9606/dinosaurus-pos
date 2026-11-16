@@ -1416,7 +1416,8 @@
         "actions": {
             "add": "New receipt",
             "add_line": "Add line",
-            "complete": "Complete receipt"
+            "complete": "Complete receipt",
+            "cancel": "Cancel draft"
         },
         "checkout": {
             "subtitle": "Scan on the left — totals and supplier payment on the right.",
@@ -1467,6 +1468,7 @@
             "create_title": "New stock receipt",
             "edit_title": "Edit stock receipt",
             "view_title": "Stock receipt details",
+            "readonly_hint": "Completed receipts are read-only. Only draft or cancelled receipts can be edited or deleted.",
             "search_placeholder": "Scan barcode / SKU / name — suggestions while typing, Enter to add",
             "scan_hint": "Like retail POS: scan or search — duplicate items increase quantity.",
             "empty_lines": "Scan or search to add products to this receipt",

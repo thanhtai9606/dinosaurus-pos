@@ -51,6 +51,15 @@ SELECT * FROM customer_debt_payments
 WHERE customer_debt_id = $1
 ORDER BY paid_at DESC, created_at DESC;
 
+-- name: ListCustomerDebtsForExport :many
+SELECT cd.*, c.name AS customer_name,
+       GREATEST(0, (CURRENT_DATE - cd.issued_at::date))::int AS age_days
+FROM customer_debts cd
+JOIN customers c ON c.id = cd.customer_id
+WHERE (sqlc.narg(customer_id)::uuid IS NULL OR cd.customer_id = sqlc.narg(customer_id))
+  AND (sqlc.narg(status)::debt_status IS NULL OR cd.status = sqlc.narg(status))
+ORDER BY cd.issued_at DESC;
+
 -- name: ListCustomerDebtSummary :many
 SELECT
     cd.customer_id,

@@ -250,7 +250,8 @@ func (q *Queries) ListEnabledEmailChannels(ctx context.Context) ([]NotificationC
 const listEnabledSubscriptionsForEvent = `-- name: ListEnabledSubscriptionsForEvent :many
 SELECT ns.id, ns.tenant_id, ns.user_id, ns.event_type, ns.channel_id, ns.enabled, ns.created_at, ns.updated_at,
        nc.channel_type, nc.config_json, nc.name AS channel_name,
-       u.email AS user_email
+       u.email AS user_email,
+       u.phone AS user_phone
 FROM notification_subscriptions ns
 JOIN notification_channels nc ON nc.id = ns.channel_id AND nc.enabled = true
 JOIN users u ON u.id = ns.user_id
@@ -270,6 +271,7 @@ type ListEnabledSubscriptionsForEventRow struct {
 	ConfigJson  []byte                  `json:"config_json"`
 	ChannelName string                  `json:"channel_name"`
 	UserEmail   string                  `json:"user_email"`
+	UserPhone   *string                 `json:"user_phone"`
 }
 
 func (q *Queries) ListEnabledSubscriptionsForEvent(ctx context.Context, eventType string) ([]ListEnabledSubscriptionsForEventRow, error) {
@@ -294,6 +296,7 @@ func (q *Queries) ListEnabledSubscriptionsForEvent(ctx context.Context, eventTyp
 			&i.ConfigJson,
 			&i.ChannelName,
 			&i.UserEmail,
+			&i.UserPhone,
 		); err != nil {
 			return nil, err
 		}

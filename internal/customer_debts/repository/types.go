@@ -42,6 +42,7 @@ type CustomerDebt struct {
 	CreatedBy   pgtype.UUID        `json:"created_by"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	TenantID    uuid.UUID          `json:"tenant_id"`
 }
 
 type CustomerDebtPayment struct {

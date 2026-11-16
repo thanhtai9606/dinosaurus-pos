@@ -25,7 +25,7 @@ func CreateDebtFromOrderTx(ctx context.Context, q *cd_repo.Queries, p FromOrderP
 	if p.CustomerID == uuid.Nil || p.Total <= 0 {
 		return nil
 	}
-	_, err := q.GetCustomerDebtByOrderID(ctx, p.OrderID)
+	_, err := q.GetCustomerDebtByOrderID(ctx, pgtype.UUID{Bytes: p.OrderID, Valid: true})
 	if err == nil {
 		return nil
 	}
@@ -48,7 +48,7 @@ func CreateDebtFromOrderTx(ctx context.Context, q *cd_repo.Queries, p FromOrderP
 }
 
 func VoidDebtByOrderTx(ctx context.Context, q *cd_repo.Queries, orderID uuid.UUID) error {
-	debt, err := q.GetCustomerDebtByOrderID(ctx, orderID)
+	debt, err := q.GetCustomerDebtByOrderID(ctx, pgtype.UUID{Bytes: orderID, Valid: true})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil
@@ -58,12 +58,14 @@ func VoidDebtByOrderTx(ctx context.Context, q *cd_repo.Queries, orderID uuid.UUI
 	if debt.Status == cd_repo.DebtStatusSettled || debt.Status == cd_repo.DebtStatusVoid {
 		return nil
 	}
-	_, err = q.SetCustomerDebtStatus(ctx, debt.ID, cd_repo.DebtStatusVoid)
+	_, err = q.SetCustomerDebtStatus(ctx, cd_repo.SetCustomerDebtStatusParams{
+		ID: debt.ID, Status: cd_repo.DebtStatusVoid,
+	})
 	return err
 }
 
 func RecordOrderPaymentTx(ctx context.Context, q *cd_repo.Queries, orderID uuid.UUID, amount float64, createdBy pgtype.UUID) error {
-	debt, err := q.GetCustomerDebtByOrderID(ctx, orderID)
+	debt, err := q.GetCustomerDebtByOrderID(ctx, pgtype.UUID{Bytes: orderID, Valid: true})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil

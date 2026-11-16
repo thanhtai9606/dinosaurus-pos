@@ -44,6 +44,7 @@ type Querier interface {
 	// Mengambil satu pesanan dan mengunci barisnya untuk pembaruan (mencegah race condition).
 	// Penting untuk digunakan di dalam transaksi sebelum mengupdate total.
 	GetOrderForUpdate(ctx context.Context, id uuid.UUID) (Order, error)
+	GetOrderHeaderByID(ctx context.Context, id uuid.UUID) (Order, error)
 	// Mengambil satu item pesanan untuk validasi sebelum update/delete.
 	GetOrderItem(ctx context.Context, arg GetOrderItemParams) (OrderItem, error)
 	// Mengambil semua item dari sebuah pesanan untuk menghitung ulang total.
@@ -60,12 +61,14 @@ type Querier interface {
 	GetPromotionByID(ctx context.Context, id uuid.UUID) (Promotion, error)
 	GetPromotionRules(ctx context.Context, promotionID uuid.UUID) ([]PromotionRule, error)
 	GetPromotionTargets(ctx context.Context, promotionID uuid.UUID) ([]PromotionTarget, error)
+	ListKitchenTickets(ctx context.Context, limit int32) ([]ListKitchenTicketsRow, error)
 	ListOrders(ctx context.Context, arg ListOrdersParams) ([]ListOrdersRow, error)
 	RefundOrder(ctx context.Context, id uuid.UUID) (Order, error)
 	UpdateOrderAppliedPromotion(ctx context.Context, arg UpdateOrderAppliedPromotionParams) error
 	// Update qty dan subtotal. Penting: Tambahkan validasi stok/constraint di level aplikasi
 	// atau pastikan trigger handle pengurangan stok jika qty bertambah.
 	UpdateOrderItemQuantity(ctx context.Context, arg UpdateOrderItemQuantityParams) (OrderItem, error)
+	UpdateOrderKitchenStatus(ctx context.Context, arg UpdateOrderKitchenStatusParams) (Order, error)
 	// Memperbarui pesanan untuk pembayaran manual (tunai, dll.) dan mengubah status menjadi 'paid'.
 	// Hanya bisa memproses pesanan yang statusnya 'open'.
 	UpdateOrderManualPayment(ctx context.Context, arg UpdateOrderManualPaymentParams) (Order, error)

@@ -42,6 +42,7 @@ type SupplierDebt struct {
 	CreatedBy       pgtype.UUID        `json:"created_by"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+	TenantID        uuid.UUID          `json:"tenant_id"`
 }
 
 type SupplierDebtPayment struct {
@@ -50,8 +51,9 @@ type SupplierDebtPayment struct {
 	Amount         pgtype.Numeric     `json:"amount"`
 	PaidAt         pgtype.Timestamptz `json:"paid_at"`
 	Note           *string            `json:"note"`
-	CreatedBy      pgtype.UUID        `json:"created_by"`
-	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	CreatedBy         pgtype.UUID        `json:"created_by"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	CashTransactionID pgtype.UUID        `json:"cash_transaction_id"`
 }
 
 func NumericToFloat(n pgtype.Numeric) float64 {

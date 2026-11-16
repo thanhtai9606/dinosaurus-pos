@@ -29,6 +29,7 @@ type CreateOrderRequest struct {
 	Type           repository.OrderType     `json:"type" validate:"required,oneof=dine_in takeaway"`
 	Items          []CreateOrderItemRequest `json:"items" validate:"required,min=1,dive"`
 	CustomerID     *uuid.UUID               `json:"customer_id,omitempty"`
+	DiningTableID  *uuid.UUID               `json:"dining_table_id,omitempty"`
 	DiscountAmount *int64                   `json:"discount_amount,omitempty" validate:"omitempty,gte=0"`
 }
 

@@ -10,6 +10,7 @@ import (
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/common/store"
 	sd_repo "dinosaurus-pos/internal/supplier_debts/repository"
+	shift_repo "dinosaurus-pos/internal/shift/repository"
 	"dinosaurus-pos/pkg/logger"
 
 	"github.com/google/uuid"
@@ -24,16 +25,18 @@ type ISupplierDebtService interface {
 	CreateManual(ctx context.Context, req CreateManualSupplierDebtRequest) (*SupplierDebtResponse, error)
 	RecordPayment(ctx context.Context, id uuid.UUID, req RecordSupplierDebtPaymentRequest) (*SupplierDebtResponse, error)
 	Void(ctx context.Context, id uuid.UUID) (*SupplierDebtResponse, error)
+	ExportExcel(ctx context.Context, req ListSupplierDebtsRequest) ([]byte, error)
 }
 
 type SupplierDebtService struct {
-	repo  *sd_repo.Queries
-	store store.Store
-	log   logger.ILogger
+	repo      *sd_repo.Queries
+	shiftRepo *shift_repo.Queries
+	store     store.Store
+	log       logger.ILogger
 }
 
-func NewSupplierDebtService(repo *sd_repo.Queries, st store.Store, log logger.ILogger) ISupplierDebtService {
-	return &SupplierDebtService{repo: repo, store: st, log: log}
+func NewSupplierDebtService(repo *sd_repo.Queries, shiftRepo *shift_repo.Queries, st store.Store, log logger.ILogger) ISupplierDebtService {
+	return &SupplierDebtService{repo: repo, shiftRepo: shiftRepo, store: st, log: log}
 }
 
 func (s *SupplierDebtService) List(ctx context.Context, req ListSupplierDebtsRequest) (*PagedSupplierDebtsResponse, error) {
@@ -48,8 +51,9 @@ func (s *SupplierDebtService) List(ctx context.Context, req ListSupplierDebtsReq
 		countParams.SupplierID = params.SupplierID
 	}
 	if req.Status != nil {
-		params.Status = sd_repo.NullDebtStatus{DebtStatus: sd_repo.DebtStatus(*req.Status), Valid: true}
-		countParams.Status = params.Status
+		s := sd_repo.DebtStatus(*req.Status)
+		params.Status = &s
+		countParams.Status = &s
 	}
 	rows, err := s.repo.ListSupplierDebts(ctx, params)
 	if err != nil {
@@ -78,7 +82,7 @@ func (s *SupplierDebtService) Get(ctx context.Context, id uuid.UUID) (*SupplierD
 		return nil, err
 	}
 	payments, _ := s.repo.ListSupplierDebtPayments(ctx, id)
-	resp := mapListRow(row)
+	resp := mapDetailRow(row)
 	resp.Payments = mapPayments(payments)
 	return &resp, nil
 }
@@ -151,15 +155,42 @@ func (s *SupplierDebtService) RecordPayment(ctx context.Context, id uuid.UUID, r
 			paidAt = *req.PaidAt
 		}
 		var createdBy pgtype.UUID
-		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
+		actorID, hasActor := ctx.Value(common.UserIDKey).(uuid.UUID)
+		if hasActor {
 			createdBy = pgtype.UUID{Bytes: actorID, Valid: true}
 		}
+		deductCash := req.DeductFromCash == nil || *req.DeductFromCash
+		var cashTxID pgtype.UUID
+		if deductCash && hasActor && s.shiftRepo != nil {
+			shiftQ := shift_repo.New(tx)
+			shift, shiftErr := shiftQ.GetOpenShiftByUserID(ctx, actorID)
+			if shiftErr != nil {
+				if errors.Is(shiftErr, pgx.ErrNoRows) {
+					return fmt.Errorf("%w: open shift required to record cash out", common.ErrInvalidState)
+				}
+				return shiftErr
+			}
+			desc := fmt.Sprintf("Trả NCC %s", debt.ReferenceNo)
+			cashTx, cashErr := shiftQ.CreateCashTransaction(ctx, shift_repo.CreateCashTransactionParams{
+				ShiftID:     shift.ID,
+				UserID:      actorID,
+				Amount:      int64(req.Amount + 0.5),
+				Type:        shift_repo.CashTransactionTypeCashOut,
+				Category:    "supplier_debt",
+				Description: &desc,
+			})
+			if cashErr != nil {
+				return cashErr
+			}
+			cashTxID = pgtype.UUID{Bytes: cashTx.ID, Valid: true}
+		}
 		_, err = qtx.InsertSupplierDebtPayment(ctx, sd_repo.InsertSupplierDebtPaymentParams{
-			SupplierDebtID: id,
-			Amount:         sd_repo.FloatToNumeric(req.Amount),
-			PaidAt:         sd_repo.PtrTime(paidAt),
-			Note:           req.Note,
-			CreatedBy:      createdBy,
+			SupplierDebtID:    id,
+			Amount:            sd_repo.FloatToNumeric(req.Amount),
+			PaidAt:            sd_repo.PtrTime(paidAt),
+			Note:              req.Note,
+			CreatedBy:         createdBy,
+			CashTransactionID: cashTxID,
 		})
 		if err != nil {
 			return err
@@ -179,7 +210,7 @@ func (s *SupplierDebtService) RecordPayment(ctx context.Context, id uuid.UUID, r
 			return err
 		}
 		payments, _ := qtx.ListSupplierDebtPayments(ctx, id)
-		mapped := mapListRow(row)
+		mapped := mapDetailRow(row)
 		mapped.Payments = mapPayments(payments)
 		result = &mapped
 		return nil
@@ -204,14 +235,49 @@ func (s *SupplierDebtService) Void(ctx context.Context, id uuid.UUID) (*Supplier
 	if debt.Status == sd_repo.DebtStatusSettled {
 		return nil, common.ErrInvalidState
 	}
-	_, err = s.repo.SetSupplierDebtStatus(ctx, id, sd_repo.DebtStatusVoid)
+	_, err = s.repo.SetSupplierDebtStatus(ctx, sd_repo.SetSupplierDebtStatusParams{
+		ID: id, Status: sd_repo.DebtStatusVoid,
+	})
 	if err != nil {
 		return nil, err
 	}
 	return s.Get(ctx, id)
 }
 
-func mapListRow(r sd_repo.SupplierDebtListRow) SupplierDebtResponse {
+func mapDetailRow(r sd_repo.GetSupplierDebtByIDRow) SupplierDebtResponse {
+	total := sd_repo.NumericToFloat(r.TotalAmount)
+	paid := sd_repo.NumericToFloat(r.AmountPaid)
+	var receiptID *uuid.UUID
+	if r.StockReceiptID.Valid {
+		id := uuid.UUID(r.StockReceiptID.Bytes)
+		receiptID = &id
+	}
+	age := 0
+	if r.IssuedAt.Valid {
+		age = int(time.Since(r.IssuedAt.Time).Hours() / 24)
+		if age < 0 {
+			age = 0
+		}
+	}
+	return SupplierDebtResponse{
+		ID:             r.ID,
+		SupplierID:     r.SupplierID,
+		SupplierName:   r.SupplierName,
+		StockReceiptID: receiptID,
+		ReferenceNo:    r.ReferenceNo,
+		TotalAmount:    total,
+		AmountPaid:     paid,
+		BalanceDue:     total - paid,
+		Status:         string(r.Status),
+		AgeDays:        age,
+		Note:           r.Note,
+		IssuedAt:       r.IssuedAt.Time,
+		CreatedAt:      r.CreatedAt.Time,
+		UpdatedAt:      r.UpdatedAt.Time,
+	}
+}
+
+func mapListRow(r sd_repo.ListSupplierDebtsRow) SupplierDebtResponse {
 	total := sd_repo.NumericToFloat(r.TotalAmount)
 	paid := sd_repo.NumericToFloat(r.AmountPaid)
 	var receiptID *uuid.UUID

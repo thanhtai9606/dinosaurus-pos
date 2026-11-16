@@ -42,9 +42,18 @@ WHERE id = $1
 RETURNING *;
 
 -- name: InsertSupplierDebtPayment :one
-INSERT INTO supplier_debt_payments (supplier_debt_id, amount, paid_at, note, created_by)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO supplier_debt_payments (supplier_debt_id, amount, paid_at, note, created_by, cash_transaction_id)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
+
+-- name: ListSupplierDebtsForExport :many
+SELECT sd.*, s.name AS supplier_name,
+       GREATEST(0, (CURRENT_DATE - sd.issued_at::date))::int AS age_days
+FROM supplier_debts sd
+JOIN suppliers s ON s.id = sd.supplier_id AND s.deleted_at IS NULL
+WHERE (sqlc.narg(supplier_id)::uuid IS NULL OR sd.supplier_id = sqlc.narg(supplier_id))
+  AND (sqlc.narg(status)::debt_status IS NULL OR sd.status = sqlc.narg(status))
+ORDER BY sd.issued_at DESC;
 
 -- name: ListSupplierDebtPayments :many
 SELECT * FROM supplier_debt_payments

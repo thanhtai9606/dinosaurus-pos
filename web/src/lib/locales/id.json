@@ -135,6 +135,8 @@
         "supplier_debts": "Hutang supplier",
         "customer_debts": "Piutang pelanggan",
         "retail_pos": "POS ritel",
+        "dining_tables": "Meja",
+        "kitchen": "Dapur / KDS",
         "tenants_admin": "Kelola toko (tenant)",
         "platform": "Platform",
         "platform_overview": "Ringkasan",

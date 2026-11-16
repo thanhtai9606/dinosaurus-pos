@@ -98,6 +98,50 @@ func (ns NullDebtStatus) Value() (driver.Value, error) {
 	return string(ns.DebtStatus), nil
 }
 
+type DiningTableStatus string
+
+const (
+	DiningTableStatusAvailable DiningTableStatus = "available"
+	DiningTableStatusOccupied  DiningTableStatus = "occupied"
+	DiningTableStatusReserved  DiningTableStatus = "reserved"
+	DiningTableStatusDirty     DiningTableStatus = "dirty"
+)
+
+func (e *DiningTableStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DiningTableStatus(s)
+	case string:
+		*e = DiningTableStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DiningTableStatus: %T", src)
+	}
+	return nil
+}
+
+type NullDiningTableStatus struct {
+	DiningTableStatus DiningTableStatus `json:"dining_table_status"`
+	Valid             bool              `json:"valid"` // Valid is true if DiningTableStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDiningTableStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.DiningTableStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DiningTableStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDiningTableStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DiningTableStatus), nil
+}
+
 type DiscountType string
 
 const (
@@ -138,6 +182,50 @@ func (ns NullDiscountType) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.DiscountType), nil
+}
+
+type KitchenTicketStatus string
+
+const (
+	KitchenTicketStatusPending   KitchenTicketStatus = "pending"
+	KitchenTicketStatusPreparing KitchenTicketStatus = "preparing"
+	KitchenTicketStatusReady     KitchenTicketStatus = "ready"
+	KitchenTicketStatusServed    KitchenTicketStatus = "served"
+)
+
+func (e *KitchenTicketStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = KitchenTicketStatus(s)
+	case string:
+		*e = KitchenTicketStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for KitchenTicketStatus: %T", src)
+	}
+	return nil
+}
+
+type NullKitchenTicketStatus struct {
+	KitchenTicketStatus KitchenTicketStatus `json:"kitchen_ticket_status"`
+	Valid               bool                `json:"valid"` // Valid is true if KitchenTicketStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullKitchenTicketStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.KitchenTicketStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.KitchenTicketStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullKitchenTicketStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.KitchenTicketStatus), nil
 }
 
 type LogActionType string
@@ -1154,6 +1242,40 @@ type CustomerGroup struct {
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
 }
 
+type DiningArea struct {
+	ID        uuid.UUID          `json:"id"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
+	Name      string             `json:"name"`
+	SortOrder int32              `json:"sort_order"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type DiningTable struct {
+	ID        uuid.UUID          `json:"id"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
+	AreaID    uuid.UUID          `json:"area_id"`
+	Name      string             `json:"name"`
+	Capacity  int32              `json:"capacity"`
+	Status    DiningTableStatus  `json:"status"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type EInvoice struct {
+	ID           uuid.UUID          `json:"id"`
+	TenantID     uuid.UUID          `json:"tenant_id"`
+	OrderID      uuid.UUID          `json:"order_id"`
+	InvoiceNo    string             `json:"invoice_no"`
+	BuyerName    *string            `json:"buyer_name"`
+	BuyerTaxCode *string            `json:"buyer_tax_code"`
+	TotalAmount  int64              `json:"total_amount"`
+	IssuedAt     pgtype.Timestamptz `json:"issued_at"`
+	Status       string             `json:"status"`
+	PayloadJson  []byte             `json:"payload_json"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+}
+
 type MeasurementUnit struct {
 	ID        uuid.UUID          `json:"id"`
 	TenantID  uuid.UUID          `json:"tenant_id"`
@@ -1223,32 +1345,34 @@ type NotificationSubscription struct {
 }
 
 type Order struct {
-	ID                      uuid.UUID          `json:"id"`
-	UserID                  pgtype.UUID        `json:"user_id"`
-	Type                    OrderType          `json:"type"`
-	Status                  OrderStatus        `json:"status"`
-	CreatedAt               pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt               pgtype.Timestamptz `json:"updated_at"`
-	GrossTotal              int64              `json:"gross_total"`
-	DiscountAmount          int64              `json:"discount_amount"`
-	NetTotal                int64              `json:"net_total"`
-	AppliedPromotionID      pgtype.UUID        `json:"applied_promotion_id"`
-	PaymentMethodID         *int32             `json:"payment_method_id"`
-	PaymentGatewayReference *string            `json:"payment_gateway_reference"`
-	CashReceived            *int64             `json:"cash_received"`
-	ChangeDue               *int64             `json:"change_due"`
-	CancellationReasonID    *int32             `json:"cancellation_reason_id"`
-	CancellationNotes       *string            `json:"cancellation_notes"`
-	PaymentUrl              *string            `json:"payment_url"`
-	PaymentToken            *string            `json:"payment_token"`
-	Version                 int32              `json:"version"`
-	TaxAmount               int64              `json:"tax_amount"`
-	ServiceChargeAmount     int64              `json:"service_charge_amount"`
-	CustomerID              pgtype.UUID        `json:"customer_id"`
-	OrderNo                 string             `json:"order_no"`
-	TenantID                uuid.UUID          `json:"tenant_id"`
-	FulfillmentWarehouseID  pgtype.UUID        `json:"fulfillment_warehouse_id"`
-	ShiftID                 pgtype.UUID        `json:"shift_id"`
+	ID                      uuid.UUID           `json:"id"`
+	UserID                  pgtype.UUID         `json:"user_id"`
+	Type                    OrderType           `json:"type"`
+	Status                  OrderStatus         `json:"status"`
+	CreatedAt               pgtype.Timestamptz  `json:"created_at"`
+	UpdatedAt               pgtype.Timestamptz  `json:"updated_at"`
+	GrossTotal              int64               `json:"gross_total"`
+	DiscountAmount          int64               `json:"discount_amount"`
+	NetTotal                int64               `json:"net_total"`
+	AppliedPromotionID      pgtype.UUID         `json:"applied_promotion_id"`
+	PaymentMethodID         *int32              `json:"payment_method_id"`
+	PaymentGatewayReference *string             `json:"payment_gateway_reference"`
+	CashReceived            *int64              `json:"cash_received"`
+	ChangeDue               *int64              `json:"change_due"`
+	CancellationReasonID    *int32              `json:"cancellation_reason_id"`
+	CancellationNotes       *string             `json:"cancellation_notes"`
+	PaymentUrl              *string             `json:"payment_url"`
+	PaymentToken            *string             `json:"payment_token"`
+	Version                 int32               `json:"version"`
+	TaxAmount               int64               `json:"tax_amount"`
+	ServiceChargeAmount     int64               `json:"service_charge_amount"`
+	CustomerID              pgtype.UUID         `json:"customer_id"`
+	OrderNo                 string              `json:"order_no"`
+	TenantID                uuid.UUID           `json:"tenant_id"`
+	FulfillmentWarehouseID  pgtype.UUID         `json:"fulfillment_warehouse_id"`
+	ShiftID                 pgtype.UUID         `json:"shift_id"`
+	DiningTableID           pgtype.UUID         `json:"dining_table_id"`
+	KitchenStatus           KitchenTicketStatus `json:"kitchen_status"`
 }
 
 type OrderItem struct {
@@ -1546,13 +1670,14 @@ type SupplierDebt struct {
 }
 
 type SupplierDebtPayment struct {
-	ID             uuid.UUID          `json:"id"`
-	SupplierDebtID uuid.UUID          `json:"supplier_debt_id"`
-	Amount         pgtype.Numeric     `json:"amount"`
-	PaidAt         pgtype.Timestamptz `json:"paid_at"`
-	Note           *string            `json:"note"`
-	CreatedBy      pgtype.UUID        `json:"created_by"`
-	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	ID                uuid.UUID          `json:"id"`
+	SupplierDebtID    uuid.UUID          `json:"supplier_debt_id"`
+	Amount            pgtype.Numeric     `json:"amount"`
+	PaidAt            pgtype.Timestamptz `json:"paid_at"`
+	Note              *string            `json:"note"`
+	CreatedBy         pgtype.UUID        `json:"created_by"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	CashTransactionID pgtype.UUID        `json:"cash_transaction_id"`
 }
 
 type Tenant struct {
@@ -1588,6 +1713,7 @@ type User struct {
 	IsActive     bool               `json:"is_active"`
 	DeletedAt    pgtype.Timestamptz `json:"deleted_at"`
 	RefreshToken *string            `json:"refresh_token"`
+	Phone        *string            `json:"phone"`
 }
 
 type Warehouse struct {

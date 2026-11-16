@@ -25,6 +25,8 @@ type IOrderHandler interface {
 	UpdateOperationalStatusHandler(c fiber.Ctx) error
 	ApplyPromotionHandler(c fiber.Ctx) error
 	RefundOrderHandler(c fiber.Ctx) error
+	ListKitchenTicketsHandler(c fiber.Ctx) error
+	UpdateKitchenStatusHandler(c fiber.Ctx) error
 }
 
 type OrderHandler struct {
@@ -596,4 +598,31 @@ func (h *OrderHandler) RefundOrderHandler(c fiber.Ctx) error {
 		Message: "Order refunded successfully",
 		Data:    orderResponse,
 	})
+}
+
+func (h *OrderHandler) ListKitchenTicketsHandler(c fiber.Ctx) error {
+	data, err := h.orderService.ListKitchenTickets(c.RequestCtx())
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to list kitchen tickets"})
+	}
+	return c.JSON(common.SuccessResponse{Message: "OK", Data: data})
+}
+
+func (h *OrderHandler) UpdateKitchenStatusHandler(c fiber.Ctx) error {
+	orderID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid order ID"})
+	}
+	var req UpdateKitchenStatusRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid body"})
+	}
+	data, err := h.orderService.UpdateKitchenStatus(c.RequestCtx(), orderID, req)
+	if err != nil {
+		if errors.Is(err, common.ErrNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "Not found"})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to update kitchen status"})
+	}
+	return c.JSON(common.SuccessResponse{Message: "OK", Data: data})
 }

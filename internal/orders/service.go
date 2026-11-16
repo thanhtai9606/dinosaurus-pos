@@ -8,6 +8,7 @@ import (
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/customer_debts"
 	"dinosaurus-pos/internal/doc_no"
+	dining_repo "dinosaurus-pos/internal/dining/repository"
 	"dinosaurus-pos/internal/inventory"
 	"dinosaurus-pos/internal/notifications"
 	shift_repo "dinosaurus-pos/internal/shift/repository"
@@ -50,6 +51,8 @@ type IOrderService interface {
 	UpdateOperationalStatus(ctx context.Context, orderID uuid.UUID, req UpdateOrderStatusRequest) (*OrderDetailResponse, error)
 	ApplyPromotion(ctx context.Context, orderID uuid.UUID, req ApplyPromotionRequest) (*OrderDetailResponse, error)
 	RefundOrder(ctx context.Context, orderID uuid.UUID, req RefundOrderRequest) (*OrderDetailResponse, error)
+	ListKitchenTickets(ctx context.Context) ([]KitchenTicketResponse, error)
+	UpdateKitchenStatus(ctx context.Context, orderID uuid.UUID, req UpdateKitchenStatusRequest) (*KitchenTicketResponse, error)
 }
 
 type OrderService struct {
@@ -1294,17 +1297,29 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		}
 		orderNo := doc_no.OrderNo(now, countToday+1)
 
+		var diningTableID pgtype.UUID
+		if req.DiningTableID != nil {
+			diningTableID = pgtype.UUID{Bytes: *req.DiningTableID, Valid: true}
+		}
 		orderHeader, err := qtx.CreateOrder(ctx, orders_repo.CreateOrderParams{
-			UserID:     pgtype.UUID{Bytes: actorID, Valid: ok},
-			Type:       req.Type,
-			CustomerID: nullCustomerID,
-			OrderNo:    orderNo,
-			ShiftID:    s.shiftIDForUser(ctx, actorID),
+			UserID:        pgtype.UUID{Bytes: actorID, Valid: ok},
+			Type:          req.Type,
+			CustomerID:    nullCustomerID,
+			OrderNo:       orderNo,
+			ShiftID:       s.shiftIDForUser(ctx, actorID),
+			DiningTableID: diningTableID,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to create order header: %w", err)
 		}
 		newOrderID = orderHeader.ID
+		if diningTableID.Valid {
+			diningQ := dining_repo.New(tx)
+			_ = diningQ.SetDiningTableStatusByID(ctx, dining_repo.SetDiningTableStatusByIDParams{
+				ID:     uuid.UUID(diningTableID.Bytes),
+				Status: dining_repo.DiningTableStatusOccupied,
+			})
+		}
 
 		productIDs := make([]uuid.UUID, len(req.Items))
 		for i, item := range req.Items {

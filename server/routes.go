@@ -114,6 +114,10 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Post("/orders/:id/pay/midtrans", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.InitiateMidtransPaymentHandler)
 	api.Post("/orders/:id/pay/manual", authMiddleware, middleware.RequireIdempotencyKey(), idempotencyMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.ConfirmManualPaymentHandler)
 	api.Post("/orders/:id/update-status", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.UpdateOperationalStatusHandler)
+	api.Get("/kitchen/tickets", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.ListKitchenTicketsHandler)
+	api.Patch("/orders/:id/kitchen-status", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.UpdateKitchenStatusHandler)
+	api.Post("/orders/:id/e-invoice", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.EInvoiceHandler.IssueHandler)
+	api.Get("/orders/:id/e-invoice", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.EInvoiceHandler.GetByOrderHandler)
 
 	api.Post("/orders/:id/print", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.PrinterHandler.PrintInvoiceHandler)
 	api.Get("/orders/:id/print-data", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.PrinterHandler.GetInvoiceDataHandler)
@@ -232,6 +236,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 	supplierDebtGroup := api.Group("/supplier-debts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{
 		supplierDebtGroup.Get("/summary", container.SupplierDebtHandler.SummaryHandler)
+		supplierDebtGroup.Get("/export", container.SupplierDebtHandler.ExportHandler)
 		supplierDebtGroup.Get("/", container.SupplierDebtHandler.ListHandler)
 		supplierDebtGroup.Post("/", container.SupplierDebtHandler.CreateHandler)
 		supplierDebtGroup.Get("/:id", container.SupplierDebtHandler.GetHandler)
@@ -242,6 +247,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 	customerDebtGroup := api.Group("/customer-debts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{
 		customerDebtGroup.Get("/summary", container.CustomerDebtHandler.SummaryHandler)
+		customerDebtGroup.Get("/export", container.CustomerDebtHandler.ExportHandler)
 		customerDebtGroup.Get("/", container.CustomerDebtHandler.ListHandler)
 		customerDebtGroup.Post("/", container.CustomerDebtHandler.CreateHandler)
 		customerDebtGroup.Get("/:id", container.CustomerDebtHandler.GetHandler)
@@ -269,6 +275,14 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Post("/warehouses", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.CreateHandler)
 	api.Put("/warehouses/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.UpdateHandler)
 	api.Delete("/warehouses/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.DeleteHandler)
+
+	diningGroup := api.Group("/dining", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier))
+	{
+		diningGroup.Get("/areas", container.DiningHandler.ListAreasHandler)
+		diningGroup.Get("/tables", container.DiningHandler.ListTablesHandler)
+		diningGroup.Post("/tables", middleware.RoleMiddleware(middleware.UserRoleManager), container.DiningHandler.CreateTableHandler)
+		diningGroup.Patch("/tables/:id/status", container.DiningHandler.UpdateTableStatusHandler)
+	}
 
 	stockOpsGroup := api.Group("", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{

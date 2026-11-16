@@ -133,6 +133,8 @@
         "supplier_debts": "Supplier debts",
         "customer_debts": "Customer debts",
         "retail_pos": "Retail POS",
+        "dining_tables": "Dining tables",
+        "kitchen": "Kitchen / KDS",
         "tenants_admin": "Stores (tenants)",
         "platform": "Platform",
         "platform_overview": "Overview",

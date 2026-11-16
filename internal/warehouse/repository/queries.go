@@ -120,6 +120,17 @@ func (q *Queries) ClearDefaultWarehouse(ctx context.Context, tenantID uuid.UUID)
 	return err
 }
 
+func (q *Queries) WarehouseHasPositiveStock(ctx context.Context, warehouseID uuid.UUID) (bool, error) {
+	var exists bool
+	err := q.db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM warehouse_stock WHERE warehouse_id=$1 AND quantity > 0)`, warehouseID).Scan(&exists)
+	return exists, err
+}
+
+func (q *Queries) DeleteWarehouse(ctx context.Context, tenantID, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, `DELETE FROM warehouses WHERE id=$1 AND tenant_id=$2`, id, tenantID)
+	return err
+}
+
 func (q *Queries) SeedDefaultWarehouse(ctx context.Context, tenantID uuid.UUID) (Warehouse, error) {
 	const sql = `INSERT INTO warehouses (tenant_id, code, name, is_default, is_active)
 VALUES ($1,'MAIN','Main warehouse',true,true)

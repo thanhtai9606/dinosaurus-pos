@@ -69,3 +69,36 @@ export function useCreateWarehouseMutation() {
     })
     return { ...mutation, isAllowed }
 }
+
+export function useUpdateWarehouseMutation() {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('PUT', '/warehouses/{id}')
+    const mutation = useMutation({
+        mutationFn: async ({
+            id,
+            body,
+        }: {
+            id: string
+            body: { code?: string; name?: string; is_default?: boolean; is_active?: boolean }
+        }) => {
+            const res = await axiosInstance.put(`/warehouses/${id}`, body)
+            return (res.data as { data: Warehouse }).data
+        },
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['warehouses'] }),
+    })
+    return { ...mutation, isAllowed }
+}
+
+export function useDeleteWarehouseMutation() {
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('DELETE', '/warehouses/{id}')
+    const mutation = useMutation({
+        mutationFn: async (id: string) => {
+            await axiosInstance.delete(`/warehouses/${id}`)
+        },
+        onSuccess: () => qc.invalidateQueries({ queryKey: ['warehouses'] }),
+    })
+    return { ...mutation, isAllowed }
+}

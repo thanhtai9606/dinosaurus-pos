@@ -3,6 +3,7 @@ package warehouse
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"dinosaurus-pos/internal/common"
@@ -19,6 +20,7 @@ type IService interface {
 	Create(ctx context.Context, req CreateWarehouseRequest) (*WarehouseResponse, error)
 	Get(ctx context.Context, id uuid.UUID) (*WarehouseResponse, error)
 	Update(ctx context.Context, id uuid.UUID, req UpdateWarehouseRequest) (*WarehouseResponse, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 	List(ctx context.Context, req ListWarehousesRequest) (*PagedWarehousesResponse, error)
 	ListStock(ctx context.Context, warehouseID uuid.UUID, req ListWarehouseStockRequest) (*PagedWarehouseStockResponse, error)
 	SeedDefaults(ctx context.Context, tenantID uuid.UUID) error
@@ -107,6 +109,12 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateWarehouseR
 	if req.IsActive != nil {
 		isActive = *req.IsActive
 	}
+	if cur.IsDefault && req.IsDefault != nil && !*req.IsDefault {
+		return nil, fmt.Errorf("%w: assign another default warehouse first", common.ErrInvalidInput)
+	}
+	if cur.IsDefault && !isActive {
+		return nil, fmt.Errorf("%w: cannot deactivate the default warehouse", common.ErrInvalidInput)
+	}
 	if isDefault && !cur.IsDefault {
 		if err := s.repo.ClearDefaultWarehouse(ctx, tenantID); err != nil {
 			return nil, err
@@ -123,6 +131,34 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateWarehouseR
 		return nil, err
 	}
 	return mapWarehouse(row), nil
+}
+
+func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
+	tenantID, ok := tenant.IDFromContext(ctx)
+	if !ok {
+		return common.ErrUnauthorized
+	}
+	cur, err := s.repo.GetWarehouseByID(ctx, tenantID, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return common.ErrNotFound
+		}
+		return err
+	}
+	if cur.IsDefault {
+		return fmt.Errorf("%w: cannot delete the default warehouse", common.ErrInvalidInput)
+	}
+	hasStock, err := s.repo.WarehouseHasPositiveStock(ctx, id)
+	if err != nil {
+		return err
+	}
+	if hasStock {
+		return fmt.Errorf("%w: warehouse still has stock", common.ErrInvalidInput)
+	}
+	if err := s.repo.DeleteWarehouse(ctx, tenantID, id); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Service) List(ctx context.Context, req ListWarehousesRequest) (*PagedWarehousesResponse, error) {

@@ -1511,12 +1511,21 @@
     "warehouses": {
         "title": "Gudang",
         "add": "Tambah gudang",
+        "edit": "Ubah gudang",
         "code": "Kode",
         "name": "Nama",
         "default": "Default",
+        "active": "Aktif",
         "inactive": "Nonaktif",
+        "default_locked_hint": "Tetapkan gudang lain sebagai default sebelum mengubah ini.",
         "created": "Gudang dibuat",
+        "updated": "Gudang diperbarui",
+        "deleted": "Gudang dihapus",
         "create_failed": "Gagal membuat gudang",
+        "update_failed": "Gagal memperbarui gudang",
+        "delete_failed": "Gagal menghapus gudang",
+        "delete_confirm_title": "Hapus gudang?",
+        "delete_confirm_body": "Hapus gudang \"{{name}}\"? Hanya gudang kosong tanpa riwayat yang bisa dihapus.",
         "validation_required": "Kode dan nama wajib diisi"
     },
     "stockMovements": {

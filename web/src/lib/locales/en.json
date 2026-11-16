@@ -1523,12 +1523,21 @@
     "warehouses": {
         "title": "Warehouses",
         "add": "Add warehouse",
+        "edit": "Edit warehouse",
         "code": "Code",
         "name": "Name",
         "default": "Default",
+        "active": "Active",
         "inactive": "Inactive",
+        "default_locked_hint": "Set another warehouse as default before changing this one.",
         "created": "Warehouse created",
+        "updated": "Warehouse updated",
+        "deleted": "Warehouse deleted",
         "create_failed": "Could not create warehouse",
+        "update_failed": "Could not update warehouse",
+        "delete_failed": "Could not delete warehouse",
+        "delete_confirm_title": "Delete warehouse?",
+        "delete_confirm_body": "Remove warehouse \"{{name}}\"? Only empty warehouses with no history can be deleted.",
         "validation_required": "Code and name are required"
     },
     "stockMovements": {

@@ -1530,12 +1530,21 @@
     "warehouses": {
         "title": "Danh sách kho",
         "add": "Thêm kho",
+        "edit": "Sửa kho",
         "code": "Mã kho",
         "name": "Tên",
         "default": "Mặc định",
+        "active": "Đang dùng",
         "inactive": "Ngưng dùng",
+        "default_locked_hint": "Chọn kho khác làm mặc định trước khi đổi kho MAIN.",
         "created": "Đã tạo kho",
+        "updated": "Đã cập nhật kho",
+        "deleted": "Đã xóa kho",
         "create_failed": "Không tạo được kho",
+        "update_failed": "Không cập nhật được kho",
+        "delete_failed": "Không xóa được kho",
+        "delete_confirm_title": "Xóa kho?",
+        "delete_confirm_body": "Xóa kho \"{{name}}\"? Chỉ xóa được kho trống, chưa có chứng từ.",
         "validation_required": "Nhập mã kho và tên"
     },
     "stockMovements": {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { buildWebSocketUrl } from '@/lib/config';
 
 type WebSocketEvent = {
   type: string;
@@ -12,9 +13,7 @@ export const useAppWebSocket = (onMessage: (event: WebSocketEvent) => void) => {
   const reconnectCountRef = useRef(0);
 
   const connect = useCallback(() => {
-    // Determine the WS URL from the API URL
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
-    const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws';
+    const wsUrl = buildWebSocketUrl();
 
     try {
       const ws = new WebSocket(wsUrl);

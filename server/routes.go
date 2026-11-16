@@ -250,6 +250,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 	}
 	api.Post("/warehouses", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.CreateHandler)
 	api.Put("/warehouses/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.UpdateHandler)
+	api.Delete("/warehouses/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.DeleteHandler)
 
 	stockOpsGroup := api.Group("", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{

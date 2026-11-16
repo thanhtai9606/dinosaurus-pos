@@ -16,6 +16,7 @@ type IHandler interface {
 	CreateHandler(c fiber.Ctx) error
 	GetHandler(c fiber.Ctx) error
 	UpdateHandler(c fiber.Ctx) error
+	DeleteHandler(c fiber.Ctx) error
 	ListStockHandler(c fiber.Ctx) error
 }
 
@@ -105,9 +106,33 @@ func (h *Handler) UpdateHandler(c fiber.Ctx) error {
 		if errors.Is(err, common.ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "Warehouse not found"})
 		}
+		if errors.Is(err, common.ErrInvalidInput) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to update warehouse"})
 	}
 	return c.JSON(common.SuccessResponse{Message: "Warehouse updated", Data: resp})
+}
+
+// @Summary      Delete warehouse
+// @Tags         Warehouses
+// @x-roles      ["admin", "manager"]
+// @Router       /warehouses/{id} [delete]
+func (h *Handler) DeleteHandler(c fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid ID format"})
+	}
+	if err := h.service.Delete(c.RequestCtx(), id); err != nil {
+		if errors.Is(err, common.ErrNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "Warehouse not found"})
+		}
+		if errors.Is(err, common.ErrInvalidInput) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to delete warehouse"})
+	}
+	return c.JSON(common.SuccessResponse{Message: "Warehouse deleted"})
 }
 
 // @Summary      List stock by warehouse

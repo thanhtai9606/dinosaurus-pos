@@ -541,6 +541,10 @@ export const RBAC_RULES: Record<string, string[]> = {
         "admin",
         "manager"
     ],
+    "DELETE /warehouses/{id}": [
+        "admin",
+        "manager"
+    ],
     "GET /warehouses/{id}/stock": [
         "admin",
         "manager",

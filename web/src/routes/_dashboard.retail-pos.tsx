@@ -34,6 +34,10 @@ import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
 import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
 import { RetailPosTabs } from '@/components/retail-pos/RetailPosTabs'
 import { createRetailSaleTab, patchTab, updateTabCart, type RetailSaleTab } from '@/lib/retail-pos/saleTabs'
+import {
+    loadRetailPosInitialState,
+    useRetailPosDraftPersistence,
+} from '@/hooks/useRetailPosDraftPersistence'
 import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
 
 export const Route = createFileRoute('/_dashboard/retail-pos')({
@@ -43,11 +47,24 @@ export const Route = createFileRoute('/_dashboard/retail-pos')({
 const QUICK_CASH = [10000, 20000, 50000, 100000, 200000]
 const MAX_TABS = 10
 
+function readInitialRetail() {
+    const init = loadRetailPosInitialState()
+    if (init.tabs.length) {
+        return { tabs: init.tabs, activeTabId: init.activeTabId, restored: init.restoredFromDraft }
+    }
+    const tab = createRetailSaleTab()
+    return { tabs: [tab], activeTabId: tab.id, restored: false }
+}
+
 function RetailPosPage() {
     const { t } = useTranslation()
     const searchRef = useRef<HTMLInputElement>(null)
-    const [tabs, setTabs] = useState<RetailSaleTab[]>(() => [createRetailSaleTab()])
-    const [activeTabId, setActiveTabId] = useState(() => tabs[0]?.id ?? '')
+    const initialRetail = useRef<ReturnType<typeof readInitialRetail> | null>(null)
+    if (initialRetail.current === null) {
+        initialRetail.current = readInitialRetail()
+    }
+    const [tabs, setTabs] = useState<RetailSaleTab[]>(() => initialRetail.current!.tabs)
+    const [activeTabId, setActiveTabId] = useState(() => initialRetail.current!.activeTabId)
     const [scanning, setScanning] = useState(false)
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
     const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
@@ -75,6 +92,15 @@ function RetailPosPage() {
         if (!activeTab) return
         setTabs((prev) => updateTabCart(activeTab.id, prev, updater))
     }
+
+    useRetailPosDraftPersistence(tabs, activeTabId)
+
+    const draftToastShown = useRef(false)
+    useEffect(() => {
+        if (!initialRetail.current?.restored || draftToastShown.current) return
+        draftToastShown.current = true
+        toast.info(t('retailPos.draft.restored'))
+    }, [t])
 
     useEffect(() => {
         searchRef.current?.focus()

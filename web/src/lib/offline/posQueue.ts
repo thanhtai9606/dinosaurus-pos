@@ -1,4 +1,10 @@
-const STORAGE_KEY = 'pos_offline_queue_v1'
+import { notifyPosQueueChanged, posStorageScope } from '@/lib/pos/sessionScope'
+
+const LEGACY_KEY = 'pos_offline_queue_v1'
+
+function storageKey() {
+    return `${LEGACY_KEY}_${posStorageScope()}`
+}
 
 export type PosQueueKind = 'retail_cash' | 'retail_debt' | 'retail_other'
 
@@ -16,7 +22,15 @@ export type PosQueueEntry = {
 
 function read(): PosQueueEntry[] {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY)
+        const key = storageKey()
+        let raw = localStorage.getItem(key)
+        if (!raw && posStorageScope() === 'default') {
+            raw = localStorage.getItem(LEGACY_KEY)
+            if (raw) {
+                localStorage.setItem(key, raw)
+                localStorage.removeItem(LEGACY_KEY)
+            }
+        }
         if (!raw) return []
         return JSON.parse(raw) as PosQueueEntry[]
     } catch {
@@ -25,7 +39,8 @@ function read(): PosQueueEntry[] {
 }
 
 function write(entries: PosQueueEntry[]) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
+    localStorage.setItem(storageKey(), JSON.stringify(entries))
+    notifyPosQueueChanged()
 }
 
 export function posQueueCount(): number {

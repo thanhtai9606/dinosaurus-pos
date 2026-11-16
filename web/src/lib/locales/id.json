@@ -468,6 +468,9 @@
             "synced": "{{count}} transaksi disinkronkan",
             "queued": "Disimpan ke antrean offline"
         },
+        "draft": {
+            "restored": "Keranjang dijeda dipulihkan dari perangkat ini."
+        },
         "return": {
             "button": "Retur",
             "title": "Retur / refund",
@@ -1179,7 +1182,19 @@
             "delete_success": "Promosi berhasil dihapus"
         }
     },
+    "posStatus": {
+        "title": "Status penjualan lokal",
+        "pending_sync": "{{count}} transaksi belum ke server",
+        "pending_sync_hint": "Checkout saat offline — sinkron atau buka POS ritel.",
+        "retail_drafts": "{{count}} tab ritel masih berisi barang (simpan lokal)",
+        "order_draft": "POS restoran: {{count}} item di keranjang (simpan lokal)",
+        "open_retail_pos": "Buka ritel",
+        "open_order_pos": "Buka POS"
+    },
     "order": {
+        "draft": {
+            "restored": "Keranjang POS dipulihkan dari sesi sebelumnya."
+        },
         "categories_title": "Kategori",
         "items_available": "{{count}} produk tersedia",
         "add_to_cart": "Tambah",

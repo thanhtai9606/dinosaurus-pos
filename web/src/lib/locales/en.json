@@ -466,6 +466,9 @@
             "synced": "Synced {{count}} sale(s)",
             "queued": "Saved to offline queue"
         },
+        "draft": {
+            "restored": "Restored in-progress cart from this device."
+        },
         "return": {
             "button": "Return",
             "title": "Return / refund",
@@ -1190,7 +1193,19 @@
             "delete_success": "Promotion deleted successfully"
         }
     },
+    "posStatus": {
+        "title": "Local sales status",
+        "pending_sync": "{{count}} sale(s) not sent to server",
+        "pending_sync_hint": "Checkout happened offline — sync or open retail POS.",
+        "retail_drafts": "{{count}} retail tab(s) with items saved locally",
+        "order_draft": "Restaurant POS: {{count}} item(s) in cart (saved locally)",
+        "open_retail_pos": "Open retail POS",
+        "open_order_pos": "Open POS"
+    },
     "order": {
+        "draft": {
+            "restored": "Restored cart from your last session on this device."
+        },
         "categories_title": "Categories",
         "items_available": "{{count}} items available",
         "add_to_cart": "Add to cart",

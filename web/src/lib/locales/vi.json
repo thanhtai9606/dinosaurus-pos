@@ -468,6 +468,9 @@
             "synced": "Đã đồng bộ {{count}} giao dịch",
             "queued": "Đã lưu vào hàng đợi ngoại tuyến"
         },
+        "draft": {
+            "restored": "Đã khôi phục giỏ hàng / đơn đang bán từ lần trước (lưu trên máy này)."
+        },
         "return": {
             "button": "Trả hàng",
             "title": "Trả hàng / hoàn tiền",
@@ -1196,7 +1199,19 @@
             "delete_success": "khuyễn mãi đã được xóa thành công"
         }
     },
+    "posStatus": {
+        "title": "Bán hàng cục bộ",
+        "pending_sync": "{{count}} đơn chưa gửi lên server",
+        "pending_sync_hint": "Đã thanh toán khi mất mạng — bấm đồng bộ hoặc mở POS bán lẻ.",
+        "retail_drafts": "{{count}} tab bán lẻ còn hàng (lưu trên máy)",
+        "order_draft": "POS nhà hàng: {{count}} món trong giỏ (lưu trên máy)",
+        "open_retail_pos": "Mở bán lẻ",
+        "open_order_pos": "Mở POS"
+    },
     "order": {
+        "draft": {
+            "restored": "Đã khôi phục giỏ hàng POS từ lần trước."
+        },
         "categories_title": "Thể loại",
         "items_available": "{{count}} sản phẩm khả dụng",
         "add_to_cart": "Thêm vào giỏ hàng",

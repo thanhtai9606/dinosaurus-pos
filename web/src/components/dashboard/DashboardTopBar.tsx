@@ -7,6 +7,7 @@ import { DashboardMobileNav } from '@/components/dashboard/DashboardMobileNav'
 import type { DashboardBranding, DashboardSessionUser } from '@/components/dashboard/types'
 import type { DashboardMenuEntry } from '@/hooks/useNavigationMenu'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import { PosStatusIndicator } from '@/components/dashboard/PosStatusIndicator'
 
 type Props = {
   branding?: DashboardBranding
@@ -43,6 +44,7 @@ export function DashboardTopBar({
         )}
 
         {!isSuperAdmin && <ShiftControl compact />}
+        {!isSuperAdmin && <PosStatusIndicator />}
 
         <ThemeToggle />
 

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
 import { useDebounce } from '@/hooks/use-debounce'
 import { useTranslation } from 'react-i18next'
@@ -20,6 +20,12 @@ import { ProductSearch } from '@/components/orders/ProductSearch'
 import { ProductGrid } from '@/components/orders/ProductGrid'
 import { CategorySidebar } from '@/components/orders/CategorySidebar'
 import { useCategoriesListQuery } from '@/lib/api/query/categories'
+import {
+    clearOrderPosDraft,
+    loadOrderPosDraft,
+    saveOrderPosDraft,
+} from '@/lib/orders/orderDraftStorage'
+import { notifyPosDraftChanged } from '@/lib/pos/sessionScope'
 
 export const Route = createFileRoute('/_dashboard/order')({
     component: OrderPage,
@@ -78,6 +84,35 @@ function OrderPage() {
     const outOfStockProducts = products.filter((p) => (p.stock || 0) <= 0)
 
     const [cart, setCart] = useState<CartItem[]>([])
+    const orderDraftHydrated = useRef(false)
+
+    useEffect(() => {
+        if (orderDraftHydrated.current) return
+        orderDraftHydrated.current = true
+        const draft = loadOrderPosDraft()
+        if (!draft?.cart.length) return
+        setCart(draft.cart)
+        setSelectedCustomerId(draft.selectedCustomerId)
+        setSelectedOrderType(draft.selectedOrderType)
+        toast.info(t('order.draft.restored'))
+    }, [t])
+
+    useEffect(() => {
+        if (!orderDraftHydrated.current) return
+        if (cart.length === 0) {
+            clearOrderPosDraft()
+            notifyPosDraftChanged()
+            return
+        }
+        saveOrderPosDraft({
+            version: 1,
+            savedAt: Date.now(),
+            cart,
+            selectedCustomerId,
+            selectedOrderType,
+        })
+        notifyPosDraftChanged()
+    }, [cart, selectedCustomerId, selectedOrderType])
     const [isPaymentOpen, setIsPaymentOpen] = useState(false)
     const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
     const [isLoadingDetailsId, setIsLoadingDetailsId] = useState<string | null>(null)

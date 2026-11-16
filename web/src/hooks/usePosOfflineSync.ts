@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { axiosInstance } from '@/lib/api/client'
 import { listPosQueue, posQueueCount, removePosQueueEntry, type PosQueueEntry } from '@/lib/offline/posQueue'
+import { notifyPosQueueChanged } from '@/lib/pos/sessionScope'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 
@@ -28,6 +29,7 @@ export function usePosOfflineSync() {
             }
         }
         refresh()
+        notifyPosQueueChanged()
         setSyncing(false)
         if (done > 0) {
             toast.success(t('retailPos.offline.synced', { count: done }))

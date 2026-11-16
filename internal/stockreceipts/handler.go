@@ -52,6 +52,9 @@ func (h *StockReceiptHandler) CreateHandler(c fiber.Ctx) error {
 
 	resp, err := h.service.Create(c.RequestCtx(), req)
 	if err != nil {
+		if errors.Is(err, common.ErrInvalidInput) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
+		}
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to create stock receipt"})
 	}
 

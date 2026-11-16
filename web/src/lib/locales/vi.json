@@ -1499,7 +1499,8 @@
             "export_success": "Đã tải file",
             "export_failed": "Xuất file thất bại",
             "product_not_found": "Không tìm thấy hàng với mã/SKU/tên đó",
-            "draft_failed": "Không lưu được phiếu nháp"
+            "draft_failed": "Không lưu được phiếu nháp",
+            "create_denied": "Chỉ admin/quản lý được tạo phiếu nhập"
         }
     },
     "importPrices": {

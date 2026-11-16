@@ -10,7 +10,7 @@ import (
 type ReceiptItemInput struct {
 	ProductID     uuid.UUID `json:"product_id" validate:"required"`
 	Quantity      int32     `json:"quantity" validate:"required,gt=0"`
-	UnitCost      float64   `json:"unit_cost" validate:"required,gte=0"`
+	UnitCost      float64   `json:"unit_cost" validate:"gte=0"`
 	UnitSellPrice *float64  `json:"unit_sell_price" validate:"omitempty,gte=0"`
 }
 
@@ -21,7 +21,7 @@ type CreateStockReceiptRequest struct {
 	Note       *string            `json:"note" validate:"omitempty,max=500"`
 	PaymentMode *string           `json:"payment_mode" validate:"omitempty,oneof=cash credit"`
 	AmountPaid  *float64          `json:"amount_paid" validate:"omitempty,gte=0"`
-	Items      []ReceiptItemInput `json:"items" validate:"omitempty,dive"`
+	Items      []ReceiptItemInput `json:"items" validate:"required,min=1,dive"`
 }
 
 type UpdateStockReceiptRequest struct {

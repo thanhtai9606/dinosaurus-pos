@@ -54,7 +54,8 @@ function StockReceiptNewPage() {
 
     const suppliers = (suppliersData?.suppliers || []).filter((s) => s.id) as { id: string; name: string }[]
     const items = linesToApiItems(draft.lines)
-    const canAct = items.length > 0 && createMutation.isAllowed
+    const hasLines = items.length > 0
+    const canAct = hasLines && createMutation.isAllowed
 
     const buildBody = () => ({
         supplier_id: supplierId || undefined,
@@ -70,8 +71,9 @@ function StockReceiptNewPage() {
             await createMutation.mutateAsync(buildBody())
             toast.success(t('stockReceipts.messages.create_success'))
             navigate({ to: '/stock-receipts' })
-        } catch {
-            toast.error(t('stockReceipts.messages.draft_failed', 'Không lưu được phiếu nháp'))
+        } catch (err: unknown) {
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+            toast.error(msg || t('stockReceipts.messages.draft_failed', 'Không lưu được phiếu nháp'))
         } finally {
             setBusyAction(null)
         }
@@ -90,8 +92,9 @@ function StockReceiptNewPage() {
             }
             toast.success(t('stockReceipts.messages.complete_success'))
             navigate({ to: '/stock-receipts' })
-        } catch {
-            toast.error(t('stockReceipts.messages.complete_failed'))
+        } catch (err: unknown) {
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+            toast.error(msg || t('stockReceipts.messages.complete_failed'))
         } finally {
             setBusyAction(null)
         }
@@ -167,6 +170,8 @@ function StockReceiptNewPage() {
                         onComplete={() => void handleComplete()}
                         canSave={canAct}
                         canComplete={canAct && completeMutation.isAllowed}
+                        needsLines={!hasLines}
+                        noPermission={!createMutation.isAllowed}
                         saving={saving}
                         completing={completing}
                     />

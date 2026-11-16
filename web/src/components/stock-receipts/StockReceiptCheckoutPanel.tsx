@@ -34,6 +34,8 @@ type Props = {
     canComplete: boolean
     saving: boolean
     completing: boolean
+    needsLines?: boolean
+    noPermission?: boolean
 }
 
 function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
@@ -65,6 +67,8 @@ export function StockReceiptCheckoutPanel({
     canComplete,
     saving,
     completing,
+    needsLines,
+    noPermission,
 }: Props) {
     const formatMoney = useFormatMoney()
     const { amounts: quickAmounts, currencyCode, fractionDigits } = useQuickCashAmounts('stock_receipt')
@@ -150,6 +154,11 @@ export function StockReceiptCheckoutPanel({
             </div>
 
             <div className="space-y-2 border-t bg-muted/30 p-4">
+                {noPermission ? (
+                    <p className="text-xs text-destructive">{t('stockReceipts.messages.create_denied')}</p>
+                ) : needsLines ? (
+                    <p className="text-xs text-muted-foreground">{t('stockReceipts.form.empty_lines')}</p>
+                ) : null}
                 <div className="flex items-center justify-between text-lg font-semibold">
                     <span>{t('stockReceipts.checkout.grand_total')}</span>
                     <span className="text-primary">{formatMoney(subtotal)}</span>

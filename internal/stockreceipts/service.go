@@ -79,7 +79,15 @@ func (s *StockReceiptService) Create(ctx context.Context, req CreateStockReceipt
 			}
 			dw, err := whRepo.GetDefaultWarehouse(ctx, tid)
 			if err != nil {
-				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+				if errors.Is(err, pgx.ErrNoRows) {
+					if _, seedErr := whRepo.SeedDefaultWarehouse(ctx, tid); seedErr != nil {
+						return seedErr
+					}
+					dw, err = whRepo.GetDefaultWarehouse(ctx, tid)
+				}
+				if err != nil {
+					return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+				}
 			}
 			warehouseID = pgtype.UUID{Bytes: dw.ID, Valid: true}
 		}
@@ -292,7 +300,15 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 			}
 			dw, err := wh.GetDefaultWarehouse(ctx, tid)
 			if err != nil {
-				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+				if errors.Is(err, pgx.ErrNoRows) {
+					if _, seedErr := wh.SeedDefaultWarehouse(ctx, tid); seedErr != nil {
+						return seedErr
+					}
+					dw, err = wh.GetDefaultWarehouse(ctx, tid)
+				}
+				if err != nil {
+					return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+				}
 			}
 			warehouseID = dw.ID
 		}

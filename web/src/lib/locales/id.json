@@ -1480,7 +1480,8 @@
             "export_success": "Unduhan dimulai",
             "export_failed": "Ekspor gagal",
             "product_not_found": "Produk tidak ditemukan",
-            "draft_failed": "Gagal simpan draf"
+            "draft_failed": "Gagal simpan draf",
+            "create_denied": "Hanya admin/manajer yang dapat membuat penerimaan"
         }
     },
     "importPrices": {

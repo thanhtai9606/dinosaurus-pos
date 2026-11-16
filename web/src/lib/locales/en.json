@@ -1492,7 +1492,8 @@
             "export_success": "Download started",
             "export_failed": "Export failed",
             "product_not_found": "No product found for that code/SKU/name",
-            "draft_failed": "Could not save draft"
+            "draft_failed": "Could not save draft",
+            "create_denied": "Only admin or manager can create goods receipts"
         }
     },
     "importPrices": {

@@ -198,13 +198,17 @@ function StockReceiptsPage() {
                                 )}
                             </>
                         )}
-                        {canCreate && (
+                        {canCreate ? (
                             <Button asChild>
                                 <Link to="/stock-receipts/new">
                                     <Plus className="mr-2 h-4 w-4" />
                                     {t('stockReceipts.actions.add')}
                                 </Link>
                             </Button>
+                        ) : (
+                            <p className="text-xs text-muted-foreground max-w-[14rem] text-right">
+                                {t('stockReceipts.messages.create_denied')}
+                            </p>
                         )}
                     </div>
                 </CardHeader>

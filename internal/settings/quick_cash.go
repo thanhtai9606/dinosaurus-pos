@@ -23,24 +23,33 @@ func normalizeMarketCode(market string) string {
 	return strings.ToLower(strings.TrimSpace(market))
 }
 
+var (
+	presetQuickCashVN = QuickCashSettings{
+		Retail:       []int64{10_000, 20_000, 50_000, 100_000, 200_000},
+		StockReceipt: []int64{100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000},
+	}
+	presetQuickCashUS = QuickCashSettings{
+		Retail:       []int64{100, 500, 1_000, 2_000, 5_000, 10_000, 20_000, 50_000},
+		StockReceipt: []int64{1_000, 5_000, 10_000, 20_000, 50_000, 100_000},
+	}
+)
+
+func cloneQuickCash(p QuickCashSettings) QuickCashSettings {
+	return QuickCashSettings{
+		Retail:       append([]int64(nil), p.Retail...),
+		StockReceipt: append([]int64(nil), p.StockReceipt...),
+	}
+}
+
 // PresetsForMarket returns default quick-cash amounts for a new tenant onboarding market.
 func PresetsForMarket(market string) QuickCashSettings {
 	switch normalizeMarketCode(market) {
 	case "id":
-		return QuickCashSettings{
-			Retail:       []int64{10_000, 20_000, 50_000, 100_000, 200_000},
-			StockReceipt: []int64{100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000},
-		}
+		return cloneQuickCash(presetQuickCashVN)
 	case "us":
-		return QuickCashSettings{
-			Retail:       []int64{100, 500, 1_000, 2_000, 5_000, 10_000, 20_000, 50_000},
-			StockReceipt: []int64{1_000, 5_000, 10_000, 20_000, 50_000, 100_000},
-		}
+		return cloneQuickCash(presetQuickCashUS)
 	default:
-		return QuickCashSettings{
-			Retail:       []int64{10_000, 20_000, 50_000, 100_000, 200_000},
-			StockReceipt: []int64{100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000},
-		}
+		return cloneQuickCash(presetQuickCashVN)
 	}
 }
 

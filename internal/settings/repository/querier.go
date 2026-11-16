@@ -13,6 +13,7 @@ type Querier interface {
 	GetSettings(ctx context.Context) ([]GetSettingsRow, error)
 	UpdateSetting(ctx context.Context, arg UpdateSettingParams) (UpdateSettingRow, error)
 	UpsertSetting(ctx context.Context, arg UpsertSettingParams) (UpsertSettingRow, error)
+	DeleteSetting(ctx context.Context, key string) error
 }
 
 var _ Querier = (*Queries)(nil)

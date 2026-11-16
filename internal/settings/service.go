@@ -333,73 +333,54 @@ func (s *SettingsService) loadSupportedCurrencies(m map[string]string) []Currenc
 	return list
 }
 
-func (s *SettingsService) GetFinancialSettings(ctx context.Context) (*FinancialSettingsResponse, error) {
+func (s *SettingsService) currentFinancialConfig(ctx context.Context) (FinancialConfig, error) {
+	row, err := s.repo.GetSettingByKey(ctx, settingKeyFinancial)
+	if err == nil && strings.TrimSpace(row.Value) != "" {
+		return parseFinancialConfigJSON(row.Value)
+	}
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return FinancialConfig{}, err
+	}
 	m, err := settingsMap(ctx, s.repo)
 	if err != nil {
-		s.log.Error("Failed to fetch settings", "error", err)
+		return FinancialConfig{}, err
+	}
+	return loadFinancialConfig(m), nil
+}
+
+func (s *SettingsService) GetFinancialSettings(ctx context.Context) (*FinancialSettingsResponse, error) {
+	cfg, err := s.currentFinancialConfig(ctx)
+	if err != nil {
+		s.log.Error("Failed to fetch financial settings", "error", err)
 		return nil, err
 	}
-	currencies := s.loadSupportedCurrencies(m)
-	currency := strings.ToUpper(strings.TrimSpace(m["currency"]))
-	if currency == "" {
-		currency = currencies[0].Code
-	} else if !currencyAllowed(currencies, currency) {
-		currency = currencies[0].Code
-	}
-	return &FinancialSettingsResponse{
-		Currency:            currency,
-		TaxRate:             parseFloatSetting(m["tax_rate"], 11),
-		ServiceChargeRate:   parseFloatSetting(m["service_charge_rate"], 0),
-		TaxEnabled:          parseBoolSetting(m["tax_enabled"], true),
-		AvailableCurrencies: currencies,
-		PosQuickCash:        resolveQuickCash(m[settingKeyPosQuickCash], currency),
-	}, nil
+	return financialConfigToResponse(cfg), nil
 }
 
 func (s *SettingsService) UpdateFinancialSettings(ctx context.Context, req UpdateFinancialSettingsRequest) (*FinancialSettingsResponse, error) {
-	m, err := settingsMap(ctx, s.repo)
+	cfg, err := s.currentFinancialConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	currencies := s.loadSupportedCurrencies(m)
 	req.Currency = strings.ToUpper(strings.TrimSpace(req.Currency))
-	if !currencyAllowed(currencies, req.Currency) {
+	if !currencyAllowed(cfg.AvailableCurrencies, req.Currency) {
 		return nil, fmt.Errorf("%w: currency %s is not enabled", common.ErrBadRequest, req.Currency)
 	}
-
-	taxEnabled := "false"
-	if req.TaxEnabled != nil && *req.TaxEnabled {
-		taxEnabled = "true"
+	cfg.Currency = req.Currency
+	cfg.TaxRate = req.TaxRate
+	cfg.ServiceChargeRate = req.ServiceChargeRate
+	if req.TaxEnabled != nil {
+		cfg.TaxEnabled = *req.TaxEnabled
+	}
+	if req.PosQuickCash != nil {
+		cfg.PosQuickCash = QuickCashSettings{
+			Retail:       req.PosQuickCash.Retail,
+			StockReceipt: req.PosQuickCash.StockReceipt,
+		}
 	}
 	txErr := s.store.ExecTx(ctx, func(tx pgx.Tx) error {
 		qtx := repository.New(tx)
-		upserts := map[string]string{
-			"currency":              req.Currency,
-			"tax_rate":              fmt.Sprintf("%.2f", req.TaxRate),
-			"service_charge_rate": fmt.Sprintf("%.2f", req.ServiceChargeRate),
-			"tax_enabled":           taxEnabled,
-		}
-		for key, val := range upserts {
-			if _, err := qtx.UpsertSetting(ctx, repository.UpsertSettingParams{Key: key, Value: val}); err != nil {
-				return err
-			}
-		}
-		if req.PosQuickCash != nil {
-			cfg := QuickCashSettings{
-				Retail:       sortQuickCashAmounts(req.PosQuickCash.Retail),
-				StockReceipt: sortQuickCashAmounts(req.PosQuickCash.StockReceipt),
-			}
-			raw, merr := marshalQuickCashSettings(cfg)
-			if merr != nil {
-				return merr
-			}
-			if _, err := qtx.UpsertSetting(ctx, repository.UpsertSettingParams{
-				Key: settingKeyPosQuickCash, Value: raw,
-			}); err != nil {
-				return err
-			}
-		}
-		return nil
+		return upsertFinancialConfig(ctx, qtx, cfg)
 	})
 	if txErr != nil {
 		s.log.Error("Failed to update financial settings", "error", txErr)
@@ -456,30 +437,22 @@ func (s *SettingsService) UpdateSupportedCurrencies(ctx context.Context, req Upd
 		return nil, fmt.Errorf("%w: at least one currency required", common.ErrBadRequest)
 	}
 
-	raw, err := marshalSupportedCurrencies(normalized)
+	cfg, err := s.currentFinancialConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	if _, err := s.repo.UpsertSetting(ctx, repository.UpsertSettingParams{Key: "supported_currencies", Value: raw}); err != nil {
-		return nil, err
+	cfg.AvailableCurrencies = normalized
+	if !currencyAllowed(normalized, cfg.Currency) {
+		cfg.Currency = normalized[0].Code
 	}
-
-	// If active currency was removed, switch to first enabled code
-	fin, err := s.GetFinancialSettings(ctx)
-	if err != nil {
-		return nil, err
+	txErr := s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		qtx := repository.New(tx)
+		return upsertFinancialConfig(ctx, qtx, cfg)
+	})
+	if txErr != nil {
+		return nil, txErr
 	}
-	if !currencyAllowed(normalized, fin.Currency) {
-		_, uerr := s.repo.UpsertSetting(ctx, repository.UpsertSettingParams{
-			Key: "currency", Value: normalized[0].Code,
-		})
-		if uerr != nil {
-			return nil, uerr
-		}
-		return s.GetFinancialSettings(ctx)
-	}
-	return fin, nil
+	return s.GetFinancialSettings(ctx)
 }
 
 func (s *SettingsService) GetInvoiceSettings(ctx context.Context) (*InvoiceSettingsResponse, error) {

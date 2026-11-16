@@ -144,3 +144,12 @@ func (q *Queries) UpsertSetting(ctx context.Context, arg UpsertSettingParams) (U
 	)
 	return i, err
 }
+
+const deleteSetting = `-- name: DeleteSetting :exec
+DELETE FROM settings WHERE key = $1
+`
+
+func (q *Queries) DeleteSetting(ctx context.Context, key string) error {
+	_, err := q.db.Exec(ctx, deleteSetting, key)
+	return err
+}

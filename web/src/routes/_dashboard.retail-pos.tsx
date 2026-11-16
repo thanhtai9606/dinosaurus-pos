@@ -39,7 +39,7 @@ import {
     useRetailPosDraftPersistence,
 } from '@/hooks/useRetailPosDraftPersistence'
 import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
-import { FALLBACK_POS_QUICK_CASH } from '@/lib/money/quickCash'
+import { useQuickCashAmounts } from '@/hooks/useQuickCashAmounts'
 
 export const Route = createFileRoute('/_dashboard/retail-pos')({
     component: RetailPosPage,
@@ -126,10 +126,11 @@ function RetailPosPage() {
         [paymentMethods],
     )
 
-    const quickCashAmounts = useMemo(
-        () => fin?.pos_quick_cash?.retail?.length ? fin.pos_quick_cash.retail : [...FALLBACK_POS_QUICK_CASH.retail],
-        [fin?.pos_quick_cash?.retail],
-    )
+    const {
+        amounts: quickCashAmounts,
+        currencyCode: quickCashCurrency,
+        fractionDigits: quickCashFractionDigits,
+    } = useQuickCashAmounts('retail')
 
     const subtotal = cart.reduce((sum, item) => sum + lineSubtotal(item, priceTier), 0)
     const orderDiscount = useMemo(() => {
@@ -567,10 +568,8 @@ function RetailPosPage() {
                         canPay={canPay}
                         paying={manualPayMutation.isPending}
                         quickAmounts={quickCashAmounts}
-                        currencyCode={fin?.currency}
-                        currencyFractionDigits={
-                            fin?.available_currencies?.find((c) => c.code === fin.currency)?.fraction_digits ?? 0
-                        }
+                        currencyCode={quickCashCurrency}
+                        currencyFractionDigits={quickCashFractionDigits}
                     />
                 </div>
             </div>

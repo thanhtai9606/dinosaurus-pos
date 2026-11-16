@@ -28,3 +28,6 @@ VALUES (
 ON CONFLICT (tenant_id, key) DO UPDATE
 SET value = EXCLUDED.value, updated_at = NOW()
 RETURNING key, value, description, updated_at;
+
+-- name: DeleteSetting :exec
+DELETE FROM settings WHERE key = $1;

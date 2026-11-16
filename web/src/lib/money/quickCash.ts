@@ -4,10 +4,7 @@ export const FALLBACK_POS_QUICK_CASH = {
     stock_receipt: [100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000],
 } as const
 
-export type PosQuickCashSettings = {
-    retail: number[]
-    stock_receipt: number[]
-}
+export type PosQuickCashSurface = 'retail' | 'stock_receipt'
 
 export function formatQuickCashAmountList(amounts: number[]): string {
     return amounts.join(', ')

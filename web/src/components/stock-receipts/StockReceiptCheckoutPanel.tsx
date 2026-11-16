@@ -5,13 +5,12 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { useFormatMoney, useMoney } from '@/context/MoneyContext'
+import { useFormatMoney } from '@/context/MoneyContext'
 import type { StockReceiptPaymentMode } from '@/lib/stock-receipts/paymentNote'
 import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
-import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
-import { FALLBACK_POS_QUICK_CASH, formatQuickCashLabel } from '@/lib/money/quickCash'
-import { useMemo } from 'react'
+import { formatQuickCashLabel } from '@/lib/money/quickCash'
+import { useQuickCashAmounts } from '@/hooks/useQuickCashAmounts'
 
 type Supplier = { id: string; name: string }
 
@@ -68,17 +67,7 @@ export function StockReceiptCheckoutPanel({
     completing,
 }: Props) {
     const formatMoney = useFormatMoney()
-    const { currencyCode } = useMoney()
-    const { data: fin } = useFinancialSettingsQuery()
-    const quickAmounts = useMemo(
-        () =>
-            fin?.pos_quick_cash?.stock_receipt?.length
-                ? fin.pos_quick_cash.stock_receipt
-                : [...FALLBACK_POS_QUICK_CASH.stock_receipt],
-        [fin?.pos_quick_cash?.stock_receipt],
-    )
-    const fractionDigits =
-        fin?.available_currencies?.find((c) => c.code === (fin?.currency ?? currencyCode))?.fraction_digits ?? 0
+    const { amounts: quickAmounts, currencyCode, fractionDigits } = useQuickCashAmounts('stock_receipt')
     const debt = Math.max(0, subtotal - amountPaid)
     const creditNeedsSupplier = paymentMode === 'credit' && !supplierId
 
@@ -149,7 +138,7 @@ export function StockReceiptCheckoutPanel({
                                 className="h-8 text-xs"
                                 onClick={() => onAmountPaidChange(amt)}
                             >
-                                {formatQuickCashLabel(amt, fin?.currency ?? currencyCode, fractionDigits)}
+                                {formatQuickCashLabel(amt, currencyCode, fractionDigits)}
                             </Button>
                         ))}
                         <Button type="button" variant="secondary" size="sm" className="h-8 text-xs" onClick={() => onAmountPaidChange(subtotal)}>

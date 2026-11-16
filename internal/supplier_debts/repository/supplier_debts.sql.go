@@ -54,6 +54,7 @@ type InsertSupplierDebtPaymentParams struct {
 type SupplierDebtListRow struct {
 	SupplierDebt
 	SupplierName string `json:"supplier_name"`
+	AgeDays      int32  `json:"age_days"`
 }
 
 type SupplierDebtSummaryRow struct {
@@ -94,7 +95,8 @@ status, note, issued_at, created_by, created_at, updated_at FROM supplier_debts 
 func (q *Queries) ListSupplierDebts(ctx context.Context, arg ListSupplierDebtsParams) ([]SupplierDebtListRow, error) {
 	const sql = `
 SELECT sd.id, sd.supplier_id, sd.stock_receipt_id, sd.reference_no, sd.total_amount, sd.amount_paid,
-       sd.status, sd.note, sd.issued_at, sd.created_by, sd.created_at, sd.updated_at, s.name AS supplier_name
+       sd.status, sd.note, sd.issued_at, sd.created_by, sd.created_at, sd.updated_at, s.name AS supplier_name,
+       GREATEST(0, (CURRENT_DATE - sd.issued_at::date))::int AS age_days
 FROM supplier_debts sd
 JOIN suppliers s ON s.id = sd.supplier_id AND s.deleted_at IS NULL
 WHERE ($1::uuid IS NULL OR sd.supplier_id = $1)
@@ -123,7 +125,7 @@ LIMIT $3 OFFSET $4`
 		var i SupplierDebtListRow
 		if err := rows.Scan(
 			&i.ID, &i.SupplierID, &i.StockReceiptID, &i.ReferenceNo, &i.TotalAmount, &i.AmountPaid,
-			&i.Status, &i.Note, &i.IssuedAt, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt, &i.SupplierName,
+			&i.Status, &i.Note, &i.IssuedAt, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt, &i.SupplierName, &i.AgeDays,
 		); err != nil {
 			return nil, err
 		}

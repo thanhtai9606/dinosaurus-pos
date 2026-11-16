@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
@@ -20,6 +21,7 @@ type Querier interface {
 	GetOpenShifts(ctx context.Context) ([]Shift, error)
 	GetShiftByID(ctx context.Context, id uuid.UUID) (Shift, error)
 	GetUserPasswordHash(ctx context.Context, id uuid.UUID) (string, error)
+	SumShiftCashSales(ctx context.Context, shiftID pgtype.UUID) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -12,7 +12,7 @@ import (
 const createPaymentMethod = `-- name: CreatePaymentMethod :one
 INSERT INTO payment_methods (name)
 VALUES ($1)
-RETURNING id, name, is_active, created_at, updated_at, tenant_id
+RETURNING id, name, is_active, created_at, updated_at, tenant_id, is_cash
 `
 
 // Membuat metode pembayaran baru.
@@ -26,12 +26,13 @@ func (q *Queries) CreatePaymentMethod(ctx context.Context, name string) (Payment
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.TenantID,
+		&i.IsCash,
 	)
 	return i, err
 }
 
 const getPaymentMethodByName = `-- name: GetPaymentMethodByName :one
-SELECT id, name, is_active, created_at, updated_at, tenant_id
+SELECT id, name, is_active, created_at, updated_at, tenant_id, is_cash
 FROM payment_methods
 WHERE name = $1
 LIMIT 1
@@ -48,12 +49,13 @@ func (q *Queries) GetPaymentMethodByName(ctx context.Context, name string) (Paym
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.TenantID,
+		&i.IsCash,
 	)
 	return i, err
 }
 
 const listPaymentMethods = `-- name: ListPaymentMethods :many
-SELECT id, name, is_active, created_at, updated_at, tenant_id
+SELECT id, name, is_active, created_at, updated_at, tenant_id, is_cash
 FROM payment_methods
 WHERE is_active = true
 ORDER BY name
@@ -76,6 +78,7 @@ func (q *Queries) ListPaymentMethods(ctx context.Context) ([]PaymentMethod, erro
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.TenantID,
+			&i.IsCash,
 		); err != nil {
 			return nil, err
 		}

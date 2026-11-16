@@ -14,7 +14,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (s *Service) buildReportEmail(ctx context.Context, period notif_repo.NotificationReportPeriod, loc *time.Location) (eventType, subject, body string, periodKey string, err error) {
+func (s *Service) buildReportEmail(ctx context.Context, period notif_repo.NotificationReportPeriod, loc *time.Location) (eventType, subject, body, htmlBody string, periodKey string, err error) {
 	now := time.Now().In(loc)
 	var start, end time.Time
 	switch period {
@@ -39,12 +39,13 @@ func (s *Service) buildReportEmail(ctx context.Context, period notif_repo.Notifi
 		periodKey = start.Format("2006")
 		subject = fmt.Sprintf("Báo cáo năm %s", periodKey)
 	default:
-		return "", "", "", "", fmt.Errorf("unknown period")
+		return "", "", "", "", "", fmt.Errorf("unknown period")
 	}
 
 	if s.reportService == nil {
 		body = fmt.Sprintf("Kỳ báo cáo: %s — %s\n(Dịch vụ báo cáo chưa khả dụng)", start.Format("02/01/2006"), end.Add(-time.Second).Format("02/01/2006"))
-		return eventType, subject, body, periodKey, nil
+		htmlBody = "<p>" + strings.ReplaceAll(body, "\n", "<br>") + "</p>"
+		return eventType, subject, body, htmlBody, periodKey, nil
 	}
 
 	req := &report.SalesReportServiceRequest{
@@ -54,7 +55,7 @@ func (s *Service) buildReportEmail(ctx context.Context, period notif_repo.Notifi
 	}
 	summary, err := s.reportService.GetDashboardSummary(ctx, req)
 	if err != nil {
-		return "", "", "", "", err
+		return "", "", "", "", "", err
 	}
 	sales, _ := s.reportService.GetSalesReports(ctx, req)
 	var lines []string
@@ -70,7 +71,26 @@ func (s *Service) buildReportEmail(ctx context.Context, period notif_repo.Notifi
 		}
 	}
 	body = strings.Join(lines, "\n")
-	return eventType, subject, body, periodKey, nil
+	var html strings.Builder
+	html.WriteString("<html><body style=\"font-family:sans-serif\">")
+	html.WriteString("<h2>" + subject + "</h2>")
+	html.WriteString("<p>Từ " + start.Format("02/01/2006") + " đến " + end.Add(-time.Second).Format("02/01/2006") + "</p>")
+	html.WriteString("<ul>")
+	html.WriteString(fmt.Sprintf("<li>Tổng doanh thu: <strong>%.0f</strong></li>", summary.TotalSales))
+	html.WriteString(fmt.Sprintf("<li>Số đơn: <strong>%d</strong></li>", summary.TotalOrders))
+	html.WriteString(fmt.Sprintf("<li>Thu ngân hoạt động: <strong>%d</strong></li>", summary.UniqueCashier))
+	html.WriteString("</ul>")
+	if sales != nil && len(*sales) > 0 {
+		html.WriteString("<table border=\"1\" cellpadding=\"6\" cellspacing=\"0\"><tr><th>Ngày</th><th>Đơn</th><th>Doanh thu</th></tr>")
+		for _, row := range *sales {
+			html.WriteString(fmt.Sprintf("<tr><td>%s</td><td>%d</td><td>%.0f</td></tr>",
+				row.Date.Format("02/01/2006"), row.OrderCount, row.TotalSales))
+		}
+		html.WriteString("</table>")
+	}
+	html.WriteString("</body></html>")
+	htmlBody = html.String()
+	return eventType, subject, body, htmlBody, periodKey, nil
 }
 
 func (s *Service) trySendTenantReport(ctx context.Context, period notif_repo.NotificationReportPeriod, slot ReportScheduleSlot, loc *time.Location) {
@@ -86,7 +106,7 @@ func (s *Service) trySendTenantReport(ctx context.Context, period notif_repo.Not
 		return
 	}
 
-	eventType, subject, body, periodKey, err := s.buildReportEmail(ctx, period, loc)
+	eventType, subject, body, htmlBody, periodKey, err := s.buildReportEmail(ctx, period, loc)
 	if err != nil {
 		s.log.Warnf("notifications: report build failed: %v", err)
 		return
@@ -116,7 +136,7 @@ func (s *Service) trySendTenantReport(ctx context.Context, period notif_repo.Not
 		if em == "" {
 			continue
 		}
-		if sendErr := s.dispatcher.SendDirectEmail(ctx, emailCh, em, subject, body); sendErr != nil {
+		if sendErr := s.dispatcher.SendDirectEmail(ctx, emailCh, em, subject, body, htmlBody); sendErr != nil {
 			s.log.Warnf("notifications: report email to %s failed: %v", em, sendErr)
 		}
 	}
@@ -197,7 +217,7 @@ func (s *Service) TestReportEmail(ctx context.Context, period string) error {
 	default:
 		return fmt.Errorf("invalid period")
 	}
-	_, subject, body, _, err := s.buildReportEmail(ctx, rp, loc)
+	_, subject, body, htmlBody, _, err := s.buildReportEmail(ctx, rp, loc)
 	if err != nil {
 		return err
 	}
@@ -211,7 +231,7 @@ func (s *Service) TestReportEmail(ctx context.Context, period string) error {
 		if em == "" {
 			continue
 		}
-		if err := s.dispatcher.SendDirectEmail(ctx, channels[0], em, subject, body); err != nil {
+		if err := s.dispatcher.SendDirectEmail(ctx, channels[0], em, subject, body, htmlBody); err != nil {
 			return err
 		}
 		sent = true

@@ -72,7 +72,7 @@ func setupTest(t *testing.T) (*mocks.MockStore, *mocks.MockOrderQuerier, *mocks.
 	mockActivity := mocks.NewMockIActivityService(ctrl)
 	mockLogger := mocks.NewMockILogger(ctrl)
 
-	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, testSettingsService{}, mockLogger, nil, nil)
+	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, testSettingsService{}, mockLogger, nil, nil, nil)
 	return mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, mockLogger, service
 }
 
@@ -118,7 +118,7 @@ func setupTestWithPgxMock(t *testing.T) (pgxmock.PgxPoolIface, *mocks.MockStore,
 		t.Fatalf("failed to create pgxmock pool: %v", err)
 	}
 
-	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, testSettingsService{}, mockLogger, nil, nil)
+	service := orders.NewOrderService(mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, testSettingsService{}, mockLogger, nil, nil, nil)
 	return mockPgx, mockStore, mockOrderRepo, mockProductRepo, mockMidtrans, mockActivity, mockLogger, service
 }
 

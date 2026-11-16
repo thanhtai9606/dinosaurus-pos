@@ -353,7 +353,7 @@ func BuildAppContainer(app *App) *AppContainer {
 
 	// Order & Payment Module
 	ordersRepo := orders_repo.New(tenantDB)
-	orderService := orders.NewOrderService(app.Store, ordersRepo, productsRepo, app.MidtransService, activityService, settingsService, app.Logger, wsHub, notificationService)
+	orderService := orders.NewOrderService(app.Store, ordersRepo, productsRepo, app.MidtransService, activityService, settingsService, app.Logger, wsHub, notificationService, shiftRepo)
 	orderHandler := orders.NewOrderHandler(orderService, app.Logger)
 
 	// Payment Method Module

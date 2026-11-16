@@ -8,7 +8,8 @@ WHERE cd.id = $1;
 SELECT * FROM customer_debts WHERE order_id = $1;
 
 -- name: ListCustomerDebts :many
-SELECT cd.*, c.name AS customer_name
+SELECT cd.*, c.name AS customer_name,
+       GREATEST(0, (CURRENT_DATE - cd.issued_at::date))::int AS age_days
 FROM customer_debts cd
 JOIN customers c ON c.id = cd.customer_id
 WHERE (sqlc.narg(customer_id)::uuid IS NULL OR cd.customer_id = sqlc.narg(customer_id))

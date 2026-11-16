@@ -229,6 +229,7 @@ func mapListRow(r sd_repo.CustomerDebtListRow) CustomerDebtResponse {
 		AmountPaid:     paid,
 		BalanceDue:     total - paid,
 		Status:         string(r.Status),
+		AgeDays:        int(r.AgeDays),
 		Note:           r.Note,
 		IssuedAt:       r.IssuedAt.Time,
 		CreatedAt:      r.CreatedAt.Time,

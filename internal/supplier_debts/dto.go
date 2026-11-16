@@ -45,6 +45,7 @@ type SupplierDebtResponse struct {
 	AmountPaid     float64    `json:"amount_paid"`
 	BalanceDue     float64    `json:"balance_due"`
 	Status         string     `json:"status"`
+	AgeDays        int        `json:"age_days"`
 	Note           *string    `json:"note,omitempty"`
 	IssuedAt       time.Time  `json:"issued_at"`
 	Payments       []SupplierDebtPaymentResponse `json:"payments,omitempty"`

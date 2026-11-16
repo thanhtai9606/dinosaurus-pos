@@ -54,6 +54,7 @@ type InsertCustomerDebtPaymentParams struct {
 type CustomerDebtListRow struct {
 	CustomerDebt
 	CustomerName string `json:"customer_name"`
+	AgeDays      int32  `json:"age_days"`
 }
 
 type CustomerDebtSummaryRow struct {
@@ -94,7 +95,8 @@ status, note, issued_at, created_by, created_at, updated_at FROM customer_debts 
 func (q *Queries) ListCustomerDebts(ctx context.Context, arg ListCustomerDebtsParams) ([]CustomerDebtListRow, error) {
 	const sql = `
 SELECT sd.id, sd.customer_id, sd.order_id, sd.reference_no, sd.total_amount, sd.amount_paid,
-       sd.status, sd.note, sd.issued_at, sd.created_by, sd.created_at, sd.updated_at, s.name AS customer_name
+       sd.status, sd.note, sd.issued_at, sd.created_by, sd.created_at, sd.updated_at, s.name AS customer_name,
+       GREATEST(0, (CURRENT_DATE - sd.issued_at::date))::int AS age_days
 FROM customer_debts sd
 JOIN customers s ON s.id = sd.customer_id AND s.deleted_at IS NULL
 WHERE ($1::uuid IS NULL OR sd.customer_id = $1)
@@ -123,7 +125,7 @@ LIMIT $3 OFFSET $4`
 		var i CustomerDebtListRow
 		if err := rows.Scan(
 			&i.ID, &i.CustomerID, &i.OrderID, &i.ReferenceNo, &i.TotalAmount, &i.AmountPaid,
-			&i.Status, &i.Note, &i.IssuedAt, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt, &i.CustomerName,
+			&i.Status, &i.Note, &i.IssuedAt, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt, &i.CustomerName, &i.AgeDays,
 		); err != nil {
 			return nil, err
 		}

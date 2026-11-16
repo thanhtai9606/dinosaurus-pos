@@ -41,9 +41,27 @@ func (s *emailSender) Send(ctx context.Context, msg Message) error {
 	if body == "" {
 		body = subject
 	}
-	headers := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n",
-		from, to, subject)
-	payload := []byte(headers + body)
+	html := strings.TrimSpace(msg.HTMLBody)
+	var payload []byte
+	if html != "" {
+		boundary := "dino-pos-report"
+		headers := fmt.Sprintf(
+			"From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=%s\r\n\r\n",
+			from, to, subject, boundary,
+		)
+		var b strings.Builder
+		b.WriteString(headers)
+		b.WriteString("--" + boundary + "\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n")
+		b.WriteString(body)
+		b.WriteString("\r\n--" + boundary + "\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n")
+		b.WriteString(html)
+		b.WriteString("\r\n--" + boundary + "--\r\n")
+		payload = []byte(b.String())
+	} else {
+		headers := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n",
+			from, to, subject)
+		payload = []byte(headers + body)
+	}
 	var auth smtp.Auth
 	if strings.TrimSpace(s.cfg.Username) != "" {
 		auth = smtp.PlainAuth("", s.cfg.Username, s.cfg.Password, host)

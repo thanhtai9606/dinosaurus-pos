@@ -82,7 +82,7 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 - `payment_mode`: `cash` \| `credit` (mặc định `cash`)
 - `amount_paid`: số tiền đã trả NCC lúc hoàn tất (≤ tổng phiếu)
 
-**Legacy:** phiếu cũ có thể chỉ có metadata JSON trong `note` với marker `__payment__` — parse qua `web/src/lib/stock-receipts/paymentNote.ts` (`stripPaymentFromNote` / `embedPaymentInNote`). **Không backfill** sang cột DB trong MVP.
+**Thanh toán:** chỉ cột DB `payment_mode`, `amount_paid` (không nhúng JSON vào `note`).
 
 **FE gửi API:** create/update gửi `payment_mode`, `amount_paid` và `note` thuần (không nhúng payment vào note trên luồng mới). File: `_dashboard.stock-receipts.new.tsx`, `StockReceiptEditorDialog.tsx`, DTO `internal/stock_receipts/dto.go`.
 
@@ -103,9 +103,9 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 
 ### Không làm trong MVP
 
-- Aging, hạn mức, nhắc nợ, Excel báo cáo công nợ.
+- Hạn mức, nhắc nợ tự động, Excel báo cáo công nợ (đã có **tuổi nợ / age_days** trên list).
 - Đồng bộ kế toán / trừ quỹ ca khi trả NCC (chỉ ghi sổ nợ).
-- Backfill phiếu nhập cũ từ `__payment__` trong `note`.
+- Legacy `__payment__` trong `note` phiếu nhập: không dùng trên FE; chỉ `payment_mode` + `amount_paid` (migration `000016` + reset DB).
 
 ### Bảng DB (công nợ — trong baseline)
 

@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createCashTransaction = `-- name: CreateCashTransaction :one
@@ -268,4 +269,20 @@ func (q *Queries) GetUserPasswordHash(ctx context.Context, id uuid.UUID) (string
 	var password_hash string
 	err := row.Scan(&password_hash)
 	return password_hash, err
+}
+
+const sumShiftCashSales = `-- name: SumShiftCashSales :one
+SELECT COALESCE(SUM(o.net_total), 0)::bigint AS total
+FROM orders o
+INNER JOIN payment_methods pm ON pm.id = o.payment_method_id AND pm.is_cash = true
+WHERE o.shift_id = $1
+  AND o.status <> 'cancelled'
+  AND o.payment_method_id IS NOT NULL
+`
+
+func (q *Queries) SumShiftCashSales(ctx context.Context, shiftID pgtype.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, sumShiftCashSales, shiftID)
+	var total int64
+	err := row.Scan(&total)
+	return total, err
 }

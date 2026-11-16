@@ -151,7 +151,7 @@ func (d *Dispatcher) SendTest(ctx context.Context, channel notif_repo.Notificati
 	})
 }
 
-func (d *Dispatcher) SendDirectEmail(ctx context.Context, channel notif_repo.NotificationChannel, to, subject, body string) error {
+func (d *Dispatcher) SendDirectEmail(ctx context.Context, channel notif_repo.NotificationChannel, to, subject, body, htmlBody string) error {
 	if channel.ChannelType != notif_repo.NotificationChannelTypeEmail {
 		return fmt.Errorf("channel is not email")
 	}
@@ -163,7 +163,7 @@ func (d *Dispatcher) SendDirectEmail(ctx context.Context, channel notif_repo.Not
 	if to == "" {
 		return fmt.Errorf("recipient email required")
 	}
-	return sender.Send(ctx, channels.Message{Subject: subject, Body: body, ToEmail: to})
+	return sender.Send(ctx, channels.Message{Subject: subject, Body: body, HTMLBody: htmlBody, ToEmail: to})
 }
 
 func senderForType(channelType notif_repo.NotificationChannelType, raw []byte) (channels.Sender, error) {

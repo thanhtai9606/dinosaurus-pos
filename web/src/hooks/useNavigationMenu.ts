@@ -206,6 +206,18 @@ export function useNavigationMenu(userRole?: string) {
                     menuKey: 'kitchen',
                     allowedRoles: cashierRoles,
                 },
+                {
+                    label: t('sidebar.dining_tables'),
+                    icon: Utensils,
+                    to: '/dining-tables',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.kitchen'),
+                    icon: ChefHat,
+                    to: '/kitchen',
+                    allowedRoles: cashierRoles,
+                },
             ],
         },
         {

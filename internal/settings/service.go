@@ -29,6 +29,8 @@ type ISettingsService interface {
 	UpdateSupportedCurrencies(ctx context.Context, req UpdateSupportedCurrenciesRequest) (*FinancialSettingsResponse, error)
 	GetInvoiceSettings(ctx context.Context) (*InvoiceSettingsResponse, error)
 	UpdateInvoiceSettings(ctx context.Context, req UpdateInvoiceSettingsRequest) (*InvoiceSettingsResponse, error)
+	GetMenuRoleAccess(ctx context.Context) (*MenuRoleAccessResponse, error)
+	UpdateMenuRoleAccess(ctx context.Context, req UpdateMenuRoleAccessRequest) (*MenuRoleAccessResponse, error)
 	ComputeOrderTaxAndService(ctx context.Context, grossTotal int64) (taxAmount int64, serviceChargeAmount int64, err error)
 	UpdateLogo(ctx context.Context, data []byte, filename string, contentType string) (string, error)
 }

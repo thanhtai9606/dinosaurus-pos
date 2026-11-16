@@ -402,4 +402,50 @@ func (h *SettingsHandler) UpdateInvoiceSettingsHandler(c fiber.Ctx) error {
 	})
 }
 
+// GetMenuRoleAccessHandler returns menu catalog and per-role overrides.
+// @Summary      Get menu role access
+// @Tags         Settings
+// @Produce      json
+// @Success      200 {object} common.SuccessResponse{data=MenuRoleAccessResponse}
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /settings/menu-access [get]
+func (h *SettingsHandler) GetMenuRoleAccessHandler(c fiber.Ctx) error {
+	resp, err := h.service.GetMenuRoleAccess(c.RequestCtx())
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(common.ErrorResponse{
+			Message: "Failed to fetch menu access", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{Message: "OK", Data: resp})
+}
+
+// UpdateMenuRoleAccessHandler updates which roles can see each menu item.
+// @Summary      Update menu role access
+// @Tags         Settings
+// @Accept       json
+// @Produce      json
+// @Param        request body UpdateMenuRoleAccessRequest true "Menu overrides"
+// @Success      200 {object} common.SuccessResponse{data=MenuRoleAccessResponse}
+// @x-roles      ["admin"]
+// @Router       /settings/menu-access [put]
+func (h *SettingsHandler) UpdateMenuRoleAccessHandler(c fiber.Ctx) error {
+	var req UpdateMenuRoleAccessRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid request body"})
+	}
+	resp, err := h.service.UpdateMenuRoleAccess(c.RequestCtx(), req)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if errors.Is(err, errInvalidMenuKey) || errors.Is(err, errInvalidMenuRole) {
+			status = http.StatusBadRequest
+		}
+		return c.Status(status).JSON(common.ErrorResponse{
+			Message: "Failed to update menu access", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Menu access updated", Data: resp,
+	})
+}
+
 // fiber:context-methods migrated

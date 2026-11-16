@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Ban, Bell, CreditCard, Palette, Printer, DollarSign, FileText, SlidersHorizontal } from 'lucide-react'
+import { Ban, Bell, CreditCard, Palette, Printer, DollarSign, FileText, SlidersHorizontal, Shield } from 'lucide-react'
 import { NotificationSettingsCard } from '@/components/settings/NotificationSettingsCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CancellationReasonsCard } from "@/components/settings/CancellationReasonsCard.tsx";
@@ -10,6 +10,7 @@ import { FinancialSettingsCard } from '@/components/settings/FinancialSettingsCa
 import { InvoiceSettingsCard } from '@/components/settings/InvoiceSettingsCard'
 import { SettingsHeader } from "@/components/settings/SettingsHeader"
 import { PreferencesSettingsCard } from '@/components/settings/PreferencesSettingsCard'
+import { RoleMenuAccessCard } from '@/components/settings/RoleMenuAccessCard'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { useRBAC } from '@/lib/auth/rbac'
@@ -33,6 +34,7 @@ function SettingsPage() {
         canAccessApi('GET', '/notification-event-types') ||
         canAccessApi('GET', '/notification-channels') ||
         canAccessApi('GET', '/notification-subscriptions/me')
+    const canViewPermissions = canAccessApi('GET', '/settings/menu-access')
 
     return (
         <div className="flex flex-col gap-6">
@@ -89,6 +91,12 @@ function SettingsPage() {
                             {t('settings.tabs.notifications')}
                         </TabsTrigger>
                     )}
+                    {canViewPermissions && (
+                        <TabsTrigger value="permissions" className="flex items-center gap-2">
+                            <Shield className="h-4 w-4" />
+                            {t('settings.tabs.permissions')}
+                        </TabsTrigger>
+                    )}
                 </TabsList>
 
                 <TabsContent value="preferences">
@@ -137,6 +145,11 @@ function SettingsPage() {
                 {canViewNotifications && (
                     <TabsContent value="notifications">
                         <NotificationSettingsCard />
+                    </TabsContent>
+                )}
+                {canViewPermissions && (
+                    <TabsContent value="permissions">
+                        <RoleMenuAccessCard />
                     </TabsContent>
                 )}
             </Tabs>

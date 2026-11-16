@@ -378,6 +378,14 @@ export const RBAC_RULES: Record<string, string[]> = {
         "manager",
         "cashier"
     ],
+    "GET /settings/menu-access": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PUT /settings/menu-access": [
+        "admin"
+    ],
     "PUT /settings/invoice": [
         "admin"
     ],

@@ -29,15 +29,21 @@ import {
     BadgeDollarSign,
 } from 'lucide-react'
 import { POSKasirInternalUserRepositoryUserRole } from '@/lib/api/generated'
+import { effectiveRolesForKey, type TenantRole } from '@/lib/auth/menuCatalog'
+import { useMenuAccessQuery } from '@/lib/api/query/menuAccess'
 
 type Role = POSKasirInternalUserRepositoryUserRole | 'super_admin'
 
-export type DashboardMenuLink = {
-    type: 'link'
+type DashboardMenuLinkBase = {
     label: string
     icon: LucideIcon
     to: string
+    menuKey?: string
     allowedRoles: Role[]
+}
+
+export type DashboardMenuLink = DashboardMenuLinkBase & {
+    type: 'link'
 }
 
 export type DashboardMenuGroup = {
@@ -45,7 +51,7 @@ export type DashboardMenuGroup = {
     label: string
     icon: LucideIcon
     allowedRoles: Role[]
-    children: Omit<DashboardMenuLink, 'type'>[]
+    children: DashboardMenuLinkBase[]
 }
 
 export type DashboardMenuEntry = DashboardMenuLink | DashboardMenuGroup
@@ -61,20 +67,39 @@ const managerRoles: Role[] = [
     POSKasirInternalUserRepositoryUserRole.UserRoleManager,
 ]
 
+function resolvedRoles(menuKey: string | undefined, fallback: Role[], overrides?: Record<string, TenantRole[]>, defaults?: Record<string, TenantRole[]>): Role[] {
+    if (!menuKey) return fallback
+    return effectiveRolesForKey(menuKey, overrides, defaults) as Role[]
+}
+
 function canAccessItem(allowedRoles: Role[], userRole?: string): boolean {
     if (!userRole) return false
+    if (userRole === 'super_admin') return true
     return allowedRoles.includes(userRole as Role)
 }
 
-function filterEntries(entries: DashboardMenuEntry[], userRole?: string): DashboardMenuEntry[] {
+function filterEntries(
+    entries: DashboardMenuEntry[],
+    userRole?: string,
+    overrides?: Record<string, TenantRole[]>,
+    defaults?: Record<string, TenantRole[]>,
+): DashboardMenuEntry[] {
     if (!userRole) return []
     const result: DashboardMenuEntry[] = []
     for (const entry of entries) {
         if (entry.type === 'link') {
-            if (canAccessItem(entry.allowedRoles, userRole)) result.push(entry)
+            const roles = resolvedRoles(entry.menuKey, entry.allowedRoles, overrides, defaults)
+            if (canAccessItem(roles, userRole)) {
+                result.push({ ...entry, allowedRoles: roles })
+            }
             continue
         }
-        const children = entry.children.filter((c) => canAccessItem(c.allowedRoles, userRole))
+        const children = entry.children
+            .map((c) => ({
+                ...c,
+                allowedRoles: resolvedRoles(c.menuKey, c.allowedRoles, overrides, defaults),
+            }))
+            .filter((c) => canAccessItem(c.allowedRoles, userRole))
         if (children.length > 0) {
             result.push({ ...entry, children })
         }
@@ -84,6 +109,7 @@ function filterEntries(entries: DashboardMenuEntry[], userRole?: string): Dashbo
 
 export function useNavigationMenu(userRole?: string) {
     const { t } = useTranslation()
+    const { data: menuAccess } = useMenuAccessQuery()
 
     const menuItems: DashboardMenuEntry[] = [
         {
@@ -129,6 +155,7 @@ export function useNavigationMenu(userRole?: string) {
             label: t('sidebar.summary'),
             icon: LayoutDashboard,
             to: '/',
+            menuKey: 'dashboard',
             allowedRoles: cashierRoles,
         },
         {
@@ -141,24 +168,42 @@ export function useNavigationMenu(userRole?: string) {
                     label: t('sidebar.sales_pos'),
                     icon: ShoppingCart,
                     to: '/order',
+                    menuKey: 'sales_pos',
                     allowedRoles: cashierRoles,
                 },
                 {
                     label: t('sidebar.retail_pos'),
                     icon: Store,
                     to: '/retail-pos',
+                    menuKey: 'retail_pos',
                     allowedRoles: cashierRoles,
                 },
                 {
                     label: t('sidebar.sales_returns'),
                     icon: Undo2,
                     to: '/sales-returns',
+                    menuKey: 'sales_returns',
                     allowedRoles: cashierRoles,
                 },
                 {
                     label: t('sidebar.sales_orders'),
                     icon: Receipt,
                     to: '/sales-orders',
+                    menuKey: 'sales_orders',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.dining_tables'),
+                    icon: Utensils,
+                    to: '/dining-tables',
+                    menuKey: 'dining_tables',
+                    allowedRoles: cashierRoles,
+                },
+                {
+                    label: t('sidebar.kitchen'),
+                    icon: ChefHat,
+                    to: '/kitchen',
+                    menuKey: 'kitchen',
                     allowedRoles: cashierRoles,
                 },
                 {
@@ -185,24 +230,28 @@ export function useNavigationMenu(userRole?: string) {
                     label: t('sidebar.products'),
                     icon: Package,
                     to: '/product',
+                    menuKey: 'products',
                     allowedRoles: cashierRoles,
                 },
                 {
                     label: t('sidebar.product_groups'),
                     icon: Tags,
                     to: '/product-groups',
+                    menuKey: 'product_groups',
                     allowedRoles: managerRoles,
                 },
                 {
                     label: t('sidebar.product_units'),
                     icon: Scale,
                     to: '/product-units',
+                    menuKey: 'product_units',
                     allowedRoles: managerRoles,
                 },
                 {
                     label: t('sidebar.price_lists'),
                     icon: BadgeDollarSign,
                     to: '/price-lists',
+                    menuKey: 'price_lists',
                     allowedRoles: managerRoles,
                 },
             ],
@@ -213,13 +262,13 @@ export function useNavigationMenu(userRole?: string) {
             icon: Warehouse,
             allowedRoles: managerRoles,
             children: [
-                { label: t('sidebar.inventory'), icon: Warehouse, to: '/inventory', allowedRoles: managerRoles },
-                { label: t('sidebar.warehouses'), icon: Warehouse, to: '/warehouses', allowedRoles: managerRoles },
-                { label: t('sidebar.stock_receipts'), icon: ClipboardList, to: '/stock-receipts', allowedRoles: managerRoles },
-                { label: t('sidebar.stock_transfers'), icon: Warehouse, to: '/stock-transfers', allowedRoles: managerRoles },
-                { label: t('sidebar.stock_adjustments'), icon: Warehouse, to: '/stock-adjustments', allowedRoles: managerRoles },
-                { label: t('sidebar.stock_takes'), icon: Warehouse, to: '/stock-takes', allowedRoles: managerRoles },
-                { label: t('sidebar.stock_movements'), icon: ClipboardList, to: '/stock-movements', allowedRoles: managerRoles },
+                { label: t('sidebar.inventory'), icon: Warehouse, to: '/inventory', menuKey: 'inventory', allowedRoles: managerRoles },
+                { label: t('sidebar.warehouses'), icon: Warehouse, to: '/warehouses', menuKey: 'warehouses', allowedRoles: managerRoles },
+                { label: t('sidebar.stock_receipts'), icon: ClipboardList, to: '/stock-receipts', menuKey: 'stock_receipts', allowedRoles: managerRoles },
+                { label: t('sidebar.stock_transfers'), icon: Warehouse, to: '/stock-transfers', menuKey: 'stock_transfers', allowedRoles: managerRoles },
+                { label: t('sidebar.stock_adjustments'), icon: Warehouse, to: '/stock-adjustments', menuKey: 'stock_adjustments', allowedRoles: managerRoles },
+                { label: t('sidebar.stock_takes'), icon: Warehouse, to: '/stock-takes', menuKey: 'stock_takes', allowedRoles: managerRoles },
+                { label: t('sidebar.stock_movements'), icon: ClipboardList, to: '/stock-movements', menuKey: 'stock_movements', allowedRoles: managerRoles },
             ],
         },
         {
@@ -227,6 +276,7 @@ export function useNavigationMenu(userRole?: string) {
             label: t('sidebar.suppliers'),
             icon: Truck,
             to: '/suppliers',
+            menuKey: 'suppliers',
             allowedRoles: managerRoles,
         },
         {
@@ -234,6 +284,7 @@ export function useNavigationMenu(userRole?: string) {
             label: t('sidebar.supplier_debts'),
             icon: HandCoins,
             to: '/supplier-debts',
+            menuKey: 'supplier_debts',
             allowedRoles: managerRoles,
         },
         {
@@ -246,18 +297,21 @@ export function useNavigationMenu(userRole?: string) {
                     label: t('sidebar.customers'),
                     icon: Users,
                     to: '/customers',
+                    menuKey: 'customers',
                     allowedRoles: cashierRoles,
                 },
                 {
                     label: t('sidebar.customer_groups'),
                     icon: Tags,
                     to: '/customer-groups',
+                    menuKey: 'customer_groups',
                     allowedRoles: managerRoles,
                 },
                 {
                     label: t('sidebar.customer_debts'),
                     icon: HandCoins,
                     to: '/customer-debts',
+                    menuKey: 'customer_debts',
                     allowedRoles: managerRoles,
                 },
             ],
@@ -267,6 +321,7 @@ export function useNavigationMenu(userRole?: string) {
             label: t('sidebar.promotions'),
             icon: Tag,
             to: '/promotions',
+            menuKey: 'promotions',
             allowedRoles: cashierRoles,
         },
         {
@@ -274,13 +329,15 @@ export function useNavigationMenu(userRole?: string) {
             label: t('sidebar.reports'),
             icon: FileText,
             to: '/reports',
-            allowedRoles: [POSKasirInternalUserRepositoryUserRole.UserRoleAdmin],
+            menuKey: 'reports',
+            allowedRoles: managerRoles,
         },
         {
             type: 'link',
             label: t('sidebar.users'),
             icon: UserIcon,
             to: '/users',
+            menuKey: 'users',
             allowedRoles: managerRoles,
         },
         {
@@ -288,6 +345,7 @@ export function useNavigationMenu(userRole?: string) {
             label: t('sidebar.settings'),
             icon: Settings,
             to: '/settings',
+            menuKey: 'settings',
             allowedRoles: cashierRoles,
         },
         {
@@ -295,11 +353,23 @@ export function useNavigationMenu(userRole?: string) {
             label: t('sidebar.activity_logs'),
             icon: ActivityIcon,
             to: '/activity-logs',
+            menuKey: 'activity_logs',
             allowedRoles: [POSKasirInternalUserRepositoryUserRole.UserRoleAdmin],
         },
     ]
 
-    const filteredMenu = filterEntries(menuItems, userRole)
+    const overrides = menuAccess?.items
+    const defaults = menuAccess?.defaults
+    const filteredMenu = filterEntries(menuItems, userRole, overrides, defaults)
 
-    return { menuItems, filteredMenu }
+    return { menuItems, filteredMenu, menuAccess }
+}
+
+export function flattenMenuPaths(entries: DashboardMenuEntry[]): string[] {
+    const paths: string[] = []
+    for (const entry of entries) {
+        if (entry.type === 'link') paths.push(entry.to)
+        else entry.children.forEach((c) => paths.push(c.to))
+    }
+    return paths
 }

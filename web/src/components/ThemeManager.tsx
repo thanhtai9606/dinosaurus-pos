@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useBrandingSettingsQuery } from '@/lib/api/query/settings'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/context/AppThemeProvider'
 
 export function ThemeManager() {
     const { data: branding } = useBrandingSettingsQuery()

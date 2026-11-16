@@ -54,13 +54,19 @@ export function printStockReceiptBarcodes(receipts: StockReceipt[], receiptNoLab
   svg { max-width: 100%; height: auto; }
 </style></head><body>
 ${pages.join('\n')}
-<script>window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }</script>
 </body></html>`
 
     const w = window.open('', '_blank')
     if (!w) throw new Error('POPUP_BLOCKED')
     w.document.write(html)
     w.document.close()
+    const triggerPrint = () => {
+        w.focus()
+        w.print()
+        window.setTimeout(() => w.close(), 500)
+    }
+    if (w.document.readyState === 'complete') triggerPrint()
+    else w.addEventListener('load', triggerPrint, { once: true })
 }
 
 function escapeHtml(s: string) {

@@ -1,7 +1,7 @@
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { QueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ThemeProvider } from 'next-themes'
+import { AppThemeProvider } from '@/context/AppThemeProvider'
 import { lazy, Suspense } from 'react'
 
 import { AuthProvider } from '@/context/AuthContext'
@@ -29,7 +29,7 @@ function RootComponent() {
 
     return (
         <>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <AppThemeProvider>
                 <AuthProvider>
                     <ShiftProvider>
                         <ThemeManager />
@@ -41,7 +41,7 @@ function RootComponent() {
                         <DevToolsPanel />
                     </Suspense>
                 )}
-            </ThemeProvider>
+            </AppThemeProvider>
             <Toaster />
         </>
     )

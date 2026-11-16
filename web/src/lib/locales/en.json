@@ -971,6 +971,23 @@
             "category": "Category",
             "category_all": "All Categories"
         },
+        "bulk": {
+            "selected": "{{count}} selected",
+            "print_barcodes": "Print barcodes",
+            "export_excel": "Export Excel",
+            "delete": "Delete products",
+            "restore": "Restore",
+            "delete_confirm_title": "Delete selected products?",
+            "delete_confirm_body": "{{count}} product(s) will be moved to trash.",
+            "delete_success": "Deleted {{count}} product(s).",
+            "delete_partial": "Could not delete {{failed}} of {{total}} products.",
+            "print_started": "Print dialog opened",
+            "print_no_barcodes": "No barcode/SKU to print in selected products",
+            "print_popup_blocked": "Popup blocked — allow popups and try again",
+            "print_failed": "Failed to print barcodes",
+            "export_success": "File exported",
+            "export_failed": "Export failed"
+        },
         "table": {
             "image": "Image",
             "name": "Name",

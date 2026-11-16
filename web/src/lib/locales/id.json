@@ -960,6 +960,23 @@
             "category": "Kategori",
             "category_all": "Semua Kategori"
         },
+        "bulk": {
+            "selected": "{{count}} dipilih",
+            "print_barcodes": "Cetak barcode",
+            "export_excel": "Ekspor Excel",
+            "delete": "Hapus produk",
+            "restore": "Pulihkan",
+            "delete_confirm_title": "Hapus produk terpilih?",
+            "delete_confirm_body": "{{count}} produk akan dipindah ke sampah.",
+            "delete_success": "Berhasil menghapus {{count}} produk.",
+            "delete_partial": "Gagal menghapus {{failed}} dari {{total}} produk.",
+            "print_started": "Dialog cetak dibuka",
+            "print_no_barcodes": "Tidak ada barcode/SKU untuk dicetak",
+            "print_popup_blocked": "Popup diblokir — izinkan popup lalu coba lagi",
+            "print_failed": "Cetak barcode gagal",
+            "export_success": "File diekspor",
+            "export_failed": "Ekspor gagal"
+        },
         "table": {
             "image": "Gambar",
             "name": "Nama",

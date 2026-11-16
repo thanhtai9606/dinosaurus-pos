@@ -977,6 +977,23 @@
             "category": "Loại tài sản",
             "category_all": "Tất cả danh mục"
         },
+        "bulk": {
+            "selected": "Đã chọn {{count}}",
+            "print_barcodes": "In mã vạch",
+            "export_excel": "Xuất Excel",
+            "delete": "Xóa sản phẩm",
+            "restore": "Khôi phục",
+            "delete_confirm_title": "Xóa các sản phẩm đã chọn?",
+            "delete_confirm_body": "Sẽ chuyển {{count}} sản phẩm vào thùng rác.",
+            "delete_success": "Đã xóa {{count}} sản phẩm.",
+            "delete_partial": "Không xóa được {{failed}}/{{total}} sản phẩm.",
+            "print_started": "Đã mở hộp thoại in mã vạch",
+            "print_no_barcodes": "Không có mã vạch/SKU để in trong các sản phẩm đã chọn",
+            "print_popup_blocked": "Trình duyệt chặn cửa sổ in — cho phép popup và thử lại",
+            "print_failed": "In mã vạch thất bại",
+            "export_success": "Đã xuất file",
+            "export_failed": "Xuất file thất bại"
+        },
         "table": {
             "image": "Hình ảnh",
             "name": "Tên",

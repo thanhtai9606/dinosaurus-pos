@@ -18,10 +18,30 @@ export function ProductCard({ product, onEdit, onRestore, hasActions = true }: P
     const formatMoney = useFormatMoney()
     const { t } = useTranslation();
     return (
-        <div className={cn(
-            "group relative rounded-lg bg-card border border-border/40 text-card-foreground transition-all duration-300 hover:border-border/80 hover:shadow-sm overflow-hidden",
-            onRestore && "opacity-75 border-dashed bg-muted/30"
-        )}>
+        <div
+            role={onEdit && !onRestore ? 'button' : undefined}
+            tabIndex={onEdit && !onRestore ? 0 : undefined}
+            onClick={
+                onEdit && !onRestore
+                    ? () => onEdit(product)
+                    : undefined
+            }
+            onKeyDown={
+                onEdit && !onRestore
+                    ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              onEdit(product)
+                          }
+                      }
+                    : undefined
+            }
+            className={cn(
+                "group relative rounded-lg bg-card border border-border/40 text-card-foreground transition-all duration-300 hover:border-border/80 hover:shadow-sm overflow-hidden",
+                onRestore && "opacity-75 border-dashed bg-muted/30",
+                onEdit && !onRestore && "cursor-pointer",
+            )}
+        >
 
             <div className="aspect-square w-full relative bg-secondary/20 overflow-hidden">
                 {product.image_url ? (
@@ -38,7 +58,7 @@ export function ProductCard({ product, onEdit, onRestore, hasActions = true }: P
 
 
                 {hasActions && !onRestore && (
-                    <div className="absolute top-2 right-2 z-10">
+                    <div className="absolute top-2 right-2 z-10" onClick={(e) => e.stopPropagation()}>
                         <div className="rounded-full bg-background/90 backdrop-blur-sm p-1 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
                             <ProductActions product={product} onEdit={onEdit ? () => onEdit(product) : undefined} />
                         </div>

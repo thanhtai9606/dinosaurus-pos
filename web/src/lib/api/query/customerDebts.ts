@@ -4,7 +4,7 @@ import { axiosInstance } from '../client'
 import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
-import { ApiErrorBody } from '../domain'
+import type { ApiErrorBody } from '../domain'
 import type { DebtStatus, SupplierDebtPayment } from './supplierDebts'
 
 export type { DebtStatus }

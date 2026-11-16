@@ -11,7 +11,7 @@ import {
     PaginationPrevious,
 } from '@/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ApiPagination } from '@/lib/api/domain'
+import type { ApiPagination } from '@/lib/api/domain'
 import { getPaginationRange } from '@/lib/pagination-range'
 import { cn } from '@/lib/utils'
 

@@ -16,10 +16,15 @@ type AppConfig struct {
 	Midtrans       MidtransConfig
 	Redis          RedisConfig
 	Meili          MeiliConfig
+	Firebase       FirebaseConfig
 	AutoMigrate      bool
 	MigrationsPath   string
 	EnableDbWipe     bool
 	WipeCronSchedule string
+}
+
+type FirebaseConfig struct {
+	CredentialsJSON string
 }
 
 type MeiliConfig struct {
@@ -153,6 +158,9 @@ func Load() *AppConfig {
 			ExpirySec:    getInt64("R2_EXPIRY_SECONDS", 3600),
 			Endpoint:     getEnv("R2_ENDPOINT", ""),
 			UseSSL:       getBool("R2_USE_SSL", true),
+		},
+		Firebase: FirebaseConfig{
+			CredentialsJSON: getEnv("FIREBASE_CREDENTIALS_JSON", ""),
 		},
 		AutoMigrate:      getBool("AUTO_MIGRATE", false),
 		MigrationsPath:   getEnv("MIGRATIONS_PATH", "file://./sqlc/migrations"),

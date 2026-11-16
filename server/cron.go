@@ -73,6 +73,15 @@ func SetupCron(app *App, container *AppContainer) {
 		}
 	}
 
+	_, err = c.AddFunc("*/15 * * * *", func() {
+		if container.NotificationService != nil {
+			container.NotificationService.RunScheduledReports(context.Background())
+		}
+	})
+	if err != nil {
+		app.Logger.Errorf("Failed to setup notification report cron: %v", err)
+	}
+
 	c.Start()
 	app.Logger.Info("Cron | Scheduler started")
 }

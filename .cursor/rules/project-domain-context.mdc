@@ -29,9 +29,10 @@ alwaysApply: true
 
 ## Notifications (multi-channel)
 
-- Package: `internal/notifications`; migration `000014_notifications`.
-- Admin: `/notification-channels`, test send, `/notifications/config` (`stock_low_threshold`).
-- User: `/notification-subscriptions/me`. Event hooks: orders, stock_receipts complete, product stock low.
+- Package: `internal/notifications`; migrations `000014_notifications`, `000015_notifications_fcm_reports` (FCM + report cron).
+- Channels include `firebase` (server creds); device tokens API; report emails via SMTP only (`report.*` events).
+- Admin: `/notification-channels`, `/notifications/config` (threshold + report schedules), `/notifications/reports/test`.
+- User: `/notification-subscriptions/me`, `/notification-devices/register`. Event hooks: orders, stock_receipts, stock low.
 
 ## Conventions when changing this area
 

@@ -159,6 +159,9 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Get("/notification-deliveries", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.ListDeliveriesHandler)
 	api.Get("/notifications/config", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.GetTenantConfigHandler)
 	api.Put("/notifications/config", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.UpdateTenantConfigHandler)
+	api.Post("/notification-devices/register", authMiddleware, container.NotificationHandler.RegisterDeviceHandler)
+	api.Delete("/notification-devices", authMiddleware, container.NotificationHandler.UnregisterDeviceHandler)
+	api.Post("/notifications/reports/test", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.TestReportEmailHandler)
 
 	settingsGroup := api.Group("/settings", authMiddleware)
 	{

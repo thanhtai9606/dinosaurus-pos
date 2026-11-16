@@ -66,6 +66,21 @@ func (q *Queries) DeleteNotificationChannel(ctx context.Context, id uuid.UUID) e
 	return err
 }
 
+const deleteNotificationDeviceToken = `-- name: DeleteNotificationDeviceToken :exec
+DELETE FROM notification_device_tokens
+WHERE user_id = $1 AND token = $2
+`
+
+type DeleteNotificationDeviceTokenParams struct {
+	UserID uuid.UUID `json:"user_id"`
+	Token  string    `json:"token"`
+}
+
+func (q *Queries) DeleteNotificationDeviceToken(ctx context.Context, arg DeleteNotificationDeviceTokenParams) error {
+	_, err := q.db.Exec(ctx, deleteNotificationDeviceToken, arg.UserID, arg.Token)
+	return err
+}
+
 const deleteUserSubscriptions = `-- name: DeleteUserSubscriptions :exec
 DELETE FROM notification_subscriptions WHERE user_id = $1
 `
@@ -134,6 +149,102 @@ func (q *Queries) InsertNotificationDelivery(ctx context.Context, arg InsertNoti
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const insertNotificationReportRun = `-- name: InsertNotificationReportRun :one
+INSERT INTO notification_report_runs (period, period_key)
+VALUES ($1, $2)
+ON CONFLICT (tenant_id, period, period_key) DO NOTHING
+RETURNING id, tenant_id, period, period_key, created_at
+`
+
+type InsertNotificationReportRunParams struct {
+	Period    NotificationReportPeriod `json:"period"`
+	PeriodKey string                   `json:"period_key"`
+}
+
+func (q *Queries) InsertNotificationReportRun(ctx context.Context, arg InsertNotificationReportRunParams) (NotificationReportRun, error) {
+	row := q.db.QueryRow(ctx, insertNotificationReportRun, arg.Period, arg.PeriodKey)
+	var i NotificationReportRun
+	err := row.Scan(
+		&i.ID,
+		&i.TenantID,
+		&i.Period,
+		&i.PeriodKey,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const listDeviceTokensByUser = `-- name: ListDeviceTokensByUser :many
+SELECT id, tenant_id, user_id, token, platform, last_seen_at, created_at
+FROM notification_device_tokens
+WHERE user_id = $1
+`
+
+func (q *Queries) ListDeviceTokensByUser(ctx context.Context, userID uuid.UUID) ([]NotificationDeviceToken, error) {
+	rows, err := q.db.Query(ctx, listDeviceTokensByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []NotificationDeviceToken{}
+	for rows.Next() {
+		var i NotificationDeviceToken
+		if err := rows.Scan(
+			&i.ID,
+			&i.TenantID,
+			&i.UserID,
+			&i.Token,
+			&i.Platform,
+			&i.LastSeenAt,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listEnabledEmailChannels = `-- name: ListEnabledEmailChannels :many
+SELECT id, tenant_id, name, channel_type, config_json, enabled, created_at, updated_at
+FROM notification_channels
+WHERE enabled = true AND channel_type = 'email'
+ORDER BY created_at
+LIMIT 10
+`
+
+func (q *Queries) ListEnabledEmailChannels(ctx context.Context) ([]NotificationChannel, error) {
+	rows, err := q.db.Query(ctx, listEnabledEmailChannels)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []NotificationChannel{}
+	for rows.Next() {
+		var i NotificationChannel
+		if err := rows.Scan(
+			&i.ID,
+			&i.TenantID,
+			&i.Name,
+			&i.ChannelType,
+			&i.ConfigJson,
+			&i.Enabled,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listEnabledSubscriptionsForEvent = `-- name: ListEnabledSubscriptionsForEvent :many
@@ -361,6 +472,35 @@ func (q *Queries) UpdateNotificationChannel(ctx context.Context, arg UpdateNotif
 		&i.Enabled,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const upsertNotificationDeviceToken = `-- name: UpsertNotificationDeviceToken :one
+INSERT INTO notification_device_tokens (user_id, token, platform, last_seen_at)
+VALUES ($1, $2, $3, NOW())
+ON CONFLICT (user_id, token) DO UPDATE
+SET platform = EXCLUDED.platform, last_seen_at = NOW()
+RETURNING id, tenant_id, user_id, token, platform, last_seen_at, created_at
+`
+
+type UpsertNotificationDeviceTokenParams struct {
+	UserID   uuid.UUID                  `json:"user_id"`
+	Token    string                     `json:"token"`
+	Platform NotificationDevicePlatform `json:"platform"`
+}
+
+func (q *Queries) UpsertNotificationDeviceToken(ctx context.Context, arg UpsertNotificationDeviceTokenParams) (NotificationDeviceToken, error) {
+	row := q.db.QueryRow(ctx, upsertNotificationDeviceToken, arg.UserID, arg.Token, arg.Platform)
+	var i NotificationDeviceToken
+	err := row.Scan(
+		&i.ID,
+		&i.TenantID,
+		&i.UserID,
+		&i.Token,
+		&i.Platform,
+		&i.LastSeenAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }

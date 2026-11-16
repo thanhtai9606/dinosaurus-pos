@@ -17,14 +17,19 @@ import {
     useNotificationSubscriptionsQuery,
     useTestNotificationChannelMutation,
     useUpdateNotificationChannelMutation,
+    useTestReportEmailMutation,
     useUpdateNotificationConfigMutation,
     useUpdateNotificationSubscriptionsMutation,
     type NotificationChannel,
     type NotificationChannelType,
+    type NotificationTenantConfig,
+    type ReportScheduleSlot,
 } from '@/lib/api/query/notifications'
 import { useRBAC } from '@/lib/auth/rbac'
+import { useFirebaseMessaging } from '@/hooks/useFirebaseMessaging'
+import { isFirebaseConfigured } from '@/lib/firebase/config'
 
-const CHANNEL_TYPES: NotificationChannelType[] = ['email', 'msteams_webhook', 'telegram', 'sms']
+const CHANNEL_TYPES: NotificationChannelType[] = ['email', 'msteams_webhook', 'telegram', 'sms', 'firebase']
 
 function defaultConfig(type: NotificationChannelType): Record<string, unknown> {
     switch (type) {
@@ -36,6 +41,8 @@ function defaultConfig(type: NotificationChannelType): Record<string, unknown> {
             return { bot_token: '', default_chat_id: '' }
         case 'sms':
             return { provider: '', api_key: '', sender_id: '' }
+        case 'firebase':
+            return {}
     }
 }
 
@@ -57,15 +64,29 @@ export function NotificationSettingsCard() {
     const testMut = useTestNotificationChannelMutation()
     const subsMut = useUpdateNotificationSubscriptionsMutation()
     const configMut = useUpdateNotificationConfigMutation()
+    const reportTestMut = useTestReportEmailMutation()
+    const push = useFirebaseMessaging()
 
     const [newName, setNewName] = useState('')
     const [newType, setNewType] = useState<NotificationChannelType>('email')
     const [newConfig, setNewConfig] = useState<Record<string, unknown>>(defaultConfig('email'))
     const [threshold, setThreshold] = useState(5)
+    const [timezone, setTimezone] = useState('Asia/Ho_Chi_Minh')
+    const [reportEmails, setReportEmails] = useState('')
+    const [reportSchedules, setReportSchedules] = useState<NotificationTenantConfig['report_schedules']>({
+        daily: { enabled: false, hour: 6, minute: 0 },
+        monthly: { enabled: false, day: 1, hour: 7, minute: 0 },
+        yearly: { enabled: false, month: 1, day: 1, hour: 8, minute: 0 },
+    })
     const [subState, setSubState] = useState<Record<string, boolean>>({})
 
     useEffect(() => {
-        if (tenantConfig) setThreshold(tenantConfig.stock_low_threshold)
+        if (tenantConfig) {
+            setThreshold(tenantConfig.stock_low_threshold)
+            setTimezone(tenantConfig.timezone || 'Asia/Ho_Chi_Minh')
+            setReportEmails((tenantConfig.report_recipient_emails || []).join(', '))
+            if (tenantConfig.report_schedules) setReportSchedules(tenantConfig.report_schedules)
+        }
     }, [tenantConfig])
 
     useEffect(() => {
@@ -136,7 +157,26 @@ export function NotificationSettingsCard() {
                         <Input placeholder="API key" value={String(config.api_key ?? '')} onChange={(e) => set('api_key', e.target.value)} className="sm:col-span-2" />
                     </div>
                 )
+            case 'firebase':
+                return <p className="text-sm text-muted-foreground">{t('settings.notifications.firebase_channel_help')}</p>
         }
+    }
+
+    const patchReportSlot = (key: keyof NotificationTenantConfig['report_schedules'], patch: Partial<ReportScheduleSlot>) => {
+        setReportSchedules((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }))
+    }
+
+    const saveFullConfig = () => {
+        const emails = reportEmails
+            .split(/[,;\s]+/)
+            .map((e) => e.trim())
+            .filter(Boolean)
+        configMut.mutate({
+            stock_low_threshold: threshold,
+            timezone,
+            report_schedules: reportSchedules,
+            report_recipient_emails: emails,
+        })
     }
 
     const ChannelRow = ({ ch }: { ch: NotificationChannel }) => {
@@ -166,7 +206,10 @@ export function NotificationSettingsCard() {
                     </div>
                 </div>
                 <p className="text-sm text-muted-foreground">{ch.channel_type}</p>
-                {renderConfigFields(ch.channel_type, localConfig, setLocalConfig)}
+                {ch.channel_type !== 'firebase' && renderConfigFields(ch.channel_type, localConfig, setLocalConfig)}
+                {ch.channel_type === 'firebase' && (
+                    <p className="text-sm text-muted-foreground">{t('settings.notifications.firebase_channel_help')}</p>
+                )}
             </div>
         )
     }
@@ -197,7 +240,88 @@ export function NotificationSettingsCard() {
                             <Label>{t('settings.notifications.stock_threshold')}</Label>
                             <Input type="number" min={0} value={threshold} onChange={(e) => setThreshold(Number(e.target.value))} className="w-32" />
                         </div>
-                        <Button onClick={() => configMut.mutate(threshold)} disabled={configMut.isPending}>
+                        <Button onClick={saveFullConfig} disabled={configMut.isPending}>
+                            {t('common.save')}
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
+
+            {canConfig && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('settings.notifications.reports_title')}</CardTitle>
+                        <CardDescription>{t('settings.notifications.reports_desc')}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label>{t('settings.notifications.timezone')}</Label>
+                            <Input value={timezone} onChange={(e) => setTimezone(e.target.value)} className="max-w-md" />
+                        </div>
+                        <div>
+                            <Label>{t('settings.notifications.report_emails')}</Label>
+                            <Input
+                                value={reportEmails}
+                                onChange={(e) => setReportEmails(e.target.value)}
+                                placeholder="owner@shop.com, manager@shop.com"
+                                className="max-w-lg"
+                            />
+                        </div>
+                        {(['daily', 'monthly', 'yearly'] as const).map((key) => (
+                            <div key={key} className="flex flex-wrap items-center gap-3 rounded-md border p-3">
+                                <Switch
+                                    checked={reportSchedules[key].enabled}
+                                    onCheckedChange={(v) => patchReportSlot(key, { enabled: v })}
+                                />
+                                <span className="font-medium min-w-[80px]">{t(`settings.notifications.report_period.${key}`)}</span>
+                                {key !== 'daily' && (
+                                    <Input
+                                        type="number"
+                                        className="w-20"
+                                        min={1}
+                                        max={31}
+                                        value={reportSchedules[key].day ?? 1}
+                                        onChange={(e) => patchReportSlot(key, { day: Number(e.target.value) })}
+                                    />
+                                )}
+                                {key === 'yearly' && (
+                                    <Input
+                                        type="number"
+                                        className="w-20"
+                                        min={1}
+                                        max={12}
+                                        value={reportSchedules[key].month ?? 1}
+                                        onChange={(e) => patchReportSlot(key, { month: Number(e.target.value) })}
+                                    />
+                                )}
+                                <Input
+                                    type="number"
+                                    className="w-20"
+                                    min={0}
+                                    max={23}
+                                    value={reportSchedules[key].hour}
+                                    onChange={(e) => patchReportSlot(key, { hour: Number(e.target.value) })}
+                                />
+                                <span>:</span>
+                                <Input
+                                    type="number"
+                                    className="w-20"
+                                    min={0}
+                                    max={59}
+                                    value={reportSchedules[key].minute}
+                                    onChange={(e) => patchReportSlot(key, { minute: Number(e.target.value) })}
+                                />
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    disabled={reportTestMut.isPending}
+                                    onClick={() => reportTestMut.mutate(key)}
+                                >
+                                    {t('settings.notifications.report_test')}
+                                </Button>
+                            </div>
+                        ))}
+                        <Button onClick={saveFullConfig} disabled={configMut.isPending}>
                             {t('common.save')}
                         </Button>
                     </CardContent>
@@ -247,6 +371,33 @@ export function NotificationSettingsCard() {
                                 {t('settings.notifications.add_channel')}
                             </Button>
                         </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {canSubscriptions && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('settings.notifications.browser_push_title')}</CardTitle>
+                        <CardDescription>{t('settings.notifications.browser_push_desc')}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-wrap items-center gap-3">
+                        {!isFirebaseConfigured() ? (
+                            <p className="text-sm text-muted-foreground">{t('settings.notifications.firebase_not_configured')}</p>
+                        ) : (
+                            <>
+                                <Button onClick={() => void push.enableBrowserPush()} disabled={push.busy || push.permission === 'denied'}>
+                                    {t('settings.notifications.enable_browser_push')}
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                    {push.permission === 'granted'
+                                        ? t('settings.notifications.push_granted')
+                                        : push.permission === 'denied'
+                                          ? t('settings.notifications.push_denied')
+                                          : t('settings.notifications.push_default')}
+                                </span>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             )}

@@ -3,9 +3,11 @@ package channels
 import "context"
 
 type Message struct {
-	Subject string
-	Body    string
-	ToEmail string
+	Subject   string
+	Body      string
+	ToEmail   string
+	EventType string
+	Data      map[string]string
 }
 
 type Sender interface {

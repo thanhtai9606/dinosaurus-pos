@@ -167,12 +167,12 @@ Package Go mirror: `internal/supplier_debts`, `internal/customer_debts` — wire
 
 ## Thông báo đa kênh (notifications)
 
-- Package: `internal/notifications` — kênh tenant (`notification_channels`), đăng ký user (`notification_subscriptions`), log giao hàng (`notification_deliveries`).
-- Kênh MVP: `email` (SMTP), `msteams_webhook`, `telegram`, `sms` (interface — chưa gửi thật).
-- Admin: CRUD kênh, test send, `GET/PUT /notifications/config` (ngưỡng `stock_low_threshold` trong settings key `notifications`).
-- User: `GET/PUT /notification-subscriptions/me` — ma trận sự kiện × kênh.
-- Sự kiện: `order.created`, `order.cancelled`, `stock.low`, `supplier_debt.created`, `customer_debt.created`, `stock_receipt.completed` — hook trong orders / products / stock_receipts.
-- FE: tab **Thông báo** trong Cài đặt (`NotificationSettingsCard.tsx`).
+- Package: `internal/notifications` — kênh tenant (`notification_channels`), đăng ký user (`notification_subscriptions`), log giao hàng (`notification_deliveries`), device token FCM (`notification_device_tokens`, migration `000015`).
+- Kênh: `email` (SMTP), `msteams_webhook`, `telegram`, `sms` (stub), `firebase` (push — credential server `FIREBASE_CREDENTIALS_JSON`, kênh tenant `config_json: {}`).
+- Admin: CRUD kênh, test send, `GET/PUT /notifications/config` (JSON `notifications`: `stock_low_threshold`, `timezone`, `report_schedules`, `report_recipient_emails`), `POST /notifications/reports/test?period=daily|monthly|yearly`.
+- User: `GET/PUT /notification-subscriptions/me` — ma trận sự kiện × kênh; `POST /notification-devices/register`, `DELETE /notification-devices` (FCM token).
+- Sự kiện realtime: `order.created`, `order.cancelled`, `stock.low`, `supplier_debt.created`, `customer_debt.created`, `stock_receipt.completed`. Báo cáo email: `report.daily|monthly|yearly` — **chỉ** kênh email (cron `*/15 * * * *`, idempotent `notification_report_runs`).
+- FE: tab **Thông báo** (`NotificationSettingsCard.tsx`), `firebase-messaging-sw.js`, `VITE_FIREBASE_*` + nút bật push trình duyệt.
 
 ---
 

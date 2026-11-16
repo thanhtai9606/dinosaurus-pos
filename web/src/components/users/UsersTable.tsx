@@ -65,12 +65,12 @@ export function UsersTable({ users, t, renderActions, onRowClick, server }: User
                 filterType: 'select',
                 filterAccessor: (u) => (u.is_active ? 'active' : 'inactive'),
                 filterOptions: [
-                    { value: 'active', label: t('users.table.active') },
-                    { value: 'inactive', label: t('users.table.inactive') },
+                    { value: 'active', label: t('users.status.active') },
+                    { value: 'inactive', label: t('users.status.inactive') },
                 ],
                 cell: (user) => (
                     <Badge variant={user.is_active ? 'default' : 'secondary'}>
-                        {user.is_active ? t('users.table.active') : t('users.table.inactive')}
+                        {user.is_active ? t('users.status.active') : t('users.status.inactive')}
                     </Badge>
                 ),
             },

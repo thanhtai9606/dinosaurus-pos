@@ -1856,7 +1856,9 @@
         "open_register": "Buka Mesin Kasir",
         "messages": {
             "start_success": "Shift berhasil dimulai",
+            "start_failed": "Gagal membuka mesin kasir",
             "end_success": "Shift berhasil diakhiri",
+            "end_failed": "Gagal menutup mesin kasir",
             "transaction_recorded": "Transaksi berhasil dicatat"
         },
         "close_modal": {
@@ -1875,7 +1877,7 @@
         },
         "open_modal": {
             "title": "Buka Mesin Kasir",
-            "desc": "Masukkan jumlah uang modal awal dan kata sandi Anda untuk memulai.",
+            "desc": "Masukkan uang modal awal dan kata sandi login Anda untuk memulai.",
             "start_cash": "Uang Modal Awal",
             "password": "Kata Sandi",
             "opening": "Membuka...",

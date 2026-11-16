@@ -6,15 +6,23 @@ type WebSocketEvent = {
   payload: any;
 };
 
-export const useAppWebSocket = (onMessage: (event: WebSocketEvent) => void) => {
+type UseAppWebSocketOptions = {
+  /** When false, disconnect and skip reconnect (e.g. logged out). */
+  enabled?: boolean
+}
+
+export const useAppWebSocket = (
+  onMessage: (event: WebSocketEvent) => void,
+  options?: UseAppWebSocketOptions,
+) => {
+  const enabled = options?.enabled ?? true
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectCountRef = useRef(0);
+  const openWebSocketRef = useRef<(url: string) => void>(() => {});
 
-  const connect = useCallback(() => {
-    const wsUrl = buildWebSocketUrl();
-
+  openWebSocketRef.current = (wsUrl: string) => {
     try {
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
@@ -46,9 +54,16 @@ export const useAppWebSocket = (onMessage: (event: WebSocketEvent) => void) => {
       console.error('[WebSocket] Connection failed:', error);
       scheduleReconnect();
     }
-  }, [onMessage]);
+  }
+
+  const connect = useCallback(() => {
+    if (!enabled) return
+    const wsUrl = buildWebSocketUrl();
+    openWebSocketRef.current(wsUrl);
+  }, [enabled]);
 
   const scheduleReconnect = useCallback(() => {
+    if (!enabled) return
     if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
     }
@@ -60,9 +75,23 @@ export const useAppWebSocket = (onMessage: (event: WebSocketEvent) => void) => {
     reconnectTimeoutRef.current = setTimeout(() => {
         connect();
     }, delay);
-  }, [connect]);
+  }, [connect, enabled]);
 
   useEffect(() => {
+    if (!enabled) {
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      if (wsRef.current) {
+        wsRef.current.onclose = null;
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      setIsConnected(false);
+      return;
+    }
+
     connect();
 
     return () => {
@@ -75,7 +104,7 @@ export const useAppWebSocket = (onMessage: (event: WebSocketEvent) => void) => {
         wsRef.current.close();
       }
     };
-  }, [connect]);
+  }, [connect, enabled]);
 
   return { isConnected };
 };

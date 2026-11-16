@@ -9,6 +9,12 @@ import {
     InternalShiftCashTransactionResponse
 } from "@/lib/api/generated";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
+
+function shiftErrorMessage(error: unknown, fallback: string): string {
+    const axiosErr = error as AxiosError<{ message?: string }>;
+  return axiosErr.response?.data?.message?.trim() || fallback
+}
 
 export const useGetCurrentShift = (options?: { enabled?: boolean }) => {
     return useQuery({
@@ -41,6 +47,9 @@ export const useStartShift = () => {
             toast.success(t("shift.messages.start_success"));
             queryClient.setQueryData(["shift", "current"], data);
         },
+        onError: (error) => {
+            toast.error(shiftErrorMessage(error, t("shift.messages.start_failed")));
+        },
     });
 };
 
@@ -56,6 +65,9 @@ export const useEndShift = () => {
             toast.success(t("shift.messages.end_success"));
             queryClient.setQueryData(["shift", "current"], null);
             queryClient.invalidateQueries({ queryKey: ["shift"] });
+        },
+        onError: (error) => {
+            toast.error(shiftErrorMessage(error, t("shift.messages.end_failed")));
         },
     });
 };

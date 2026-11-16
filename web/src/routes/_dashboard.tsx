@@ -43,11 +43,14 @@ function DashboardLayout() {
     const { data: branding } = useBrandingSettingsQuery()
     const queryClient = useQueryClient()
 
-    useAppWebSocket((event) => {
-        if (event.type === 'ORDER_CREATED' || event.type === 'ORDER_UPDATED') {
-            queryClient.invalidateQueries({ queryKey: ['orders'] })
-        }
-    })
+    useAppWebSocket(
+        (event) => {
+            if (event.type === 'ORDER_CREATED' || event.type === 'ORDER_UPDATED') {
+                queryClient.invalidateQueries({ queryKey: ['orders'] })
+            }
+        },
+        { enabled: auth.isAuthenticated && !auth.isLoading },
+    )
 
     useEffect(() => {
         if (branding?.app_name) {

@@ -1869,7 +1869,9 @@
         "open_register": "Open Register",
         "messages": {
             "start_success": "Shift started successfully",
+            "start_failed": "Could not open register",
             "end_success": "Shift ended successfully",
+            "end_failed": "Could not close register",
             "transaction_recorded": "Transaction recorded"
         },
         "close_modal": {
@@ -1888,7 +1890,7 @@
         },
         "open_modal": {
             "title": "Open Register",
-            "desc": "Enter the starting cash amount and your password to begin.",
+            "desc": "Enter the starting cash amount and your login password to begin.",
             "start_cash": "Start Cash",
             "password": "Password",
             "opening": "Opening...",

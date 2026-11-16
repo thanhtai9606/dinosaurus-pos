@@ -1,16 +1,23 @@
 package shift
 
 import (
-	"dinosaurus-pos/internal/common"
-	repository "dinosaurus-pos/internal/shift/repository"
-	"dinosaurus-pos/pkg/logger"
-	"dinosaurus-pos/pkg/utils"
 	"context"
 	"errors"
 	"time"
 
+	"dinosaurus-pos/internal/common"
+	repository "dinosaurus-pos/internal/shift/repository"
+	"dinosaurus-pos/pkg/logger"
+	"dinosaurus-pos/pkg/utils"
+
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+)
+
+var (
+	ErrShiftAlreadyOpen = errors.New("user already has an open shift")
+	ErrNoOpenShift      = errors.New("no open shift found")
 )
 
 func (s *service) computeExpectedCashEnd(ctx context.Context, shift repository.Shift) (int64, error) {
@@ -74,7 +81,11 @@ func (s *service) StartShift(ctx context.Context, userID uuid.UUID, req StartShi
 	_, err = s.repo.GetOpenShiftByUserID(ctx, userID)
 	if err == nil {
 		s.log.Warnf("StartShift | User already has an open shift: userID=%v", userID)
-		return nil, errors.New("user already has an open shift")
+		return nil, ErrShiftAlreadyOpen
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
+		s.log.Errorf("StartShift | Failed to check open shift: %v", err)
+		return nil, err
 	}
 
 	shift, err := s.repo.CreateShift(ctx, repository.CreateShiftParams{
@@ -111,7 +122,7 @@ func (s *service) EndShift(ctx context.Context, userID uuid.UUID, req EndShiftRe
 	shift, err := s.repo.GetOpenShiftByUserID(ctx, userID)
 	if err != nil {
 		s.log.Warnf("EndShift | No open shift found: userID=%v", userID)
-		return nil, errors.New("no open shift found")
+		return nil, ErrNoOpenShift
 	}
 
 	expectedCashEnd, err := s.computeExpectedCashEnd(ctx, shift)
@@ -162,7 +173,7 @@ func (s *service) CreateCashTransaction(ctx context.Context, userID uuid.UUID, r
 	shift, err := s.repo.GetOpenShiftByUserID(ctx, userID)
 	if err != nil {
 		s.log.Warnf("CreateCashTransaction | No open shift found: userID=%v", userID)
-		return nil, errors.New("no open shift found")
+		return nil, ErrNoOpenShift
 	}
 
 	tx, err := s.repo.CreateCashTransaction(ctx, repository.CreateCashTransactionParams{

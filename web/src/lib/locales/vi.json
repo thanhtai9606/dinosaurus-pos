@@ -1908,7 +1908,9 @@
         "open_register": "Mở chi nhánh",
         "messages": {
             "start_success": "Bắt đầu ca làm việc thành công",
+            "start_failed": "Không mở được ca",
             "end_success": "Ca làm việc đã kết thúc thành công",
+            "end_failed": "Không đóng được ca",
             "transaction_recorded": "Giao dịch được ghi lại"
         },
         "close_modal": {
@@ -1927,7 +1929,7 @@
         },
         "open_modal": {
             "title": "Mở chi nhánh",
-            "desc": "Nhập số tiền mặt bắt đầu và mật khẩu của bạn để bắt đầu.",
+            "desc": "Nhập tiền mặt đầu ca và mật khẩu đăng nhập của bạn.",
             "start_cash": "Bắt đầu bằng tiền mặt",
             "password": "Mật khẩu",
             "opening": "Khai mạc",

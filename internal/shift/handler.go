@@ -67,10 +67,7 @@ func (h *handler) StartShiftHandler(c fiber.Ctx) error {
 
 	shift, err := h.service.StartShift(ctx, userID, req)
 	if err != nil {
-		h.log.Errorf("StartShiftHandler | Failed to start shift: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
-			Message: err.Error(),
-		})
+		return shiftWriteError(c, h.log, "StartShiftHandler", err)
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{
@@ -117,10 +114,7 @@ func (h *handler) EndShiftHandler(c fiber.Ctx) error {
 
 	shift, err := h.service.EndShift(ctx, userID, req)
 	if err != nil {
-		h.log.Errorf("EndShiftHandler | Failed to end shift: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
-			Message: err.Error(),
-		})
+		return shiftWriteError(c, h.log, "EndShiftHandler", err)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(common.SuccessResponse{
@@ -201,14 +195,37 @@ func (h *handler) CreateCashTransactionHandler(c fiber.Ctx) error {
 
 	tx, err := h.service.CreateCashTransaction(ctx, userID, req)
 	if err != nil {
-		h.log.Errorf("CreateCashTransactionHandler | Failed to create cash transaction: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
-			Message: err.Error(),
-		})
+		return shiftWriteError(c, h.log, "CreateCashTransactionHandler", err)
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{
 		Message: "Cash transaction created successfully",
 		Data:    tx,
 	})
+}
+
+func shiftWriteError(c fiber.Ctx, log logger.ILogger, op string, err error) error {
+	switch {
+	case errors.Is(err, common.ErrInvalidCredentials):
+		return c.Status(fiber.StatusUnauthorized).JSON(common.ErrorResponse{
+			Message: "Invalid password",
+		})
+	case errors.Is(err, common.ErrNotFound):
+		return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{
+			Message: "User not found",
+		})
+	case errors.Is(err, ErrShiftAlreadyOpen):
+		return c.Status(fiber.StatusConflict).JSON(common.ErrorResponse{
+			Message: err.Error(),
+		})
+	case errors.Is(err, ErrNoOpenShift):
+		return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{
+			Message: err.Error(),
+		})
+	default:
+		log.Errorf("%s | %v", op, err)
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{
+			Message: "Failed to process shift request",
+		})
+	}
 }

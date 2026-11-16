@@ -22,6 +22,15 @@ function isLoginPath(pathname: string): boolean {
     return pathname === '/login' || pathname.endsWith('/login')
 }
 
+/** 401 on these routes means “no session”, not “expired access token”. */
+function shouldAttemptTokenRefresh(requestUrl: string | undefined): boolean {
+    const url = requestUrl ?? ''
+    if (url.includes('/auth/refresh') || url.includes('/auth/login') || url.includes('/auth/me')) {
+        return false
+    }
+    return true
+}
+
 export const axiosInstance = axios.create({
     baseURL: BASE_PATH,
     withCredentials: true,
@@ -32,15 +41,19 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh') && !originalRequest.url?.includes('/auth/login')) {
+        if (
+            error.response?.status === 401
+            && !originalRequest._retry
+            && shouldAttemptTokenRefresh(originalRequest.url)
+        ) {
             originalRequest._retry = true;
 
             try {
                 await axiosInstance.post('/auth/refresh');
                 return axiosInstance(originalRequest);
             } catch (refreshError) {
-                console.error("Token refresh failed. Redirecting to login...", refreshError);
                 if (!isLoginPath(window.location.pathname)) {
+                    console.error('Token refresh failed. Redirecting to login...', refreshError);
                     window.location.replace('/login');
                 }
                 return Promise.reject(refreshError);

@@ -6,8 +6,7 @@ import {
     InternalUserUpdatePasswordRequest,
     InternalUserProfileResponse,
     InternalUserLoginResponse,
-    ApiErrorBody
-} from "@/lib/api/generated";
+} from '@/lib/api/generated'
 import { AxiosError } from "axios";
 import { toast } from "sonner";
 import i18n from "@/lib/i18n";

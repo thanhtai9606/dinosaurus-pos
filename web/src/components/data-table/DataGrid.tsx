@@ -50,6 +50,7 @@ export function DataGrid<T>({
   defaultPageSize = 10,
   className,
   toolbarExtra,
+  enableColumnFilters = false,
   onRowClick,
   rowSelection,
 }: DataGridProps<T>) {
@@ -141,7 +142,7 @@ export function DataGrid<T>({
   }
 
   const activeColumns = columns.filter((c) => visibleIds.includes(c.id))
-  const hasFilters = columns.some((c) => c.filterable)
+  const hasFilters = enableColumnFilters && columns.some((c) => c.filterable)
   const anyFilterActive = Object.values(columnFilters).some((v) => v.trim() !== '' && v !== '__all__')
 
   const updateFilter = (colId: string, value: string) => {

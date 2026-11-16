@@ -56,6 +56,8 @@ export type DataGridProps<T> = {
   defaultPageSize?: number
   className?: string
   toolbarExtra?: ReactNode
+  /** In-header column filters (default off). Prefer ListSearchToolbar + API search for server lists. */
+  enableColumnFilters?: boolean
   onRowClick?: (row: T) => void
   /** Optional row checkboxes for bulk actions */
   rowSelection?: {

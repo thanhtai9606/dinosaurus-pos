@@ -194,6 +194,11 @@
         "subtitle": "Super admin: buat, ubah, nonaktifkan, atau hapus tenant.",
         "list_title": "Semua toko",
         "list_help": "Login memakai kode toko. Ganti toko di sidebar untuk mengelola user di tenant itu.",
+        "filters": {
+            "search_label": "Cari",
+            "search_placeholder": "Kode atau nama toko…",
+            "all": "Semua"
+        },
         "add": "Tambah toko",
         "code": "Kode toko",
         "code_placeholder": "mis. cabang-jkt",
@@ -894,6 +899,9 @@
         "title": "Pengguna",
         "description": "Kelola akses dan peran pengguna.",
         "add_button": "Tambah Pengguna",
+        "filters": {
+            "search_label": "Cari"
+        },
         "search_placeholder": "Cari pengguna...",
         "view_list": "Tampilan daftar",
         "view_grid": "Tampilan kartu",
@@ -970,7 +978,8 @@
             "grid": "Tampilan Grid"
         },
         "filters": {
-            "search_placeholder": "Cari produk...",
+            "search_label": "Cari",
+            "search_placeholder": "Kode, barcode, SKU, atau nama…",
             "category": "Kategori",
             "category_all": "Semua Kategori"
         },
@@ -994,6 +1003,7 @@
         "table": {
             "image": "Gambar",
             "name": "Nama",
+            "code_barcode": "Kode / barcode",
             "category": "Kategori",
             "price": "Harga",
             "stock": "Stok",
@@ -1113,6 +1123,9 @@
         "title": "Promosi",
         "description": "Kelola promosi dan diskon untuk pelanggan.",
         "add_button": "Tambah Promosi",
+        "filters": {
+            "search_label": "Cari"
+        },
         "search_placeholder": "Cari promosi…",
         "table": {
             "name": "Nama Promosi",
@@ -1325,6 +1338,7 @@
         "list_title": "Aktivitas Sistem",
         "search_placeholder": "Cari detail atau ID entitas...",
         "filters": {
+            "search_label": "Cari",
             "all_actions": "Semua Aksi",
             "all_entities": "Semua Entitas",
             "action_type": "Tipe Aksi",
@@ -1353,6 +1367,9 @@
     "suppliers": {
         "title": "Supplier",
         "search_placeholder": "Cari nama atau kode…",
+        "filters": {
+            "search_label": "Cari"
+        },
         "actions": { "add": "Tambah supplier" },
         "fields": {
             "code": "Kode",
@@ -1490,6 +1507,7 @@
         "add_button": "Tambah Pelanggan",
         "search_placeholder": "CUS-000001, nama, telepon…",
         "filters": {
+            "search_label": "Cari",
             "group": "Grup pelanggan",
             "all_groups": "Semua grup"
         },
@@ -1565,6 +1583,9 @@
     "product_groups": {
         "title": "Grup produk",
         "description": "Kategori untuk mengelompokkan produk di POS dan laporan.",
+        "filters": {
+            "search_label": "Cari"
+        },
         "bulk": {
             "selected": "{{count}} dipilih",
             "delete": "Hapus grup",
@@ -1588,6 +1609,9 @@
     "measurementUnits": {
         "add_button": "Tambah satuan",
         "search_placeholder": "Cari nama…",
+        "filters": {
+            "search_label": "Cari"
+        },
         "fields": {
             "name": "Nama satuan",
             "name_placeholder": "mis. Pcs, Dus, Gelas"
@@ -1618,6 +1642,9 @@
         "title": "Grup pelanggan",
         "description": "Kelompokkan pelanggan untuk harga, laporan, dan filter daftar.",
         "search_placeholder": "Cari kode, nama…",
+        "filters": {
+            "search_label": "Cari"
+        },
         "table": {
             "actions": "Tindakan",
             "empty": "Tidak ada grup pelanggan."

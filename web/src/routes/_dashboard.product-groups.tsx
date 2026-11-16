@@ -13,6 +13,7 @@ import {
 import { CategoryFormDialog } from '@/components/settings/CategoryFormDialog'
 import { CategoryActions } from '@/components/settings/CategoryActions'
 import { ProductGroupsHeader } from '@/components/productgroups/ProductGroupsHeader'
+import { ProductGroupsFilters } from '@/components/productgroups/ProductGroupsFilters'
 import { ProductGroupsTable } from '@/components/productgroups/ProductGroupsTable'
 import {
     AlertDialog,
@@ -52,8 +53,15 @@ function ProductGroupsPage() {
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
     const [bulkDeleting, setBulkDeleting] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
 
-    const rowIds = useMemo(() => categories.map((c) => String(c.id)), [categories])
+    const filteredCategories = useMemo(() => {
+        const q = searchTerm.trim().toLowerCase()
+        if (!q) return categories
+        return categories.filter((c) => (c.name ?? '').toLowerCase().includes(q))
+    }, [categories, searchTerm])
+
+    const rowIds = useMemo(() => filteredCategories.map((c) => String(c.id)), [filteredCategories])
     const allSelected = rowIds.length > 0 && rowIds.every((id) => selectedIds.has(id))
     const someSelected = rowIds.some((id) => selectedIds.has(id))
 
@@ -124,8 +132,10 @@ function ProductGroupsPage() {
                 bulkDeleting={bulkDeleting}
             />
 
+            <ProductGroupsFilters t={t} search={searchTerm} onSearchChange={setSearchTerm} />
+
             <ProductGroupsTable
-                categories={categories}
+                categories={filteredCategories}
                 t={t}
                 onRowClick={canEdit ? (c) => openDialog(c) : undefined}
                 rowSelection={rowSelection}

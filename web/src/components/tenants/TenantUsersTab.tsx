@@ -44,7 +44,6 @@ export function TenantUsersTab({ tenantId }: Props) {
         header: t('tenants_admin.member_email'),
         icon: Mail,
         sortable: true,
-        filterable: true,
         accessor: (m) => m.email,
         cell: (m) => m.email,
       },
@@ -53,7 +52,6 @@ export function TenantUsersTab({ tenantId }: Props) {
         header: t('tenants_admin.member_username'),
         icon: UserIcon,
         sortable: true,
-        filterable: true,
         accessor: (m) => m.username,
         cell: (m) => <span className="font-mono text-sm">{m.username}</span>,
       },
@@ -61,7 +59,6 @@ export function TenantUsersTab({ tenantId }: Props) {
         id: 'role',
         header: t('tenants_admin.member_role'),
         icon: Shield,
-        filterable: true,
         filterType: 'select',
         filterAccessor: (m) => m.role,
         filterOptions: [

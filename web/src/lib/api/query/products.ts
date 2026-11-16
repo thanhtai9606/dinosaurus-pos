@@ -21,7 +21,15 @@ export type Product = InternalProductsProductResponse & {
     sale_units?: ProductSaleUnit[]
     matched_sale_unit_id?: string | null
 }
-export type ProductListResponse = InternalProductsListProductsResponse
+/** List row includes code/sku/barcode from API though OpenAPI list type is minimal. */
+export type ProductListItem = InternalProductsProductResponse & {
+    code?: string
+    sku?: string | null
+    barcode?: string | null
+}
+export type ProductListResponse = InternalProductsListProductsResponse & {
+    products?: ProductListItem[]
+}
 
 export type ProductsListParams = {
     limit?: number

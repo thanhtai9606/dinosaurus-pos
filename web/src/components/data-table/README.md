@@ -18,6 +18,7 @@ Use `size` and `dismissible` on any raw `Dialog` instead of hand-rolled `max-w-*
 - Show/hide columns (optional `storageKey` for localStorage)
 - **Client pagination** (default `enableClientPagination`, `defaultPageSize`) via `ListPagination`
 - **Server pagination** via `server.pagination` + `onPageChange` (client pagination disabled for slicing; column filters still apply to the current page rows)
-- **Per-column quick filters**: set `filterable: true` on a column; optional `filterType` (`text` | `select`), `filterOptions`, `filterAccessor` (when the cell value differs from the filter string)
+- **Page search (preferred)**: use `ListSearchToolbar` + API `search` for server-paginated lists. Column filters only see the current page.
+- **Per-column quick filters (opt-in)**: set `enableColumnFilters` on `DataGrid` and `filterable: true` on columns — for small client-only grids.
 
 Example server mode is on the Users list page.

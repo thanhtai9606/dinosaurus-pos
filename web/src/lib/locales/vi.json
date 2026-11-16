@@ -194,6 +194,11 @@
         "subtitle": "Super admin: thêm, sửa, vô hiệu hoặc xóa tenant.",
         "list_title": "Danh sách cửa hàng",
         "list_help": "Người dùng đăng nhập bằng mã cửa hàng. Đổi cửa hàng trên sidebar để quản lý user trong tenant đó.",
+        "filters": {
+            "search_label": "Tìm kiếm",
+            "search_placeholder": "Mã hoặc tên cửa hàng…",
+            "all": "Tất cả"
+        },
         "add": "Thêm cửa hàng",
         "code": "Mã cửa hàng",
         "code_placeholder": "vd: chi-nhanh-hcm",
@@ -901,6 +906,9 @@
         "description": "Quản lý quyền truy cập và vai trò của người dùng.",
         "add_button": "Thêm Người dùng",
         "search_placeholder": "Tìm Kiếm Người Dùng",
+        "filters": {
+            "search_label": "Tìm kiếm"
+        },
         "view_list": "Dạng xem danh sách",
         "view_grid": "Cáº¥u hÃ¬nh cÃ¡c thiáº¿t láº­p cache á» ÄÃ¢y. Name",
         "role_filter": "Vai trò",
@@ -987,6 +995,7 @@
             "grid": "Chế độ hiển thị theo ô"
         },
         "filters": {
+            "search_label": "Tìm kiếm",
             "search_placeholder": "P-000001, SKU, mã vạch, tên…",
             "category": "Loại tài sản",
             "category_all": "Tất cả danh mục"
@@ -1011,6 +1020,7 @@
         "table": {
             "image": "Hình ảnh",
             "name": "Tên",
+            "code_barcode": "Mã / mã vạch",
             "category": "Loại tài sản",
             "price": "Giá",
             "stock": "Tồn kho",
@@ -1131,6 +1141,9 @@
         "description": "Khuyến mại, chiết khấu cho khách hàng",
         "add_button": "Thêm quảng cáo",
         "search_placeholder": "Tìm kiếm chương trình khuyến mãi…",
+        "filters": {
+            "search_label": "Tìm kiếm"
+        },
         "table": {
             "name": "Promotion Name:",
             "scope": "Phạm vi",
@@ -1343,6 +1356,7 @@
         "list_title": "Hoạt động hệ thống",
         "search_placeholder": "Chi tiết tìm kiếm hoặc ID thực thể...",
         "filters": {
+            "search_label": "Tìm kiếm",
             "all_actions": "Tất cả hình thức",
             "all_entities": "Tất cả các đơn vị",
             "action_type": "Thể Loại Hành Động",
@@ -1372,6 +1386,9 @@
     "suppliers": {
         "title": "Nhà cung cấp",
         "search_placeholder": "Tìm theo tên hoặc mã…",
+        "filters": {
+            "search_label": "Tìm kiếm"
+        },
         "actions": { "add": "Thêm NCC" },
         "fields": {
             "code": "Mã",
@@ -1509,6 +1526,7 @@
         "add_button": "Thêm khách hàng mới",
         "search_placeholder": "CUS-000001, tên, SĐT…",
         "filters": {
+            "search_label": "Tìm kiếm",
             "group": "Nhóm khách",
             "all_groups": "Tất cả nhóm"
         },
@@ -1584,6 +1602,10 @@
     "product_groups": {
         "title": "Nhóm sản phẩm",
         "description": "Danh mục / nhóm để phân loại sản phẩm trên POS và báo cáo.",
+        "search_placeholder": "Tìm theo tên nhóm…",
+        "filters": {
+            "search_label": "Tìm kiếm"
+        },
         "bulk": {
             "selected": "Đã chọn {{count}}",
             "delete": "Xóa nhóm",
@@ -1607,6 +1629,9 @@
     "measurementUnits": {
         "add_button": "Thêm đơn vị",
         "search_placeholder": "Tìm theo tên…",
+        "filters": {
+            "search_label": "Tìm kiếm"
+        },
         "fields": {
             "name": "Tên đơn vị",
             "name_placeholder": "Ví dụ: Cái, Thùng, Ly"
@@ -1637,6 +1662,9 @@
         "title": "Nhóm khách hàng",
         "description": "Phân loại khách để giá, báo cáo và lọc danh sách.",
         "search_placeholder": "Tìm theo mã, tên…",
+        "filters": {
+            "search_label": "Tìm kiếm"
+        },
         "table": {
             "actions": "Hành động",
             "empty": "Không tìm thấy nhóm khách."

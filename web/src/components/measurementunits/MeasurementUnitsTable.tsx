@@ -30,7 +30,6 @@ export function MeasurementUnitsTable({ units, t, onRowClick, server, canEdit, c
                 header: t('measurementUnits.fields.name'),
                 icon: Tags,
                 sortable: true,
-                filterable: true,
                 accessor: (u) => u.name,
                 cell: (u) => <span className="font-medium">{u.name}</span>,
             },

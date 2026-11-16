@@ -1,22 +1,23 @@
 import { useMemo } from 'react'
-import { DollarSign, Image, Package, Settings2, Tag, Boxes } from 'lucide-react'
+import { Barcode, DollarSign, Image, Package, Settings2, Tag, Boxes } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import type { Product } from '@/lib/api/query/products'
+import type { ProductListItem } from '@/lib/api/query/products'
+import { formatProductListCodes } from '@/lib/products/productListCodes'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
 import { ProductActions } from './ProductActions'
 import { useFormatMoney } from '@/context/MoneyContext'
 import type { POSKasirInternalCommonPaginationPagination } from '@/lib/api/generated'
 
 type Props = {
-    products: Product[]
+    products: ProductListItem[]
     emptyMessage: string
     t: (key: string, fallback?: string) => string
     isTrash?: boolean
     canRestore?: boolean
-    onRestore?: (product: Product) => void
-    onRowClick?: (product: Product) => void
-    renderActions?: (product: Product) => React.ReactNode
+    onRestore?: (product: ProductListItem) => void
+    onRowClick?: (product: ProductListItem) => void
+    renderActions?: (product: ProductListItem) => React.ReactNode
     rowSelection?: {
         selectedIds: Set<string>
         onSelectRow: (id: string, selected: boolean) => void
@@ -48,7 +49,7 @@ export function ProductListTable({
     const formatMoney = useFormatMoney()
 
     const defaultActions = useMemo(
-        () => (product: Product) =>
+        () => (product: ProductListItem) =>
             isTrash ? (
                 canRestore ? (
                     <button
@@ -68,7 +69,7 @@ export function ProductListTable({
         [canRestore, isTrash, onRestore, onRowClick, t],
     )
 
-    const columns = useMemo<DataGridColumnDef<Product>[]>(
+    const columns = useMemo<DataGridColumnDef<ProductListItem>[]>(
         () => [
             {
                 id: 'image',
@@ -90,17 +91,27 @@ export function ProductListTable({
                 header: t('products.table.name'),
                 icon: Package,
                 sortable: true,
-                filterable: true,
                 accessor: (p) => p.name ?? '',
                 cell: (p) => (
                     <span className={`font-medium ${isTrash ? 'text-muted-foreground' : ''}`}>{p.name}</span>
                 ),
             },
             {
+                id: 'codes',
+                header: t('products.table.code_barcode'),
+                icon: Barcode,
+                className: 'hidden lg:table-cell max-w-[200px]',
+                defaultVisible: true,
+                cell: (p) => (
+                    <span className="font-mono text-xs text-muted-foreground truncate block">
+                        {formatProductListCodes(p)}
+                    </span>
+                ),
+            },
+            {
                 id: 'category',
                 header: t('products.table.category'),
                 icon: Tag,
-                filterable: true,
                 accessor: (p) => (p.categories ?? []).map((c) => c.name).join(' '),
                 className: 'hidden md:table-cell',
                 defaultVisible: true,

@@ -70,7 +70,20 @@ FROM
 WHERE
     (sqlc.narg(category_id)::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = sqlc.narg(category_id)))
   AND
-    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%' OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%' OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%' OR p.code ILIKE '%' || sqlc.narg(search_text) || '%')
+    (sqlc.narg(search_text)::text IS NULL OR (
+        p.name ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.code ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+                  OR pu.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+              )
+        )
+    ))
   AND
     (sqlc.narg(low_stock_only)::bool IS NOT TRUE OR p.stock <= p.min_stock)
   AND p.deleted_at IS NULL
@@ -108,7 +121,20 @@ SELECT count(*) FROM products p
 WHERE
     (sqlc.narg(category_id)::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = sqlc.narg(category_id)))
   AND
-    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%' OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%' OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%' OR p.code ILIKE '%' || sqlc.narg(search_text) || '%')
+    (sqlc.narg(search_text)::text IS NULL OR (
+        p.name ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.code ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+                  OR pu.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+              )
+        )
+    ))
   AND
     (sqlc.narg(low_stock_only)::bool IS NOT TRUE OR p.stock <= p.min_stock)
   AND p.deleted_at IS NULL;
@@ -215,6 +241,9 @@ SELECT
     p.price,
     p.stock,
     p.image_url,
+    p.code,
+    p.sku,
+    p.barcode,
     COALESCE(
         (SELECT json_agg(c.*) 
          FROM product_categories pc 
@@ -228,7 +257,20 @@ FROM
 WHERE
     (sqlc.narg(category_id)::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = sqlc.narg(category_id)))
   AND
-    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%')
+    (sqlc.narg(search_text)::text IS NULL OR (
+        p.name ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.code ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+                  OR pu.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+              )
+        )
+    ))
   AND p.deleted_at IS NOT NULL
 ORDER BY
     p.deleted_at DESC
@@ -239,7 +281,20 @@ SELECT count(*) FROM products p
 WHERE
     (sqlc.narg(category_id)::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = sqlc.narg(category_id)))
   AND
-    (sqlc.narg(search_text)::text IS NULL OR p.name ILIKE '%' || sqlc.narg(search_text) || '%')
+    (sqlc.narg(search_text)::text IS NULL OR (
+        p.name ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR p.code ILIKE '%' || sqlc.narg(search_text) || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || sqlc.narg(search_text) || '%'
+                  OR pu.sku ILIKE '%' || sqlc.narg(search_text) || '%'
+              )
+        )
+    ))
   AND p.deleted_at IS NOT NULL;
 
 -- name: AssignProductCategory :exec

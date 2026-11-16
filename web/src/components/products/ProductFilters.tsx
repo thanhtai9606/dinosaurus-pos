@@ -1,5 +1,6 @@
 import { Filter, Loader2, Search, LayoutGrid, LayoutList } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { ListFilterField, ListSearchToolbar } from '@/components/data-table/ListSearchToolbar'
 import {
     Select,
     SelectContent,
@@ -45,40 +46,42 @@ export function ProductFilters({
                 </Tabs>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center mb-6">
-                <div className="relative flex-1 md:max-w-sm">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        type="search"
-                        placeholder={t('products.filters.search_placeholder')}
-                        className="pl-8 pr-8"
-                        value={searchTerm}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                    />
-                    {isSearching && (
-                        <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
-                    )}
-                </div>
-
-                <Select
-                    value={category ? String(category) : 'all'}
-                    onValueChange={onCategoryChange}
-                >
-                    <SelectTrigger className="w-[180px]">
-                        <Filter className="mr-2 h-4 w-4" />
-                        <SelectValue placeholder={t('products.filters.category')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">{t('products.filters.category_all')}</SelectItem>
-                        {categories.map((cat: any) => (
-                            <SelectItem key={cat.id} value={String(cat.id)}>
-                                {cat.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+            <ListSearchToolbar className="mb-4">
+                <ListFilterField label={t('products.filters.search_label')} className="min-w-[min(100%,20rem)] flex-[2]">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            placeholder={t('products.filters.search_placeholder')}
+                            className="h-9 pl-8 pr-8"
+                            value={searchTerm}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                        />
+                        {isSearching && (
+                            <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
+                        )}
+                    </div>
+                </ListFilterField>
+                <ListFilterField label={t('products.filters.category')} className="w-full sm:w-[12rem]">
+                    <Select
+                        value={category ? String(category) : 'all'}
+                        onValueChange={onCategoryChange}
+                    >
+                        <SelectTrigger className="h-9">
+                            <Filter className="mr-2 h-4 w-4 shrink-0 opacity-60" />
+                            <SelectValue placeholder={t('products.filters.category_all')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">{t('products.filters.category_all')}</SelectItem>
+                            {categories.map((cat: any) => (
+                                <SelectItem key={cat.id} value={String(cat.id)}>
+                                    {cat.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </ListFilterField>
+            </ListSearchToolbar>
         </div>
     )
 }

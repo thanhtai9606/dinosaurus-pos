@@ -25,7 +25,6 @@ export function ProductGroupsTable({ categories, t, renderActions, onRowClick, r
                 header: t('settings.category.table.name'),
                 icon: Tags,
                 sortable: true,
-                filterable: true,
                 accessor: (c) => c.name ?? '',
                 cell: (c) => <span className="font-medium">{c.name}</span>,
             },

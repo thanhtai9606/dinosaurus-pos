@@ -27,7 +27,6 @@ export function CustomerGroupsTable({ groups, t, renderActions, onRowClick, serv
                 header: t('customerGroups.fields.code'),
                 icon: Hash,
                 sortable: true,
-                filterable: true,
                 accessor: (g) => g.code,
                 cell: (g) => <span className="font-mono text-xs">{g.code}</span>,
             },
@@ -36,7 +35,6 @@ export function CustomerGroupsTable({ groups, t, renderActions, onRowClick, serv
                 header: t('customerGroups.fields.name'),
                 icon: Tags,
                 sortable: true,
-                filterable: true,
                 accessor: (g) => g.name,
                 cell: (g) => <span className="font-medium">{g.name}</span>,
             },
@@ -44,7 +42,6 @@ export function CustomerGroupsTable({ groups, t, renderActions, onRowClick, serv
                 id: 'description',
                 header: t('customerGroups.fields.description'),
                 icon: AlignLeft,
-                filterable: true,
                 accessor: (g) => g.description ?? '',
                 cell: (g) => (
                     <span className="block max-w-md truncate text-muted-foreground" title={g.description ?? undefined}>

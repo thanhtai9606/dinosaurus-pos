@@ -98,7 +98,20 @@ SELECT count(*) FROM products p
 WHERE
     ($1::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = $1))
   AND
-    ($2::text IS NULL OR p.name ILIKE '%' || $2 || '%')
+    ($2::text IS NULL OR (
+        p.name ILIKE '%' || $2 || '%'
+        OR p.sku ILIKE '%' || $2 || '%'
+        OR p.barcode ILIKE '%' || $2 || '%'
+        OR p.code ILIKE '%' || $2 || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || $2 || '%'
+                  OR pu.sku ILIKE '%' || $2 || '%'
+              )
+        )
+    ))
   AND p.deleted_at IS NOT NULL
 `
 
@@ -119,7 +132,20 @@ SELECT count(*) FROM products p
 WHERE
     ($1::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = $1))
   AND
-    ($2::text IS NULL OR p.name ILIKE '%' || $2 || '%' OR p.sku ILIKE '%' || $2 || '%' OR p.barcode ILIKE '%' || $2 || '%' OR p.code ILIKE '%' || $2 || '%')
+    ($2::text IS NULL OR (
+        p.name ILIKE '%' || $2 || '%'
+        OR p.sku ILIKE '%' || $2 || '%'
+        OR p.barcode ILIKE '%' || $2 || '%'
+        OR p.code ILIKE '%' || $2 || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || $2 || '%'
+                  OR pu.sku ILIKE '%' || $2 || '%'
+              )
+        )
+    ))
   AND
     ($3::bool IS NOT TRUE OR p.stock <= p.min_stock)
   AND p.deleted_at IS NULL
@@ -769,6 +795,9 @@ SELECT
     p.price,
     p.stock,
     p.image_url,
+    p.code,
+    p.sku,
+    p.barcode,
     COALESCE(
         (SELECT json_agg(c.*) 
          FROM product_categories pc 
@@ -782,7 +811,20 @@ FROM
 WHERE
     ($3::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = $3))
   AND
-    ($4::text IS NULL OR p.name ILIKE '%' || $4 || '%')
+    ($4::text IS NULL OR (
+        p.name ILIKE '%' || $4 || '%'
+        OR p.sku ILIKE '%' || $4 || '%'
+        OR p.barcode ILIKE '%' || $4 || '%'
+        OR p.code ILIKE '%' || $4 || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || $4 || '%'
+                  OR pu.sku ILIKE '%' || $4 || '%'
+              )
+        )
+    ))
   AND p.deleted_at IS NOT NULL
 ORDER BY
     p.deleted_at DESC
@@ -802,6 +844,9 @@ type ListDeletedProductsRow struct {
 	Price      int64              `json:"price"`
 	Stock      int32              `json:"stock"`
 	ImageUrl   *string            `json:"image_url"`
+	Code       *string            `json:"code"`
+	Sku        *string            `json:"sku"`
+	Barcode    *string            `json:"barcode"`
 	Categories interface{}        `json:"categories"`
 	DeletedAt  pgtype.Timestamptz `json:"deleted_at"`
 }
@@ -826,6 +871,9 @@ func (q *Queries) ListDeletedProducts(ctx context.Context, arg ListDeletedProduc
 			&i.Price,
 			&i.Stock,
 			&i.ImageUrl,
+			&i.Code,
+			&i.Sku,
+			&i.Barcode,
 			&i.Categories,
 			&i.DeletedAt,
 		); err != nil {
@@ -901,7 +949,20 @@ FROM
 WHERE
     ($3::int IS NULL OR EXISTS (SELECT 1 FROM product_categories pc WHERE pc.product_id = p.id AND pc.category_id = $3))
   AND
-    ($4::text IS NULL OR p.name ILIKE '%' || $4 || '%' OR p.sku ILIKE '%' || $4 || '%' OR p.barcode ILIKE '%' || $4 || '%' OR p.code ILIKE '%' || $4 || '%')
+    ($4::text IS NULL OR (
+        p.name ILIKE '%' || $4 || '%'
+        OR p.sku ILIKE '%' || $4 || '%'
+        OR p.barcode ILIKE '%' || $4 || '%'
+        OR p.code ILIKE '%' || $4 || '%'
+        OR EXISTS (
+            SELECT 1 FROM product_units pu
+            WHERE pu.product_id = p.id AND pu.deleted_at IS NULL
+              AND (
+                  pu.barcode ILIKE '%' || $4 || '%'
+                  OR pu.sku ILIKE '%' || $4 || '%'
+              )
+        )
+    ))
   AND
     ($5::bool IS NOT TRUE OR p.stock <= p.min_stock)
   AND p.deleted_at IS NULL

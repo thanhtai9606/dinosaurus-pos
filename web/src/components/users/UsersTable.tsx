@@ -32,7 +32,6 @@ export function UsersTable({ users, t, renderActions, server }: UsersTableProps)
                 header: t('users.table.user'),
                 icon: Mail,
                 sortable: true,
-                filterable: true,
                 filterAccessor: (u) => `${u.username ?? ''} ${u.email ?? ''}`,
                 accessor: (u) => u.username ?? '',
                 cell: (user) => (
@@ -47,7 +46,6 @@ export function UsersTable({ users, t, renderActions, server }: UsersTableProps)
                 header: t('users.table.role'),
                 icon: Shield,
                 sortable: true,
-                filterable: true,
                 filterType: 'select',
                 filterAccessor: (u) => u.role ?? '',
                 filterOptions: [
@@ -63,7 +61,6 @@ export function UsersTable({ users, t, renderActions, server }: UsersTableProps)
                 id: 'status',
                 header: t('users.table.status'),
                 icon: CircleDot,
-                filterable: true,
                 filterType: 'select',
                 filterAccessor: (u) => (u.is_active ? 'active' : 'inactive'),
                 filterOptions: [

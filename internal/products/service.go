@@ -991,6 +991,10 @@ func (s *PrdService) ListDeletedProducts(ctx context.Context, req ListProductsRe
 		}
 
 		categories := parseCategoriesJSON(p.Categories)
+		pcode := ""
+		if p.Code != nil {
+			pcode = *p.Code
+		}
 
 		productsResponse = append(productsResponse, ProductListResponse{
 			ID:         p.ID,
@@ -999,6 +1003,9 @@ func (s *PrdService) ListDeletedProducts(ctx context.Context, req ListProductsRe
 			ImageURL:   p.ImageUrl,
 			Price:      price,
 			Stock:      p.Stock,
+			Code:       pcode,
+			Sku:        p.Sku,
+			Barcode:    p.Barcode,
 			DeletedAt:  deletedAt,
 		})
 	}

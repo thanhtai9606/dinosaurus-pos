@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Building2, Hash, Layers, Pencil, Plus, Settings2, Trash2, ToggleLeft } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { DataGrid, type DataGridColumnDef } from '@/components/data-table'
 import { requireSuperAdmin } from '@/lib/auth/requireSuperAdmin'
 import { usePlatformOverviewQuery } from '@/lib/api/query/platform'
@@ -28,8 +28,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import {
+  TenantsAdminFilters,
+  type TenantAdminFilterState,
+} from '@/components/tenants/TenantsAdminFilters'
 
 const DEFAULT_TENANT_ID = '00000000-0000-0000-0000-000000000001'
 
@@ -53,6 +56,26 @@ function TenantsAdminPage() {
   const [dialogTab, setDialogTab] = useState<'general' | 'users'>('general')
   const [selected, setSelected] = useState<TenantAdmin | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<TenantAdmin | null>(null)
+  const [listFilters, setListFilters] = useState<TenantAdminFilterState>({
+    search: '',
+    dataPlane: 'all',
+    status: 'all',
+  })
+
+  const filteredTenants = useMemo(() => {
+    const q = listFilters.search.trim().toLowerCase()
+    return (tenants ?? []).filter((tnt) => {
+      if (q && !tnt.code.toLowerCase().includes(q) && !tnt.name.toLowerCase().includes(q)) {
+        return false
+      }
+      if (listFilters.dataPlane !== 'all' && tnt.data_plane !== listFilters.dataPlane) {
+        return false
+      }
+      if (listFilters.status === 'active' && !tnt.is_active) return false
+      if (listFilters.status === 'inactive' && tnt.is_active) return false
+      return true
+    })
+  }, [tenants, listFilters])
 
   const openCreate = () => {
     setDialogMode('create')
@@ -116,7 +139,6 @@ function TenantsAdminPage() {
         header: t('tenants_admin.code'),
         icon: Hash,
         sortable: true,
-        filterable: true,
         accessor: (r) => r.code,
         cell: (tnt) => <span className="font-mono text-sm">{tnt.code}</span>,
       },
@@ -125,7 +147,6 @@ function TenantsAdminPage() {
         header: t('tenants_admin.name'),
         icon: Building2,
         sortable: true,
-        filterable: true,
         accessor: (r) => r.name,
         cell: (tnt) => tnt.name,
       },
@@ -133,13 +154,7 @@ function TenantsAdminPage() {
         id: 'data_plane',
         header: t('tenants_admin.data_plane'),
         icon: Layers,
-        filterable: true,
-        filterType: 'select',
-        filterAccessor: (r) => r.data_plane,
-        filterOptions: [
-          { value: 'dedicated', label: t('tenants_admin.data_plane_dedicated') },
-          { value: 'shared', label: t('tenants_admin.data_plane_shared') },
-        ],
+        accessor: (r) => r.data_plane,
         cell: (tnt) => (
           <Badge variant={tnt.data_plane === 'dedicated' ? 'outline' : 'secondary'}>
             {tnt.data_plane === 'dedicated'
@@ -153,13 +168,6 @@ function TenantsAdminPage() {
         header: t('tenants_admin.status'),
         icon: ToggleLeft,
         sortable: true,
-        filterable: true,
-        filterType: 'select',
-        filterAccessor: (r) => (r.is_active ? 'active' : 'inactive'),
-        filterOptions: [
-          { value: 'active', label: t('tenants_admin.active') },
-          { value: 'inactive', label: t('tenants_admin.inactive') },
-        ],
         accessor: (r) => (r.is_active ? 1 : 0),
         cell: (tnt) => (
           <Badge variant={tnt.is_active ? 'default' : 'secondary'}>
@@ -243,7 +251,12 @@ function TenantsAdminPage() {
           <CardTitle>{t('tenants_admin.list_title')}</CardTitle>
           <CardDescription>{t('tenants_admin.list_help')}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <TenantsAdminFilters
+            t={t}
+            value={listFilters}
+            onChange={(patch) => setListFilters((f) => ({ ...f, ...patch }))}
+          />
           {isLoading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -252,7 +265,7 @@ function TenantsAdminPage() {
             <DataGrid
               storageKey="tenants-admin-grid"
               columns={columns}
-              data={tenants ?? []}
+              data={filteredTenants}
               getRowId={(r) => r.id}
               emptyMessage={t('tenants_admin.list_title')}
             />

@@ -14,7 +14,7 @@ import {
 import { SupplierFormDialog } from '@/components/suppliers/SupplierFormDialog'
 import { ListPagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { SuppliersFilters } from '@/components/suppliers/SuppliersFilters'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
@@ -28,6 +28,7 @@ function SuppliersPage() {
     const { page, limit, onPageChange, onLimitChange, resetPage } = useServerListState({ scope: LIST_SCOPES.suppliers })
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearch = useDebounce(searchTerm, 400)
+    const isSearchPending = searchTerm !== debouncedSearch
 
     useEffect(() => {
         resetPage()
@@ -67,11 +68,11 @@ function SuppliersPage() {
                     )}
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <Input
-                        placeholder={t('suppliers.search_placeholder')}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="max-w-sm"
+                    <SuppliersFilters
+                        t={t}
+                        search={searchTerm}
+                        onSearchChange={setSearchTerm}
+                        isSearching={isSearchPending || isFetching}
                     />
                     <Table>
                         <TableHeader>

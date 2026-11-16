@@ -1,8 +1,8 @@
-import { Filter, Search } from 'lucide-react'
+import { Filter, Loader2, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { UsersGetRoleEnum } from '@/lib/api/generated'
-import { Loader2 } from 'lucide-react'
+import { ListFilterField, ListSearchToolbar } from '@/components/data-table/ListSearchToolbar'
 
 interface UsersFiltersProps {
     t: any
@@ -26,14 +26,14 @@ export function UsersFilters({
     isSearching,
 }: UsersFiltersProps) {
     return (
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-1 flex-wrap items-center gap-2">
-                <div className="relative w-full md:w-[300px]">
+        <ListSearchToolbar>
+            <ListFilterField label={t('users.filters.search_label')} className="min-w-[min(100%,20rem)] flex-[2]">
+                <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                         type="search"
                         placeholder={t('users.search_placeholder')}
-                        className="pl-8"
+                        className="h-9 pl-8 pr-8"
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
                     />
@@ -41,10 +41,12 @@ export function UsersFilters({
                         <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
                     )}
                 </div>
+            </ListFilterField>
+            <ListFilterField label={t('users.role_filter')} className="w-full sm:w-[10rem]">
                 <Select value={role || 'all'} onValueChange={onRoleChange}>
-                    <SelectTrigger className="w-[150px]">
-                        <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                        <SelectValue placeholder={t('users.role_filter')} />
+                    <SelectTrigger className="h-9">
+                        <Filter className="mr-2 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <SelectValue placeholder={t('users.role_all')} />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">{t('users.role_all')}</SelectItem>
@@ -53,10 +55,12 @@ export function UsersFilters({
                         <SelectItem value={UsersGetRoleEnum.Cashier}>{t('users.roles.cashier')}</SelectItem>
                     </SelectContent>
                 </Select>
+            </ListFilterField>
+            <ListFilterField label={t('users.status_filter')} className="w-full sm:w-[10rem]">
                 <Select value={activeFilter} onValueChange={(v) => onActiveFilterChange(v as 'all' | 'active' | 'inactive')}>
-                    <SelectTrigger className="w-[150px]">
-                        <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                        <SelectValue placeholder={t('users.status_filter')} />
+                    <SelectTrigger className="h-9">
+                        <Filter className="mr-2 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <SelectValue placeholder={t('users.status_all')} />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">{t('users.status_all')}</SelectItem>
@@ -64,7 +68,7 @@ export function UsersFilters({
                         <SelectItem value="inactive">{t('users.status.inactive')}</SelectItem>
                     </SelectContent>
                 </Select>
-            </div>
-        </div>
+            </ListFilterField>
+        </ListSearchToolbar>
     )
 }

@@ -26,14 +26,12 @@ export function CustomerDetailDebtsGrid({ debts, t, formatMoney, emptyMessage, s
                 header: t('debts.fields.reference'),
                 icon: Hash,
                 sortable: true,
-                filterable: true,
                 accessor: (d) => d.reference_no ?? '',
                 cell: (d) => <span className="font-mono text-xs">{d.reference_no || '—'}</span>,
             },
             {
                 id: 'status',
                 header: t('debts.fields.status'),
-                filterable: true,
                 accessor: (d) => d.status,
                 cell: (d) => (
                     <Badge variant="secondary">{t(`debts.status.${d.status}`, d.status)}</Badge>

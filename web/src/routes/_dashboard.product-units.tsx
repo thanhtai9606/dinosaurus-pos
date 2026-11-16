@@ -6,8 +6,9 @@ import { useResetPageOnChange } from '@/hooks/use-reset-page-on-change'
 import { useServerListState } from '@/hooks/use-server-list-state'
 import { LIST_SCOPES } from '@/stores/list-scopes'
 import { useTranslation } from 'react-i18next'
+import { Loader2, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
+import { ListFilterField, ListSearchToolbar } from '@/components/data-table/ListSearchToolbar'
 import {
     measurementUnitsListQueryOptions,
     useCreateMeasurementUnitMutation,
@@ -63,15 +64,23 @@ function ProductUnitsPage() {
         <div className="flex flex-col gap-4 p-4">
             <MeasurementUnitsHeader t={t} canCreate={canCreate} onCreate={() => openDialog(null)} />
 
-            <div className="relative max-w-sm">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                    className="pl-8"
-                    placeholder={t('measurementUnits.search_placeholder')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
+            <ListSearchToolbar>
+                <ListFilterField label={t('measurementUnits.filters.search_label')} className="min-w-[min(100%,20rem)] flex-[2]">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            className="h-9 pl-8 pr-8"
+                            placeholder={t('measurementUnits.search_placeholder')}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        {(isSearchPending || unitsQuery.isFetching) && (
+                            <Loader2 className="absolute right-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
+                        )}
+                    </div>
+                </ListFilterField>
+            </ListSearchToolbar>
 
             <MeasurementUnitsTable
                 units={units}

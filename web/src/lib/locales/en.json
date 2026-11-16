@@ -192,6 +192,11 @@
         "subtitle": "Super admin: create, edit, or remove tenant stores.",
         "list_title": "All stores",
         "list_help": "Users sign in with the store code. Switch store from the sidebar to manage users in that tenant.",
+        "filters": {
+            "search_label": "Search",
+            "search_placeholder": "Store code or name…",
+            "all": "All"
+        },
         "add": "Add store",
         "code": "Store code",
         "code_placeholder": "e.g. branch-hcm",
@@ -895,6 +900,9 @@
         "description": "Manage user access and roles.",
         "add_button": "Add User",
         "search_placeholder": "Search user...",
+        "filters": {
+            "search_label": "Search"
+        },
         "view_list": "List view",
         "view_grid": "Card view",
         "role_filter": "Role",
@@ -981,7 +989,8 @@
             "grid": "Grid View"
         },
         "filters": {
-            "search_placeholder": "Search products...",
+            "search_label": "Search",
+            "search_placeholder": "Code, barcode, SKU, or name…",
             "category": "Category",
             "category_all": "All Categories"
         },
@@ -1005,6 +1014,7 @@
         "table": {
             "image": "Image",
             "name": "Name",
+            "code_barcode": "Code / barcode",
             "category": "Category",
             "price": "Price",
             "stock": "Stock",
@@ -1125,6 +1135,9 @@
         "description": "Manage promotions and discounts for customers.",
         "add_button": "Add Promotion",
         "search_placeholder": "Search promotions…",
+        "filters": {
+            "search_label": "Search"
+        },
         "table": {
             "name": "Promotion Name",
             "scope": "Scope",
@@ -1337,12 +1350,13 @@
         "list_title": "System Activities",
         "search_placeholder": "Search details or entity ID...",
         "filters": {
+            "search_label": "Search",
             "all_actions": "All Actions",
             "all_entities": "All Entities",
             "action_type": "Action Type",
             "entity_type": "Entity Type",
             "user_id": "User ID",
-            "date_range": "Pick a date range"
+            "date_range": "Date range"
         },
         "table": {
             "details": "Details",
@@ -1365,6 +1379,9 @@
     "suppliers": {
         "title": "Suppliers",
         "search_placeholder": "Search by name or code…",
+        "filters": {
+            "search_label": "Search"
+        },
         "actions": { "add": "Add supplier" },
         "fields": {
             "code": "Code",
@@ -1502,6 +1519,7 @@
         "add_button": "Add Customer",
         "search_placeholder": "CUS-000001, name, phone…",
         "filters": {
+            "search_label": "Search",
             "group": "Customer group",
             "all_groups": "All groups"
         },
@@ -1577,6 +1595,10 @@
     "product_groups": {
         "title": "Product groups",
         "description": "Categories to organize products for POS and reports.",
+        "search_placeholder": "Search by group name…",
+        "filters": {
+            "search_label": "Search"
+        },
         "bulk": {
             "selected": "{{count}} selected",
             "delete": "Delete groups",
@@ -1600,6 +1622,9 @@
     "measurementUnits": {
         "add_button": "Add unit",
         "search_placeholder": "Search by name…",
+        "filters": {
+            "search_label": "Search"
+        },
         "fields": {
             "name": "Unit name",
             "name_placeholder": "e.g. Piece, Box, Cup"
@@ -1630,6 +1655,9 @@
         "title": "Customer groups",
         "description": "Segment customers for pricing, reports, and list filters.",
         "search_placeholder": "Search by code, name…",
+        "filters": {
+            "search_label": "Search"
+        },
         "table": {
             "actions": "Actions",
             "empty": "No customer groups found."

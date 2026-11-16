@@ -44,7 +44,6 @@ export function CustomerDetailOrdersGrid({
                 header: t('customers.detail.order_no', t('salesOrders.col_queue', 'Order no.')),
                 icon: Hash,
                 sortable: true,
-                filterable: true,
                 accessor: (o) => o.order_no || o.queue_number || o.id || '',
                 cell: (o) => {
                     const label = o.order_no || o.queue_number || '—'
@@ -80,7 +79,6 @@ export function CustomerDetailOrdersGrid({
             {
                 id: 'status',
                 header: t('customers.detail.order_status'),
-                filterable: true,
                 accessor: (o) => o.status ?? '',
                 cell: (o) => (
                     <Badge variant="secondary">

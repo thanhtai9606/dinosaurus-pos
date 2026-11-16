@@ -350,6 +350,7 @@
             "total": "Total",
             "paid": "Dibayar",
             "balance": "Sisa",
+            "age_days": "Umur (hari)",
             "amount": "Jumlah",
             "note": "Catatan",
             "date": "Tanggal"
@@ -772,7 +773,12 @@
                 "monthly": "Bulanan",
                 "yearly": "Tahunan"
             },
-            "report_test": "Kirim uji"
+            "report_test": "Kirim uji",
+            "deliveries_title": "Log pengiriman",
+            "deliveries_desc": "Pengiriman notifikasi terbaru.",
+            "delivery_time": "Waktu",
+            "delivery_status": "Status",
+            "delivery_summary": "Ringkasan / error"
         },
         "preferences": {
             "title": "Tampilan & bahasa",

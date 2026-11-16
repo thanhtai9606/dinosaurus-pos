@@ -350,6 +350,7 @@
             "total": "Tổng nợ",
             "paid": "Đã trả",
             "balance": "Còn lại",
+            "age_days": "Tuổi nợ (ngày)",
             "amount": "Số tiền",
             "note": "Ghi chú",
             "date": "Ngày"
@@ -772,7 +773,12 @@
                 "monthly": "Hàng tháng",
                 "yearly": "Hàng năm"
             },
-            "report_test": "Gửi thử"
+            "report_test": "Gửi thử",
+            "deliveries_title": "Nhật ký gửi thông báo",
+            "deliveries_desc": "Các lần gửi gần đây (email, push, …).",
+            "delivery_time": "Thời gian",
+            "delivery_status": "Trạng thái",
+            "delivery_summary": "Tóm tắt / lỗi"
         },
         "preferences": {
             "title": "Hiển thị & ngôn ngữ",

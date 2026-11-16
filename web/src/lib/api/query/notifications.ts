@@ -215,6 +215,30 @@ export function useUpdateNotificationConfigMutation() {
     })
 }
 
+export type NotificationDelivery = {
+    id: string
+    event_type: string
+    status: string
+    error_text?: string
+    payload_summary?: string
+    created_at: string
+}
+
+export function useNotificationDeliveriesQuery(page = 1, limit = 20) {
+    const { canAccessApi } = useRBAC()
+    return useQuery({
+        queryKey: ['notifications', 'deliveries', page, limit],
+        enabled: canAccessApi('GET', '/notification-deliveries'),
+        queryFn: async () => {
+            const res = await axiosInstance.get<Success<{ items: NotificationDelivery[]; total: number }>>(
+                '/notification-deliveries',
+                { params: { page, limit } }
+            )
+            return res.data.data
+        },
+    })
+}
+
 export function useTestReportEmailMutation() {
     return useMutation({
         mutationFn: async (period: 'daily' | 'monthly' | 'yearly') => {

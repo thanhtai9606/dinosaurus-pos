@@ -10,7 +10,30 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+func (s *service) computeExpectedCashEnd(ctx context.Context, shift repository.Shift) (int64, error) {
+	cashIn, err := s.repo.GetCashTotalByShiftIDAndType(ctx, repository.GetCashTotalByShiftIDAndTypeParams{
+		ShiftID: shift.ID,
+		Type:    repository.CashTransactionTypeCashIn,
+	})
+	if err != nil {
+		return 0, err
+	}
+	cashOut, err := s.repo.GetCashTotalByShiftIDAndType(ctx, repository.GetCashTotalByShiftIDAndTypeParams{
+		ShiftID: shift.ID,
+		Type:    repository.CashTransactionTypeCashOut,
+	})
+	if err != nil {
+		return 0, err
+	}
+	cashSales, err := s.repo.SumShiftCashSales(ctx, pgtype.UUID{Bytes: shift.ID, Valid: true})
+	if err != nil {
+		return 0, err
+	}
+	return shift.StartCash + cashIn - cashOut + cashSales, nil
+}
 
 type Service interface {
 	StartShift(ctx context.Context, userID uuid.UUID, req StartShiftRequest) (*ShiftResponse, error)
@@ -91,36 +114,11 @@ func (s *service) EndShift(ctx context.Context, userID uuid.UUID, req EndShiftRe
 		return nil, errors.New("no open shift found")
 	}
 
-	// Calculate expected cash end
-	// Start Cash + Cash In - Cash Out + Sales (Cash Payment method)
-	// For MVP, we will simplify: Start Cash + Cash In - Cash Out.
-	// Ideally we need to query orders with payment_method_id corresponding to CASH for this shift.
-	// Since we don't have direct link between orders and shifts yet (implied by time and user),
-	// we would need to sum order totals where user_id = shift.user_id AND created_at >= shift.start_time AND payment_method is CASH.
-
-	// For now, let's just sum cash transactions. Note: This is partial implementation.
-	// TODO: Include Sales in Expected Cash Calculation.
-	cashIn, err := s.repo.GetCashTotalByShiftIDAndType(ctx, repository.GetCashTotalByShiftIDAndTypeParams{
-		ShiftID: shift.ID,
-		Type:    repository.CashTransactionTypeCashIn,
-	})
+	expectedCashEnd, err := s.computeExpectedCashEnd(ctx, shift)
 	if err != nil {
-		s.log.Errorf("EndShift | Failed to get cash in total: %v", err)
+		s.log.Errorf("EndShift | Failed to compute expected cash: %v", err)
 		return nil, err
 	}
-
-	cashOut, err := s.repo.GetCashTotalByShiftIDAndType(ctx, repository.GetCashTotalByShiftIDAndTypeParams{
-		ShiftID: shift.ID,
-		Type:    repository.CashTransactionTypeCashOut,
-	})
-	if err != nil {
-		s.log.Errorf("EndShift | Failed to get cash out total: %v", err)
-		return nil, err
-	}
-
-	expectedCashEnd := shift.StartCash + cashIn - cashOut
-	// Note: We need to add Order Sales (Cash) here.
-	// Assuming for now simple Shift management without strict order reconciliation in this step as it requires Order Repository dependency.
 
 	updatedShift, err := s.repo.EndShift(ctx, repository.EndShiftParams{
 		ID:              shift.ID,
@@ -202,28 +200,22 @@ func (s *service) AutoCloseShifts(ctx context.Context) error {
 	for _, shift := range shifts {
 		s.log.Infof("AutoCloseShifts | Closing shift %v for user %v", shift.ID, shift.UserID)
 
-		// Calculate expected cash
-		cashIn, _ := s.repo.GetCashTotalByShiftIDAndType(ctx, repository.GetCashTotalByShiftIDAndTypeParams{
-			ShiftID: shift.ID,
-			Type:    repository.CashTransactionTypeCashIn,
-		})
-		cashOut, _ := s.repo.GetCashTotalByShiftIDAndType(ctx, repository.GetCashTotalByShiftIDAndTypeParams{
-			ShiftID: shift.ID,
-			Type:    repository.CashTransactionTypeCashOut,
-		})
-
-		expectedCashEnd := shift.StartCash + cashIn - cashOut
+		expectedCashEnd, err := s.computeExpectedCashEnd(ctx, shift)
+		if err != nil {
+			s.log.Errorf("AutoCloseShifts | compute expected cash shift=%v: %v", shift.ID, err)
+			continue
+		}
 
 		// For auto-close, we assume Actual = Expected to avoid difference.
 		// Or we can just leave actual as nil? The schema allows nil.
 		// But EndShift in repo sets actual_cash_end.
-		_, err := s.repo.EndShift(ctx, repository.EndShiftParams{
+		_, endErr := s.repo.EndShift(ctx, repository.EndShiftParams{
 			ID:              shift.ID,
 			ExpectedCashEnd: &expectedCashEnd,
 			ActualCashEnd:   &expectedCashEnd,
 		})
-		if err != nil {
-			s.log.Errorf("AutoCloseShifts | Failed to close shift %v: %v", shift.ID, err)
+		if endErr != nil {
+			s.log.Errorf("AutoCloseShifts | Failed to close shift %v: %v", shift.ID, endErr)
 			continue
 		}
 

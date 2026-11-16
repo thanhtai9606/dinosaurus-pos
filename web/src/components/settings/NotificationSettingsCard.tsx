@@ -18,6 +18,7 @@ import {
     useTestNotificationChannelMutation,
     useUpdateNotificationChannelMutation,
     useTestReportEmailMutation,
+    useNotificationDeliveriesQuery,
     useUpdateNotificationConfigMutation,
     useUpdateNotificationSubscriptionsMutation,
     type NotificationChannel,
@@ -52,6 +53,8 @@ export function NotificationSettingsCard() {
     const canAdminChannels = canAccessApi('POST', '/notification-channels')
     const canConfig = canAccessApi('PUT', '/notifications/config')
     const canSubscriptions = canAccessApi('PUT', '/notification-subscriptions/me')
+    const canDeliveries = canAccessApi('GET', '/notification-deliveries')
+    const { data: deliveries } = useNotificationDeliveriesQuery(1, 25)
 
     const { data: channels = [], isLoading: channelsLoading } = useNotificationChannelsQuery()
     const { data: eventTypes = [] } = useNotificationEventTypesQuery()
@@ -398,6 +401,41 @@ export function NotificationSettingsCard() {
                                 </span>
                             </>
                         )}
+                    </CardContent>
+                </Card>
+            )}
+
+            {canDeliveries && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('settings.notifications.deliveries_title')}</CardTitle>
+                        <CardDescription>{t('settings.notifications.deliveries_desc')}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="border-b">
+                                    <th className="text-left py-2">{t('settings.notifications.delivery_time')}</th>
+                                    <th className="text-left py-2">{t('settings.notifications.event')}</th>
+                                    <th className="text-left py-2">{t('settings.notifications.delivery_status')}</th>
+                                    <th className="text-left py-2">{t('settings.notifications.delivery_summary')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(deliveries?.items || []).map((row) => (
+                                    <tr key={row.id} className="border-b">
+                                        <td className="py-2 pr-2 whitespace-nowrap">
+                                            {new Date(row.created_at).toLocaleString()}
+                                        </td>
+                                        <td className="py-2 pr-2">{row.event_type}</td>
+                                        <td className="py-2 pr-2">{row.status}</td>
+                                        <td className="py-2 text-muted-foreground max-w-xs truncate">
+                                            {row.error_text || row.payload_summary || '—'}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </CardContent>
                 </Card>
             )}

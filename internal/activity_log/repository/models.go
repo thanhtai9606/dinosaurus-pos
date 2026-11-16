@@ -1248,6 +1248,7 @@ type Order struct {
 	OrderNo                 string             `json:"order_no"`
 	TenantID                uuid.UUID          `json:"tenant_id"`
 	FulfillmentWarehouseID  pgtype.UUID        `json:"fulfillment_warehouse_id"`
+	ShiftID                 pgtype.UUID        `json:"shift_id"`
 }
 
 type OrderItem struct {
@@ -1279,6 +1280,7 @@ type PaymentMethod struct {
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	TenantID  uuid.UUID          `json:"tenant_id"`
+	IsCash    bool               `json:"is_cash"`
 }
 
 type PlatformAuditLog struct {

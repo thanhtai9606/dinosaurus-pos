@@ -10,6 +10,7 @@ import (
 	"dinosaurus-pos/internal/doc_no"
 	"dinosaurus-pos/internal/inventory"
 	"dinosaurus-pos/internal/notifications"
+	shift_repo "dinosaurus-pos/internal/shift/repository"
 	cd_repo "dinosaurus-pos/internal/customer_debts/repository"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	orders_repo "dinosaurus-pos/internal/orders/repository"
@@ -61,9 +62,10 @@ type OrderService struct {
 	log              logger.ILogger
 	wsHub            *ws.Hub
 	events           notifications.EventPublisher
+	shiftRepo        shift_repo.Querier
 }
 
-func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activity_log.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub, events notifications.EventPublisher) IOrderService {
+func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activity_log.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub, events notifications.EventPublisher, shiftRepo shift_repo.Querier) IOrderService {
 	return &OrderService{
 		store:            store,
 		ordersRepo:       ordersRepo,
@@ -74,7 +76,19 @@ func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, products
 		log:              log,
 		wsHub:            wsHub,
 		events:           events,
+		shiftRepo:        shiftRepo,
 	}
+}
+
+func (s *OrderService) shiftIDForUser(ctx context.Context, userID uuid.UUID) pgtype.UUID {
+	if s.shiftRepo == nil {
+		return pgtype.UUID{}
+	}
+	sh, err := s.shiftRepo.GetOpenShiftByUserID(ctx, userID)
+	if err != nil {
+		return pgtype.UUID{}
+	}
+	return pgtype.UUID{Bytes: sh.ID, Valid: true}
 }
 
 var allowedStatusTransitions = map[orders_repo.OrderStatus]map[orders_repo.OrderStatus]bool{
@@ -442,12 +456,17 @@ func (s *OrderService) ConfirmManualPayment(ctx context.Context, orderID uuid.UU
 
 		changeDue := cashReceived - netTotal
 
+		shiftID := pgtype.UUID{}
+		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
+			shiftID = s.shiftIDForUser(ctx, actorID)
+		}
 		_, err = qtx.UpdateOrderManualPayment(ctx, orders_repo.UpdateOrderManualPaymentParams{
 			ID:              orderID,
 			PaymentMethodID: utils.Int32Ptr(int(req.PaymentMethodID)),
 			CashReceived:    &cashReceived,
 			ChangeDue:       &changeDue,
 			Version:         req.Version,
+			ShiftID:         shiftID,
 		})
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
@@ -1280,6 +1299,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			Type:       req.Type,
 			CustomerID: nullCustomerID,
 			OrderNo:    orderNo,
+			ShiftID:    s.shiftIDForUser(ctx, actorID),
 		})
 		if err != nil {
 			return fmt.Errorf("failed to create order header: %w", err)

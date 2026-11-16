@@ -8,7 +8,8 @@ WHERE sd.id = $1;
 SELECT * FROM supplier_debts WHERE stock_receipt_id = $1;
 
 -- name: ListSupplierDebts :many
-SELECT sd.*, s.name AS supplier_name
+SELECT sd.*, s.name AS supplier_name,
+       GREATEST(0, (CURRENT_DATE - sd.issued_at::date))::int AS age_days
 FROM supplier_debts sd
 JOIN suppliers s ON s.id = sd.supplier_id AND s.deleted_at IS NULL
 WHERE (sqlc.narg(supplier_id)::uuid IS NULL OR sd.supplier_id = sqlc.narg(supplier_id))

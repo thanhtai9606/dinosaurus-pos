@@ -6,7 +6,7 @@ import {
     useDeleteStockReceiptMutation,
     useStockReceiptDetailQuery,
 } from '@/lib/api/query/stockReceipts'
-import { stripPaymentFromNote, type StockReceiptPaymentMeta, type StockReceiptPaymentMode } from '@/lib/stock-receipts/paymentNote'
+import { type StockReceiptPaymentMeta, type StockReceiptPaymentMode } from '@/lib/stock-receipts/paymentNote'
 import type { StockReceipt } from '@/lib/api/query/stockReceipts'
 import { useSuppliersListQuery } from '@/lib/api/query/suppliers'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
@@ -63,9 +63,8 @@ export function StockReceiptEditorDialog({
         if (!open) return
         if (receiptId && detail) {
             setSupplierId(detail.supplier_id || '')
-            const parsed = stripPaymentFromNote(detail.note)
-            setNote(parsed.text)
-            setPaymentMeta(resolvePaymentMeta(detail, parsed.meta))
+            setNote(detail.note ?? '')
+            setPaymentMeta(resolvePaymentMeta(detail))
         }
     }, [open, receiptId, detail])
 
@@ -270,15 +269,10 @@ export function StockReceiptEditorDialog({
     )
 }
 
-function resolvePaymentMeta(
-    detail: StockReceipt,
-    fromNote?: StockReceiptPaymentMeta,
-): StockReceiptPaymentMeta | undefined {
-    if (detail.payment_mode) {
-        return {
-            mode: detail.payment_mode as StockReceiptPaymentMode,
-            amount_paid: detail.amount_paid ?? 0,
-        }
+function resolvePaymentMeta(detail: StockReceipt): StockReceiptPaymentMeta | undefined {
+    if (!detail.payment_mode) return undefined
+    return {
+        mode: detail.payment_mode as StockReceiptPaymentMode,
+        amount_paid: detail.amount_paid ?? 0,
     }
-    return fromNote
 }

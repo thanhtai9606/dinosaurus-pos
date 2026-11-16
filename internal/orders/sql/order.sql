@@ -1,6 +1,6 @@
 -- name: CreateOrder :one
-INSERT INTO orders (user_id, type, customer_id, order_no)
-VALUES ($1, $2, $3, $4)
+INSERT INTO orders (user_id, type, customer_id, order_no, shift_id)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: CountOrdersOnDate :one
@@ -245,6 +245,7 @@ SET
     payment_method_id = $2,
     cash_received = $3,
     change_due = $4,
+    shift_id = COALESCE(orders.shift_id, $6),
     status = CASE WHEN status = 'open' THEN 'in_progress'::order_status ELSE status END,
     version = version + 1
 WHERE

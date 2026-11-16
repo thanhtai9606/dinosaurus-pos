@@ -348,6 +348,7 @@
             "total": "Total",
             "paid": "Paid",
             "balance": "Balance due",
+            "age_days": "Age (days)",
             "amount": "Amount",
             "note": "Note",
             "date": "Date"
@@ -766,7 +767,12 @@
                 "monthly": "Monthly",
                 "yearly": "Yearly"
             },
-            "report_test": "Send test"
+            "report_test": "Send test",
+            "deliveries_title": "Delivery log",
+            "deliveries_desc": "Recent notification sends.",
+            "delivery_time": "Time",
+            "delivery_status": "Status",
+            "delivery_summary": "Summary / error"
         },
         "preferences": {
             "title": "Display & language",

@@ -130,6 +130,7 @@ function SupplierDebtsPage() {
                                 <TableHead>{t('debts.fields.reference')}</TableHead>
                                 <TableHead>{t('supplierDebts.fields.supplier')}</TableHead>
                                 <TableHead>{t('debts.fields.status')}</TableHead>
+                                <TableHead className="text-right">{t('debts.fields.age_days')}</TableHead>
                                 <TableHead className="text-right">{t('debts.fields.total')}</TableHead>
                                 <TableHead className="text-right">{t('debts.fields.balance')}</TableHead>
                             </TableRow>
@@ -146,6 +147,7 @@ function SupplierDebtsPage() {
                                     <TableCell>
                                         <Badge variant="secondary">{t(`debts.status.${d.status}`, d.status)}</Badge>
                                     </TableCell>
+                                    <TableCell className="text-right">{d.age_days ?? 0}</TableCell>
                                     <TableCell className="text-right">{formatMoney(d.total_amount)}</TableCell>
                                     <TableCell className="text-right font-medium">{formatMoney(d.balance_due)}</TableCell>
                                 </TableRow>

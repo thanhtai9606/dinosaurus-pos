@@ -135,6 +135,7 @@
         "retail_pos": "Retail POS",
         "dining_tables": "Dining tables",
         "kitchen": "Kitchen / KDS",
+        "general": "General",
         "tenants_admin": "Stores (tenants)",
         "platform": "Platform",
         "platform_overview": "Overview",
@@ -729,7 +730,20 @@
             "printer": "Printer",
             "financial": "Financial",
             "invoice": "Invoice / Receipt",
-            "notifications": "Notifications"
+            "notifications": "Notifications",
+            "permissions": "Roles & menu"
+        },
+        "permissions": {
+            "menu_title": "Menu by role",
+            "menu_description": "Choose which sidebar items each role can see. Admin always keeps Settings and Users.",
+            "menu_column": "Menu item",
+            "api_title": "Key API rules (reference)",
+            "api_description": "Subset of generated RBAC rules; change via Swagger @x-roles in development.",
+            "api_column": "Endpoint",
+            "roles_column": "Allowed roles",
+            "saved": "Menu permissions saved",
+            "save_failed": "Failed to save menu permissions",
+            "admin_lock": "Cannot remove admin access from a locked item"
         },
         "notifications": {
             "threshold_title": "Alert thresholds",

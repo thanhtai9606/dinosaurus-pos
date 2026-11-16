@@ -137,6 +137,7 @@
         "retail_pos": "Bán hàng POS",
         "dining_tables": "Bàn ăn",
         "kitchen": "Bếp / KDS",
+        "general": "Chung",
         "tenants_admin": "Quản lý cửa hàng",
         "platform": "Nền tảng",
         "platform_overview": "Tổng quan",
@@ -767,7 +768,20 @@
             "printer": "Máy in",
             "financial": "Tài chính",
             "invoice": "Hóa đơn / Biên lai",
-            "notifications": "Thông báo"
+            "notifications": "Thông báo",
+            "permissions": "Phân quyền & menu"
+        },
+        "permissions": {
+            "menu_title": "Menu theo vai trò",
+            "menu_description": "Chọn vai trò nào thấy từng mục trên sidebar. Admin luôn giữ quyền Cài đặt và Người dùng.",
+            "menu_column": "Mục menu",
+            "api_title": "API chính (tham chiếu)",
+            "api_description": "Danh sách rút gọn từ quy tắc RBAC hệ thống; chỉnh qua Swagger/@x-roles khi phát triển.",
+            "api_column": "Endpoint",
+            "roles_column": "Vai trò được phép",
+            "saved": "Đã lưu phân quyền menu",
+            "save_failed": "Không lưu được phân quyền menu",
+            "admin_lock": "Không thể bỏ quyền admin trên mục bắt buộc"
         },
         "notifications": {
             "threshold_title": "Ngưỡng cảnh báo",

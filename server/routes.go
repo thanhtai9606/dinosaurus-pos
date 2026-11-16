@@ -185,6 +185,9 @@ func SetupRoutes(app *App, container *AppContainer) {
 		settingsGroup.Get("/invoice", container.SettingsHandler.GetInvoiceSettingsHandler)
 		settingsGroup.Put("/invoice", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateInvoiceSettingsHandler)
 		settingsGroup.Post("/invoice", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateInvoiceSettingsHandler)
+
+		settingsGroup.Get("/menu-access", container.SettingsHandler.GetMenuRoleAccessHandler)
+		settingsGroup.Put("/menu-access", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateMenuRoleAccessHandler)
 		settingsGroup.Get("/printer/discover", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.PrinterHandler.DiscoverPrintersHandler)
 		settingsGroup.Post("/printer/test", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.PrinterHandler.TestPrintHandler)
 	}

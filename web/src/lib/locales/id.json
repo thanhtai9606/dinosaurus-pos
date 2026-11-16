@@ -137,6 +137,7 @@
         "retail_pos": "POS ritel",
         "dining_tables": "Meja",
         "kitchen": "Dapur / KDS",
+        "general": "Umum",
         "tenants_admin": "Kelola toko (tenant)",
         "platform": "Platform",
         "platform_overview": "Ringkasan",
@@ -735,7 +736,20 @@
             "printer": "Printer",
             "financial": "Keuangan",
             "invoice": "Faktur / Struk",
-            "notifications": "Notifikasi"
+            "notifications": "Notifikasi",
+            "permissions": "Peran & menu"
+        },
+        "permissions": {
+            "menu_title": "Menu menurut peran",
+            "menu_description": "Pilih item sidebar yang dapat dilihat setiap peran. Admin selalu memiliki Pengaturan dan Pengguna.",
+            "menu_column": "Item menu",
+            "api_title": "Aturan API utama (referensi)",
+            "api_description": "Cuplikan dari aturan RBAC; ubah lewat Swagger @x-roles saat development.",
+            "api_column": "Endpoint",
+            "roles_column": "Peran diizinkan",
+            "saved": "Izin menu disimpan",
+            "save_failed": "Gagal menyimpan izin menu",
+            "admin_lock": "Tidak dapat menghapus akses admin pada item terkunci"
         },
         "notifications": {
             "threshold_title": "Ambang peringatan",

@@ -16,6 +16,8 @@ import (
 	customer_groups_repo "dinosaurus-pos/internal/customer_groups/repository"
 	"dinosaurus-pos/internal/measurement_units"
 	measurement_units_repo "dinosaurus-pos/internal/measurement_units/repository"
+	"dinosaurus-pos/internal/notifications"
+	notif_repo "dinosaurus-pos/internal/notifications/repository"
 	"dinosaurus-pos/internal/stock_ops"
 	ops_repo "dinosaurus-pos/internal/stock_ops/repository"
 	"dinosaurus-pos/internal/stock_receipts"
@@ -129,6 +131,7 @@ type AppContainer struct {
 	ShiftHandler              shift.Handler
 	TenantHandler             *tenants.Handler
 	PlatformHandler           *platform.Handler
+	NotificationHandler       notifications.IHandler
 	ShiftRepo                 shift_repo.Querier
 	ShiftService              shift.Service
 	WSHub                     *ws.Hub
@@ -274,9 +277,14 @@ func BuildAppContainer(app *App) *AppContainer {
 	supplierService := suppliers.NewSupplierService(supplierRepo, app.Logger)
 	supplierHandler := suppliers.NewSupplierHandler(supplierService, app.Logger)
 
+	settingsRepo := settings_repo.New(tenantDB)
+	notificationRepo := notif_repo.New(tenantDB)
+	notificationService := notifications.NewService(notificationRepo, settingsRepo, app.Logger)
+	notificationHandler := notifications.NewHandler(notificationService, app.Logger)
+
 	// Stock receipt Module
 	stockReceiptRepo := sr_repo.New(tenantDB)
-	stockReceiptService := stock_receipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger)
+	stockReceiptService := stock_receipts.NewStockReceiptService(stockReceiptRepo, app.Store, app.Logger, notificationService)
 	stockReceiptHandler := stock_receipts.NewStockReceiptHandler(stockReceiptService, app.Logger)
 
 	supplierDebtRepo := sd_debts_repo.New(tenantDB)
@@ -314,7 +322,7 @@ func BuildAppContainer(app *App) *AppContainer {
 						tenantIDs = append(tenantIDs, t.ID)
 					}
 				}
-				svc := products.NewPrdService(app.Store, products_repo.New(tenantDB), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer, productListCache)
+				svc := products.NewPrdService(app.Store, products_repo.New(tenantDB), app.Logger, products.NewProductImageRepository(app.R2, app.Logger), activityService, productIndexer, productListCache, nil)
 				if n, err := svc.ReindexProductSearchAllTenants(reindexCtx, tenantIDs); err != nil {
 					app.Logger.Warnf("Meilisearch auto-reindex failed: %v", err)
 				} else {
@@ -327,20 +335,19 @@ func BuildAppContainer(app *App) *AppContainer {
 	// Product Module
 	prdRepo := products.NewProductImageRepository(app.R2, app.Logger)
 	productsRepo := products_repo.New(tenantDB)
-	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService, productIndexer, productListCache)
+	prdService := products.NewPrdService(app.Store, productsRepo, app.Logger, prdRepo, activityService, productIndexer, productListCache, notificationService)
 	prdHandler := products.NewPrdHandler(prdService, app.Logger)
 
 	// Shift Module Repo
 	shiftRepo := shift_repo.New(tenantDB)
 
 	// Settings Module (needed by orders & printer)
-	settingsRepo := settings_repo.New(tenantDB)
 	settingsService := settings.NewSettingsService(app.Store, activityService, settingsRepo, app.R2, app.Logger)
 	settingsHandler := settings.NewSettingsHandler(settingsService, app.Logger)
 
 	// Order & Payment Module
 	ordersRepo := orders_repo.New(tenantDB)
-	orderService := orders.NewOrderService(app.Store, ordersRepo, productsRepo, app.MidtransService, activityService, settingsService, app.Logger, wsHub)
+	orderService := orders.NewOrderService(app.Store, ordersRepo, productsRepo, app.MidtransService, activityService, settingsService, app.Logger, wsHub, notificationService)
 	orderHandler := orders.NewOrderHandler(orderService, app.Logger)
 
 	// Payment Method Module
@@ -396,6 +403,7 @@ func BuildAppContainer(app *App) *AppContainer {
 		ShiftHandler:              shiftHandler,
 		TenantHandler:             tenantHandler,
 		PlatformHandler:           platformHandler,
+		NotificationHandler:       notificationHandler,
 		ShiftRepo:                 shiftRepo,
 		ShiftService:              shiftService,
 		WSHub:                     wsHub,

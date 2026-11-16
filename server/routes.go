@@ -145,6 +145,21 @@ func SetupRoutes(app *App, container *AppContainer) {
 		promotionsWriteGroup.Post("/:id/restore", container.PromotionHandler.RestorePromotionHandler)
 	}
 
+	notificationGroup := api.Group("/notification-channels", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
+	{
+		notificationGroup.Get("/", container.NotificationHandler.ListChannelsHandler)
+		notificationGroup.Post("/", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.CreateChannelHandler)
+		notificationGroup.Put("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.UpdateChannelHandler)
+		notificationGroup.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.DeleteChannelHandler)
+		notificationGroup.Post("/:id/test", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.TestChannelHandler)
+	}
+	api.Get("/notification-event-types", authMiddleware, container.NotificationHandler.ListEventTypesHandler)
+	api.Get("/notification-subscriptions/me", authMiddleware, container.NotificationHandler.GetMySubscriptionsHandler)
+	api.Put("/notification-subscriptions/me", authMiddleware, container.NotificationHandler.UpdateMySubscriptionsHandler)
+	api.Get("/notification-deliveries", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.ListDeliveriesHandler)
+	api.Get("/notifications/config", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.GetTenantConfigHandler)
+	api.Put("/notifications/config", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.UpdateTenantConfigHandler)
+
 	settingsGroup := api.Group("/settings", authMiddleware)
 	{
 		settingsGroup.Get("/branding", container.SettingsHandler.GetBrandingHandler)

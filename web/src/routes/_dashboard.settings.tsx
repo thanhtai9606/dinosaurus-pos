@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Ban, CreditCard, Palette, Printer, DollarSign, FileText, SlidersHorizontal } from 'lucide-react'
+import { Ban, Bell, CreditCard, Palette, Printer, DollarSign, FileText, SlidersHorizontal } from 'lucide-react'
+import { NotificationSettingsCard } from '@/components/settings/NotificationSettingsCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CancellationReasonsCard } from "@/components/settings/CancellationReasonsCard.tsx";
 import { PaymentMethodsCard } from "@/components/settings/PaymentMethodsCard.tsx";
@@ -28,6 +29,10 @@ function SettingsPage() {
     const canViewPrinter = canAccessApi('GET', '/settings/printer')
     const canViewFinancial = canAccessApi('GET', '/settings/financial')
     const canViewInvoice = canAccessApi('GET', '/settings/invoice')
+    const canViewNotifications =
+        canAccessApi('GET', '/notification-event-types') ||
+        canAccessApi('GET', '/notification-channels') ||
+        canAccessApi('GET', '/notification-subscriptions/me')
 
     return (
         <div className="flex flex-col gap-6">
@@ -78,6 +83,12 @@ function SettingsPage() {
                             {t('settings.tabs.invoice')}
                         </TabsTrigger>
                     )}
+                    {canViewNotifications && (
+                        <TabsTrigger value="notifications" className="flex items-center gap-2">
+                            <Bell className="h-4 w-4" />
+                            {t('settings.tabs.notifications')}
+                        </TabsTrigger>
+                    )}
                 </TabsList>
 
                 <TabsContent value="preferences">
@@ -121,6 +132,11 @@ function SettingsPage() {
                 {canViewInvoice && (
                     <TabsContent value="invoice">
                         <InvoiceSettingsCard />
+                    </TabsContent>
+                )}
+                {canViewNotifications && (
+                    <TabsContent value="notifications">
+                        <NotificationSettingsCard />
                     </TabsContent>
                 )}
             </Tabs>

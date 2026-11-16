@@ -387,6 +387,46 @@ export const RBAC_RULES: Record<string, string[]> = {
     "POST /settings/printer/test": [
         "admin"
     ],
+    "GET /notification-event-types": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /notification-channels": [
+        "admin",
+        "manager"
+    ],
+    "POST /notification-channels": [
+        "admin"
+    ],
+    "PUT /notification-channels/{id}": [
+        "admin"
+    ],
+    "DELETE /notification-channels/{id}": [
+        "admin"
+    ],
+    "POST /notification-channels/{id}/test": [
+        "admin"
+    ],
+    "GET /notification-subscriptions/me": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PUT /notification-subscriptions/me": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /notification-deliveries": [
+        "admin"
+    ],
+    "GET /notifications/config": [
+        "admin"
+    ],
+    "PUT /notifications/config": [
+        "admin"
+    ],
     "POST /shifts/cash-transaction": [
         "admin",
         "manager",

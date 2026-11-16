@@ -37,7 +37,7 @@ INSERT INTO stock_history (
     created_by
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9
-) RETURNING id, product_id, warehouse_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at
+) RETURNING id, product_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at, warehouse_id
 `
 
 type CreateStockHistoryParams struct {
@@ -68,7 +68,6 @@ func (q *Queries) CreateStockHistory(ctx context.Context, arg CreateStockHistory
 	err := row.Scan(
 		&i.ID,
 		&i.ProductID,
-		&i.WarehouseID,
 		&i.ChangeAmount,
 		&i.PreviousStock,
 		&i.CurrentStock,
@@ -77,12 +76,13 @@ func (q *Queries) CreateStockHistory(ctx context.Context, arg CreateStockHistory
 		&i.Note,
 		&i.CreatedBy,
 		&i.CreatedAt,
+		&i.WarehouseID,
 	)
 	return i, err
 }
 
 const getStockHistoryByProduct = `-- name: GetStockHistoryByProduct :many
-SELECT id, product_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at FROM stock_history
+SELECT id, product_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at, warehouse_id FROM stock_history
 WHERE product_id = $1
 ORDER BY created_at DESC
 `
@@ -107,6 +107,7 @@ func (q *Queries) GetStockHistoryByProduct(ctx context.Context, productID uuid.U
 			&i.Note,
 			&i.CreatedBy,
 			&i.CreatedAt,
+			&i.WarehouseID,
 		); err != nil {
 			return nil, err
 		}
@@ -119,7 +120,7 @@ func (q *Queries) GetStockHistoryByProduct(ctx context.Context, productID uuid.U
 }
 
 const getStockHistoryByProductWithPagination = `-- name: GetStockHistoryByProductWithPagination :many
-SELECT id, product_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at FROM stock_history
+SELECT id, product_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at, warehouse_id FROM stock_history
 WHERE product_id = $1
 ORDER BY created_at DESC
 LIMIT $2 OFFSET $3
@@ -151,6 +152,7 @@ func (q *Queries) GetStockHistoryByProductWithPagination(ctx context.Context, ar
 			&i.Note,
 			&i.CreatedBy,
 			&i.CreatedAt,
+			&i.WarehouseID,
 		); err != nil {
 			return nil, err
 		}

@@ -9,6 +9,7 @@ import (
 	"dinosaurus-pos/internal/customer_debts"
 	"dinosaurus-pos/internal/doc_no"
 	"dinosaurus-pos/internal/inventory"
+	"dinosaurus-pos/internal/notifications"
 	cd_repo "dinosaurus-pos/internal/customer_debts/repository"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	orders_repo "dinosaurus-pos/internal/orders/repository"
@@ -59,9 +60,10 @@ type OrderService struct {
 	settingsService  settings.ISettingsService
 	log              logger.ILogger
 	wsHub            *ws.Hub
+	events           notifications.EventPublisher
 }
 
-func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activity_log.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub) IOrderService {
+func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activity_log.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub, events notifications.EventPublisher) IOrderService {
 	return &OrderService{
 		store:            store,
 		ordersRepo:       ordersRepo,
@@ -69,8 +71,9 @@ func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, products
 		midtransService:  midtransService,
 		activityService:  activityService,
 		settingsService:  settingsService,
-		log:             log,
-		wsHub:           wsHub,
+		log:              log,
+		wsHub:            wsHub,
+		events:           events,
 	}
 }
 
@@ -991,6 +994,11 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID uuid.UUID, req C
 		s.wsHub.BroadcastEvent(ws.EventOrderUpdated, map[string]interface{}{"order_id": orderID})
 	}
 
+	if s.events != nil {
+		subject := fmt.Sprintf("Order %s cancelled", orderID)
+		s.events.PublishAsync(ctx, notifications.EventOrderCancelled, subject, subject)
+	}
+
 	return nil
 }
 
@@ -1566,6 +1574,16 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 
 	if s.wsHub != nil {
 		s.wsHub.BroadcastEvent(ws.EventOrderCreated, map[string]interface{}{"order_id": newOrderID})
+	}
+
+	if s.events != nil {
+		subject := fmt.Sprintf("Order %s created", finalOrder.OrderNo)
+		body := fmt.Sprintf("New order %s — net total %d", finalOrder.OrderNo, finalOrder.NetTotal)
+		s.events.PublishAsync(ctx, notifications.EventOrderCreated, subject, body)
+		if finalOrder.CustomerID.Valid && finalOrder.Status != orders_repo.OrderStatusPaid && finalOrder.NetTotal > 0 {
+			debtSubject := fmt.Sprintf("Customer debt for order %s", finalOrder.OrderNo)
+			s.events.PublishAsync(ctx, notifications.EventCustomerDebtCreated, debtSubject, debtSubject)
+		}
 	}
 
 	return s.buildOrderDetailResponseFromQueryResult(ctx, finalOrder)

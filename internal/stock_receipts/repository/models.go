@@ -241,6 +241,92 @@ func (ns NullLogEntityType) Value() (driver.Value, error) {
 	return string(ns.LogEntityType), nil
 }
 
+type NotificationChannelType string
+
+const (
+	NotificationChannelTypeEmail          NotificationChannelType = "email"
+	NotificationChannelTypeMsteamsWebhook NotificationChannelType = "msteams_webhook"
+	NotificationChannelTypeTelegram       NotificationChannelType = "telegram"
+	NotificationChannelTypeSms            NotificationChannelType = "sms"
+)
+
+func (e *NotificationChannelType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = NotificationChannelType(s)
+	case string:
+		*e = NotificationChannelType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for NotificationChannelType: %T", src)
+	}
+	return nil
+}
+
+type NullNotificationChannelType struct {
+	NotificationChannelType NotificationChannelType `json:"notification_channel_type"`
+	Valid                   bool                    `json:"valid"` // Valid is true if NotificationChannelType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullNotificationChannelType) Scan(value interface{}) error {
+	if value == nil {
+		ns.NotificationChannelType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.NotificationChannelType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullNotificationChannelType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.NotificationChannelType), nil
+}
+
+type NotificationDeliveryStatus string
+
+const (
+	NotificationDeliveryStatusSent   NotificationDeliveryStatus = "sent"
+	NotificationDeliveryStatusFailed NotificationDeliveryStatus = "failed"
+)
+
+func (e *NotificationDeliveryStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = NotificationDeliveryStatus(s)
+	case string:
+		*e = NotificationDeliveryStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for NotificationDeliveryStatus: %T", src)
+	}
+	return nil
+}
+
+type NullNotificationDeliveryStatus struct {
+	NotificationDeliveryStatus NotificationDeliveryStatus `json:"notification_delivery_status"`
+	Valid                      bool                       `json:"valid"` // Valid is true if NotificationDeliveryStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullNotificationDeliveryStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.NotificationDeliveryStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.NotificationDeliveryStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullNotificationDeliveryStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.NotificationDeliveryStatus), nil
+}
+
 type OrderStatus string
 
 const (
@@ -544,11 +630,14 @@ func (ns NullSortOrder) Value() (driver.Value, error) {
 type StockChangeType string
 
 const (
-	StockChangeTypeSale       StockChangeType = "sale"
-	StockChangeTypeRestock    StockChangeType = "restock"
-	StockChangeTypeCorrection StockChangeType = "correction"
-	StockChangeTypeReturn     StockChangeType = "return"
-	StockChangeTypeDamage     StockChangeType = "damage"
+	StockChangeTypeSale        StockChangeType = "sale"
+	StockChangeTypeRestock     StockChangeType = "restock"
+	StockChangeTypeCorrection  StockChangeType = "correction"
+	StockChangeTypeReturn      StockChangeType = "return"
+	StockChangeTypeDamage      StockChangeType = "damage"
+	StockChangeTypeTransferOut StockChangeType = "transfer_out"
+	StockChangeTypeTransferIn  StockChangeType = "transfer_in"
+	StockChangeTypeCount       StockChangeType = "count"
 )
 
 func (e *StockChangeType) Scan(src interface{}) error {
@@ -584,6 +673,49 @@ func (ns NullStockChangeType) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.StockChangeType), nil
+}
+
+type StockDocStatus string
+
+const (
+	StockDocStatusDraft     StockDocStatus = "draft"
+	StockDocStatusCompleted StockDocStatus = "completed"
+	StockDocStatusCancelled StockDocStatus = "cancelled"
+)
+
+func (e *StockDocStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = StockDocStatus(s)
+	case string:
+		*e = StockDocStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for StockDocStatus: %T", src)
+	}
+	return nil
+}
+
+type NullStockDocStatus struct {
+	StockDocStatus StockDocStatus `json:"stock_doc_status"`
+	Valid          bool           `json:"valid"` // Valid is true if StockDocStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullStockDocStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.StockDocStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.StockDocStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullStockDocStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.StockDocStatus), nil
 }
 
 type StockReceiptPaymentMode string
@@ -669,6 +801,50 @@ func (ns NullStockReceiptStatus) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.StockReceiptStatus), nil
+}
+
+type StockTakeStatus string
+
+const (
+	StockTakeStatusDraft     StockTakeStatus = "draft"
+	StockTakeStatusCounting  StockTakeStatus = "counting"
+	StockTakeStatusPosted    StockTakeStatus = "posted"
+	StockTakeStatusCancelled StockTakeStatus = "cancelled"
+)
+
+func (e *StockTakeStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = StockTakeStatus(s)
+	case string:
+		*e = StockTakeStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for StockTakeStatus: %T", src)
+	}
+	return nil
+}
+
+type NullStockTakeStatus struct {
+	StockTakeStatus StockTakeStatus `json:"stock_take_status"`
+	Valid           bool            `json:"valid"` // Valid is true if StockTakeStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullStockTakeStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.StockTakeStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.StockTakeStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullStockTakeStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.StockTakeStatus), nil
 }
 
 type TenantDataPlane string
@@ -891,6 +1067,56 @@ type CustomerGroup struct {
 	DeletedAt   pgtype.Timestamptz `json:"deleted_at"`
 }
 
+type MeasurementUnit struct {
+	ID        uuid.UUID          `json:"id"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
+	Code      string             `json:"code"`
+	Name      string             `json:"name"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+}
+
+type NotificationChannel struct {
+	ID          uuid.UUID               `json:"id"`
+	TenantID    uuid.UUID               `json:"tenant_id"`
+	Name        string                  `json:"name"`
+	ChannelType NotificationChannelType `json:"channel_type"`
+	ConfigJson  []byte                  `json:"config_json"`
+	Enabled     bool                    `json:"enabled"`
+	CreatedAt   pgtype.Timestamptz      `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz      `json:"updated_at"`
+}
+
+type NotificationDelivery struct {
+	ID             uuid.UUID                  `json:"id"`
+	TenantID       uuid.UUID                  `json:"tenant_id"`
+	EventType      string                     `json:"event_type"`
+	ChannelID      pgtype.UUID                `json:"channel_id"`
+	UserID         pgtype.UUID                `json:"user_id"`
+	Status         NotificationDeliveryStatus `json:"status"`
+	ErrorText      *string                    `json:"error_text"`
+	PayloadSummary *string                    `json:"payload_summary"`
+	CreatedAt      pgtype.Timestamptz         `json:"created_at"`
+}
+
+type NotificationEventType struct {
+	Code        string  `json:"code"`
+	Label       string  `json:"label"`
+	Description *string `json:"description"`
+}
+
+type NotificationSubscription struct {
+	ID        uuid.UUID          `json:"id"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
+	UserID    uuid.UUID          `json:"user_id"`
+	EventType string             `json:"event_type"`
+	ChannelID uuid.UUID          `json:"channel_id"`
+	Enabled   bool               `json:"enabled"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Order struct {
 	ID                      uuid.UUID          `json:"id"`
 	UserID                  pgtype.UUID        `json:"user_id"`
@@ -916,6 +1142,7 @@ type Order struct {
 	CustomerID              pgtype.UUID        `json:"customer_id"`
 	OrderNo                 string             `json:"order_no"`
 	TenantID                uuid.UUID          `json:"tenant_id"`
+	FulfillmentWarehouseID  pgtype.UUID        `json:"fulfillment_warehouse_id"`
 }
 
 type OrderItem struct {
@@ -996,18 +1223,20 @@ type ProductOption struct {
 }
 
 type ProductUnit struct {
-	ID           uuid.UUID          `json:"id"`
-	ProductID    uuid.UUID          `json:"product_id"`
-	Name         string             `json:"name"`
-	IsBase       bool               `json:"is_base"`
-	FactorToBase pgtype.Numeric     `json:"factor_to_base"`
-	SellPrice    int64              `json:"sell_price"`
-	Barcode      *string            `json:"barcode"`
-	Sku          *string            `json:"sku"`
-	SortOrder    int32              `json:"sort_order"`
-	CreatedAt    pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
-	DeletedAt    pgtype.Timestamptz `json:"deleted_at"`
+	ID                uuid.UUID          `json:"id"`
+	ProductID         uuid.UUID          `json:"product_id"`
+	Name              string             `json:"name"`
+	IsBase            bool               `json:"is_base"`
+	FactorToBase      pgtype.Numeric     `json:"factor_to_base"`
+	SellPrice         int64              `json:"sell_price"`
+	Barcode           *string            `json:"barcode"`
+	Sku               *string            `json:"sku"`
+	SortOrder         int32              `json:"sort_order"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
+	DeletedAt         pgtype.Timestamptz `json:"deleted_at"`
+	MeasurementUnitID pgtype.UUID        `json:"measurement_unit_id"`
+	WholesalePrice    int64              `json:"wholesale_price"`
 }
 
 type Promotion struct {
@@ -1068,6 +1297,29 @@ type Shift struct {
 	TenantID        uuid.UUID          `json:"tenant_id"`
 }
 
+type StockAdjustment struct {
+	ID          uuid.UUID          `json:"id"`
+	TenantID    uuid.UUID          `json:"tenant_id"`
+	DocNo       string             `json:"doc_no"`
+	WarehouseID uuid.UUID          `json:"warehouse_id"`
+	Status      StockDocStatus     `json:"status"`
+	Reason      StockChangeType    `json:"reason"`
+	Note        *string            `json:"note"`
+	CreatedBy   pgtype.UUID        `json:"created_by"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	CompletedAt pgtype.Timestamptz `json:"completed_at"`
+}
+
+type StockAdjustmentItem struct {
+	ID            uuid.UUID          `json:"id"`
+	AdjustmentID  uuid.UUID          `json:"adjustment_id"`
+	ProductID     uuid.UUID          `json:"product_id"`
+	QuantityDelta int32              `json:"quantity_delta"`
+	Note          *string            `json:"note"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+}
+
 type StockHistory struct {
 	ID            uuid.UUID          `json:"id"`
 	ProductID     uuid.UUID          `json:"product_id"`
@@ -1079,6 +1331,7 @@ type StockHistory struct {
 	Note          *string            `json:"note"`
 	CreatedBy     pgtype.UUID        `json:"created_by"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	WarehouseID   pgtype.UUID        `json:"warehouse_id"`
 }
 
 type StockReceipt struct {
@@ -1106,6 +1359,51 @@ type StockReceiptItem struct {
 	LineTotal     pgtype.Numeric     `json:"line_total"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 	UnitSellPrice pgtype.Numeric     `json:"unit_sell_price"`
+}
+
+type StockTake struct {
+	ID          uuid.UUID          `json:"id"`
+	TenantID    uuid.UUID          `json:"tenant_id"`
+	DocNo       string             `json:"doc_no"`
+	WarehouseID uuid.UUID          `json:"warehouse_id"`
+	Status      StockTakeStatus    `json:"status"`
+	Note        *string            `json:"note"`
+	CreatedBy   pgtype.UUID        `json:"created_by"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	PostedAt    pgtype.Timestamptz `json:"posted_at"`
+}
+
+type StockTakeItem struct {
+	ID          uuid.UUID          `json:"id"`
+	StockTakeID uuid.UUID          `json:"stock_take_id"`
+	ProductID   uuid.UUID          `json:"product_id"`
+	SystemQty   int32              `json:"system_qty"`
+	CountedQty  *int32             `json:"counted_qty"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type StockTransfer struct {
+	ID              uuid.UUID          `json:"id"`
+	TenantID        uuid.UUID          `json:"tenant_id"`
+	DocNo           string             `json:"doc_no"`
+	FromWarehouseID uuid.UUID          `json:"from_warehouse_id"`
+	ToWarehouseID   uuid.UUID          `json:"to_warehouse_id"`
+	Status          StockDocStatus     `json:"status"`
+	Note            *string            `json:"note"`
+	CreatedBy       pgtype.UUID        `json:"created_by"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+	CompletedAt     pgtype.Timestamptz `json:"completed_at"`
+}
+
+type StockTransferItem struct {
+	ID         uuid.UUID          `json:"id"`
+	TransferID uuid.UUID          `json:"transfer_id"`
+	ProductID  uuid.UUID          `json:"product_id"`
+	Quantity   int32              `json:"quantity"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 }
 
 type Supplier struct {
@@ -1159,7 +1457,9 @@ type Tenant struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	DataPlane TenantDataPlane    `json:"data_plane"`
 	// Name of env var holding DSN for dedicated DB, e.g. TENANT_DSN_ACME. Never store password in this table.
-	DatabaseDsnKey *string `json:"database_dsn_key"`
+	DatabaseDsnKey   *string `json:"database_dsn_key"`
+	MarketCode       string  `json:"market_code"`
+	BusinessVertical string  `json:"business_vertical"`
 }
 
 type TenantUser struct {
@@ -1181,4 +1481,26 @@ type User struct {
 	IsActive     bool               `json:"is_active"`
 	DeletedAt    pgtype.Timestamptz `json:"deleted_at"`
 	RefreshToken *string            `json:"refresh_token"`
+}
+
+type Warehouse struct {
+	ID        uuid.UUID          `json:"id"`
+	TenantID  uuid.UUID          `json:"tenant_id"`
+	Code      string             `json:"code"`
+	Name      string             `json:"name"`
+	IsDefault bool               `json:"is_default"`
+	IsActive  bool               `json:"is_active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type WarehouseStock struct {
+	ID          uuid.UUID          `json:"id"`
+	TenantID    uuid.UUID          `json:"tenant_id"`
+	WarehouseID uuid.UUID          `json:"warehouse_id"`
+	ProductID   uuid.UUID          `json:"product_id"`
+	Quantity    int32              `json:"quantity"`
+	MinStock    int32              `json:"min_stock"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
 }

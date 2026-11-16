@@ -165,6 +165,17 @@ Package Go mirror: `internal/supplier_debts`, `internal/customer_debts` — wire
 
 ---
 
+## Thông báo đa kênh (notifications)
+
+- Package: `internal/notifications` — kênh tenant (`notification_channels`), đăng ký user (`notification_subscriptions`), log giao hàng (`notification_deliveries`).
+- Kênh MVP: `email` (SMTP), `msteams_webhook`, `telegram`, `sms` (interface — chưa gửi thật).
+- Admin: CRUD kênh, test send, `GET/PUT /notifications/config` (ngưỡng `stock_low_threshold` trong settings key `notifications`).
+- User: `GET/PUT /notification-subscriptions/me` — ma trận sự kiện × kênh.
+- Sự kiện: `order.created`, `order.cancelled`, `stock.low`, `supplier_debt.created`, `customer_debt.created`, `stock_receipt.completed` — hook trong orders / products / stock_receipts.
+- FE: tab **Thông báo** trong Cài đặt (`NotificationSettingsCard.tsx`).
+
+---
+
 ## Lệnh hữu ích
 
 ```bash

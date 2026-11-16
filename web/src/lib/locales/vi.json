@@ -731,7 +731,29 @@
             "branding": "Branding",
             "printer": "Máy in",
             "financial": "Tài chính",
-            "invoice": "Hóa đơn / Biên lai"
+            "invoice": "Hóa đơn / Biên lai",
+            "notifications": "Thông báo"
+        },
+        "notifications": {
+            "threshold_title": "Ngưỡng cảnh báo",
+            "threshold_desc": "Gửi thông báo khi tồn kho sản phẩm ở hoặc dưới mức này.",
+            "stock_threshold": "Ngưỡng tồn thấp",
+            "channels_title": "Kênh thông báo",
+            "channels_desc": "Cấu hình email, Microsoft Teams, Telegram hoặc SMS (MVP: SMS chưa gửi thật).",
+            "add_channel": "Thêm kênh",
+            "channel_name": "Tên kênh",
+            "enabled": "Bật",
+            "test": "Gửi thử",
+            "subscriptions_title": "Đăng ký của tôi",
+            "subscriptions_desc": "Chọn sự kiện và kênh bạn muốn nhận thông báo.",
+            "event": "Sự kiện",
+            "save_subscriptions": "Lưu đăng ký",
+            "channel_types": {
+                "email": "Email (SMTP)",
+                "msteams_webhook": "Microsoft Teams",
+                "telegram": "Telegram",
+                "sms": "SMS"
+            }
         },
         "preferences": {
             "title": "Hiển thị & ngôn ngữ",

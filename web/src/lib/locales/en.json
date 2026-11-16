@@ -725,7 +725,29 @@
             "branding": "Branding",
             "printer": "Printer",
             "financial": "Financial",
-            "invoice": "Invoice / Receipt"
+            "invoice": "Invoice / Receipt",
+            "notifications": "Notifications"
+        },
+        "notifications": {
+            "threshold_title": "Alert thresholds",
+            "threshold_desc": "Notify when product stock is at or below this level.",
+            "stock_threshold": "Low stock threshold",
+            "channels_title": "Notification channels",
+            "channels_desc": "Configure email, Microsoft Teams, Telegram, or SMS (SMS send is not implemented yet).",
+            "add_channel": "Add channel",
+            "channel_name": "Channel name",
+            "enabled": "Enabled",
+            "test": "Test send",
+            "subscriptions_title": "My subscriptions",
+            "subscriptions_desc": "Choose which events and channels you want to receive.",
+            "event": "Event",
+            "save_subscriptions": "Save subscriptions",
+            "channel_types": {
+                "email": "Email (SMTP)",
+                "msteams_webhook": "Microsoft Teams",
+                "telegram": "Telegram",
+                "sms": "SMS"
+            }
         },
         "preferences": {
             "title": "Display & language",

@@ -10,6 +10,7 @@ import (
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/inventory"
+	"dinosaurus-pos/internal/notifications"
 	products_repo "dinosaurus-pos/internal/products/repository"
 	"dinosaurus-pos/internal/tenant"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
@@ -34,13 +35,14 @@ type IStockReceiptService interface {
 }
 
 type StockReceiptService struct {
-	repo  sr_repo.Querier
-	store store.Store
-	log   logger.ILogger
+	repo   sr_repo.Querier
+	store  store.Store
+	log    logger.ILogger
+	events notifications.EventPublisher
 }
 
-func NewStockReceiptService(repo sr_repo.Querier, st store.Store, log logger.ILogger) IStockReceiptService {
-	return &StockReceiptService{repo: repo, store: st, log: log}
+func NewStockReceiptService(repo sr_repo.Querier, st store.Store, log logger.ILogger, events notifications.EventPublisher) IStockReceiptService {
+	return &StockReceiptService{repo: repo, store: st, log: log, events: events}
 }
 
 func (s *StockReceiptService) Create(ctx context.Context, req CreateStockReceiptRequest) (*StockReceiptResponse, error) {
@@ -376,7 +378,19 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 		return nil, err
 	}
 
-	return s.Get(ctx, id)
+	resp, getErr := s.Get(ctx, id)
+	if s.events != nil && getErr == nil {
+		subject := fmt.Sprintf("Stock receipt %s completed", resp.ReceiptNo)
+		s.events.PublishAsync(ctx, notifications.EventStockReceiptCompleted, subject, subject)
+		if resp.SupplierID != nil && resp.TotalAmount-resp.AmountPaid > 0.0001 {
+			debtSubject := fmt.Sprintf("Supplier debt from receipt %s", resp.ReceiptNo)
+			s.events.PublishAsync(ctx, notifications.EventSupplierDebtCreated, debtSubject, debtSubject)
+		}
+	}
+	if getErr != nil {
+		return nil, getErr
+	}
+	return resp, nil
 }
 
 func (s *StockReceiptService) Cancel(ctx context.Context, id uuid.UUID) (*StockReceiptResponse, error) {

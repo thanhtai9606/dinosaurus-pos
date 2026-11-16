@@ -6,6 +6,7 @@ import (
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/doc_no"
+	"dinosaurus-pos/internal/notifications"
 	"dinosaurus-pos/internal/common/store"
 	products_repo "dinosaurus-pos/internal/products/repository"
 	"dinosaurus-pos/internal/tenant"
@@ -63,9 +64,10 @@ type PrdService struct {
 	activityService activity_log.IActivityService
 	search          productsearch.Indexer
 	listCache       *ListCache
+	events          notifications.EventPublisher
 }
 
-func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activity_log.IActivityService, search productsearch.Indexer, listCache *ListCache) IPrdService {
+func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILogger, prdRepo IProductImageRepository, activityService activity_log.IActivityService, search productsearch.Indexer, listCache *ListCache, events notifications.EventPublisher) IPrdService {
 	return &PrdService{
 		store:           store,
 		repo:            repo,
@@ -74,6 +76,7 @@ func NewPrdService(store store.Store, repo products_repo.Querier, log logger.ILo
 		activityService: activityService,
 		search:          search,
 		listCache:       listCache,
+		events:          events,
 	}
 }
 
@@ -472,6 +475,14 @@ func (s *PrdService) UpdateProduct(ctx context.Context, productID uuid.UUID, req
 			if err != nil {
 				// Don't fail the request if logging fails, but log error
 				s.log.Errorf("Failed to record stock history", "error", err)
+			}
+			if s.events != nil {
+				threshold := s.events.StockLowThreshold(ctx)
+				if currentStock <= int32(threshold) {
+					subject := fmt.Sprintf("Low stock: %s", product.Name)
+					body := fmt.Sprintf("Product %s stock is %d (threshold %d)", product.Name, currentStock, threshold)
+					s.events.PublishAsync(ctx, notifications.EventStockLow, subject, body)
+				}
 			}
 		}
 	}

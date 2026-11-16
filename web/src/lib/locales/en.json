@@ -416,7 +416,13 @@
         "empty_cart": "No line items yet — scan or search above.",
         "product_not_found": "Product not found",
         "customer": "Customer",
+        "customer_search_placeholder": "Search customer by name / phone…",
         "walk_in": "Walk-in",
+        "price_tier": {
+            "label": "Pricing",
+            "retail": "Retail",
+            "wholesale": "Wholesale"
+        },
         "pay": "Pay",
         "totals": {
             "subtotal": "Subtotal",

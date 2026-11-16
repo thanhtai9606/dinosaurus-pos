@@ -7,6 +7,13 @@ import {
 } from '@/lib/retail-pos/draftStorage'
 import { notifyPosDraftChanged, posStorageScope } from '@/lib/pos/sessionScope'
 
+function normalizeSaleTab(tab: RetailSaleTab): RetailSaleTab {
+    return {
+        ...tab,
+        priceTier: tab.priceTier ?? 'retail',
+    }
+}
+
 export function loadRetailPosInitialState(): {
     tabs: RetailSaleTab[]
     activeTabId: string
@@ -14,10 +21,10 @@ export function loadRetailPosInitialState(): {
 } {
     const draft = loadRetailPosDraft()
     if (draft?.tabs?.length) {
-        const active =
-            draft.tabs.some((t) => t.id === draft.activeTabId) ? draft.activeTabId : draft.tabs[0]!.id
-        const restoredFromDraft = draft.tabs.some((t) => t.cart.length > 0)
-        return { tabs: draft.tabs, activeTabId: active, restoredFromDraft }
+        const tabs = draft.tabs.map(normalizeSaleTab)
+        const active = tabs.some((t) => t.id === draft.activeTabId) ? draft.activeTabId : tabs[0]!.id
+        const restoredFromDraft = tabs.some((t) => t.cart.length > 0)
+        return { tabs, activeTabId: active, restoredFromDraft }
     }
     return { tabs: [], activeTabId: '', restoredFromDraft: false }
 }

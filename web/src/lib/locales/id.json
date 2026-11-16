@@ -418,7 +418,13 @@
         "empty_cart": "Belum ada baris — pindai atau cari di atas.",
         "product_not_found": "Produk tidak ditemukan",
         "customer": "Pelanggan",
+        "customer_search_placeholder": "Cari pelanggan nama / telepon…",
         "walk_in": "Pelanggan umum",
+        "price_tier": {
+            "label": "Harga jual",
+            "retail": "Eceran",
+            "wholesale": "Grosir"
+        },
         "pay": "Bayar",
         "totals": {
             "subtotal": "Subtotal",

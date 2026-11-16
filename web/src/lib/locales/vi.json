@@ -418,7 +418,13 @@
         "empty_cart": "Chưa có dòng hàng — quét hoặc tìm sản phẩm ở trên.",
         "product_not_found": "Không tìm thấy sản phẩm",
         "customer": "Khách hàng",
+        "customer_search_placeholder": "Tìm khách theo tên / SĐT…",
         "walk_in": "Khách lẻ",
+        "price_tier": {
+            "label": "Giá bán",
+            "retail": "Bán lẻ",
+            "wholesale": "Bán sỉ"
+        },
         "pay": "Thanh toán",
         "totals": {
             "subtotal": "Tổng tiền hàng",

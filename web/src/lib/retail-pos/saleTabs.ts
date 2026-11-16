@@ -1,10 +1,12 @@
 import { CartItem } from '@/components/orders/CartContent'
 import { RetailSettlementMode } from '@/components/retail-pos/RetailCheckoutPanel'
+import type { PriceTier } from '@/lib/retail-pos/pricing'
 
 export type RetailSaleTab = {
     id: string
     cart: CartItem[]
     selectedCustomerId: string | null
+    priceTier: PriceTier
     discountMode: 'amount' | 'percent'
     discountInput: string
     cashReceived: number
@@ -17,6 +19,7 @@ export function createRetailSaleTab(): RetailSaleTab {
         id: crypto.randomUUID(),
         cart: [],
         selectedCustomerId: null,
+        priceTier: 'retail',
         discountMode: 'amount',
         discountInput: '',
         cashReceived: 0,

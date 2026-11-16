@@ -15,12 +15,11 @@ import { axiosInstance } from '@/lib/api/client'
 import { fetchProductByCode, fetchProductDetail } from '@/lib/products/lookupProduct'
 import { usePosCatalog } from '@/hooks/usePosCatalog'
 import { useConfirmManualPaymentMutation, useCreateOrderMutation } from '@/lib/api/query/orders'
-import { useCustomersListQuery } from '@/lib/api/query/customers'
 import { usePaymentMethodsListQuery } from '@/lib/api/query/payment-methods'
 import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
 import { InternalProductsProductOptionResponse, POSKasirInternalOrdersRepositoryOrderType } from '@/lib/api/generated'
 import { useQueryClient } from '@tanstack/react-query'
-import { catalogUnitPrice, lineSubtotal } from '@/lib/retail-pos/pricing'
+import { catalogUnitPrice, lineSubtotal, type PriceTier } from '@/lib/retail-pos/pricing'
 import {
     baseQtyForLine,
     cartBaseQtyForProduct,
@@ -84,10 +83,17 @@ function RetailPosPage() {
     const discountInput = activeTab?.discountInput ?? ''
     const cashReceived = activeTab?.cashReceived ?? 0
     const settlementMode = activeTab?.settlementMode ?? 'cash'
+    const priceTier: PriceTier = activeTab?.priceTier ?? 'retail'
 
     const patchActive = (patch: Partial<RetailSaleTab>) => {
         if (!activeTab) return
         setTabs((prev) => patchTab(prev, activeTab.id, patch))
+    }
+
+    const handlePriceTierChange = (tier: PriceTier) => {
+        if (tier === priceTier) return
+        patchActive({ priceTier: tier })
+        setCart((prev) => prev.map((item) => ({ ...item, unitPrice: undefined })))
     }
 
     const setCart = (updater: (prev: CartItem[]) => CartItem[]) => {
@@ -108,8 +114,6 @@ function RetailPosPage() {
         searchRef.current?.focus()
     }, [activeTabId])
 
-    const { data: customersData } = useCustomersListQuery({ limit: 100 })
-    const customers = customersData?.customers || []
     const createOrderMutation = useCreateOrderMutation()
     const manualPayMutation = useConfirmManualPaymentMutation()
     const updateProductMutation = useUpdateProductMutation()
@@ -122,7 +126,7 @@ function RetailPosPage() {
         [paymentMethods],
     )
 
-    const subtotal = cart.reduce((sum, item) => sum + lineSubtotal(item), 0)
+    const subtotal = cart.reduce((sum, item) => sum + lineSubtotal(item, priceTier), 0)
     const orderDiscount = useMemo(() => {
         const raw = Number(discountInput)
         if (!Number.isFinite(raw) || raw <= 0) return 0
@@ -345,7 +349,7 @@ function RetailPosPage() {
         customer_id: selectedCustomerId || undefined,
         discount_amount: orderDiscount > 0 ? orderDiscount : undefined,
         items: cart.map((item) => {
-            const catalog = catalogUnitPrice(item)
+            const catalog = catalogUnitPrice(item, priceTier)
             const unit = item.unitPrice ?? catalog
             const saleUnit = item.saleUnit ?? defaultSaleUnit(item.product)
             return {
@@ -522,6 +526,7 @@ function RetailPosPage() {
                     <div className="min-h-0 flex-1 p-2">
                         <RetailLineItemsTable
                             cart={cart}
+                            priceTier={priceTier}
                             t={t}
                             onUpdateQuantity={updateQuantity}
                             onRemove={removeFromCart}
@@ -534,9 +539,10 @@ function RetailPosPage() {
                 <div className="w-[min(100%,22rem)] shrink-0 xl:w-[min(24rem,100%)]">
                     <RetailCheckoutPanel
                         t={t}
-                        customers={customers}
                         selectedCustomerId={selectedCustomerId}
                         onCustomerChange={(id) => patchActive({ selectedCustomerId: id })}
+                        priceTier={priceTier}
+                        onPriceTierChange={handlePriceTierChange}
                         subtotal={subtotal}
                         itemCount={itemCount}
                         taxAmount={taxAmount}
@@ -564,6 +570,7 @@ function RetailPosPage() {
                 open={!!priceEditItem}
                 onOpenChange={(open) => !open && setPriceEditItem(null)}
                 item={priceEditItem}
+                priceTier={priceTier}
                 t={t}
                 onApply={(price, save) => void applyLinePrice(price, save)}
                 saving={updateProductMutation.isPending}

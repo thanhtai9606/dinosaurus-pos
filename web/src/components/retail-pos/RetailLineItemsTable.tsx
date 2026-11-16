@@ -5,12 +5,13 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useFormatMoney } from '@/context/MoneyContext'
 import { CartItem } from '@/components/orders/CartContent'
-import { catalogUnitPrice, lineSubtotal, lineUnitPrice } from '@/lib/retail-pos/pricing'
+import { catalogUnitPrice, lineSubtotal, lineUnitPrice, type PriceTier } from '@/lib/retail-pos/pricing'
 import { cartLineKey, defaultSaleUnit, saleUnitsOf, type ProductSaleUnit } from '@/lib/retail-pos/productUnits'
 import { cn } from '@/lib/utils'
 
 type Props = {
     cart: CartItem[]
+    priceTier?: PriceTier
     t: (key: string, fallback?: string) => string
     onUpdateQuantity: (lineKey: string, delta: number) => void
     onRemove: (lineKey: string) => void
@@ -18,7 +19,15 @@ type Props = {
     onChangeSaleUnit: (lineKey: string, unit: ProductSaleUnit) => void
 }
 
-export function RetailLineItemsTable({ cart, t, onUpdateQuantity, onRemove, onEditPrice, onChangeSaleUnit }: Props) {
+export function RetailLineItemsTable({
+    cart,
+    priceTier = 'retail',
+    t,
+    onUpdateQuantity,
+    onRemove,
+    onEditPrice,
+    onChangeSaleUnit,
+}: Props) {
     const formatMoney = useFormatMoney()
 
     return (
@@ -113,15 +122,19 @@ export function RetailLineItemsTable({ cart, t, onUpdateQuantity, onRemove, onEd
                                             type="button"
                                             className={cn(
                                                 'rounded px-1.5 py-0.5 hover:bg-primary/10 underline-offset-2 hover:underline',
-                                                item.unitPrice != null && item.unitPrice !== catalogUnitPrice(item) && 'text-amber-700 dark:text-amber-400',
+                                                item.unitPrice != null &&
+                                                    item.unitPrice !== catalogUnitPrice(item, priceTier) &&
+                                                    'text-amber-700 dark:text-amber-400',
                                             )}
                                             title={t('retailPos.table.edit_price')}
                                             onClick={() => onEditPrice(item)}
                                         >
-                                            {formatMoney(lineUnitPrice(item))}
+                                            {formatMoney(lineUnitPrice(item, priceTier))}
                                         </button>
                                     </TableCell>
-                                    <TableCell className="text-right font-semibold">{formatMoney(lineSubtotal(item))}</TableCell>
+                                    <TableCell className="text-right font-semibold">
+                                        {formatMoney(lineSubtotal(item, priceTier))}
+                                    </TableCell>
                                     <TableCell>
                                         <Button
                                             type="button"

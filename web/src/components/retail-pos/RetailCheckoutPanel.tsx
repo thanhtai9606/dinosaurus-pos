@@ -1,21 +1,22 @@
-import { User } from 'lucide-react'
+import { UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useFormatMoney, useMoney } from '@/context/MoneyContext'
-import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
 import { cn } from '@/lib/utils'
+import { CustomerSearchCombobox } from '@/components/customers/CustomerSearchCombobox'
+import type { PriceTier } from '@/lib/retail-pos/pricing'
 
 export type RetailSettlementMode = 'cash' | 'debt'
 
 type Props = {
     t: (key: string, fallback?: string) => string
-    customers: Array<{ id?: string; name?: string }>
     selectedCustomerId: string | null
     onCustomerChange: (id: string | null) => void
+    priceTier: PriceTier
+    onPriceTierChange: (tier: PriceTier) => void
     subtotal: number
     itemCount: number
     taxAmount: number
@@ -39,9 +40,10 @@ type Props = {
 
 export function RetailCheckoutPanel({
     t,
-    customers,
     selectedCustomerId,
     onCustomerChange,
+    priceTier,
+    onPriceTierChange,
     subtotal,
     itemCount,
     taxAmount,
@@ -69,24 +71,31 @@ export function RetailCheckoutPanel({
 
     return (
         <div className="flex h-full flex-col border-l bg-card">
-            <div className="border-b p-4">
-                <p className="text-sm font-medium text-muted-foreground mb-2">{t('retailPos.customer')}</p>
-                <Select value={selectedCustomerId || 'walk_in'} onValueChange={(v) => onCustomerChange(v === 'walk_in' ? null : v)}>
-                    <SelectTrigger className="w-full">
-                        <div className="flex items-center gap-2 truncate">
-                            <User className="h-4 w-4 shrink-0" />
-                            <SelectValue placeholder={t('order.walk_in')} />
-                        </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="walk_in">{t('retailPos.walk_in')}</SelectItem>
-                        {customers.map((c) => (
-                            <SelectItem key={c.id} value={c.id!}>
-                                {c.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+            <div className="border-b p-4 space-y-3">
+                <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">{t('retailPos.price_tier.label')}</p>
+                    <PriceTierToggle priceTier={priceTier} onPriceTierChange={onPriceTierChange} t={t} />
+                </div>
+                <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">{t('retailPos.customer')}</p>
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            type="button"
+                            variant={!selectedCustomerId ? 'secondary' : 'outline'}
+                            size="sm"
+                            className="justify-start gap-2"
+                            onClick={() => onCustomerChange(null)}
+                        >
+                            <UserRound className="h-4 w-4" />
+                            {t('retailPos.walk_in')}
+                        </Button>
+                        <CustomerSearchCombobox
+                            value={selectedCustomerId || ''}
+                            onValueChange={(id) => onCustomerChange(id)}
+                            placeholder={t('retailPos.customer_search_placeholder')}
+                        />
+                    </div>
+                </div>
             </div>
 
             <div className="flex-1 space-y-3 overflow-y-auto p-4 text-sm">
@@ -187,6 +196,39 @@ export function RetailCheckoutPanel({
                     {t('retailPos.other_payment')}
                 </Button>
             </div>
+        </div>
+    )
+}
+
+function PriceTierToggle({
+    priceTier,
+    onPriceTierChange,
+    t,
+}: {
+    priceTier: PriceTier
+    onPriceTierChange: (tier: PriceTier) => void
+    t: Props['t']
+}) {
+    return (
+        <div className="grid grid-cols-2 gap-1 rounded-lg border bg-muted/40 p-1">
+            <Button
+                type="button"
+                size="sm"
+                variant={priceTier === 'retail' ? 'default' : 'ghost'}
+                className="h-9"
+                onClick={() => onPriceTierChange('retail')}
+            >
+                {t('retailPos.price_tier.retail')}
+            </Button>
+            <Button
+                type="button"
+                size="sm"
+                variant={priceTier === 'wholesale' ? 'default' : 'ghost'}
+                className="h-9"
+                onClick={() => onPriceTierChange('wholesale')}
+            >
+                {t('retailPos.price_tier.wholesale')}
+            </Button>
         </div>
     )
 }

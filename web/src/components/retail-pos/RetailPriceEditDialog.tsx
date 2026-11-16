@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { CartItem } from '@/components/orders/CartContent'
-import { catalogUnitPrice } from '@/lib/retail-pos/pricing'
+import { catalogUnitPrice, type PriceTier } from '@/lib/retail-pos/pricing'
 import { useFormatMoney } from '@/context/MoneyContext'
 
 type Props = {
@@ -22,6 +22,7 @@ type Props = {
     onApply: (unitPrice: number, saveAsRetailPrice: boolean) => void
     saving?: boolean
     canSaveCatalog: boolean
+    priceTier?: PriceTier
 }
 
 export function RetailPriceEditDialog({
@@ -32,21 +33,22 @@ export function RetailPriceEditDialog({
     onApply,
     saving,
     canSaveCatalog,
+    priceTier = 'retail',
 }: Props) {
     const formatMoney = useFormatMoney()
-    const catalog = item ? catalogUnitPrice(item) : 0
+    const catalog = item ? catalogUnitPrice(item, priceTier) : 0
     const [priceInput, setPriceInput] = useState('')
     const [percentInput, setPercentInput] = useState('')
     const [saveCatalog, setSaveCatalog] = useState(false)
 
     useEffect(() => {
         if (open && item) {
-            const current = item.unitPrice ?? catalogUnitPrice(item)
+            const current = item.unitPrice ?? catalogUnitPrice(item, priceTier)
             setPriceInput(String(current))
             setPercentInput('')
             setSaveCatalog(false)
         }
-    }, [open, item, catalog])
+    }, [open, item, catalog, priceTier])
 
     const applyPercent = () => {
         const pct = Number(percentInput)

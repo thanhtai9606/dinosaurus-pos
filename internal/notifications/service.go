@@ -4,12 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/notifications/channelconfig"
+	"dinosaurus-pos/internal/notifications/channels"
 	notif_repo "dinosaurus-pos/internal/notifications/repository"
+	"dinosaurus-pos/internal/report"
 	settings_repo "dinosaurus-pos/internal/settings/repository"
 	"dinosaurus-pos/internal/tenant"
 	"dinosaurus-pos/pkg/logger"
@@ -19,6 +22,11 @@ import (
 
 const settingKeyNotifications = "notifications"
 
+// TenantIDLister lists tenant IDs for cron jobs (implemented in server package to avoid import cycles).
+type TenantIDLister interface {
+	ListActiveTenantIDs(ctx context.Context) ([]uuid.UUID, error)
+}
+
 type INotificationService interface {
 	ListEventTypes(ctx context.Context) ([]EventTypeResponse, error)
 	ListChannels(ctx context.Context) ([]ChannelResponse, error)
@@ -26,37 +34,48 @@ type INotificationService interface {
 	CreateChannel(ctx context.Context, req CreateChannelRequest) (ChannelResponse, error)
 	UpdateChannel(ctx context.Context, id uuid.UUID, req UpdateChannelRequest) (ChannelResponse, error)
 	DeleteChannel(ctx context.Context, id uuid.UUID) error
-	TestChannel(ctx context.Context, id uuid.UUID, actorEmail string) error
+	TestChannel(ctx context.Context, id uuid.UUID, actorEmail string, actorUserID uuid.UUID) error
 	GetMySubscriptions(ctx context.Context, userID uuid.UUID) ([]SubscriptionResponse, error)
 	UpdateMySubscriptions(ctx context.Context, userID uuid.UUID, req UpdateSubscriptionsRequest) ([]SubscriptionResponse, error)
 	ListDeliveries(ctx context.Context, page, limit int) (*ListDeliveriesResponse, error)
 	GetTenantConfig(ctx context.Context) (TenantConfigResponse, error)
 	UpdateTenantConfig(ctx context.Context, req UpdateTenantConfigRequest) (TenantConfigResponse, error)
+	RegisterDeviceToken(ctx context.Context, userID uuid.UUID, token, platform string) error
+	UnregisterDeviceToken(ctx context.Context, userID uuid.UUID, token string) error
+	TestReportEmail(ctx context.Context, period string) error
+	RunScheduledReports(ctx context.Context)
 	PublishAsync(ctx context.Context, eventType, subject, body string)
 	StockLowThreshold(ctx context.Context) int
 }
 
 type Service struct {
-	repo         notif_repo.Querier
-	settingsRepo settings_repo.Querier
-	dispatcher   *Dispatcher
-	log          logger.ILogger
-	testMu       sync.Mutex
-	testCounts   map[uuid.UUID][]time.Time
+	repo          notif_repo.Querier
+	settingsRepo  settings_repo.Querier
+	tenantLister  TenantIDLister
+	reportService report.IRptService
+	dispatcher    *Dispatcher
+	log           logger.ILogger
+	testMu        sync.Mutex
+	testCounts    map[uuid.UUID][]time.Time
 }
 
 func NewService(
 	repo notif_repo.Querier,
 	settingsRepo settings_repo.Querier,
+	tenantLister TenantIDLister,
+	reportService report.IRptService,
+	fcm *channels.FCMClient,
 	log logger.ILogger,
 ) INotificationService {
-	d := NewDispatcher(repo, log)
+	d := NewDispatcher(repo, fcm, log)
 	return &Service{
-		repo:         repo,
-		settingsRepo: settingsRepo,
-		dispatcher:   d,
-		log:          log,
-		testCounts:   make(map[uuid.UUID][]time.Time),
+		repo:          repo,
+		settingsRepo:  settingsRepo,
+		tenantLister:  tenantLister,
+		reportService: reportService,
+		dispatcher:    d,
+		log:           log,
+		testCounts:    make(map[uuid.UUID][]time.Time),
 	}
 }
 
@@ -102,11 +121,15 @@ func (s *Service) CreateChannel(ctx context.Context, req CreateChannelRequest) (
 	if req.Enabled != nil {
 		enabled = *req.Enabled
 	}
+	configBytes := req.Config
+	if len(configBytes) == 0 {
+		configBytes = []byte("{}")
+	}
 	chType := notif_repo.NotificationChannelType(req.ChannelType)
 	row, err := s.repo.CreateNotificationChannel(ctx, notif_repo.CreateNotificationChannelParams{
 		Name:        req.Name,
 		ChannelType: chType,
-		ConfigJson:  []byte(req.Config),
+		ConfigJson:  configBytes,
 		Enabled:     enabled,
 	})
 	if err != nil {
@@ -149,7 +172,7 @@ func (s *Service) DeleteChannel(ctx context.Context, id uuid.UUID) error {
 	return s.repo.DeleteNotificationChannel(ctx, id)
 }
 
-func (s *Service) TestChannel(ctx context.Context, id uuid.UUID, actorEmail string) error {
+func (s *Service) TestChannel(ctx context.Context, id uuid.UUID, actorEmail string, actorUserID uuid.UUID) error {
 	tid, _ := tenant.IDFromContext(ctx)
 	if err := s.checkTestRateLimit(tid); err != nil {
 		return err
@@ -158,7 +181,7 @@ func (s *Service) TestChannel(ctx context.Context, id uuid.UUID, actorEmail stri
 	if err != nil {
 		return common.ErrNotFound
 	}
-	return s.dispatcher.SendTest(ctx, ch, actorEmail)
+	return s.dispatcher.SendTest(ctx, ch, actorEmail, actorUserID)
 }
 
 func (s *Service) checkTestRateLimit(tenantID uuid.UUID) error {
@@ -274,15 +297,33 @@ func (s *Service) ListDeliveries(ctx context.Context, page, limit int) (*ListDel
 }
 
 func (s *Service) GetTenantConfig(ctx context.Context) (TenantConfigResponse, error) {
-	cfg, err := s.loadTenantConfig(ctx)
+	cfg, err := s.loadTenantConfigStruct(ctx)
 	if err != nil {
-		return TenantConfigResponse{StockLowThreshold: 5}, nil
+		def := DefaultTenantNotificationConfig()
+		return tenantConfigToResponse(def), nil
 	}
-	return cfg, nil
+	return tenantConfigToResponse(cfg), nil
 }
 
 func (s *Service) UpdateTenantConfig(ctx context.Context, req UpdateTenantConfigRequest) (TenantConfigResponse, error) {
-	payload, err := json.Marshal(TenantNotificationConfig{StockLowThreshold: req.StockLowThreshold})
+	existing, err := s.loadTenantConfigStruct(ctx)
+	if err != nil {
+		existing = DefaultTenantNotificationConfig()
+	}
+	if req.StockLowThreshold != nil {
+		existing.StockLowThreshold = *req.StockLowThreshold
+	}
+	if req.Timezone != "" {
+		existing.Timezone = req.Timezone
+	}
+	if req.ReportSchedules != nil {
+		existing.ReportSchedules = *req.ReportSchedules
+	}
+	if req.ReportRecipientEmails != nil {
+		existing.ReportRecipientEmails = req.ReportRecipientEmails
+	}
+	existing.Normalize()
+	payload, err := json.Marshal(existing)
 	if err != nil {
 		return TenantConfigResponse{}, err
 	}
@@ -293,27 +334,68 @@ func (s *Service) UpdateTenantConfig(ctx context.Context, req UpdateTenantConfig
 	if err != nil {
 		return TenantConfigResponse{}, err
 	}
-	return TenantConfigResponse{StockLowThreshold: req.StockLowThreshold}, nil
+	return tenantConfigToResponse(existing), nil
 }
 
-func (s *Service) loadTenantConfig(ctx context.Context) (TenantConfigResponse, error) {
+func (s *Service) loadTenantConfigStruct(ctx context.Context) (TenantNotificationConfig, error) {
 	row, err := s.settingsRepo.GetSettingByKey(ctx, settingKeyNotifications)
 	if err != nil {
-		return TenantConfigResponse{}, err
+		return TenantNotificationConfig{}, err
 	}
 	var cfg TenantNotificationConfig
 	if err := json.Unmarshal([]byte(row.Value), &cfg); err != nil {
-		return TenantConfigResponse{}, err
+		return TenantNotificationConfig{}, err
 	}
-	return TenantConfigResponse{StockLowThreshold: cfg.StockLowThreshold}, nil
+	cfg.Normalize()
+	return cfg, nil
+}
+
+func tenantConfigToResponse(cfg TenantNotificationConfig) TenantConfigResponse {
+	return TenantConfigResponse{
+		StockLowThreshold:     cfg.StockLowThreshold,
+		Timezone:              cfg.Timezone,
+		ReportSchedules:       cfg.ReportSchedules,
+		ReportRecipientEmails: cfg.ReportRecipientEmails,
+	}
 }
 
 func (s *Service) StockLowThreshold(ctx context.Context) int {
-	cfg, err := s.loadTenantConfig(ctx)
+	cfg, err := s.loadTenantConfigStruct(ctx)
 	if err != nil || cfg.StockLowThreshold <= 0 {
 		return 5
 	}
 	return cfg.StockLowThreshold
+}
+
+func (s *Service) RegisterDeviceToken(ctx context.Context, userID uuid.UUID, token, platform string) error {
+	token = strings.TrimSpace(token)
+	if token == "" {
+		return fmt.Errorf("%w: token required", common.ErrBadRequest)
+	}
+	plat := notif_repo.NotificationDevicePlatformWeb
+	switch platform {
+	case "android":
+		plat = notif_repo.NotificationDevicePlatformAndroid
+	case "ios":
+		plat = notif_repo.NotificationDevicePlatformIos
+	case "", "web":
+		plat = notif_repo.NotificationDevicePlatformWeb
+	default:
+		return fmt.Errorf("%w: invalid platform", common.ErrBadRequest)
+	}
+	_, err := s.repo.UpsertNotificationDeviceToken(ctx, notif_repo.UpsertNotificationDeviceTokenParams{
+		UserID:   userID,
+		Token:    token,
+		Platform: plat,
+	})
+	return err
+}
+
+func (s *Service) UnregisterDeviceToken(ctx context.Context, userID uuid.UUID, token string) error {
+	return s.repo.DeleteNotificationDeviceToken(ctx, notif_repo.DeleteNotificationDeviceTokenParams{
+		UserID: userID,
+		Token:  strings.TrimSpace(token),
+	})
 }
 
 func (s *Service) PublishAsync(parentCtx context.Context, eventType, subject, body string) {

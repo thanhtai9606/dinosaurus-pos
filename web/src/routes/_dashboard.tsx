@@ -15,6 +15,7 @@ import { useAppWebSocket } from '@/hooks/useAppWebSocket'
 import { useQueryClient } from '@tanstack/react-query'
 import { PosStorageScopeEffect } from '@/components/dashboard/PosStorageScopeEffect'
 import { PosCatalogBootstrap } from '@/components/dashboard/PosCatalogBootstrap'
+import { FirebaseMessagingBootstrap } from '@/components/notifications/FirebaseMessagingBootstrap'
 
 export const Route = createFileRoute('/_dashboard')({
     loader: async ({ context: { queryClient } }) => {
@@ -108,6 +109,7 @@ function DashboardLayout() {
                 </div>
                 {!isSuperAdmin && (
                     <>
+                        <FirebaseMessagingBootstrap />
                         <PosStorageScopeEffect />
                         <PosCatalogBootstrap />
                         <OpenShiftModal />

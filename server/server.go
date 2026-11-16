@@ -17,6 +17,7 @@ import (
 	"dinosaurus-pos/internal/measurement_units"
 	measurement_units_repo "dinosaurus-pos/internal/measurement_units/repository"
 	"dinosaurus-pos/internal/notifications"
+	"dinosaurus-pos/internal/notifications/channels"
 	notif_repo "dinosaurus-pos/internal/notifications/repository"
 	"dinosaurus-pos/internal/stock_ops"
 	ops_repo "dinosaurus-pos/internal/stock_ops/repository"
@@ -132,6 +133,7 @@ type AppContainer struct {
 	TenantHandler             *tenants.Handler
 	PlatformHandler           *platform.Handler
 	NotificationHandler       notifications.IHandler
+	NotificationService       notifications.INotificationService
 	ShiftRepo                 shift_repo.Querier
 	ShiftService              shift.Service
 	WSHub                     *ws.Hub
@@ -279,7 +281,11 @@ func BuildAppContainer(app *App) *AppContainer {
 
 	settingsRepo := settings_repo.New(tenantDB)
 	notificationRepo := notif_repo.New(tenantDB)
-	notificationService := notifications.NewService(notificationRepo, settingsRepo, app.Logger)
+	reportRepo := report_repo.New(tenantDB)
+	reportService := report.NewRptService(app.Store, reportRepo, activityService, app.Logger, app.RedisCache)
+	fcmClient := channels.NewFCMClient([]byte(app.Config.Firebase.CredentialsJSON), app.Logger)
+	tenantLister := &notificationTenantLister{repo: tenantRepo}
+	notificationService := notifications.NewService(notificationRepo, settingsRepo, tenantLister, reportService, fcmClient, app.Logger)
 	notificationHandler := notifications.NewHandler(notificationService, app.Logger)
 
 	// Stock receipt Module
@@ -361,8 +367,6 @@ func BuildAppContainer(app *App) *AppContainer {
 	cancellationReasonHandler := cancellation_reasons.NewCancellationReasonHandler(cancellationReasonService, app.Logger)
 
 	// report module
-	reportRepo := report_repo.New(tenantDB)
-	reportService := report.NewRptService(app.Store, reportRepo, activityService, app.Logger, app.RedisCache)
 	reportHandler := report.NewRptHandler(reportService, app.Logger)
 
 	// Promotion Module
@@ -404,6 +408,7 @@ func BuildAppContainer(app *App) *AppContainer {
 		TenantHandler:             tenantHandler,
 		PlatformHandler:           platformHandler,
 		NotificationHandler:       notificationHandler,
+		NotificationService:       notificationService,
 		ShiftRepo:                 shiftRepo,
 		ShiftService:              shiftService,
 		WSHub:                     wsHub,

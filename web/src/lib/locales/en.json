@@ -746,8 +746,27 @@
                 "email": "Email (SMTP)",
                 "msteams_webhook": "Microsoft Teams",
                 "telegram": "Telegram",
-                "sms": "SMS"
-            }
+                "sms": "SMS",
+                "firebase": "Browser / mobile push (Firebase)"
+            },
+            "firebase_channel_help": "Credentials are configured on the server (FIREBASE_CREDENTIALS_JSON). Users only need to enable browser push and subscribe to events.",
+            "browser_push_title": "Browser push",
+            "browser_push_desc": "Receive real-time alerts in Chrome/Edge when this device is allowed.",
+            "enable_browser_push": "Enable browser notifications",
+            "push_granted": "Notifications allowed on this browser",
+            "push_denied": "Blocked in browser settings",
+            "push_default": "Not enabled yet",
+            "firebase_not_configured": "Set VITE_FIREBASE_* and server FIREBASE_CREDENTIALS_JSON to enable push.",
+            "reports_title": "Scheduled report emails",
+            "reports_desc": "Daily, monthly, and yearly summaries are sent via your SMTP channel only (not push).",
+            "timezone": "Timezone (IANA)",
+            "report_emails": "Report recipients (comma-separated)",
+            "report_period": {
+                "daily": "Daily",
+                "monthly": "Monthly",
+                "yearly": "Yearly"
+            },
+            "report_test": "Send test"
         },
         "preferences": {
             "title": "Display & language",

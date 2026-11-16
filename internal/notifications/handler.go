@@ -22,6 +22,9 @@ type IHandler interface {
 	ListDeliveriesHandler(c fiber.Ctx) error
 	GetTenantConfigHandler(c fiber.Ctx) error
 	UpdateTenantConfigHandler(c fiber.Ctx) error
+	RegisterDeviceHandler(c fiber.Ctx) error
+	UnregisterDeviceHandler(c fiber.Ctx) error
+	TestReportEmailHandler(c fiber.Ctx) error
 }
 
 type Handler struct {
@@ -162,7 +165,8 @@ func (h *Handler) TestChannelHandler(c fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid id"})
 	}
-	if err := h.service.TestChannel(c.RequestCtx(), id, actorEmailFromCtx(c)); err != nil {
+	uid, _ := userIDFromCtx(c)
+	if err := h.service.TestChannel(c.RequestCtx(), id, actorEmailFromCtx(c), uid); err != nil {
 		if errors.Is(err, common.ErrNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(common.ErrorResponse{Message: "Not found"})
 		}
@@ -267,4 +271,75 @@ func (h *Handler) UpdateTenantConfigHandler(c fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to update config"})
 	}
 	return c.JSON(common.SuccessResponse{Message: "OK", Data: data})
+}
+
+type registerDeviceRequest struct {
+	Token    string `json:"token"`
+	Platform string `json:"platform"`
+}
+
+type unregisterDeviceRequest struct {
+	Token string `json:"token"`
+}
+
+// RegisterDeviceHandler
+// @Summary      Register FCM device token
+// @Tags         Notifications
+// @Accept       json
+// @Success      200 {object} common.SuccessResponse
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /notification-devices/register [post]
+func (h *Handler) RegisterDeviceHandler(c fiber.Ctx) error {
+	uid, err := userIDFromCtx(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(common.ErrorResponse{Message: "Unauthorized"})
+	}
+	var req registerDeviceRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid body"})
+	}
+	if err := h.service.RegisterDeviceToken(c.RequestCtx(), uid, req.Token, req.Platform); err != nil {
+		if errors.Is(err, common.ErrBadRequest) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to register device"})
+	}
+	return c.JSON(common.SuccessResponse{Message: "Registered"})
+}
+
+// UnregisterDeviceHandler
+// @Summary      Unregister FCM device token
+// @Tags         Notifications
+// @Accept       json
+// @Success      200 {object} common.SuccessResponse
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /notification-devices [delete]
+func (h *Handler) UnregisterDeviceHandler(c fiber.Ctx) error {
+	uid, err := userIDFromCtx(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(common.ErrorResponse{Message: "Unauthorized"})
+	}
+	var req unregisterDeviceRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid body"})
+	}
+	if err := h.service.UnregisterDeviceToken(c.RequestCtx(), uid, req.Token); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to unregister"})
+	}
+	return c.JSON(common.SuccessResponse{Message: "Unregistered"})
+}
+
+// TestReportEmailHandler
+// @Summary      Send test scheduled report email
+// @Tags         Notifications
+// @Param        period query string true "daily|monthly|yearly"
+// @Success      200 {object} common.SuccessResponse
+// @x-roles      ["admin"]
+// @Router       /notifications/reports/test [post]
+func (h *Handler) TestReportEmailHandler(c fiber.Ctx) error {
+	period := c.Query("period", "daily")
+	if err := h.service.TestReportEmail(c.RequestCtx(), period); err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(common.ErrorResponse{Message: "Report test failed", Error: err.Error()})
+	}
+	return c.JSON(common.SuccessResponse{Message: "Report email sent"})
 }

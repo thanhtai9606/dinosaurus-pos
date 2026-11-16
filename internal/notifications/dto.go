@@ -27,8 +27,8 @@ type ChannelResponse struct {
 
 type CreateChannelRequest struct {
 	Name        string          `json:"name" validate:"required,max=120"`
-	ChannelType string          `json:"channel_type" validate:"required,oneof=email msteams_webhook telegram sms"`
-	Config      json.RawMessage `json:"config" validate:"required"`
+	ChannelType string          `json:"channel_type" validate:"required,oneof=email msteams_webhook telegram sms firebase"`
+	Config      json.RawMessage `json:"config"`
 	Enabled     *bool           `json:"enabled"`
 }
 
@@ -72,11 +72,17 @@ type ListDeliveriesResponse struct {
 }
 
 type TenantConfigResponse struct {
-	StockLowThreshold int `json:"stock_low_threshold"`
+	StockLowThreshold     int                   `json:"stock_low_threshold"`
+	Timezone              string                `json:"timezone"`
+	ReportSchedules       ReportSchedulesConfig `json:"report_schedules"`
+	ReportRecipientEmails []string              `json:"report_recipient_emails"`
 }
 
 type UpdateTenantConfigRequest struct {
-	StockLowThreshold int `json:"stock_low_threshold" validate:"required,min=0"`
+	StockLowThreshold     *int                   `json:"stock_low_threshold" validate:"omitempty,min=0"`
+	Timezone              string                 `json:"timezone"`
+	ReportSchedules       *ReportSchedulesConfig `json:"report_schedules"`
+	ReportRecipientEmails []string               `json:"report_recipient_emails"`
 }
 
 func toChannelResponse(row notif_repo.NotificationChannel, masked []byte) ChannelResponse {

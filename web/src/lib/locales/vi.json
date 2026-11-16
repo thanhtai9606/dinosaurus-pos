@@ -752,8 +752,27 @@
                 "email": "Email (SMTP)",
                 "msteams_webhook": "Microsoft Teams",
                 "telegram": "Telegram",
-                "sms": "SMS"
-            }
+                "sms": "SMS",
+                "firebase": "Push trình duyệt / mobile (Firebase)"
+            },
+            "firebase_channel_help": "Credential cấu hình trên server (FIREBASE_CREDENTIALS_JSON). Người dùng chỉ cần bật push trình duyệt và đăng ký sự kiện.",
+            "browser_push_title": "Thông báo trình duyệt",
+            "browser_push_desc": "Nhận cảnh báo realtime trên Chrome/Edge khi được phép.",
+            "enable_browser_push": "Bật thông báo trình duyệt",
+            "push_granted": "Đã cho phép thông báo trên trình duyệt này",
+            "push_denied": "Đã chặn trong cài đặt trình duyệt",
+            "push_default": "Chưa bật",
+            "firebase_not_configured": "Cần VITE_FIREBASE_* và FIREBASE_CREDENTIALS_JSON trên server.",
+            "reports_title": "Báo cáo email định kỳ",
+            "reports_desc": "Báo cáo ngày/tháng/năm chỉ gửi qua kênh SMTP (không qua push).",
+            "timezone": "Múi giờ (IANA)",
+            "report_emails": "Email nhận báo cáo (phân tách bằng dấu phẩy)",
+            "report_period": {
+                "daily": "Hàng ngày",
+                "monthly": "Hàng tháng",
+                "yearly": "Hàng năm"
+            },
+            "report_test": "Gửi thử"
         },
         "preferences": {
             "title": "Hiển thị & ngôn ngữ",

@@ -248,6 +248,7 @@ const (
 	NotificationChannelTypeMsteamsWebhook NotificationChannelType = "msteams_webhook"
 	NotificationChannelTypeTelegram       NotificationChannelType = "telegram"
 	NotificationChannelTypeSms            NotificationChannelType = "sms"
+	NotificationChannelTypeFirebase       NotificationChannelType = "firebase"
 )
 
 func (e *NotificationChannelType) Scan(src interface{}) error {
@@ -325,6 +326,92 @@ func (ns NullNotificationDeliveryStatus) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.NotificationDeliveryStatus), nil
+}
+
+type NotificationDevicePlatform string
+
+const (
+	NotificationDevicePlatformWeb     NotificationDevicePlatform = "web"
+	NotificationDevicePlatformAndroid NotificationDevicePlatform = "android"
+	NotificationDevicePlatformIos     NotificationDevicePlatform = "ios"
+)
+
+func (e *NotificationDevicePlatform) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = NotificationDevicePlatform(s)
+	case string:
+		*e = NotificationDevicePlatform(s)
+	default:
+		return fmt.Errorf("unsupported scan type for NotificationDevicePlatform: %T", src)
+	}
+	return nil
+}
+
+type NullNotificationDevicePlatform struct {
+	NotificationDevicePlatform NotificationDevicePlatform `json:"notification_device_platform"`
+	Valid                      bool                       `json:"valid"` // Valid is true if NotificationDevicePlatform is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullNotificationDevicePlatform) Scan(value interface{}) error {
+	if value == nil {
+		ns.NotificationDevicePlatform, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.NotificationDevicePlatform.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullNotificationDevicePlatform) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.NotificationDevicePlatform), nil
+}
+
+type NotificationReportPeriod string
+
+const (
+	NotificationReportPeriodDaily   NotificationReportPeriod = "daily"
+	NotificationReportPeriodMonthly NotificationReportPeriod = "monthly"
+	NotificationReportPeriodYearly  NotificationReportPeriod = "yearly"
+)
+
+func (e *NotificationReportPeriod) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = NotificationReportPeriod(s)
+	case string:
+		*e = NotificationReportPeriod(s)
+	default:
+		return fmt.Errorf("unsupported scan type for NotificationReportPeriod: %T", src)
+	}
+	return nil
+}
+
+type NullNotificationReportPeriod struct {
+	NotificationReportPeriod NotificationReportPeriod `json:"notification_report_period"`
+	Valid                    bool                     `json:"valid"` // Valid is true if NotificationReportPeriod is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullNotificationReportPeriod) Scan(value interface{}) error {
+	if value == nil {
+		ns.NotificationReportPeriod, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.NotificationReportPeriod.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullNotificationReportPeriod) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.NotificationReportPeriod), nil
 }
 
 type OrderStatus string
@@ -1100,10 +1187,28 @@ type NotificationDelivery struct {
 	CreatedAt      pgtype.Timestamptz         `json:"created_at"`
 }
 
+type NotificationDeviceToken struct {
+	ID         uuid.UUID                  `json:"id"`
+	TenantID   uuid.UUID                  `json:"tenant_id"`
+	UserID     uuid.UUID                  `json:"user_id"`
+	Token      string                     `json:"token"`
+	Platform   NotificationDevicePlatform `json:"platform"`
+	LastSeenAt pgtype.Timestamptz         `json:"last_seen_at"`
+	CreatedAt  pgtype.Timestamptz         `json:"created_at"`
+}
+
 type NotificationEventType struct {
 	Code        string  `json:"code"`
 	Label       string  `json:"label"`
 	Description *string `json:"description"`
+}
+
+type NotificationReportRun struct {
+	ID        uuid.UUID                `json:"id"`
+	TenantID  uuid.UUID                `json:"tenant_id"`
+	Period    NotificationReportPeriod `json:"period"`
+	PeriodKey string                   `json:"period_key"`
+	CreatedAt pgtype.Timestamptz       `json:"created_at"`
 }
 
 type NotificationSubscription struct {

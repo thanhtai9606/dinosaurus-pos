@@ -109,6 +109,8 @@ func MergeConfigJSON(channelType string, incoming, existing []byte) ([]byte, err
 		ex.APIKey = mergeStringSecret(in.APIKey, ex.APIKey)
 		ex.SenderID = strings.TrimSpace(in.SenderID)
 		return json.Marshal(ex)
+	case "firebase":
+		return existing, nil
 	default:
 		return incoming, nil
 	}
@@ -140,6 +142,8 @@ func MaskConfigForResponse(channelType string, raw []byte) ([]byte, error) {
 			return raw, err
 		}
 		return json.Marshal(maskSMSConfig(c))
+	case "firebase":
+		return []byte(`{}`), nil
 	default:
 		return raw, nil
 	}

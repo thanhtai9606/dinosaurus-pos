@@ -427,6 +427,19 @@ export const RBAC_RULES: Record<string, string[]> = {
     "PUT /notifications/config": [
         "admin"
     ],
+    "POST /notification-devices/register": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "DELETE /notification-devices": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "POST /notifications/reports/test": [
+        "admin"
+    ],
     "POST /shifts/cash-transaction": [
         "admin",
         "manager",

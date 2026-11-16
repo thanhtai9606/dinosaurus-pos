@@ -14,15 +14,20 @@ type Querier interface {
 	CountNotificationDeliveries(ctx context.Context) (int32, error)
 	CreateNotificationChannel(ctx context.Context, arg CreateNotificationChannelParams) (NotificationChannel, error)
 	DeleteNotificationChannel(ctx context.Context, id uuid.UUID) error
+	DeleteNotificationDeviceToken(ctx context.Context, arg DeleteNotificationDeviceTokenParams) error
 	DeleteUserSubscriptions(ctx context.Context, userID uuid.UUID) error
 	GetNotificationChannelByID(ctx context.Context, id uuid.UUID) (NotificationChannel, error)
 	InsertNotificationDelivery(ctx context.Context, arg InsertNotificationDeliveryParams) (NotificationDelivery, error)
+	InsertNotificationReportRun(ctx context.Context, arg InsertNotificationReportRunParams) (NotificationReportRun, error)
+	ListDeviceTokensByUser(ctx context.Context, userID uuid.UUID) ([]NotificationDeviceToken, error)
+	ListEnabledEmailChannels(ctx context.Context) ([]NotificationChannel, error)
 	ListEnabledSubscriptionsForEvent(ctx context.Context, eventType string) ([]ListEnabledSubscriptionsForEventRow, error)
 	ListNotificationChannels(ctx context.Context) ([]NotificationChannel, error)
 	ListNotificationDeliveries(ctx context.Context, arg ListNotificationDeliveriesParams) ([]NotificationDelivery, error)
 	ListNotificationEventTypes(ctx context.Context) ([]NotificationEventType, error)
 	ListSubscriptionsByUser(ctx context.Context, userID uuid.UUID) ([]NotificationSubscription, error)
 	UpdateNotificationChannel(ctx context.Context, arg UpdateNotificationChannelParams) (NotificationChannel, error)
+	UpsertNotificationDeviceToken(ctx context.Context, arg UpsertNotificationDeviceTokenParams) (NotificationDeviceToken, error)
 	UpsertNotificationSubscription(ctx context.Context, arg UpsertNotificationSubscriptionParams) (NotificationSubscription, error)
 }
 

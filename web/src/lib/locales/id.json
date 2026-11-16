@@ -752,8 +752,27 @@
                 "email": "Email (SMTP)",
                 "msteams_webhook": "Microsoft Teams",
                 "telegram": "Telegram",
-                "sms": "SMS"
-            }
+                "sms": "SMS",
+                "firebase": "Push browser / mobile (Firebase)"
+            },
+            "firebase_channel_help": "Kredensial di server (FIREBASE_CREDENTIALS_JSON). Pengguna cukup mengaktifkan push browser dan berlangganan peristiwa.",
+            "browser_push_title": "Push browser",
+            "browser_push_desc": "Terima peringatan realtime di Chrome/Edge jika diizinkan.",
+            "enable_browser_push": "Aktifkan notifikasi browser",
+            "push_granted": "Notifikasi diizinkan di browser ini",
+            "push_denied": "Diblokir di pengaturan browser",
+            "push_default": "Belum diaktifkan",
+            "firebase_not_configured": "Atur VITE_FIREBASE_* dan FIREBASE_CREDENTIALS_JSON di server.",
+            "reports_title": "Email laporan terjadwal",
+            "reports_desc": "Ringkasan harian/bulanan/tahunan hanya dikirim lewat SMTP (bukan push).",
+            "timezone": "Zona waktu (IANA)",
+            "report_emails": "Penerima laporan (pisahkan dengan koma)",
+            "report_period": {
+                "daily": "Harian",
+                "monthly": "Bulanan",
+                "yearly": "Tahunan"
+            },
+            "report_test": "Kirim uji"
         },
         "preferences": {
             "title": "Tampilan & bahasa",

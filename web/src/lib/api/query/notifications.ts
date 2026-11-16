@@ -3,7 +3,26 @@ import { axiosInstance } from '../client'
 import { useRBAC } from '@/lib/auth/rbac'
 import { toast } from 'sonner'
 
-export type NotificationChannelType = 'email' | 'msteams_webhook' | 'telegram' | 'sms'
+export type NotificationChannelType = 'email' | 'msteams_webhook' | 'telegram' | 'sms' | 'firebase'
+
+export type ReportScheduleSlot = {
+    enabled: boolean
+    hour: number
+    minute: number
+    day?: number
+    month?: number
+}
+
+export type NotificationTenantConfig = {
+    stock_low_threshold: number
+    timezone: string
+    report_schedules: {
+        daily: ReportScheduleSlot
+        monthly: ReportScheduleSlot
+        yearly: ReportScheduleSlot
+    }
+    report_recipient_emails: string[]
+}
 
 export type NotificationChannel = {
     id: string
@@ -59,7 +78,7 @@ export const notificationConfigQueryOptions = () =>
     queryOptions({
         queryKey: ['notifications', 'config'],
         queryFn: async () => {
-            const res = await axiosInstance.get<Success<{ stock_low_threshold: number }>>('/notifications/config')
+            const res = await axiosInstance.get<Success<NotificationTenantConfig>>('/notifications/config')
             return res.data.data
         },
     })
@@ -184,10 +203,8 @@ export function useUpdateNotificationSubscriptionsMutation() {
 export function useUpdateNotificationConfigMutation() {
     const qc = useQueryClient()
     return useMutation({
-        mutationFn: async (stock_low_threshold: number) => {
-            const res = await axiosInstance.put<Success<{ stock_low_threshold: number }>>('/notifications/config', {
-                stock_low_threshold,
-            })
+        mutationFn: async (body: Partial<NotificationTenantConfig> & { stock_low_threshold?: number }) => {
+            const res = await axiosInstance.put<Success<NotificationTenantConfig>>('/notifications/config', body)
             return res.data.data
         },
         onSuccess: () => {
@@ -195,5 +212,16 @@ export function useUpdateNotificationConfigMutation() {
             toast.success('Notification settings saved')
         },
         onError: () => toast.error('Failed to save settings'),
+    })
+}
+
+export function useTestReportEmailMutation() {
+    return useMutation({
+        mutationFn: async (period: 'daily' | 'monthly' | 'yearly') => {
+            await axiosInstance.post(`/notifications/reports/test?period=${period}`)
+        },
+        onSuccess: () => toast.success('Report email sent'),
+        onError: (err: { response?: { data?: { error?: string; message?: string } } }) =>
+            toast.error(err.response?.data?.error || err.response?.data?.message || 'Report send failed'),
     })
 }

@@ -1,7 +1,7 @@
 package user_test
 
 import (
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/user"
 	user_repo "dinosaurus-pos/internal/user/repository"
@@ -59,7 +59,7 @@ func TestAuthService_Login(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 
 		mockRepo.EXPECT().GetUserByEmail(ctx, req.Email).Return(testUser, nil)
-		mockActivity.EXPECT().Log(gomock.Any(), testUser.ID, activitylog_repo.LogActionTypeLOGINSUCCESS, activitylog_repo.LogEntityTypeUSER, testUser.ID.String(), gomock.Any())
+		mockActivity.EXPECT().Log(gomock.Any(), testUser.ID, activity_log_repo.LogActionTypeLOGINSUCCESS, activity_log_repo.LogEntityTypeUSER, testUser.ID.String(), gomock.Any())
 		mockToken.EXPECT().GenerateToken(testUser.Username, testUser.Email, testUser.ID, string(testUser.Role), gomock.Any()).Return("access_token", time.Now().Add(1*time.Hour), nil)
 		mockToken.EXPECT().GenerateRefreshToken(testUser.Username, testUser.Email, testUser.ID, string(testUser.Role), gomock.Any()).Return("refresh_token", time.Now().Add(24*time.Hour), nil)
 		mockRepo.EXPECT().UpdateRefreshToken(ctx, gomock.Any()).Return(nil)
@@ -91,7 +91,7 @@ func TestAuthService_Login(t *testing.T) {
 		reqWrongPass.Password = "wrongpassword"
 
 		mockLogger.EXPECT().Errorf(gomock.Any(), gomock.Any()).AnyTimes()
-		mockActivity.EXPECT().Log(ctx, testUser.ID, activitylog_repo.LogActionTypeLOGINFAILED, activitylog_repo.LogEntityTypeUSER, testUser.ID.String(), gomock.Any())
+		mockActivity.EXPECT().Log(ctx, testUser.ID, activity_log_repo.LogActionTypeLOGINFAILED, activity_log_repo.LogEntityTypeUSER, testUser.ID.String(), gomock.Any())
 
 		_, err := service.Login(ctx, reqWrongPass)
 		if err == nil {
@@ -135,7 +135,7 @@ func TestAuthService_Register(t *testing.T) {
 		}
 		mockRepo.EXPECT().CreateUser(ctx, gomock.Any()).Return(newUser, nil)
 
-		mockActivity.EXPECT().Log(ctx, gomock.Any(), activitylog_repo.LogActionTypeCREATE, activitylog_repo.LogEntityTypeUSER, gomock.Any(), gomock.Any())
+		mockActivity.EXPECT().Log(ctx, gomock.Any(), activity_log_repo.LogActionTypeCREATE, activity_log_repo.LogEntityTypeUSER, gomock.Any(), gomock.Any())
 
 		mockLogger.EXPECT().Warnf(gomock.Any(), gomock.Any()).AnyTimes()
 
@@ -275,7 +275,7 @@ func TestAuthService_UploadAvatar(t *testing.T) {
 
 		mockRepo.EXPECT().UpdateUser(ctx, gomock.Any()).Return(updatedUser, nil)
 		mockLogger.EXPECT().Infof(gomock.Any(), gomock.Any()).Times(1)
-		mockActivity.EXPECT().Log(ctx, gomock.Any(), activitylog_repo.LogActionTypeUPDATEAVATAR, activitylog_repo.LogEntityTypeUSER, userID.String(), gomock.Any())
+		mockActivity.EXPECT().Log(ctx, gomock.Any(), activity_log_repo.LogActionTypeUPDATEAVATAR, activity_log_repo.LogEntityTypeUSER, userID.String(), gomock.Any())
 
 		resp, err := service.UploadAvatar(ctx, userID, validImg)
 		if err != nil {
@@ -361,7 +361,7 @@ func TestAuthService_UpdatePassword(t *testing.T) {
 			return nil
 		})
 
-		mockActivity.EXPECT().Log(ctx, gomock.Any(), activitylog_repo.LogActionTypeUPDATEPASSWORD, activitylog_repo.LogEntityTypeUSER, userID.String(), gomock.Any())
+		mockActivity.EXPECT().Log(ctx, gomock.Any(), activity_log_repo.LogActionTypeUPDATEPASSWORD, activity_log_repo.LogEntityTypeUSER, userID.String(), gomock.Any())
 		mockLogger.EXPECT().Warnf(gomock.Any()).AnyTimes()
 
 		err := service.UpdatePassword(ctx, userID, req)

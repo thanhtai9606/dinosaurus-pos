@@ -82,11 +82,11 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 - `payment_mode`: `cash` \| `credit` (mặc định `cash`)
 - `amount_paid`: số tiền đã trả NCC lúc hoàn tất (≤ tổng phiếu)
 
-**Legacy:** phiếu cũ có thể chỉ có metadata JSON trong `note` với marker `__payment__` — parse qua `web/src/lib/stock-receipts/paymentNote.ts` (`stripPaymentFromNote` / `embedPaymentInNote`). **Không backfill** sang cột DB trong MVP.
+**Thanh toán:** chỉ cột DB `payment_mode`, `amount_paid` (không nhúng JSON vào `note`).
 
-**FE gửi API:** create/update gửi `payment_mode`, `amount_paid` và `note` thuần (không nhúng payment vào note trên luồng mới). File: `_dashboard.stock-receipts.new.tsx`, `StockReceiptEditorDialog.tsx`, DTO `internal/stockreceipts/dto.go`.
+**FE gửi API:** create/update gửi `payment_mode`, `amount_paid` và `note` thuần (không nhúng payment vào note trên luồng mới). File: `_dashboard.stock-receipts.new.tsx`, `StockReceiptEditorDialog.tsx`, DTO `internal/stock_receipts/dto.go`.
 
-**BE:** `applyReceiptPayment` trong `internal/stockreceipts/service.go`; khi **`Complete`**, nếu `total - amount_paid > 0` → tạo **một** `supplier_debts` gắn `stock_receipt_id` (`internal/supplierdebts/integrate.go`).
+**BE:** `applyReceiptPayment` trong `internal/stock_receipts/service.go`; khi **`Complete`**, nếu `total - amount_paid > 0` → tạo **một** `supplier_debts` gắn `stock_receipt_id` (`internal/supplier_debts/integrate.go`).
 
 **Kho (đa kho):** migration `000013_warehouses_stock_ops` — `warehouses`, `warehouse_stock` (nguồn tồn theo kho); `products.stock` = tổng các kho. Nhập/bán/điều chỉnh/chuyển/kiểm kê ghi `stock_history.warehouse_id`. Helper: `internal/inventory/stockmovement.go` (`ApplyWarehouseDelta`). API: `/warehouses`, `/stock-adjustments`, `/stock-transfers`, `/stock-takes`, `/stock-movements`. FE menu **Kho hàng** (`useNavigationMenu`). Seed kho `MAIN` khi tạo tenant.
 
@@ -103,9 +103,9 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 
 ### Không làm trong MVP
 
-- Aging, hạn mức, nhắc nợ, Excel báo cáo công nợ.
+- Hạn mức, nhắc nợ tự động, Excel báo cáo công nợ (đã có **tuổi nợ / age_days** trên list).
 - Đồng bộ kế toán / trừ quỹ ca khi trả NCC (chỉ ghi sổ nợ).
-- Backfill phiếu nhập cũ từ `__payment__` trong `note`.
+- Legacy `__payment__` trong `note` phiếu nhập: không dùng trên FE; chỉ `payment_mode` + `amount_paid` (migration `000016` + reset DB).
 
 ### Bảng DB (công nợ — trong baseline)
 
@@ -120,7 +120,7 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 | NCC | `GET/POST /supplier-debts`, `GET /supplier-debts/summary`, `GET /supplier-debts/:id`, `POST .../payments`, `POST .../void` |
 | Khách | `GET/POST /customer-debts`, `GET /customer-debts/summary`, `GET /customer-debts/:id`, `POST .../payments`, `POST .../void` |
 
-Package Go mirror: `internal/supplierdebts`, `internal/customerdebts` — wire trong `server/server.go`, `server/routes.go`.
+Package Go mirror: `internal/supplier_debts`, `internal/customer_debts` — wire trong `server/server.go`, `server/routes.go`.
 
 ### Tích hợp sự kiện (orders + receipts)
 
@@ -165,6 +165,17 @@ Package Go mirror: `internal/supplierdebts`, `internal/customerdebts` — wire t
 
 ---
 
+## Thông báo đa kênh (notifications)
+
+- Package: `internal/notifications` — kênh tenant (`notification_channels`), đăng ký user (`notification_subscriptions`), log giao hàng (`notification_deliveries`), device token FCM (`notification_device_tokens`, migration `000015`).
+- Kênh: `email` (SMTP), `msteams_webhook`, `telegram`, `sms` (stub), `firebase` (push — credential server `FIREBASE_CREDENTIALS_JSON`, kênh tenant `config_json: {}`).
+- Admin: CRUD kênh, test send, `GET/PUT /notifications/config` (JSON `notifications`: `stock_low_threshold`, `timezone`, `report_schedules`, `report_recipient_emails`), `POST /notifications/reports/test?period=daily|monthly|yearly`.
+- User: `GET/PUT /notification-subscriptions/me` — ma trận sự kiện × kênh; `POST /notification-devices/register`, `DELETE /notification-devices` (FCM token).
+- Sự kiện realtime: `order.created`, `order.cancelled`, `stock.low`, `supplier_debt.created`, `customer_debt.created`, `stock_receipt.completed`. Báo cáo email: `report.daily|monthly|yearly` — **chỉ** kênh email (cron `*/15 * * * *`, idempotent `notification_report_runs`).
+- FE: tab **Thông báo** (`NotificationSettingsCard.tsx`), `firebase-messaging-sw.js`, `VITE_FIREBASE_*` + nút bật push trình duyệt.
+
+---
+
 ## Lệnh hữu ích
 
 ```bash
@@ -179,6 +190,8 @@ sqlc: query debt nằm trong `internal/*/sql/` và repository `*.sql.go`; nếu 
 
 ## Commit gần đây (tham chiếu)
 
+- Migration `000017` — F&B (`dining_*`, `kitchen_status`), e-invoice (`e_invoices`), SMS thật, export Excel công nợ, trả NCC ↔ `cash_transactions`, offline queue POS `/order`.
+- **Menu RBAC** — setting `menu_role_access` + `GET/PUT /settings/menu-access`; tab Cài đặt → Phân quyền & menu; sidebar + chặn deep-link theo override tenant.
 - `c6a4a45` — Debt ledgers MVP + stock receipt `payment_mode` / `amount_paid` + trang công nợ + luồng tạo phiếu nhập mới.
 - Trước đó: stock receipts UX (modal rộng, bulk, delete API, barcode dòng).
 

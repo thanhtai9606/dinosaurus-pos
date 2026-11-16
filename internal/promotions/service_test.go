@@ -1,7 +1,7 @@
 package promotions_test
 
 import (
-	"dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log/repository"
 	common "dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/promotions"
 	promo_repo "dinosaurus-pos/internal/promotions/repository"

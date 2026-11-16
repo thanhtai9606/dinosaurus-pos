@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"dinosaurus-pos/internal/common"
-	"dinosaurus-pos/internal/platformaudit"
+	"dinosaurus-pos/internal/platform_audit"
 	"dinosaurus-pos/internal/tenant"
 	"dinosaurus-pos/pkg/database/seeder/catalog"
 	"dinosaurus-pos/pkg/logger"
@@ -18,7 +18,7 @@ type Handler struct {
 	repo          *Repository
 	service       *Service
 	log           logger.ILogger
-	audit         platformaudit.Recorder
+	audit         platform_audit.Recorder
 	lookupCache   *LookupCache
 	overviewCache overviewCacheInvalidator
 }
@@ -31,7 +31,7 @@ func NewHandler(
 	repo *Repository,
 	service *Service,
 	log logger.ILogger,
-	audit platformaudit.Recorder,
+	audit platform_audit.Recorder,
 	lookupCache *LookupCache,
 	overviewCache overviewCacheInvalidator,
 ) *Handler {

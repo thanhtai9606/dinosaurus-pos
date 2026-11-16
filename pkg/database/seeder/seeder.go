@@ -3,8 +3,8 @@ package seeder
 import (
 	cancellation_reasons_repo "dinosaurus-pos/internal/cancellation_reasons/repository"
 	categories_repo "dinosaurus-pos/internal/categories/repository"
-	"dinosaurus-pos/internal/measurementunits"
-	measurementunits_repo "dinosaurus-pos/internal/measurementunits/repository"
+	"dinosaurus-pos/internal/measurement_units"
+	measurement_units_repo "dinosaurus-pos/internal/measurement_units/repository"
 	payment_methods_repo "dinosaurus-pos/internal/payment_methods/repository"
 	cloudflarer2 "dinosaurus-pos/pkg/cloudflare-r2"
 
@@ -59,6 +59,6 @@ func RunSeeders(ctx context.Context, tenantDB *database.TenantDB, userRepo user_
 }
 
 func seedMeasurementUnitCatalog(ctx context.Context, db *database.TenantDB, tenantID uuid.UUID, log logger.ILogger) error {
-	svc := measurementunits.NewService(measurementunits_repo.New(db), log)
+	svc := measurement_units.NewService(measurement_units_repo.New(db), log)
 	return svc.SeedDefaults(ctx, tenantID)
 }

@@ -135,6 +135,9 @@
         "supplier_debts": "Công nợ NCC",
         "customer_debts": "Công nợ khách",
         "retail_pos": "Bán hàng POS",
+        "dining_tables": "Bàn ăn",
+        "kitchen": "Bếp / KDS",
+        "general": "Chung",
         "tenants_admin": "Quản lý cửa hàng",
         "platform": "Nền tảng",
         "platform_overview": "Tổng quan",
@@ -350,6 +353,7 @@
             "total": "Tổng nợ",
             "paid": "Đã trả",
             "balance": "Còn lại",
+            "age_days": "Tuổi nợ (ngày)",
             "amount": "Số tiền",
             "note": "Ghi chú",
             "date": "Ngày"
@@ -365,6 +369,36 @@
             "void": "Hủy khoản nợ"
         }
     },
+    "kitchen": {
+        "title": "Màn hình bếp",
+        "refresh": "Làm mới",
+        "empty": "Không có phiếu bếp đang chờ",
+        "table": "Bàn",
+        "status": {
+            "pending": "Chờ bếp",
+            "preparing": "Đang làm",
+            "ready": "Sẵn sàng",
+            "served": "Đã ra"
+        },
+        "advance_to": {
+            "preparing": "Bắt đầu làm",
+            "ready": "Hoàn tất",
+            "served": "Đã phục vụ"
+        },
+        "errors": {
+            "update_failed": "Cập nhật trạng thái bếp thất bại"
+        }
+    },
+    "dining": {
+        "title": "Sơ đồ bàn",
+        "seats": "{{count}} chỗ",
+        "status": {
+            "available": "Trống",
+            "occupied": "Có khách",
+            "reserved": "Đặt trước",
+            "dirty": "Cần dọn"
+        }
+    },
     "supplierDebts": {
         "title": "Công nợ nhà cung cấp",
         "fields": {
@@ -376,7 +410,8 @@
         },
         "actions": {
             "add_manual": "Thêm khoản nợ",
-            "view_suppliers": "Danh sách NCC"
+            "view_suppliers": "Danh sách NCC",
+            "export_excel": "Xuất Excel"
         },
         "messages": {
             "create_success": "Đã tạo khoản nợ NCC",
@@ -398,7 +433,8 @@
         },
         "actions": {
             "add_manual": "Thêm khoản nợ thủ công",
-            "view_customers": "Danh sách khách"
+            "view_customers": "Danh sách khách",
+            "export_excel": "Xuất Excel"
         },
         "messages": {
             "create_success": "Đã tạo khoản phải thu",
@@ -731,7 +767,66 @@
             "branding": "Branding",
             "printer": "Máy in",
             "financial": "Tài chính",
-            "invoice": "Hóa đơn / Biên lai"
+            "invoice": "Hóa đơn / Biên lai",
+            "notifications": "Thông báo",
+            "permissions": "Phân quyền & menu"
+        },
+        "permissions": {
+            "menu_title": "Menu theo vai trò",
+            "menu_description": "Chọn vai trò nào thấy từng mục trên sidebar. Admin luôn giữ quyền Cài đặt và Người dùng.",
+            "menu_column": "Mục menu",
+            "api_title": "API chính (tham chiếu)",
+            "api_description": "Danh sách rút gọn từ quy tắc RBAC hệ thống; chỉnh qua Swagger/@x-roles khi phát triển.",
+            "api_column": "Endpoint",
+            "roles_column": "Vai trò được phép",
+            "saved": "Đã lưu phân quyền menu",
+            "save_failed": "Không lưu được phân quyền menu",
+            "admin_lock": "Không thể bỏ quyền admin trên mục bắt buộc"
+        },
+        "notifications": {
+            "threshold_title": "Ngưỡng cảnh báo",
+            "threshold_desc": "Gửi thông báo khi tồn kho sản phẩm ở hoặc dưới mức này.",
+            "stock_threshold": "Ngưỡng tồn thấp",
+            "channels_title": "Kênh thông báo",
+            "channels_desc": "Cấu hình email, Microsoft Teams, Telegram hoặc SMS (MVP: SMS chưa gửi thật).",
+            "add_channel": "Thêm kênh",
+            "channel_name": "Tên kênh",
+            "enabled": "Bật",
+            "test": "Gửi thử",
+            "subscriptions_title": "Đăng ký của tôi",
+            "subscriptions_desc": "Chọn sự kiện và kênh bạn muốn nhận thông báo.",
+            "event": "Sự kiện",
+            "save_subscriptions": "Lưu đăng ký",
+            "channel_types": {
+                "email": "Email (SMTP)",
+                "msteams_webhook": "Microsoft Teams",
+                "telegram": "Telegram",
+                "sms": "SMS",
+                "firebase": "Push trình duyệt / mobile (Firebase)"
+            },
+            "firebase_channel_help": "Credential cấu hình trên server (FIREBASE_CREDENTIALS_JSON). Người dùng chỉ cần bật push trình duyệt và đăng ký sự kiện.",
+            "browser_push_title": "Thông báo trình duyệt",
+            "browser_push_desc": "Nhận cảnh báo realtime trên Chrome/Edge khi được phép.",
+            "enable_browser_push": "Bật thông báo trình duyệt",
+            "push_granted": "Đã cho phép thông báo trên trình duyệt này",
+            "push_denied": "Đã chặn trong cài đặt trình duyệt",
+            "push_default": "Chưa bật",
+            "firebase_not_configured": "Cần VITE_FIREBASE_* và FIREBASE_CREDENTIALS_JSON trên server.",
+            "reports_title": "Báo cáo email định kỳ",
+            "reports_desc": "Báo cáo ngày/tháng/năm chỉ gửi qua kênh SMTP (không qua push).",
+            "timezone": "Múi giờ (IANA)",
+            "report_emails": "Email nhận báo cáo (phân tách bằng dấu phẩy)",
+            "report_period": {
+                "daily": "Hàng ngày",
+                "monthly": "Hàng tháng",
+                "yearly": "Hàng năm"
+            },
+            "report_test": "Gửi thử",
+            "deliveries_title": "Nhật ký gửi thông báo",
+            "deliveries_desc": "Các lần gửi gần đây (email, push, …).",
+            "delivery_time": "Thời gian",
+            "delivery_status": "Trạng thái",
+            "delivery_summary": "Tóm tắt / lỗi"
         },
         "preferences": {
             "title": "Hiển thị & ngôn ngữ",

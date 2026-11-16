@@ -1,15 +1,18 @@
 package orders
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activity_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/common/store"
-	"dinosaurus-pos/internal/customerdebts"
-	"dinosaurus-pos/internal/docno"
+	"dinosaurus-pos/internal/customer_debts"
+	"dinosaurus-pos/internal/doc_no"
+	dining_repo "dinosaurus-pos/internal/dining/repository"
 	"dinosaurus-pos/internal/inventory"
-	cd_repo "dinosaurus-pos/internal/customerdebts/repository"
+	"dinosaurus-pos/internal/notifications"
+	shift_repo "dinosaurus-pos/internal/shift/repository"
+	cd_repo "dinosaurus-pos/internal/customer_debts/repository"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	orders_repo "dinosaurus-pos/internal/orders/repository"
 	prdunits "dinosaurus-pos/internal/products"
@@ -48,6 +51,8 @@ type IOrderService interface {
 	UpdateOperationalStatus(ctx context.Context, orderID uuid.UUID, req UpdateOrderStatusRequest) (*OrderDetailResponse, error)
 	ApplyPromotion(ctx context.Context, orderID uuid.UUID, req ApplyPromotionRequest) (*OrderDetailResponse, error)
 	RefundOrder(ctx context.Context, orderID uuid.UUID, req RefundOrderRequest) (*OrderDetailResponse, error)
+	ListKitchenTickets(ctx context.Context) ([]KitchenTicketResponse, error)
+	UpdateKitchenStatus(ctx context.Context, orderID uuid.UUID, req UpdateKitchenStatusRequest) (*KitchenTicketResponse, error)
 }
 
 type OrderService struct {
@@ -55,13 +60,15 @@ type OrderService struct {
 	ordersRepo       orders_repo.Querier
 	productsRepo     products_repo.Querier
 	midtransService  payment.IMidtrans
-	activityService  activitylog.IActivityService
+	activityService  activity_log.IActivityService
 	settingsService  settings.ISettingsService
 	log              logger.ILogger
 	wsHub            *ws.Hub
+	events           notifications.EventPublisher
+	shiftRepo        shift_repo.Querier
 }
 
-func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activitylog.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub) IOrderService {
+func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, productsRepo products_repo.Querier, midtransService payment.IMidtrans, activityService activity_log.IActivityService, settingsService settings.ISettingsService, log logger.ILogger, wsHub *ws.Hub, events notifications.EventPublisher, shiftRepo shift_repo.Querier) IOrderService {
 	return &OrderService{
 		store:            store,
 		ordersRepo:       ordersRepo,
@@ -69,9 +76,22 @@ func NewOrderService(store store.Store, ordersRepo orders_repo.Querier, products
 		midtransService:  midtransService,
 		activityService:  activityService,
 		settingsService:  settingsService,
-		log:             log,
-		wsHub:           wsHub,
+		log:              log,
+		wsHub:            wsHub,
+		events:           events,
+		shiftRepo:        shiftRepo,
 	}
+}
+
+func (s *OrderService) shiftIDForUser(ctx context.Context, userID uuid.UUID) pgtype.UUID {
+	if s.shiftRepo == nil {
+		return pgtype.UUID{}
+	}
+	sh, err := s.shiftRepo.GetOpenShiftByUserID(ctx, userID)
+	if err != nil {
+		return pgtype.UUID{}
+	}
+	return pgtype.UUID{Bytes: sh.ID, Valid: true}
 }
 
 var allowedStatusTransitions = map[orders_repo.OrderStatus]map[orders_repo.OrderStatus]bool{
@@ -439,12 +459,17 @@ func (s *OrderService) ConfirmManualPayment(ctx context.Context, orderID uuid.UU
 
 		changeDue := cashReceived - netTotal
 
+		shiftID := pgtype.UUID{}
+		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
+			shiftID = s.shiftIDForUser(ctx, actorID)
+		}
 		_, err = qtx.UpdateOrderManualPayment(ctx, orders_repo.UpdateOrderManualPaymentParams{
 			ID:              orderID,
 			PaymentMethodID: utils.Int32Ptr(int(req.PaymentMethodID)),
 			CashReceived:    &cashReceived,
 			ChangeDue:       &changeDue,
 			Version:         req.Version,
+			ShiftID:         shiftID,
 		})
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
@@ -455,7 +480,7 @@ func (s *OrderService) ConfirmManualPayment(ctx context.Context, orderID uuid.UU
 
 		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
 			cdq := cd_repo.New(tx)
-			_ = customerdebts.RecordOrderPaymentTx(ctx, cdq, orderID, float64(netTotal), pgtype.UUID{Bytes: actorID, Valid: true})
+			_ = customer_debts.RecordOrderPaymentTx(ctx, cdq, orderID, float64(netTotal), pgtype.UUID{Bytes: actorID, Valid: true})
 		}
 
 		finalOrder, err = qtx.GetOrderWithDetails(ctx, orderID)
@@ -961,7 +986,7 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID uuid.UUID, req C
 		}
 
 		cdq := cd_repo.New(tx)
-		if err := customerdebts.VoidDebtByOrderTx(ctx, cdq, orderID); err != nil {
+		if err := customer_debts.VoidDebtByOrderTx(ctx, cdq, orderID); err != nil {
 			return err
 		}
 		return nil
@@ -989,6 +1014,11 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID uuid.UUID, req C
 
 	if s.wsHub != nil {
 		s.wsHub.BroadcastEvent(ws.EventOrderUpdated, map[string]interface{}{"order_id": orderID})
+	}
+
+	if s.events != nil {
+		subject := fmt.Sprintf("Order %s cancelled", orderID)
+		s.events.PublishAsync(ctx, notifications.EventOrderCancelled, subject, subject)
 	}
 
 	return nil
@@ -1265,18 +1295,31 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		if err != nil {
 			return fmt.Errorf("failed to allocate order number: %w", err)
 		}
-		orderNo := docno.OrderNo(now, countToday+1)
+		orderNo := doc_no.OrderNo(now, countToday+1)
 
+		var diningTableID pgtype.UUID
+		if req.DiningTableID != nil {
+			diningTableID = pgtype.UUID{Bytes: *req.DiningTableID, Valid: true}
+		}
 		orderHeader, err := qtx.CreateOrder(ctx, orders_repo.CreateOrderParams{
-			UserID:     pgtype.UUID{Bytes: actorID, Valid: ok},
-			Type:       req.Type,
-			CustomerID: nullCustomerID,
-			OrderNo:    orderNo,
+			UserID:        pgtype.UUID{Bytes: actorID, Valid: ok},
+			Type:          req.Type,
+			CustomerID:    nullCustomerID,
+			OrderNo:       orderNo,
+			ShiftID:       s.shiftIDForUser(ctx, actorID),
+			DiningTableID: diningTableID,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to create order header: %w", err)
 		}
 		newOrderID = orderHeader.ID
+		if diningTableID.Valid {
+			diningQ := dining_repo.New(tx)
+			_ = diningQ.SetDiningTableStatusByID(ctx, dining_repo.SetDiningTableStatusByIDParams{
+				ID:     uuid.UUID(diningTableID.Bytes),
+				Status: dining_repo.DiningTableStatusOccupied,
+			})
+		}
 
 		productIDs := make([]uuid.UUID, len(req.Items))
 		for i, item := range req.Items {
@@ -1530,7 +1573,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		if nullCustomerID.Valid && netTotal > 0 {
 			cdq := cd_repo.New(tx)
 			ref := fmt.Sprintf("ORD-%s", newOrderID.String()[:8])
-			if err := customerdebts.CreateDebtFromOrderTx(ctx, cdq, customerdebts.FromOrderParams{
+			if err := customer_debts.CreateDebtFromOrderTx(ctx, cdq, customer_debts.FromOrderParams{
 				CustomerID:  uuid.UUID(nullCustomerID.Bytes),
 				OrderID:     newOrderID,
 				ReferenceNo: ref,
@@ -1566,6 +1609,16 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 
 	if s.wsHub != nil {
 		s.wsHub.BroadcastEvent(ws.EventOrderCreated, map[string]interface{}{"order_id": newOrderID})
+	}
+
+	if s.events != nil {
+		subject := fmt.Sprintf("Order %s created", finalOrder.OrderNo)
+		body := fmt.Sprintf("New order %s — net total %d", finalOrder.OrderNo, finalOrder.NetTotal)
+		s.events.PublishAsync(ctx, notifications.EventOrderCreated, subject, body)
+		if finalOrder.CustomerID.Valid && finalOrder.Status != orders_repo.OrderStatusPaid && finalOrder.NetTotal > 0 {
+			debtSubject := fmt.Sprintf("Customer debt for order %s", finalOrder.OrderNo)
+			s.events.PublishAsync(ctx, notifications.EventCustomerDebtCreated, debtSubject, debtSubject)
+		}
 	}
 
 	return s.buildOrderDetailResponseFromQueryResult(ctx, finalOrder)

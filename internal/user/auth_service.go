@@ -1,8 +1,8 @@
 package user
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/tenant"
 	"dinosaurus-pos/internal/tenants"
@@ -26,10 +26,10 @@ type AthService struct {
 	Log            logger.ILogger
 	Token          utils.Manager
 	AvatarRepo     IAthRepo
-	ActivityLogger activitylog.IActivityService
+	ActivityLogger activity_log.IActivityService
 }
 
-func NewAuthService(userRepo user_repo.Querier, tenantsRepo *tenants.Repository, log logger.ILogger, tokenManager utils.Manager, avaRepo IAthRepo, actLog activitylog.IActivityService) IAuthService {
+func NewAuthService(userRepo user_repo.Querier, tenantsRepo *tenants.Repository, log logger.ILogger, tokenManager utils.Manager, avaRepo IAthRepo, actLog activity_log.IActivityService) IAuthService {
 	return &AthService{
 		UserRepo:       userRepo,
 		Tenants:        tenantsRepo,
@@ -261,8 +261,8 @@ func (s *AthService) UpdatePassword(ctx context.Context, userID uuid.UUID, req U
 	s.ActivityLogger.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATEPASSWORD,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeUPDATEPASSWORD,
+		activity_log_repo.LogEntityTypeUSER,
 		user.ID.String(),
 		logDetails,
 	)
@@ -329,8 +329,8 @@ func (s *AthService) UploadAvatar(ctx context.Context, userID uuid.UUID, data []
 	s.ActivityLogger.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATEAVATAR,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeUPDATEAVATAR,
+		activity_log_repo.LogEntityTypeUSER,
 		profile.ID.String(),
 		logDetails,
 	)
@@ -416,8 +416,8 @@ func (s *AthService) Register(ctx context.Context, req RegisterRequest) (*Profil
 	s.ActivityLogger.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeCREATE,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeCREATE,
+		activity_log_repo.LogEntityTypeUSER,
 		user.ID.String(),
 		logDetails,
 	)
@@ -465,8 +465,8 @@ func (s *AthService) Login(ctx context.Context, req LoginRequest) (*LoginRespons
 		s.ActivityLogger.Log(
 			ctx,
 			user.ID,
-			activitylog_repo.LogActionTypeLOGINFAILED,
-			activitylog_repo.LogEntityTypeUSER,
+			activity_log_repo.LogActionTypeLOGINFAILED,
+			activity_log_repo.LogEntityTypeUSER,
 			user.ID.String(),
 			logDetails,
 		)
@@ -483,8 +483,8 @@ func (s *AthService) Login(ctx context.Context, req LoginRequest) (*LoginRespons
 	s.ActivityLogger.Log(
 		logCtx,
 		user.ID,
-		activitylog_repo.LogActionTypeLOGINSUCCESS,
-		activitylog_repo.LogEntityTypeUSER,
+		activity_log_repo.LogActionTypeLOGINSUCCESS,
+		activity_log_repo.LogEntityTypeUSER,
 		user.ID.String(),
 		logDetails,
 	)

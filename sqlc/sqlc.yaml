@@ -1,13 +1,13 @@
 version: "2"
 sql:
-## Activity Log | internal/activitylog/sql/activity_log.sql
+## Activity Log | internal/activity_log/sql/activity_log.sql
   - engine: "postgresql"
-    queries: "../internal/activitylog/sql/"
+    queries: "../internal/activity_log/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/activitylog/repository"
+        out: "../internal/activity_log/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true
@@ -63,14 +63,14 @@ sql:
               import: "github.com/google/uuid"
               type: "UUID"
 
-## Customer groups | internal/customergroups/sql/customer_groups.sql
+## Customer groups | internal/customer_groups/sql/customer_groups.sql
   - engine: "postgresql"
-    queries: "../internal/customergroups/sql/"
+    queries: "../internal/customer_groups/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/customergroups/repository"
+        out: "../internal/customer_groups/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true
@@ -84,14 +84,14 @@ sql:
               import: "github.com/google/uuid"
               type: "UUID"
 
-## Measurement units | internal/measurementunits/sql/measurement_units.sql
+## Measurement units | internal/measurement_units/sql/measurement_units.sql
   - engine: "postgresql"
-    queries: "../internal/measurementunits/sql/"
+    queries: "../internal/measurement_units/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/measurementunits/repository"
+        out: "../internal/measurement_units/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true
@@ -168,14 +168,35 @@ sql:
               import: "github.com/google/uuid"
               type: "UUID"
 
-## Stock receipts | internal/stockreceipts/sql/stock_receipts.sql
+## Stock receipts | internal/stock_receipts/sql/stock_receipts.sql
   - engine: "postgresql"
-    queries: "../internal/stockreceipts/sql/"
+    queries: "../internal/stock_receipts/sql/"
     schema: "migrations/"
     gen:
       go:
         package: "repository"
-        out: "../internal/stockreceipts/repository"
+        out: "../internal/stock_receipts/repository"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: true
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_empty_slices: true
+        emit_pointers_for_null_types : true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+
+## Notifications | internal/notifications/sql/notifications.sql
+  - engine: "postgresql"
+    queries: "../internal/notifications/sql/"
+    schema: "migrations/"
+    gen:
+      go:
+        package: "repository"
+        out: "../internal/notifications/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true
@@ -362,6 +383,90 @@ sql:
       go:
         package: "repository"
         out: "../internal/report/repository"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: true
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_empty_slices: true
+        emit_pointers_for_null_types : true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+
+## Supplier debts | internal/supplier_debts/sql/supplier_debts.sql
+  - engine: "postgresql"
+    queries: "../internal/supplier_debts/sql/"
+    schema: "migrations/"
+    gen:
+      go:
+        package: "repository"
+        out: "../internal/supplier_debts/repository"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: true
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_empty_slices: true
+        emit_pointers_for_null_types : true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+
+## Customer debts | internal/customer_debts/sql/customer_debts.sql
+  - engine: "postgresql"
+    queries: "../internal/customer_debts/sql/"
+    schema: "migrations/"
+    gen:
+      go:
+        package: "repository"
+        out: "../internal/customer_debts/repository"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: true
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_empty_slices: true
+        emit_pointers_for_null_types : true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+
+## Dining | internal/dining/sql/dining.sql
+  - engine: "postgresql"
+    queries: "../internal/dining/sql/"
+    schema: "migrations/"
+    gen:
+      go:
+        package: "repository"
+        out: "../internal/dining/repository"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_prepared_queries: true
+        emit_interface: true
+        emit_exact_table_names: false
+        emit_empty_slices: true
+        emit_pointers_for_null_types : true
+        overrides:
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+
+## E-invoice | internal/einvoice/sql/einvoice.sql
+  - engine: "postgresql"
+    queries: "../internal/einvoice/sql/"
+    schema: "migrations/"
+    gen:
+      go:
+        package: "repository"
+        out: "../internal/einvoice/repository"
         sql_package: "pgx/v5"
         emit_json_tags: true
         emit_prepared_queries: true

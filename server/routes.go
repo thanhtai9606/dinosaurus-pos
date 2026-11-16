@@ -114,6 +114,10 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Post("/orders/:id/pay/midtrans", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.InitiateMidtransPaymentHandler)
 	api.Post("/orders/:id/pay/manual", authMiddleware, middleware.RequireIdempotencyKey(), idempotencyMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.ConfirmManualPaymentHandler)
 	api.Post("/orders/:id/update-status", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.UpdateOperationalStatusHandler)
+	api.Get("/kitchen/tickets", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.ListKitchenTicketsHandler)
+	api.Patch("/orders/:id/kitchen-status", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.OrderHandler.UpdateKitchenStatusHandler)
+	api.Post("/orders/:id/e-invoice", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.EInvoiceHandler.IssueHandler)
+	api.Get("/orders/:id/e-invoice", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.EInvoiceHandler.GetByOrderHandler)
 
 	api.Post("/orders/:id/print", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.PrinterHandler.PrintInvoiceHandler)
 	api.Get("/orders/:id/print-data", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier), container.PrinterHandler.GetInvoiceDataHandler)
@@ -145,6 +149,24 @@ func SetupRoutes(app *App, container *AppContainer) {
 		promotionsWriteGroup.Post("/:id/restore", container.PromotionHandler.RestorePromotionHandler)
 	}
 
+	notificationGroup := api.Group("/notification-channels", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
+	{
+		notificationGroup.Get("/", container.NotificationHandler.ListChannelsHandler)
+		notificationGroup.Post("/", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.CreateChannelHandler)
+		notificationGroup.Put("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.UpdateChannelHandler)
+		notificationGroup.Delete("/:id", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.DeleteChannelHandler)
+		notificationGroup.Post("/:id/test", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.TestChannelHandler)
+	}
+	api.Get("/notification-event-types", authMiddleware, container.NotificationHandler.ListEventTypesHandler)
+	api.Get("/notification-subscriptions/me", authMiddleware, container.NotificationHandler.GetMySubscriptionsHandler)
+	api.Put("/notification-subscriptions/me", authMiddleware, container.NotificationHandler.UpdateMySubscriptionsHandler)
+	api.Get("/notification-deliveries", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.ListDeliveriesHandler)
+	api.Get("/notifications/config", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.GetTenantConfigHandler)
+	api.Put("/notifications/config", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.UpdateTenantConfigHandler)
+	api.Post("/notification-devices/register", authMiddleware, container.NotificationHandler.RegisterDeviceHandler)
+	api.Delete("/notification-devices", authMiddleware, container.NotificationHandler.UnregisterDeviceHandler)
+	api.Post("/notifications/reports/test", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleAdmin), container.NotificationHandler.TestReportEmailHandler)
+
 	settingsGroup := api.Group("/settings", authMiddleware)
 	{
 		settingsGroup.Get("/branding", container.SettingsHandler.GetBrandingHandler)
@@ -163,6 +185,9 @@ func SetupRoutes(app *App, container *AppContainer) {
 		settingsGroup.Get("/invoice", container.SettingsHandler.GetInvoiceSettingsHandler)
 		settingsGroup.Put("/invoice", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateInvoiceSettingsHandler)
 		settingsGroup.Post("/invoice", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateInvoiceSettingsHandler)
+
+		settingsGroup.Get("/menu-access", container.SettingsHandler.GetMenuRoleAccessHandler)
+		settingsGroup.Put("/menu-access", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateMenuRoleAccessHandler)
 		settingsGroup.Get("/printer/discover", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.PrinterHandler.DiscoverPrintersHandler)
 		settingsGroup.Post("/printer/test", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.PrinterHandler.TestPrintHandler)
 	}
@@ -214,6 +239,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 	supplierDebtGroup := api.Group("/supplier-debts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{
 		supplierDebtGroup.Get("/summary", container.SupplierDebtHandler.SummaryHandler)
+		supplierDebtGroup.Get("/export", container.SupplierDebtHandler.ExportHandler)
 		supplierDebtGroup.Get("/", container.SupplierDebtHandler.ListHandler)
 		supplierDebtGroup.Post("/", container.SupplierDebtHandler.CreateHandler)
 		supplierDebtGroup.Get("/:id", container.SupplierDebtHandler.GetHandler)
@@ -224,6 +250,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 	customerDebtGroup := api.Group("/customer-debts", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{
 		customerDebtGroup.Get("/summary", container.CustomerDebtHandler.SummaryHandler)
+		customerDebtGroup.Get("/export", container.CustomerDebtHandler.ExportHandler)
 		customerDebtGroup.Get("/", container.CustomerDebtHandler.ListHandler)
 		customerDebtGroup.Post("/", container.CustomerDebtHandler.CreateHandler)
 		customerDebtGroup.Get("/:id", container.CustomerDebtHandler.GetHandler)
@@ -251,6 +278,14 @@ func SetupRoutes(app *App, container *AppContainer) {
 	api.Post("/warehouses", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.CreateHandler)
 	api.Put("/warehouses/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.UpdateHandler)
 	api.Delete("/warehouses/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.DeleteHandler)
+
+	diningGroup := api.Group("/dining", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier))
+	{
+		diningGroup.Get("/areas", container.DiningHandler.ListAreasHandler)
+		diningGroup.Get("/tables", container.DiningHandler.ListTablesHandler)
+		diningGroup.Post("/tables", middleware.RoleMiddleware(middleware.UserRoleManager), container.DiningHandler.CreateTableHandler)
+		diningGroup.Patch("/tables/:id/status", container.DiningHandler.UpdateTableStatusHandler)
+	}
 
 	stockOpsGroup := api.Group("", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
 	{

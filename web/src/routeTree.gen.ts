@@ -19,7 +19,9 @@ import { Route as DashboardActivityLogsRouteImport } from './routes/_dashboard.a
 import { Route as DashboardCustomerDebtsRouteImport } from './routes/_dashboard.customer-debts'
 import { Route as DashboardCustomerGroupsRouteImport } from './routes/_dashboard.customer-groups'
 import { Route as DashboardCustomersRouteImport } from './routes/_dashboard.customers'
+import { Route as DashboardDiningTablesRouteImport } from './routes/_dashboard.dining-tables'
 import { Route as DashboardInventoryRouteImport } from './routes/_dashboard.inventory'
+import { Route as DashboardKitchenRouteImport } from './routes/_dashboard.kitchen'
 import { Route as DashboardOrderRouteImport } from './routes/_dashboard.order'
 import { Route as DashboardPriceListsRouteImport } from './routes/_dashboard.price-lists'
 import { Route as DashboardProductRouteImport } from './routes/_dashboard.product'
@@ -98,9 +100,19 @@ const DashboardCustomersRoute = DashboardCustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDiningTablesRoute = DashboardDiningTablesRouteImport.update({
+  id: '/dining-tables',
+  path: '/dining-tables',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardInventoryRoute = DashboardInventoryRouteImport.update({
   id: '/inventory',
   path: '/inventory',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardKitchenRoute = DashboardKitchenRouteImport.update({
+  id: '/kitchen',
+  path: '/kitchen',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardOrderRoute = DashboardOrderRouteImport.update({
@@ -258,7 +270,9 @@ export interface FileRoutesByFullPath {
   '/customer-debts': typeof DashboardCustomerDebtsRoute
   '/customer-groups': typeof DashboardCustomerGroupsRoute
   '/customers': typeof DashboardCustomersRoute
+  '/dining-tables': typeof DashboardDiningTablesRoute
   '/inventory': typeof DashboardInventoryRoute
+  '/kitchen': typeof DashboardKitchenRoute
   '/order': typeof DashboardOrderRoute
   '/price-lists': typeof DashboardPriceListsRoute
   '/product': typeof DashboardProductRoute
@@ -297,7 +311,9 @@ export interface FileRoutesByTo {
   '/customer-debts': typeof DashboardCustomerDebtsRoute
   '/customer-groups': typeof DashboardCustomerGroupsRoute
   '/customers': typeof DashboardCustomersRoute
+  '/dining-tables': typeof DashboardDiningTablesRoute
   '/inventory': typeof DashboardInventoryRoute
+  '/kitchen': typeof DashboardKitchenRoute
   '/order': typeof DashboardOrderRoute
   '/price-lists': typeof DashboardPriceListsRoute
   '/product': typeof DashboardProductRoute
@@ -339,7 +355,9 @@ export interface FileRoutesById {
   '/_dashboard/customer-debts': typeof DashboardCustomerDebtsRoute
   '/_dashboard/customer-groups': typeof DashboardCustomerGroupsRoute
   '/_dashboard/customers': typeof DashboardCustomersRoute
+  '/_dashboard/dining-tables': typeof DashboardDiningTablesRoute
   '/_dashboard/inventory': typeof DashboardInventoryRoute
+  '/_dashboard/kitchen': typeof DashboardKitchenRoute
   '/_dashboard/order': typeof DashboardOrderRoute
   '/_dashboard/price-lists': typeof DashboardPriceListsRoute
   '/_dashboard/product': typeof DashboardProductRoute
@@ -382,7 +400,9 @@ export interface FileRouteTypes {
     | '/customer-debts'
     | '/customer-groups'
     | '/customers'
+    | '/dining-tables'
     | '/inventory'
+    | '/kitchen'
     | '/order'
     | '/price-lists'
     | '/product'
@@ -421,7 +441,9 @@ export interface FileRouteTypes {
     | '/customer-debts'
     | '/customer-groups'
     | '/customers'
+    | '/dining-tables'
     | '/inventory'
+    | '/kitchen'
     | '/order'
     | '/price-lists'
     | '/product'
@@ -462,7 +484,9 @@ export interface FileRouteTypes {
     | '/_dashboard/customer-debts'
     | '/_dashboard/customer-groups'
     | '/_dashboard/customers'
+    | '/_dashboard/dining-tables'
     | '/_dashboard/inventory'
+    | '/_dashboard/kitchen'
     | '/_dashboard/order'
     | '/_dashboard/price-lists'
     | '/_dashboard/product'
@@ -572,11 +596,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCustomersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/dining-tables': {
+      id: '/_dashboard/dining-tables'
+      path: '/dining-tables'
+      fullPath: '/dining-tables'
+      preLoaderRoute: typeof DashboardDiningTablesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/inventory': {
       id: '/_dashboard/inventory'
       path: '/inventory'
       fullPath: '/inventory'
       preLoaderRoute: typeof DashboardInventoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/kitchen': {
+      id: '/_dashboard/kitchen'
+      path: '/kitchen'
+      fullPath: '/kitchen'
+      preLoaderRoute: typeof DashboardKitchenRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/order': {
@@ -823,7 +861,9 @@ interface DashboardRouteChildren {
   DashboardCustomerDebtsRoute: typeof DashboardCustomerDebtsRoute
   DashboardCustomerGroupsRoute: typeof DashboardCustomerGroupsRoute
   DashboardCustomersRoute: typeof DashboardCustomersRoute
+  DashboardDiningTablesRoute: typeof DashboardDiningTablesRoute
   DashboardInventoryRoute: typeof DashboardInventoryRoute
+  DashboardKitchenRoute: typeof DashboardKitchenRoute
   DashboardOrderRoute: typeof DashboardOrderRoute
   DashboardPriceListsRoute: typeof DashboardPriceListsRoute
   DashboardProductRoute: typeof DashboardProductRoute
@@ -859,7 +899,9 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardCustomerDebtsRoute: DashboardCustomerDebtsRoute,
   DashboardCustomerGroupsRoute: DashboardCustomerGroupsRoute,
   DashboardCustomersRoute: DashboardCustomersRoute,
+  DashboardDiningTablesRoute: DashboardDiningTablesRoute,
   DashboardInventoryRoute: DashboardInventoryRoute,
+  DashboardKitchenRoute: DashboardKitchenRoute,
   DashboardOrderRoute: DashboardOrderRoute,
   DashboardPriceListsRoute: DashboardPriceListsRoute,
   DashboardProductRoute: DashboardProductRoute,

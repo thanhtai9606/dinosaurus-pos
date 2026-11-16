@@ -1,8 +1,8 @@
 package promotions
 
 import (
-	"dinosaurus-pos/internal/activitylog"
-	activitylog_repo "dinosaurus-pos/internal/activitylog/repository"
+	"dinosaurus-pos/internal/activity_log"
+	activity_log_repo "dinosaurus-pos/internal/activity_log/repository"
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/common/store"
@@ -29,10 +29,10 @@ type PromotionService struct {
 	repo            repository.Querier
 	store           store.Store
 	log             logger.ILogger
-	activityService activitylog.IActivityService
+	activityService activity_log.IActivityService
 }
 
-func NewPromotionService(store store.Store, repo repository.Querier, log logger.ILogger, activityService activitylog.IActivityService) IPromotionService {
+func NewPromotionService(store store.Store, repo repository.Querier, log logger.ILogger, activityService activity_log.IActivityService) IPromotionService {
 	return &PromotionService{
 		repo:            repo,
 		store:           store,
@@ -113,8 +113,8 @@ func (s *PromotionService) CreatePromotion(ctx context.Context, req CreatePromot
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeCREATE,
-		activitylog_repo.LogEntityTypePROMOTION,
+		activity_log_repo.LogActionTypeCREATE,
+		activity_log_repo.LogEntityTypePROMOTION,
 		promoID.String(),
 		logDetails,
 	)
@@ -192,8 +192,8 @@ func (s *PromotionService) UpdatePromotion(ctx context.Context, id uuid.UUID, re
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeUPDATE,
-		activitylog_repo.LogEntityTypePROMOTION,
+		activity_log_repo.LogActionTypeUPDATE,
+		activity_log_repo.LogEntityTypePROMOTION,
 		id.String(),
 		map[string]interface{}{
 			"updated_promotion_id":   id,
@@ -296,8 +296,8 @@ func (s *PromotionService) RestorePromotion(ctx context.Context, id uuid.UUID) e
 	s.activityService.Log(
 		ctx,
 		actorID,
-		activitylog_repo.LogActionTypeRESTORE,
-		activitylog_repo.LogEntityTypePROMOTION,
+		activity_log_repo.LogActionTypeRESTORE,
+		activity_log_repo.LogEntityTypePROMOTION,
 		id.String(),
 		map[string]interface{}{
 			"restored_promotion_id": id,

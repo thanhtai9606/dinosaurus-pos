@@ -6,7 +6,7 @@ function storageKey() {
     return `${LEGACY_KEY}_${posStorageScope()}`
 }
 
-export type PosQueueKind = 'retail_cash' | 'retail_debt' | 'retail_other'
+export type PosQueueKind = 'retail_cash' | 'retail_debt' | 'retail_other' | 'pos_cash' | 'pos_debt'
 
 export type PosQueueEntry = {
     id: string

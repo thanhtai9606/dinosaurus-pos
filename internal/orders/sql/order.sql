@@ -1,7 +1,26 @@
 -- name: CreateOrder :one
-INSERT INTO orders (user_id, type, customer_id, order_no)
-VALUES ($1, $2, $3, $4)
+INSERT INTO orders (user_id, type, customer_id, order_no, shift_id, dining_table_id)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING *;
+
+-- name: UpdateOrderKitchenStatus :one
+UPDATE orders SET kitchen_status = $2, updated_at = NOW() WHERE id = $1 RETURNING *;
+
+-- name: ListKitchenTickets :many
+SELECT
+    o.id,
+    o.order_no,
+    o.kitchen_status,
+    o.status AS order_status,
+    o.created_at,
+    o.dining_table_id,
+    dt.name AS table_name
+FROM orders o
+LEFT JOIN dining_tables dt ON dt.id = o.dining_table_id
+WHERE o.status NOT IN ('cancelled', 'paid')
+  AND o.kitchen_status <> 'served'
+ORDER BY o.created_at ASC
+LIMIT $1;
 
 -- name: CountOrdersOnDate :one
 SELECT COUNT(*)::int FROM orders
@@ -34,6 +53,9 @@ INSERT INTO order_item_options (
 ) VALUES (
              $1, $2, $3
          ) RETURNING *;
+
+-- name: GetOrderHeaderByID :one
+SELECT * FROM orders WHERE id = $1;
 
 -- name: GetOrderForUpdate :one
 -- Mengambil satu pesanan dan mengunci barisnya untuk pembaruan (mencegah race condition).
@@ -245,6 +267,7 @@ SET
     payment_method_id = $2,
     cash_received = $3,
     change_due = $4,
+    shift_id = COALESCE(orders.shift_id, $6),
     status = CASE WHEN status = 'open' THEN 'in_progress'::order_status ELSE status END,
     version = version + 1
 WHERE

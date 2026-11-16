@@ -6,7 +6,7 @@ import (
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/customers/repository"
-	"dinosaurus-pos/internal/docno"
+	"dinosaurus-pos/internal/doc_no"
 	"dinosaurus-pos/pkg/logger"
 	"strings"
 
@@ -58,7 +58,7 @@ func (s *CustomerService) CreateCustomer(ctx context.Context, req CreateCustomer
 		Phone:           req.Phone,
 		Email:           req.Email,
 		Address:         req.Address,
-		Code:            docno.CustomerCode(count + 1),
+		Code:            doc_no.CustomerCode(count + 1),
 		CustomerGroupID: uuidPtrToPg(req.CustomerGroupID),
 	})
 	if err != nil {

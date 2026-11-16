@@ -8,6 +8,7 @@ import { meQueryOptions } from '@/lib/api/query/auth'
 import { useBrandingSettingsQuery, financialSettingsQueryOptions } from '@/lib/api/query/settings'
 import { MoneyProvider } from '@/context/MoneyContext'
 import { useNavigationMenu } from '@/hooks/useNavigationMenu'
+import { canAccessMenuPath, MENU_BY_PATH } from '@/lib/auth/menuCatalog'
 import { isSuperAdminPlatformPath, SUPER_ADMIN_HOME } from '@/lib/auth/superAdminPaths'
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar"
 import { DashboardTopBar } from "@/components/dashboard/DashboardTopBar"
@@ -15,6 +16,7 @@ import { useAppWebSocket } from '@/hooks/useAppWebSocket'
 import { useQueryClient } from '@tanstack/react-query'
 import { PosStorageScopeEffect } from '@/components/dashboard/PosStorageScopeEffect'
 import { PosCatalogBootstrap } from '@/components/dashboard/PosCatalogBootstrap'
+import { FirebaseMessagingBootstrap } from '@/components/notifications/FirebaseMessagingBootstrap'
 
 export const Route = createFileRoute('/_dashboard')({
     loader: async ({ context: { queryClient } }) => {
@@ -67,7 +69,7 @@ function DashboardLayout() {
         }
     }
 
-    const { filteredMenu } = useNavigationMenu(auth.user?.role)
+    const { filteredMenu, menuAccess } = useNavigationMenu(auth.user?.role)
     const pathname = useRouterState({ select: (s) => s.location.pathname })
     const isSuperAdmin = auth.user?.role === 'super_admin'
 
@@ -77,6 +79,14 @@ function DashboardLayout() {
             void router.navigate({ to: SUPER_ADMIN_HOME, replace: true })
         }
     }, [isSuperAdmin, pathname, router])
+
+    useEffect(() => {
+        if (isSuperAdmin || !auth.user?.role) return
+        const normalized = pathname === '/' ? '/' : pathname.replace(/\/$/, '')
+        if (MENU_BY_PATH[normalized] && !canAccessMenuPath(normalized, auth.user.role, menuAccess?.items)) {
+            void router.navigate({ to: '/', replace: true })
+        }
+    }, [auth.user?.role, isSuperAdmin, menuAccess?.items, pathname, router])
 
     return (
         <div className={cn(
@@ -108,6 +118,7 @@ function DashboardLayout() {
                 </div>
                 {!isSuperAdmin && (
                     <>
+                        <FirebaseMessagingBootstrap />
                         <PosStorageScopeEffect />
                         <PosCatalogBootstrap />
                         <OpenShiftModal />

@@ -378,6 +378,14 @@ export const RBAC_RULES: Record<string, string[]> = {
         "manager",
         "cashier"
     ],
+    "GET /settings/menu-access": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PUT /settings/menu-access": [
+        "admin"
+    ],
     "PUT /settings/invoice": [
         "admin"
     ],
@@ -385,6 +393,59 @@ export const RBAC_RULES: Record<string, string[]> = {
         "admin"
     ],
     "POST /settings/printer/test": [
+        "admin"
+    ],
+    "GET /notification-event-types": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /notification-channels": [
+        "admin",
+        "manager"
+    ],
+    "POST /notification-channels": [
+        "admin"
+    ],
+    "PUT /notification-channels/{id}": [
+        "admin"
+    ],
+    "DELETE /notification-channels/{id}": [
+        "admin"
+    ],
+    "POST /notification-channels/{id}/test": [
+        "admin"
+    ],
+    "GET /notification-subscriptions/me": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PUT /notification-subscriptions/me": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /notification-deliveries": [
+        "admin"
+    ],
+    "GET /notifications/config": [
+        "admin"
+    ],
+    "PUT /notifications/config": [
+        "admin"
+    ],
+    "POST /notification-devices/register": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "DELETE /notification-devices": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "POST /notifications/reports/test": [
         "admin"
     ],
     "POST /shifts/cash-transaction": [
@@ -483,6 +544,10 @@ export const RBAC_RULES: Record<string, string[]> = {
         "admin",
         "manager"
     ],
+    "GET /supplier-debts/export": [
+        "admin",
+        "manager"
+    ],
     "POST /supplier-debts": [
         "admin",
         "manager"
@@ -504,6 +569,43 @@ export const RBAC_RULES: Record<string, string[]> = {
         "manager"
     ],
     "GET /customer-debts/summary": [
+        "admin",
+        "manager"
+    ],
+    "GET /customer-debts/export": [
+        "admin",
+        "manager"
+    ],
+    "GET /dining/tables": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /dining/areas": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PATCH /dining/tables/{id}/status": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /kitchen/tickets": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PATCH /orders/{id}/kitchen-status": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "POST /orders/{id}/e-invoice": [
+        "admin",
+        "manager"
+    ],
+    "GET /orders/{id}/e-invoice": [
         "admin",
         "manager"
     ],

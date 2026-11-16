@@ -11,6 +11,7 @@ import (
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/inventory"
 	products_repo "dinosaurus-pos/internal/products/repository"
+	"dinosaurus-pos/internal/tenant"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	"dinosaurus-pos/internal/supplierdebts"
 	sd_repo "dinosaurus-pos/internal/supplierdebts/repository"
@@ -72,7 +73,11 @@ func (s *StockReceiptService) Create(ctx context.Context, req CreateStockReceipt
 		if req.WarehouseID != nil {
 			warehouseID = pgtype.UUID{Bytes: *req.WarehouseID, Valid: true}
 		} else {
-			dw, err := whRepo.GetDefaultWarehouse(ctx)
+			tid, ok := tenant.IDFromContext(ctx)
+			if !ok {
+				return common.ErrUnauthorized
+			}
+			dw, err := whRepo.GetDefaultWarehouse(ctx, tid)
 			if err != nil {
 				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
 			}
@@ -281,7 +286,11 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 
 		warehouseID := uuid.UUID(receipt.WarehouseID.Bytes)
 		if !receipt.WarehouseID.Valid {
-			dw, err := wh.GetDefaultWarehouse(ctx)
+			tid, ok := tenant.IDFromContext(ctx)
+			if !ok {
+				return common.ErrUnauthorized
+			}
+			dw, err := wh.GetDefaultWarehouse(ctx, tid)
 			if err != nil {
 				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
 			}

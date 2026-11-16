@@ -24,7 +24,11 @@ function WarehousesPage() {
 
     return (
         <div className="space-y-4 p-4">
-            <motionCardHeader title={t('warehouses.title')} onAdd={() => setOpen(true)} addLabel={t('warehouses.add')} />
+            <WarehousesPageHeader
+                title={t('warehouses.title')}
+                onAdd={createMut.isAllowed ? () => setOpen(true) : undefined}
+                addLabel={t('warehouses.add')}
+            />
             <Card>
                 <CardContent className="pt-4">
                     <div className="divide-y">
@@ -51,20 +55,29 @@ function WarehousesPage() {
                         <DialogTitle>{t('warehouses.add')}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3">
-                        <motionField label={t('warehouses.code')} value={code} onChange={setCode} />
-                        <motionField label={t('warehouses.name')} value={name} onChange={setName} />
+                        <LabeledInput label={t('warehouses.code')} value={code} onChange={setCode} />
+                        <LabeledInput label={t('warehouses.name')} value={name} onChange={setName} />
                     </div>
                     <DialogFooter>
                         <Button
+                            disabled={!createMut.isAllowed || createMut.isPending}
                             onClick={async () => {
+                                const c = code.trim()
+                                const n = name.trim()
+                                if (!c || !n) {
+                                    toast.error(t('warehouses.validation_required'))
+                                    return
+                                }
                                 try {
-                                    await createMut.mutateAsync({ code, name, is_active: true })
+                                    await createMut.mutateAsync({ code: c, name: n, is_active: true })
                                     toast.success(t('warehouses.created'))
                                     setOpen(false)
                                     setCode('')
                                     setName('')
-                                } catch {
-                                    toast.error(t('warehouses.create_failed'))
+                                } catch (err: unknown) {
+                                    const msg =
+                                        (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+                                    toast.error(msg || t('warehouses.create_failed'))
                                 }
                             }}
                         >
@@ -77,16 +90,24 @@ function WarehousesPage() {
     )
 }
 
-function motionCardHeader({ title, onAdd, addLabel }: { title: string; onAdd: () => void; addLabel: string }) {
+function WarehousesPageHeader({
+    title,
+    onAdd,
+    addLabel,
+}: {
+    title: string
+    onAdd?: () => void
+    addLabel: string
+}) {
     return (
         <div className="flex flex-wrap items-center justify-between gap-2">
             <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-            <Button onClick={onAdd}>{addLabel}</Button>
+            {onAdd ? <Button onClick={onAdd}>{addLabel}</Button> : null}
         </div>
     )
 }
 
-function motionField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function LabeledInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
     return (
         <div className="space-y-1.5">
             <Label>{label}</Label>

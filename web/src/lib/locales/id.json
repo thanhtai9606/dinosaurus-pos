@@ -1516,7 +1516,8 @@
         "default": "Default",
         "inactive": "Nonaktif",
         "created": "Gudang dibuat",
-        "create_failed": "Gagal membuat gudang"
+        "create_failed": "Gagal membuat gudang",
+        "validation_required": "Kode dan nama wajib diisi"
     },
     "stockMovements": {
         "title": "Buku mutasi stok",

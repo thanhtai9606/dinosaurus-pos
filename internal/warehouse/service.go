@@ -51,11 +51,12 @@ func (s *Service) Create(ctx context.Context, req CreateWarehouseRequest) (*Ware
 		isActive = *req.IsActive
 	}
 	if isDefault {
-		if err := s.repo.ClearDefaultWarehouse(ctx); err != nil {
+		if err := s.repo.ClearDefaultWarehouse(ctx, tenantID); err != nil {
 			return nil, err
 		}
 	}
-	row, err := s.repo.CreateWarehouse(ctx, tenantID, strings.TrimSpace(req.Code), strings.TrimSpace(req.Name), isDefault, isActive)
+	code := strings.TrimSpace(strings.ToUpper(req.Code))
+	row, err := s.repo.CreateWarehouse(ctx, tenantID, code, strings.TrimSpace(req.Name), isDefault, isActive)
 	if err != nil {
 		s.log.Errorf("CreateWarehouse failed: %v", err)
 		return nil, err
@@ -64,7 +65,11 @@ func (s *Service) Create(ctx context.Context, req CreateWarehouseRequest) (*Ware
 }
 
 func (s *Service) Get(ctx context.Context, id uuid.UUID) (*WarehouseResponse, error) {
-	row, err := s.repo.GetWarehouseByID(ctx, id)
+	tenantID, ok := tenant.IDFromContext(ctx)
+	if !ok {
+		return nil, common.ErrUnauthorized
+	}
+	row, err := s.repo.GetWarehouseByID(ctx, tenantID, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, common.ErrNotFound
@@ -75,7 +80,11 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*WarehouseResponse, er
 }
 
 func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateWarehouseRequest) (*WarehouseResponse, error) {
-	cur, err := s.repo.GetWarehouseByID(ctx, id)
+	tenantID, ok := tenant.IDFromContext(ctx)
+	if !ok {
+		return nil, common.ErrUnauthorized
+	}
+	cur, err := s.repo.GetWarehouseByID(ctx, tenantID, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, common.ErrNotFound
@@ -99,11 +108,14 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateWarehouseR
 		isActive = *req.IsActive
 	}
 	if isDefault && !cur.IsDefault {
-		if err := s.repo.ClearDefaultWarehouse(ctx); err != nil {
+		if err := s.repo.ClearDefaultWarehouse(ctx, tenantID); err != nil {
 			return nil, err
 		}
 	}
-	row, err := s.repo.UpdateWarehouse(ctx, id, code, name, isDefault, isActive)
+	if req.Code != nil {
+		code = strings.TrimSpace(strings.ToUpper(code))
+	}
+	row, err := s.repo.UpdateWarehouse(ctx, tenantID, id, code, name, isDefault, isActive)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, common.ErrNotFound
@@ -114,6 +126,10 @@ func (s *Service) Update(ctx context.Context, id uuid.UUID, req UpdateWarehouseR
 }
 
 func (s *Service) List(ctx context.Context, req ListWarehousesRequest) (*PagedWarehousesResponse, error) {
+	tenantID, ok := tenant.IDFromContext(ctx)
+	if !ok {
+		return nil, common.ErrUnauthorized
+	}
 	req.SetDefaults()
 	limit := req.Limit
 	offset := (req.Page - 1) * limit
@@ -125,11 +141,11 @@ func (s *Service) List(ctx context.Context, req ListWarehousesRequest) (*PagedWa
 	if req.ActiveOnly != nil {
 		activeOnly = *req.ActiveOnly
 	}
-	rows, err := s.repo.ListWarehouses(ctx, int32(limit), int32(offset), search, activeOnly)
+	rows, err := s.repo.ListWarehouses(ctx, tenantID, int32(limit), int32(offset), search, activeOnly)
 	if err != nil {
 		return nil, err
 	}
-	count, err := s.repo.CountWarehouses(ctx, search, activeOnly)
+	count, err := s.repo.CountWarehouses(ctx, tenantID, search, activeOnly)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +166,11 @@ type ListWarehouseStockRequest struct {
 }
 
 func (s *Service) ListStock(ctx context.Context, warehouseID uuid.UUID, req ListWarehouseStockRequest) (*PagedWarehouseStockResponse, error) {
-	if _, err := s.repo.GetWarehouseByID(ctx, warehouseID); err != nil {
+	tenantID, ok := tenant.IDFromContext(ctx)
+	if !ok {
+		return nil, common.ErrUnauthorized
+	}
+	if _, err := s.repo.GetWarehouseByID(ctx, tenantID, warehouseID); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, common.ErrNotFound
 		}

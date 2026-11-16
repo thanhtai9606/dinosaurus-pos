@@ -1535,7 +1535,8 @@
         "default": "Mặc định",
         "inactive": "Ngưng dùng",
         "created": "Đã tạo kho",
-        "create_failed": "Không tạo được kho"
+        "create_failed": "Không tạo được kho",
+        "validation_required": "Nhập mã kho và tên"
     },
     "stockMovements": {
         "title": "Sổ biến động kho",

@@ -1528,7 +1528,8 @@
         "default": "Default",
         "inactive": "Inactive",
         "created": "Warehouse created",
-        "create_failed": "Could not create warehouse"
+        "create_failed": "Could not create warehouse",
+        "validation_required": "Code and name are required"
     },
     "stockMovements": {
         "title": "Stock ledger",

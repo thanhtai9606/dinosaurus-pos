@@ -15,6 +15,7 @@ import (
 	prdunits "dinosaurus-pos/internal/products"
 	products_repo "dinosaurus-pos/internal/products/repository"
 	"dinosaurus-pos/internal/settings"
+	"dinosaurus-pos/internal/tenant"
 	"dinosaurus-pos/pkg/logger"
 	"strconv"
 	"strings"
@@ -1482,7 +1483,11 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 		}
 
 		wh := wh_repo.New(tx)
-		defaultWh, err := wh.GetDefaultWarehouse(ctx)
+		tid, ok := tenant.IDFromContext(ctx)
+		if !ok {
+			return common.ErrUnauthorized
+		}
+		defaultWh, err := wh.GetDefaultWarehouse(ctx, tid)
 		if err != nil {
 			return fmt.Errorf("failed to resolve default warehouse: %w", err)
 		}

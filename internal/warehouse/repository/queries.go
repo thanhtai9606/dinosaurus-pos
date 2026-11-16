@@ -64,23 +64,25 @@ RETURNING id, tenant_id, code, name, is_default, is_active, created_at, updated_
 	return scanWarehouse(q.db.QueryRow(ctx, sql, tenantID, code, name, isDefault, isActive))
 }
 
-func (q *Queries) GetWarehouseByID(ctx context.Context, id uuid.UUID) (Warehouse, error) {
-	const sql = `SELECT id, tenant_id, code, name, is_default, is_active, created_at, updated_at FROM warehouses WHERE id=$1`
-	return scanWarehouse(q.db.QueryRow(ctx, sql, id))
-}
-
-func (q *Queries) GetDefaultWarehouse(ctx context.Context) (Warehouse, error) {
+func (q *Queries) GetWarehouseByID(ctx context.Context, tenantID, id uuid.UUID) (Warehouse, error) {
 	const sql = `SELECT id, tenant_id, code, name, is_default, is_active, created_at, updated_at
-FROM warehouses WHERE is_default=true AND is_active=true ORDER BY created_at ASC LIMIT 1`
-	return scanWarehouse(q.db.QueryRow(ctx, sql))
+FROM warehouses WHERE id=$1 AND tenant_id=$2`
+	return scanWarehouse(q.db.QueryRow(ctx, sql, id, tenantID))
 }
 
-func (q *Queries) ListWarehouses(ctx context.Context, limit, offset int32, search *string, activeOnly bool) ([]Warehouse, error) {
+func (q *Queries) GetDefaultWarehouse(ctx context.Context, tenantID uuid.UUID) (Warehouse, error) {
+	const sql = `SELECT id, tenant_id, code, name, is_default, is_active, created_at, updated_at
+FROM warehouses WHERE tenant_id=$1 AND is_default=true AND is_active=true ORDER BY created_at ASC LIMIT 1`
+	return scanWarehouse(q.db.QueryRow(ctx, sql, tenantID))
+}
+
+func (q *Queries) ListWarehouses(ctx context.Context, tenantID uuid.UUID, limit, offset int32, search *string, activeOnly bool) ([]Warehouse, error) {
 	const sql = `SELECT id, tenant_id, code, name, is_default, is_active, created_at, updated_at FROM warehouses
-WHERE ($3::bool IS NOT TRUE OR is_active=true)
-  AND ($4::text IS NULL OR name ILIKE '%'||$4||'%' OR code ILIKE '%'||$4||'%')
+WHERE tenant_id=$3
+  AND ($4::bool IS NOT TRUE OR is_active=true)
+  AND ($5::text IS NULL OR name ILIKE '%'||$5||'%' OR code ILIKE '%'||$5||'%')
 ORDER BY is_default DESC, name ASC LIMIT $1 OFFSET $2`
-	rows, err := q.db.Query(ctx, sql, limit, offset, activeOnly, search)
+	rows, err := q.db.Query(ctx, sql, limit, offset, tenantID, activeOnly, search)
 	if err != nil {
 		return nil, err
 	}
@@ -96,23 +98,25 @@ ORDER BY is_default DESC, name ASC LIMIT $1 OFFSET $2`
 	return out, rows.Err()
 }
 
-func (q *Queries) CountWarehouses(ctx context.Context, search *string, activeOnly bool) (int64, error) {
+func (q *Queries) CountWarehouses(ctx context.Context, tenantID uuid.UUID, search *string, activeOnly bool) (int64, error) {
 	const sql = `SELECT COUNT(*) FROM warehouses
-WHERE ($2::bool IS NOT TRUE OR is_active=true)
+WHERE tenant_id=$3
+  AND ($2::bool IS NOT TRUE OR is_active=true)
   AND ($1::text IS NULL OR name ILIKE '%'||$1||'%' OR code ILIKE '%'||$1||'%')`
 	var n int64
-	err := q.db.QueryRow(ctx, sql, search, activeOnly).Scan(&n)
+	err := q.db.QueryRow(ctx, sql, search, activeOnly, tenantID).Scan(&n)
 	return n, err
 }
 
-func (q *Queries) UpdateWarehouse(ctx context.Context, id uuid.UUID, code, name string, isDefault, isActive bool) (Warehouse, error) {
-	const sql = `UPDATE warehouses SET code=$2,name=$3,is_default=$4,is_active=$5,updated_at=NOW() WHERE id=$1
+func (q *Queries) UpdateWarehouse(ctx context.Context, tenantID, id uuid.UUID, code, name string, isDefault, isActive bool) (Warehouse, error) {
+	const sql = `UPDATE warehouses SET code=$3,name=$4,is_default=$5,is_active=$6,updated_at=NOW()
+WHERE id=$1 AND tenant_id=$2
 RETURNING id, tenant_id, code, name, is_default, is_active, created_at, updated_at`
-	return scanWarehouse(q.db.QueryRow(ctx, sql, id, code, name, isDefault, isActive))
+	return scanWarehouse(q.db.QueryRow(ctx, sql, id, tenantID, code, name, isDefault, isActive))
 }
 
-func (q *Queries) ClearDefaultWarehouse(ctx context.Context) error {
-	_, err := q.db.Exec(ctx, `UPDATE warehouses SET is_default=false, updated_at=NOW() WHERE is_default=true`)
+func (q *Queries) ClearDefaultWarehouse(ctx context.Context, tenantID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, `UPDATE warehouses SET is_default=false, updated_at=NOW() WHERE tenant_id=$1 AND is_default=true`, tenantID)
 	return err
 }
 

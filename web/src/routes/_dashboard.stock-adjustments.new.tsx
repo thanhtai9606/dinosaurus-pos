@@ -46,13 +46,13 @@ function NewStockAdjustmentPage() {
                             </SelectContent>
                         </Select>
                     </div>
-                    <motionFld
+                    <LabeledField
                         label={t('stockAdjustments.product_id')}
                         value={productId}
                         onChange={setProductId}
                         hint={t('stockAdjustments.product_id_hint')}
                     />
-                    <motionFld label={t('stockAdjustments.delta')} value={delta} onChange={setDelta} />
+                    <LabeledField label={t('stockAdjustments.delta')} value={delta} onChange={setDelta} />
                     <div className="space-y-1.5">
                         <Label>{t('stockAdjustments.reason')}</Label>
                         <Select value={reason} onValueChange={setReason}>
@@ -95,7 +95,7 @@ function NewStockAdjustmentPage() {
     )
 }
 
-function motionFld({
+function LabeledField({
     label,
     value,
     onChange,

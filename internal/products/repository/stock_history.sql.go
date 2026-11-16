@@ -27,6 +27,7 @@ func (q *Queries) CountStockHistoryByProduct(ctx context.Context, productID uuid
 const createStockHistory = `-- name: CreateStockHistory :one
 INSERT INTO stock_history (
     product_id,
+    warehouse_id,
     change_amount,
     previous_stock,
     current_stock,
@@ -35,12 +36,13 @@ INSERT INTO stock_history (
     note,
     created_by
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
-) RETURNING id, product_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at
+    $1, $2, $3, $4, $5, $6, $7, $8, $9
+) RETURNING id, product_id, warehouse_id, change_amount, previous_stock, current_stock, change_type, reference_id, note, created_by, created_at
 `
 
 type CreateStockHistoryParams struct {
 	ProductID     uuid.UUID       `json:"product_id"`
+	WarehouseID   pgtype.UUID     `json:"warehouse_id"`
 	ChangeAmount  int32           `json:"change_amount"`
 	PreviousStock int32           `json:"previous_stock"`
 	CurrentStock  int32           `json:"current_stock"`
@@ -53,6 +55,7 @@ type CreateStockHistoryParams struct {
 func (q *Queries) CreateStockHistory(ctx context.Context, arg CreateStockHistoryParams) (StockHistory, error) {
 	row := q.db.QueryRow(ctx, createStockHistory,
 		arg.ProductID,
+		arg.WarehouseID,
 		arg.ChangeAmount,
 		arg.PreviousStock,
 		arg.CurrentStock,
@@ -65,6 +68,7 @@ func (q *Queries) CreateStockHistory(ctx context.Context, arg CreateStockHistory
 	err := row.Scan(
 		&i.ID,
 		&i.ProductID,
+		&i.WarehouseID,
 		&i.ChangeAmount,
 		&i.PreviousStock,
 		&i.CurrentStock,

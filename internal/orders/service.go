@@ -8,7 +8,9 @@ import (
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/customerdebts"
 	"dinosaurus-pos/internal/docno"
+	"dinosaurus-pos/internal/inventory"
 	cd_repo "dinosaurus-pos/internal/customerdebts/repository"
+	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	orders_repo "dinosaurus-pos/internal/orders/repository"
 	prdunits "dinosaurus-pos/internal/products"
 	products_repo "dinosaurus-pos/internal/products/repository"
@@ -1479,34 +1481,17 @@ func (s *OrderService) CreateOrder(ctx context.Context, req CreateOrderRequest) 
 			}
 		}
 
-		err = qtx.BatchDecreaseProductStock(ctx, orders_repo.BatchDecreaseProductStockParams{
-			ProductIds: stockUpdateIDs,
-			Quantities: stockUpdateQty,
-		})
+		wh := wh_repo.New(tx)
+		defaultWh, err := wh.GetDefaultWarehouse(ctx)
 		if err != nil {
-			return fmt.Errorf("failed to batch update stock: %w", err)
+			return fmt.Errorf("failed to resolve default warehouse: %w", err)
 		}
-
+		refID := pgtype.UUID{Bytes: newOrderID, Valid: true}
+		note := "Order Created"
 		for i, pID := range stockUpdateIDs {
 			qty := stockUpdateQty[i]
-			product := productMap[pID]
-			previousStock := product.Stock
-			currentStock := previousStock - qty
-
-			_, err := qtx.CreateStockHistory(ctx, orders_repo.CreateStockHistoryParams{
-				ProductID:     pID,
-				ChangeAmount:  -qty,
-				PreviousStock: previousStock,
-				CurrentStock:  currentStock,
-				ChangeType:    orders_repo.StockChangeTypeSale,
-				ReferenceID:   pgtype.UUID{Bytes: newOrderID, Valid: true},
-				Note:          utils.StringPtr("Order Created"),
-				CreatedBy:     pgtype.UUID{Bytes: actorID, Valid: ok},
-			})
-			if err != nil {
-				// We log error but maybe valid to strictly fail transaction?
-				// For data integrity, strictly failing is better.
-				return fmt.Errorf("failed to log stock history for %s: %w", pID, err)
+			if err := inventory.ApplyWarehouseDelta(ctx, qPrd, wh, defaultWh.ID, pID, -qty, products_repo.StockChangeTypeSale, refID, &note, pgtype.UUID{Bytes: actorID, Valid: ok}); err != nil {
+				return fmt.Errorf("failed to update warehouse stock for %s: %w", pID, err)
 			}
 		}
 

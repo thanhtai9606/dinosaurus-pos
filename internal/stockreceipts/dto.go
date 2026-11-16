@@ -15,6 +15,7 @@ type ReceiptItemInput struct {
 }
 
 type CreateStockReceiptRequest struct {
+	WarehouseID *uuid.UUID        `json:"warehouse_id" validate:"omitempty"`
 	SupplierID *uuid.UUID         `json:"supplier_id" validate:"omitempty"`
 	ReceivedAt *time.Time         `json:"received_at" validate:"omitempty"`
 	Note       *string            `json:"note" validate:"omitempty,max=500"`
@@ -57,6 +58,7 @@ type StockReceiptItemResponse struct {
 type StockReceiptResponse struct {
 	ID           uuid.UUID                  `json:"id"`
 	ReceiptNo    string                     `json:"receipt_no"`
+	WarehouseID  *uuid.UUID                 `json:"warehouse_id,omitempty"`
 	SupplierID   *uuid.UUID                 `json:"supplier_id,omitempty"`
 	SupplierName *string                    `json:"supplier_name,omitempty"`
 	Status       string                     `json:"status"`

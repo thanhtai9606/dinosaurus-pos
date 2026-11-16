@@ -16,8 +16,12 @@ import (
 	customergroups_repo "dinosaurus-pos/internal/customergroups/repository"
 	"dinosaurus-pos/internal/measurementunits"
 	measurementunits_repo "dinosaurus-pos/internal/measurementunits/repository"
+	"dinosaurus-pos/internal/stockops"
+	ops_repo "dinosaurus-pos/internal/stockops/repository"
 	"dinosaurus-pos/internal/stockreceipts"
 	sr_repo "dinosaurus-pos/internal/stockreceipts/repository"
+	"dinosaurus-pos/internal/warehouse"
+	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	"dinosaurus-pos/internal/suppliers"
 	suppliers_repo "dinosaurus-pos/internal/suppliers/repository"
 	"dinosaurus-pos/internal/supplierdebts"
@@ -109,6 +113,8 @@ type AppContainer struct {
 	MeasurementUnitHandler    measurementunits.IHandler
 	SupplierHandler           suppliers.ISupplierHandler
 	StockReceiptHandler       stockreceipts.IStockReceiptHandler
+	WarehouseHandler          warehouse.IHandler
+	StockOpsHandler           stockops.IHandler
 	SupplierDebtHandler       supplierdebts.ISupplierDebtHandler
 	CustomerDebtHandler       customerdebts.ICustomerDebtHandler
 	ProductHandler            products.IPrdHandler
@@ -227,10 +233,19 @@ func BuildAppContainer(app *App) *AppContainer {
 	measurementUnitService := measurementunits.NewService(measurementUnitRepo, app.Logger)
 	measurementUnitHandler := measurementunits.NewHandler(measurementUnitService, app.Logger)
 
+	warehouseRepo := wh_repo.New(tenantDB)
+	warehouseService := warehouse.NewService(warehouseRepo, app.Logger)
+	warehouseHandler := warehouse.NewHandler(warehouseService, app.Logger)
+
+	stockOpsRepo := ops_repo.New(tenantDB)
+	stockOpsService := stockops.NewService(stockOpsRepo, app.Store, app.Logger)
+	stockOpsHandler := stockops.NewHandler(stockOpsService, app.Logger)
+
 	tenantCatalogSeeder := catalog.NewTenantCatalogSeeder(tenantDB, app.R2, app.Logger)
 	tenantDefaults := &tenantDefaultsSeeder{
 		customerGroups:   customerGroupService,
 		measurementUnits: measurementUnitService,
+		warehouses:       warehouseService,
 	}
 	settingsRepoForSeed := settings_repo.New(tenantDB)
 	financialSeeder := settings.NewFinancialSeeder(settingsRepoForSeed, app.Logger)
@@ -365,6 +380,8 @@ func BuildAppContainer(app *App) *AppContainer {
 		MeasurementUnitHandler:    measurementUnitHandler,
 		SupplierHandler:           supplierHandler,
 		StockReceiptHandler:       stockReceiptHandler,
+		WarehouseHandler:          warehouseHandler,
+		StockOpsHandler:           stockOpsHandler,
 		SupplierDebtHandler:       supplierDebtHandler,
 		CustomerDebtHandler:       customerDebtHandler,
 		ProductHandler:            prdHandler,

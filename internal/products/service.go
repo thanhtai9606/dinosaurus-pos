@@ -420,6 +420,23 @@ func (s *PrdService) UpdateProduct(ctx context.Context, productID uuid.UUID, req
 		return nil, err
 	}
 
+	if req.Price != nil {
+		if err := s.repo.SetBaseProductUnitSellPrice(ctx, products_repo.SetBaseProductUnitSellPriceParams{
+			ProductID: productID,
+			SellPrice: int64(*req.Price),
+		}); err != nil {
+			s.log.Warnf("Failed to sync base unit sell price", "error", err, "productID", productID)
+		}
+	}
+	if req.WholesalePrice != nil {
+		if err := s.repo.SetBaseProductUnitWholesalePrice(ctx, products_repo.SetBaseProductUnitWholesalePriceParams{
+			ProductID:      productID,
+			WholesalePrice: int64(*req.WholesalePrice),
+		}); err != nil {
+			s.log.Warnf("Failed to sync base unit wholesale price", "error", err, "productID", productID)
+		}
+	}
+
 	// Stock History Logging
 	if req.Stock != nil {
 		currentStock := int32(*req.Stock)
@@ -736,6 +753,7 @@ func (s *PrdService) ListProducts(ctx context.Context, req ListProductsRequest) 
 			Categories:        categories,
 			ImageURL:          p.ImageUrl,
 			Price:             price,
+			WholesalePrice:    float64(p.BaseWholesalePrice),
 			CostPrice:         costPrice,
 			Stock:             p.Stock,
 			Code:              pcode,

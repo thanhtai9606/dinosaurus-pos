@@ -121,9 +121,15 @@
         "customers": "Customer list",
         "customers_menu": "Customers",
         "customer_groups": "Customer groups",
-        "inventory": "Inventory",
+        "inventory_menu": "Warehouse",
+        "inventory": "Stock levels",
+        "warehouses": "Warehouses",
+        "stock_transfers": "Stock transfers",
+        "stock_adjustments": "Adjustments",
+        "stock_takes": "Stock takes",
+        "stock_movements": "Stock ledger",
         "suppliers": "Suppliers",
-        "stock_receipts": "Stock receipts",
+        "stock_receipts": "Goods receipt",
         "supplier_debts": "Supplier debts",
         "customer_debts": "Customer debts",
         "retail_pos": "Retail POS",
@@ -1511,7 +1517,67 @@
         "description": "Stock levels, SKU, and low-stock filter.",
         "low_stock_only": "Low stock only",
         "create_receipt": "New stock receipt",
-        "link_from_receipts": "View inventory"
+        "link_from_receipts": "View inventory",
+        "warehouse": "Warehouse"
+    },
+    "warehouses": {
+        "title": "Warehouses",
+        "add": "Add warehouse",
+        "code": "Code",
+        "name": "Name",
+        "default": "Default",
+        "inactive": "Inactive",
+        "created": "Warehouse created",
+        "create_failed": "Could not create warehouse"
+    },
+    "stockMovements": {
+        "title": "Stock ledger",
+        "warehouse": "Warehouse",
+        "all_warehouses": "All warehouses",
+        "date": "Date",
+        "product": "Product",
+        "type": "Type",
+        "delta": "Qty Δ"
+    },
+    "stockAdjustments": {
+        "title": "Stock adjustments",
+        "new": "New adjustment",
+        "doc_no": "Doc #",
+        "warehouse": "Warehouse",
+        "reason": "Reason",
+        "status": "Status",
+        "complete": "Complete",
+        "completed": "Adjustment completed",
+        "complete_failed": "Could not complete",
+        "form_title": "Quick adjustment",
+        "pick_warehouse": "Select warehouse",
+        "product_id": "Product ID",
+        "product_id_hint": "UUID from product list (improve with search later)",
+        "delta": "Quantity change (+/-)",
+        "validation": "Warehouse and product required",
+        "save_and_complete": "Save & complete",
+        "create_failed": "Could not create adjustment"
+    },
+    "stockTransfers": {
+        "title": "Stock transfers",
+        "hint": "Create transfers via API or upcoming UI; list shows draft/completed.",
+        "doc_no": "Doc #",
+        "from": "From",
+        "to": "To",
+        "status": "Status",
+        "complete": "Complete",
+        "completed": "Transfer completed",
+        "complete_failed": "Could not complete"
+    },
+    "stockTakes": {
+        "title": "Stock takes",
+        "hint": "Open sessions via API; post to apply count variances.",
+        "doc_no": "Doc #",
+        "warehouse": "Warehouse",
+        "status": "Status",
+        "post": "Post counts",
+        "posted": "Stock take posted",
+        "post_failed": "Could not post"
     },
     "customers": {
         "title": "Customers",
@@ -1610,9 +1676,30 @@
     },
     "price_lists": {
         "title": "Price lists",
-        "description": "Bulk export and import of selling prices (Excel).",
+        "description": "Edit selling prices in the grid, or bulk export and import via Excel.",
         "card_title": "Product selling prices",
-        "card_description": "Download template, edit Excel, import; or export current prices."
+        "card_description": "Download template, edit Excel, import; or export current prices.",
+        "excel_menu": "Excel",
+        "grid_title": "Inline price editor",
+        "grid_help_edit": "Edit cost or sell price in the row; changes save when you leave the field (Enter or click away).",
+        "grid_help_readonly": "You can view prices here; only managers can edit.",
+        "empty": "No products found.",
+        "filters": {
+            "search_label": "Search",
+            "search_placeholder": "Code, barcode, SKU, or name…"
+        },
+        "columns": {
+            "sku": "Code / SKU",
+            "name": "Product",
+            "unit": "Unit",
+            "cost_price": "Cost",
+            "retail_price": "Retail",
+            "wholesale_price": "Wholesale",
+            "stock": "Stock"
+        },
+        "messages": {
+            "save_failed": "Could not save price"
+        }
     },
     "product_units_page": {
         "title": "Units of measure",

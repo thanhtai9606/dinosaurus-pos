@@ -73,3 +73,13 @@ UPDATE product_units
 SET deleted_at = NOW(), updated_at = NOW()
 WHERE product_id = $1
   AND deleted_at IS NULL;
+
+-- name: SetBaseProductUnitSellPrice :exec
+UPDATE product_units
+SET sell_price = $2, updated_at = NOW()
+WHERE product_id = $1 AND is_base = TRUE AND deleted_at IS NULL;
+
+-- name: SetBaseProductUnitWholesalePrice :exec
+UPDATE product_units
+SET wholesale_price = $2, updated_at = NOW()
+WHERE product_id = $1 AND is_base = TRUE AND deleted_at IS NULL;

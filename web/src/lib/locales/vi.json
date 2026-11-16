@@ -123,7 +123,13 @@
         "customers": "Danh sách khách",
         "customers_menu": "Khách hàng",
         "customer_groups": "Nhóm khách",
+        "inventory_menu": "Kho hàng",
         "inventory": "Tồn kho",
+        "warehouses": "Danh sách kho",
+        "stock_transfers": "Chuyển kho",
+        "stock_adjustments": "Điều chỉnh",
+        "stock_takes": "Kiểm kê",
+        "stock_movements": "Sổ biến động",
         "suppliers": "Nhà cung cấp",
         "stock_receipts": "Nhập hàng",
         "supplier_debts": "Công nợ NCC",
@@ -1518,7 +1524,67 @@
         "description": "Tồn, SKU và lọc hàng sắp hết.",
         "low_stock_only": "Chỉ hàng sắp hết",
         "create_receipt": "Tạo phiếu nhập",
-        "link_from_receipts": "Xem tồn kho"
+        "link_from_receipts": "Xem tồn kho",
+        "warehouse": "Kho"
+    },
+    "warehouses": {
+        "title": "Danh sách kho",
+        "add": "Thêm kho",
+        "code": "Mã kho",
+        "name": "Tên",
+        "default": "Mặc định",
+        "inactive": "Ngưng dùng",
+        "created": "Đã tạo kho",
+        "create_failed": "Không tạo được kho"
+    },
+    "stockMovements": {
+        "title": "Sổ biến động kho",
+        "warehouse": "Kho",
+        "all_warehouses": "Tất cả kho",
+        "date": "Ngày",
+        "product": "Sản phẩm",
+        "type": "Loại",
+        "delta": "SL Δ"
+    },
+    "stockAdjustments": {
+        "title": "Điều chỉnh kho",
+        "new": "Phiếu mới",
+        "doc_no": "Số phiếu",
+        "warehouse": "Kho",
+        "reason": "Lý do",
+        "status": "Trạng thái",
+        "complete": "Hoàn tất",
+        "completed": "Đã hoàn tất điều chỉnh",
+        "complete_failed": "Hoàn tất thất bại",
+        "form_title": "Điều chỉnh nhanh",
+        "pick_warehouse": "Chọn kho",
+        "product_id": "ID sản phẩm",
+        "product_id_hint": "UUID từ danh sách SP",
+        "delta": "Thay đổi SL (+/-)",
+        "validation": "Cần kho và sản phẩm",
+        "save_and_complete": "Lưu & hoàn tất",
+        "create_failed": "Không tạo được phiếu"
+    },
+    "stockTransfers": {
+        "title": "Chuyển kho",
+        "hint": "Tạo phiếu qua API hoặc UI sắp có.",
+        "doc_no": "Số phiếu",
+        "from": "Từ kho",
+        "to": "Đến kho",
+        "status": "Trạng thái",
+        "complete": "Hoàn tất",
+        "completed": "Đã chuyển kho",
+        "complete_failed": "Hoàn tất thất bại"
+    },
+    "stockTakes": {
+        "title": "Kiểm kê",
+        "hint": "Mở phiên qua API; post để cập nhật chênh lệch.",
+        "doc_no": "Số phiếu",
+        "warehouse": "Kho",
+        "status": "Trạng thái",
+        "post": "Chốt kiểm kê",
+        "posted": "Đã chốt kiểm kê",
+        "post_failed": "Chốt thất bại"
     },
     "customers": {
         "title": "Khách hàng",
@@ -1617,9 +1683,30 @@
     },
     "price_lists": {
         "title": "Bảng giá",
-        "description": "Xuất và nhập giá bán hàng loạt (Excel).",
+        "description": "Sửa giá trên lưới hoặc xuất/nhập hàng loạt bằng Excel.",
         "card_title": "Giá bán sản phẩm",
-        "card_description": "Tải mẫu, chỉnh file Excel và import lại; hoặc xuất giá hiện tại."
+        "card_description": "Tải mẫu, chỉnh file Excel và import lại; hoặc xuất giá hiện tại.",
+        "excel_menu": "Excel",
+        "grid_title": "Sửa giá trực tiếp",
+        "grid_help_edit": "Sửa giá vốn hoặc giá bán trong ô; lưu khi rời ô (Enter hoặc click ra ngoài).",
+        "grid_help_readonly": "Chỉ xem giá; chỉ quản lý trở lên được sửa.",
+        "empty": "Không có sản phẩm.",
+        "filters": {
+            "search_label": "Tìm kiếm",
+            "search_placeholder": "Mã, barcode, SKU hoặc tên…"
+        },
+        "columns": {
+            "sku": "Mã / SKU",
+            "name": "Sản phẩm",
+            "unit": "ĐVT",
+            "cost_price": "Giá vốn",
+            "retail_price": "Giá lẻ",
+            "wholesale_price": "Giá sỉ",
+            "stock": "Tồn"
+        },
+        "messages": {
+            "save_failed": "Không lưu được giá"
+        }
     },
     "product_units_page": {
         "title": "Đơn vị tính",

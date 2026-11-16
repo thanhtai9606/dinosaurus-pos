@@ -26,6 +26,8 @@ export type ProductListItem = InternalProductsProductResponse & {
     code?: string
     sku?: string | null
     barcode?: string | null
+    unit?: string
+    wholesale_price?: number
 }
 export type ProductListResponse = InternalProductsListProductsResponse & {
     products?: ProductListItem[]
@@ -151,6 +153,39 @@ export const useUpdateProductMutation = () => {
     return { ...mutation, isAllowed }
 }
 
+/** Inline price/cost edits (no success toast — used on price list grid). */
+export const usePatchProductPricesMutation = () => {
+    const qc = useQueryClient()
+    const { t } = useTranslation()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('PATCH', '/products/{id}')
+
+    const mutation = useMutation<
+        Product,
+        AxiosError<POSKasirInternalCommonErrorResponse>,
+        { id: string; cost_price?: number; price?: number; wholesale_price?: number }
+    >({
+        mutationKey: ['products', 'patch-prices'],
+        mutationFn: async ({ id, cost_price, price, wholesale_price }) => {
+            const body: InternalProductsUpdateProductRequest & { wholesale_price?: number } = {}
+            if (cost_price !== undefined) body.cost_price = cost_price
+            if (price !== undefined) body.price = price
+            if (wholesale_price !== undefined) body.wholesale_price = wholesale_price
+            const res = await productsApi.productsIdPatch(id, body)
+            return (res.data as { data: Product }).data
+        },
+        onSuccess: (data) => {
+            qc.invalidateQueries({ queryKey: ['products', 'list'] })
+            qc.invalidateQueries({ queryKey: ['products', 'detail', data.id] })
+        },
+        onError: (error) => {
+            const msg = error.response?.data?.message || t('price_lists.messages.save_failed')
+            toast.error(msg)
+        },
+    })
+
+    return { ...mutation, isAllowed }
+}
 
 export const useDeleteProductMutation = () => {
     const qc = useQueryClient()

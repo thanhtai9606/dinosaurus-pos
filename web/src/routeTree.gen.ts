@@ -31,16 +31,22 @@ import { Route as DashboardRetailPosRouteImport } from './routes/_dashboard.reta
 import { Route as DashboardSalesOrdersRouteImport } from './routes/_dashboard.sales-orders'
 import { Route as DashboardSalesReturnsRouteImport } from './routes/_dashboard.sales-returns'
 import { Route as DashboardSettingsRouteImport } from './routes/_dashboard.settings'
+import { Route as DashboardStockAdjustmentsRouteImport } from './routes/_dashboard.stock-adjustments'
+import { Route as DashboardStockMovementsRouteImport } from './routes/_dashboard.stock-movements'
 import { Route as DashboardStockReceiptsRouteImport } from './routes/_dashboard.stock-receipts'
+import { Route as DashboardStockTakesRouteImport } from './routes/_dashboard.stock-takes'
+import { Route as DashboardStockTransfersRouteImport } from './routes/_dashboard.stock-transfers'
 import { Route as DashboardSupplierDebtsRouteImport } from './routes/_dashboard.supplier-debts'
 import { Route as DashboardSuppliersRouteImport } from './routes/_dashboard.suppliers'
 import { Route as DashboardTenantsRouteImport } from './routes/_dashboard.tenants'
 import { Route as DashboardTransactionsRouteImport } from './routes/_dashboard.transactions'
 import { Route as DashboardUsersRouteImport } from './routes/_dashboard.users'
+import { Route as DashboardWarehousesRouteImport } from './routes/_dashboard.warehouses'
 import { Route as DashboardPlatformAuditRouteImport } from './routes/_dashboard.platform.audit'
 import { Route as DashboardPlatformOpsRouteImport } from './routes/_dashboard.platform.ops'
 import { Route as DashboardPlatformOverviewRouteImport } from './routes/_dashboard.platform.overview'
 import { Route as DashboardPlatformUsersRouteImport } from './routes/_dashboard.platform.users'
+import { Route as DashboardStockAdjustmentsNewRouteImport } from './routes/_dashboard.stock-adjustments.new'
 import { Route as DashboardStockReceiptsNewRouteImport } from './routes/_dashboard.stock-receipts.new'
 
 const LocaleRoute = LocaleRouteImport.update({
@@ -152,9 +158,30 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardStockAdjustmentsRoute =
+  DashboardStockAdjustmentsRouteImport.update({
+    id: '/stock-adjustments',
+    path: '/stock-adjustments',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardStockMovementsRoute = DashboardStockMovementsRouteImport.update({
+  id: '/stock-movements',
+  path: '/stock-movements',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardStockReceiptsRoute = DashboardStockReceiptsRouteImport.update({
   id: '/stock-receipts',
   path: '/stock-receipts',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStockTakesRoute = DashboardStockTakesRouteImport.update({
+  id: '/stock-takes',
+  path: '/stock-takes',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStockTransfersRoute = DashboardStockTransfersRouteImport.update({
+  id: '/stock-transfers',
+  path: '/stock-transfers',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSupplierDebtsRoute = DashboardSupplierDebtsRouteImport.update({
@@ -182,6 +209,11 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardWarehousesRoute = DashboardWarehousesRouteImport.update({
+  id: '/warehouses',
+  path: '/warehouses',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardPlatformAuditRoute = DashboardPlatformAuditRouteImport.update({
   id: '/platform/audit',
   path: '/platform/audit',
@@ -203,6 +235,12 @@ const DashboardPlatformUsersRoute = DashboardPlatformUsersRouteImport.update({
   path: '/platform/users',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardStockAdjustmentsNewRoute =
+  DashboardStockAdjustmentsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => DashboardStockAdjustmentsRoute,
+  } as any)
 const DashboardStockReceiptsNewRoute =
   DashboardStockReceiptsNewRouteImport.update({
     id: '/new',
@@ -232,16 +270,22 @@ export interface FileRoutesByFullPath {
   '/sales-orders': typeof DashboardSalesOrdersRoute
   '/sales-returns': typeof DashboardSalesReturnsRoute
   '/settings': typeof DashboardSettingsRoute
+  '/stock-adjustments': typeof DashboardStockAdjustmentsRouteWithChildren
+  '/stock-movements': typeof DashboardStockMovementsRoute
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
+  '/stock-takes': typeof DashboardStockTakesRoute
+  '/stock-transfers': typeof DashboardStockTransfersRoute
   '/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/suppliers': typeof DashboardSuppliersRoute
   '/tenants': typeof DashboardTenantsRoute
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
+  '/warehouses': typeof DashboardWarehousesRoute
   '/platform/audit': typeof DashboardPlatformAuditRoute
   '/platform/ops': typeof DashboardPlatformOpsRoute
   '/platform/overview': typeof DashboardPlatformOverviewRoute
   '/platform/users': typeof DashboardPlatformUsersRoute
+  '/stock-adjustments/new': typeof DashboardStockAdjustmentsNewRoute
   '/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRoutesByTo {
@@ -265,17 +309,23 @@ export interface FileRoutesByTo {
   '/sales-orders': typeof DashboardSalesOrdersRoute
   '/sales-returns': typeof DashboardSalesReturnsRoute
   '/settings': typeof DashboardSettingsRoute
+  '/stock-adjustments': typeof DashboardStockAdjustmentsRouteWithChildren
+  '/stock-movements': typeof DashboardStockMovementsRoute
   '/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
+  '/stock-takes': typeof DashboardStockTakesRoute
+  '/stock-transfers': typeof DashboardStockTransfersRoute
   '/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/suppliers': typeof DashboardSuppliersRoute
   '/tenants': typeof DashboardTenantsRoute
   '/transactions': typeof DashboardTransactionsRoute
   '/users': typeof DashboardUsersRoute
+  '/warehouses': typeof DashboardWarehousesRoute
   '/': typeof DashboardIndexRoute
   '/platform/audit': typeof DashboardPlatformAuditRoute
   '/platform/ops': typeof DashboardPlatformOpsRoute
   '/platform/overview': typeof DashboardPlatformOverviewRoute
   '/platform/users': typeof DashboardPlatformUsersRoute
+  '/stock-adjustments/new': typeof DashboardStockAdjustmentsNewRoute
   '/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRoutesById {
@@ -301,17 +351,23 @@ export interface FileRoutesById {
   '/_dashboard/sales-orders': typeof DashboardSalesOrdersRoute
   '/_dashboard/sales-returns': typeof DashboardSalesReturnsRoute
   '/_dashboard/settings': typeof DashboardSettingsRoute
+  '/_dashboard/stock-adjustments': typeof DashboardStockAdjustmentsRouteWithChildren
+  '/_dashboard/stock-movements': typeof DashboardStockMovementsRoute
   '/_dashboard/stock-receipts': typeof DashboardStockReceiptsRouteWithChildren
+  '/_dashboard/stock-takes': typeof DashboardStockTakesRoute
+  '/_dashboard/stock-transfers': typeof DashboardStockTransfersRoute
   '/_dashboard/supplier-debts': typeof DashboardSupplierDebtsRoute
   '/_dashboard/suppliers': typeof DashboardSuppliersRoute
   '/_dashboard/tenants': typeof DashboardTenantsRoute
   '/_dashboard/transactions': typeof DashboardTransactionsRoute
   '/_dashboard/users': typeof DashboardUsersRoute
+  '/_dashboard/warehouses': typeof DashboardWarehousesRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/platform/audit': typeof DashboardPlatformAuditRoute
   '/_dashboard/platform/ops': typeof DashboardPlatformOpsRoute
   '/_dashboard/platform/overview': typeof DashboardPlatformOverviewRoute
   '/_dashboard/platform/users': typeof DashboardPlatformUsersRoute
+  '/_dashboard/stock-adjustments/new': typeof DashboardStockAdjustmentsNewRoute
   '/_dashboard/stock-receipts/new': typeof DashboardStockReceiptsNewRoute
 }
 export interface FileRouteTypes {
@@ -338,16 +394,22 @@ export interface FileRouteTypes {
     | '/sales-orders'
     | '/sales-returns'
     | '/settings'
+    | '/stock-adjustments'
+    | '/stock-movements'
     | '/stock-receipts'
+    | '/stock-takes'
+    | '/stock-transfers'
     | '/supplier-debts'
     | '/suppliers'
     | '/tenants'
     | '/transactions'
     | '/users'
+    | '/warehouses'
     | '/platform/audit'
     | '/platform/ops'
     | '/platform/overview'
     | '/platform/users'
+    | '/stock-adjustments/new'
     | '/stock-receipts/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -371,17 +433,23 @@ export interface FileRouteTypes {
     | '/sales-orders'
     | '/sales-returns'
     | '/settings'
+    | '/stock-adjustments'
+    | '/stock-movements'
     | '/stock-receipts'
+    | '/stock-takes'
+    | '/stock-transfers'
     | '/supplier-debts'
     | '/suppliers'
     | '/tenants'
     | '/transactions'
     | '/users'
+    | '/warehouses'
     | '/'
     | '/platform/audit'
     | '/platform/ops'
     | '/platform/overview'
     | '/platform/users'
+    | '/stock-adjustments/new'
     | '/stock-receipts/new'
   id:
     | '__root__'
@@ -406,17 +474,23 @@ export interface FileRouteTypes {
     | '/_dashboard/sales-orders'
     | '/_dashboard/sales-returns'
     | '/_dashboard/settings'
+    | '/_dashboard/stock-adjustments'
+    | '/_dashboard/stock-movements'
     | '/_dashboard/stock-receipts'
+    | '/_dashboard/stock-takes'
+    | '/_dashboard/stock-transfers'
     | '/_dashboard/supplier-debts'
     | '/_dashboard/suppliers'
     | '/_dashboard/tenants'
     | '/_dashboard/transactions'
     | '/_dashboard/users'
+    | '/_dashboard/warehouses'
     | '/_dashboard/'
     | '/_dashboard/platform/audit'
     | '/_dashboard/platform/ops'
     | '/_dashboard/platform/overview'
     | '/_dashboard/platform/users'
+    | '/_dashboard/stock-adjustments/new'
     | '/_dashboard/stock-receipts/new'
   fileRoutesById: FileRoutesById
 }
@@ -582,11 +656,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/stock-adjustments': {
+      id: '/_dashboard/stock-adjustments'
+      path: '/stock-adjustments'
+      fullPath: '/stock-adjustments'
+      preLoaderRoute: typeof DashboardStockAdjustmentsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stock-movements': {
+      id: '/_dashboard/stock-movements'
+      path: '/stock-movements'
+      fullPath: '/stock-movements'
+      preLoaderRoute: typeof DashboardStockMovementsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/stock-receipts': {
       id: '/_dashboard/stock-receipts'
       path: '/stock-receipts'
       fullPath: '/stock-receipts'
       preLoaderRoute: typeof DashboardStockReceiptsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stock-takes': {
+      id: '/_dashboard/stock-takes'
+      path: '/stock-takes'
+      fullPath: '/stock-takes'
+      preLoaderRoute: typeof DashboardStockTakesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/stock-transfers': {
+      id: '/_dashboard/stock-transfers'
+      path: '/stock-transfers'
+      fullPath: '/stock-transfers'
+      preLoaderRoute: typeof DashboardStockTransfersRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/supplier-debts': {
@@ -624,6 +726,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/warehouses': {
+      id: '/_dashboard/warehouses'
+      path: '/warehouses'
+      fullPath: '/warehouses'
+      preLoaderRoute: typeof DashboardWarehousesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/_dashboard/platform/audit': {
       id: '/_dashboard/platform/audit'
       path: '/platform/audit'
@@ -652,6 +761,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPlatformUsersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/stock-adjustments/new': {
+      id: '/_dashboard/stock-adjustments/new'
+      path: '/new'
+      fullPath: '/stock-adjustments/new'
+      preLoaderRoute: typeof DashboardStockAdjustmentsNewRouteImport
+      parentRoute: typeof DashboardStockAdjustmentsRoute
+    }
     '/_dashboard/stock-receipts/new': {
       id: '/_dashboard/stock-receipts/new'
       path: '/new'
@@ -672,6 +788,20 @@ const LocaleRouteChildren: LocaleRouteChildren = {
 
 const LocaleRouteWithChildren =
   LocaleRoute._addFileChildren(LocaleRouteChildren)
+
+interface DashboardStockAdjustmentsRouteChildren {
+  DashboardStockAdjustmentsNewRoute: typeof DashboardStockAdjustmentsNewRoute
+}
+
+const DashboardStockAdjustmentsRouteChildren: DashboardStockAdjustmentsRouteChildren =
+  {
+    DashboardStockAdjustmentsNewRoute: DashboardStockAdjustmentsNewRoute,
+  }
+
+const DashboardStockAdjustmentsRouteWithChildren =
+  DashboardStockAdjustmentsRoute._addFileChildren(
+    DashboardStockAdjustmentsRouteChildren,
+  )
 
 interface DashboardStockReceiptsRouteChildren {
   DashboardStockReceiptsNewRoute: typeof DashboardStockReceiptsNewRoute
@@ -705,12 +835,17 @@ interface DashboardRouteChildren {
   DashboardSalesOrdersRoute: typeof DashboardSalesOrdersRoute
   DashboardSalesReturnsRoute: typeof DashboardSalesReturnsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardStockAdjustmentsRoute: typeof DashboardStockAdjustmentsRouteWithChildren
+  DashboardStockMovementsRoute: typeof DashboardStockMovementsRoute
   DashboardStockReceiptsRoute: typeof DashboardStockReceiptsRouteWithChildren
+  DashboardStockTakesRoute: typeof DashboardStockTakesRoute
+  DashboardStockTransfersRoute: typeof DashboardStockTransfersRoute
   DashboardSupplierDebtsRoute: typeof DashboardSupplierDebtsRoute
   DashboardSuppliersRoute: typeof DashboardSuppliersRoute
   DashboardTenantsRoute: typeof DashboardTenantsRoute
   DashboardTransactionsRoute: typeof DashboardTransactionsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
+  DashboardWarehousesRoute: typeof DashboardWarehousesRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardPlatformAuditRoute: typeof DashboardPlatformAuditRoute
   DashboardPlatformOpsRoute: typeof DashboardPlatformOpsRoute
@@ -736,12 +871,17 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSalesOrdersRoute: DashboardSalesOrdersRoute,
   DashboardSalesReturnsRoute: DashboardSalesReturnsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardStockAdjustmentsRoute: DashboardStockAdjustmentsRouteWithChildren,
+  DashboardStockMovementsRoute: DashboardStockMovementsRoute,
   DashboardStockReceiptsRoute: DashboardStockReceiptsRouteWithChildren,
+  DashboardStockTakesRoute: DashboardStockTakesRoute,
+  DashboardStockTransfersRoute: DashboardStockTransfersRoute,
   DashboardSupplierDebtsRoute: DashboardSupplierDebtsRoute,
   DashboardSuppliersRoute: DashboardSuppliersRoute,
   DashboardTenantsRoute: DashboardTenantsRoute,
   DashboardTransactionsRoute: DashboardTransactionsRoute,
   DashboardUsersRoute: DashboardUsersRoute,
+  DashboardWarehousesRoute: DashboardWarehousesRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardPlatformAuditRoute: DashboardPlatformAuditRoute,
   DashboardPlatformOpsRoute: DashboardPlatformOpsRoute,

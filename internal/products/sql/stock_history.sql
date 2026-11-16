@@ -1,6 +1,7 @@
 -- name: CreateStockHistory :one
 INSERT INTO stock_history (
     product_id,
+    warehouse_id,
     change_amount,
     previous_stock,
     current_stock,
@@ -9,7 +10,7 @@ INSERT INTO stock_history (
     note,
     created_by
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8
+    $1, $2, $3, $4, $5, $6, $7, $8, $9
 ) RETURNING *;
 
 -- name: GetStockHistoryByProduct :many

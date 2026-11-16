@@ -9,7 +9,9 @@ import (
 	"dinosaurus-pos/internal/common"
 	"dinosaurus-pos/internal/common/pagination"
 	"dinosaurus-pos/internal/common/store"
+	"dinosaurus-pos/internal/inventory"
 	products_repo "dinosaurus-pos/internal/products/repository"
+	wh_repo "dinosaurus-pos/internal/warehouse/repository"
 	"dinosaurus-pos/internal/supplierdebts"
 	sd_repo "dinosaurus-pos/internal/supplierdebts/repository"
 	sr_repo "dinosaurus-pos/internal/stockreceipts/repository"
@@ -65,12 +67,25 @@ func (s *StockReceiptService) Create(ctx context.Context, req CreateStockReceipt
 			supplierID = pgtype.UUID{Bytes: *req.SupplierID, Valid: true}
 		}
 
+		whRepo := wh_repo.New(tx)
+		warehouseID := pgtype.UUID{}
+		if req.WarehouseID != nil {
+			warehouseID = pgtype.UUID{Bytes: *req.WarehouseID, Valid: true}
+		} else {
+			dw, err := whRepo.GetDefaultWarehouse(ctx)
+			if err != nil {
+				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+			}
+			warehouseID = pgtype.UUID{Bytes: dw.ID, Valid: true}
+		}
+
 		receipt, err = qtx.CreateStockReceipt(ctx, sr_repo.CreateStockReceiptParams{
-			ReceiptNo:  receiptNo,
-			SupplierID: supplierID,
-			ReceivedAt: pgtype.Timestamptz{Time: receivedAt, Valid: true},
-			Note:       req.Note,
-			CreatedBy:  createdBy,
+			ReceiptNo:   receiptNo,
+			SupplierID:  supplierID,
+			ReceivedAt:  pgtype.Timestamptz{Time: receivedAt, Valid: true},
+			Note:        req.Note,
+			CreatedBy:   createdBy,
+			WarehouseID: warehouseID,
 		})
 		if err != nil {
 			return err
@@ -262,6 +277,16 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 	err = s.store.ExecTx(ctx, func(tx pgx.Tx) error {
 		qtx := sr_repo.New(tx)
 		prd := products_repo.New(tx)
+		wh := wh_repo.New(tx)
+
+		warehouseID := uuid.UUID(receipt.WarehouseID.Bytes)
+		if !receipt.WarehouseID.Valid {
+			dw, err := wh.GetDefaultWarehouse(ctx)
+			if err != nil {
+				return fmt.Errorf("%w: no default warehouse", common.ErrInvalidInput)
+			}
+			warehouseID = dw.ID
+		}
 
 		var createdBy pgtype.UUID
 		if actorID, ok := ctx.Value(common.UserIDKey).(uuid.UUID); ok {
@@ -272,20 +297,14 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 		note := fmt.Sprintf("Stock receipt %s", receipt.ReceiptNo)
 
 		for _, line := range items {
-			prod, err := prd.GetProductByID(ctx, line.ProductID)
-			if err != nil {
+			if _, err := prd.GetProductByID(ctx, line.ProductID); err != nil {
 				if errors.Is(err, pgx.ErrNoRows) {
 					return fmt.Errorf("%w: product not found", common.ErrInvalidInput)
 				}
 				return err
 			}
 
-			previousStock := prod.Stock
-			updated, err := prd.AddProductStock(ctx, products_repo.AddProductStockParams{
-				ID:       line.ProductID,
-				Quantity: line.Quantity,
-			})
-			if err != nil {
+			if err := inventory.ApplyWarehouseDelta(ctx, prd, wh, warehouseID, line.ProductID, line.Quantity, products_repo.StockChangeTypeRestock, refID, &note, createdBy); err != nil {
 				return err
 			}
 
@@ -310,19 +329,6 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 				}
 			}
 
-			_, err = prd.CreateStockHistory(ctx, products_repo.CreateStockHistoryParams{
-				ProductID:     line.ProductID,
-				ChangeAmount:  line.Quantity,
-				PreviousStock: previousStock,
-				CurrentStock:  updated.Stock,
-				ChangeType:    products_repo.StockChangeTypeRestock,
-				ReferenceID:   refID,
-				Note:          &note,
-				CreatedBy:     createdBy,
-			})
-			if err != nil {
-				return err
-			}
 		}
 
 		_, err = qtx.SetStockReceiptStatus(ctx, sr_repo.SetStockReceiptStatusParams{
@@ -458,6 +464,10 @@ func mapReceiptDetail(r sr_repo.StockReceipt, items []sr_repo.ListStockReceiptIt
 	if r.SupplierID.Valid {
 		sid := uuid.UUID(r.SupplierID.Bytes)
 		resp.SupplierID = &sid
+	}
+	if r.WarehouseID.Valid {
+		wid := uuid.UUID(r.WarehouseID.Bytes)
+		resp.WarehouseID = &wid
 	}
 	for _, it := range items {
 		var sellPtr *float64

@@ -88,6 +88,8 @@ Draft dòng: `useStockReceiptDraft`, lookup chung `web/src/lib/retail-pos/lookup
 
 **BE:** `applyReceiptPayment` trong `internal/stockreceipts/service.go`; khi **`Complete`**, nếu `total - amount_paid > 0` → tạo **một** `supplier_debts` gắn `stock_receipt_id` (`internal/supplierdebts/integrate.go`).
 
+**Kho (đa kho):** migration `000013_warehouses_stock_ops` — `warehouses`, `warehouse_stock` (nguồn tồn theo kho); `products.stock` = tổng các kho. Nhập/bán/điều chỉnh/chuyển/kiểm kê ghi `stock_history.warehouse_id`. Helper: `internal/inventory/stockmovement.go` (`ApplyWarehouseDelta`). API: `/warehouses`, `/stock-adjustments`, `/stock-transfers`, `/stock-takes`, `/stock-movements`. FE menu **Kho hàng** (`useNavigationMenu`). Seed kho `MAIN` khi tạo tenant.
+
 ---
 
 ## Công nợ MVP (supplier AP + customer AR)

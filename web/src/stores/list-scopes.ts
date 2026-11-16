@@ -13,4 +13,6 @@ export const LIST_SCOPES = {
     inventory: 'inventory',
     activityLogs: 'activity-logs',
     stockReceipts: 'stock-receipts',
+    priceLists: 'price-lists',
+    stockMovements: 'stock-movements',
 } as const

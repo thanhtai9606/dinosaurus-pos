@@ -242,5 +242,37 @@ func SetupRoutes(app *App, container *AppContainer) {
 		stockReceiptGroup.Delete("/:id", container.StockReceiptHandler.DeleteHandler)
 	}
 
+	warehouseRead := api.Group("/warehouses", authMiddleware)
+	{
+		warehouseRead.Get("/", container.WarehouseHandler.ListHandler)
+		warehouseRead.Get("/:id", container.WarehouseHandler.GetHandler)
+		warehouseRead.Get("/:id/stock", container.WarehouseHandler.ListStockHandler)
+	}
+	api.Post("/warehouses", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.CreateHandler)
+	api.Put("/warehouses/:id", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager), container.WarehouseHandler.UpdateHandler)
+
+	stockOpsGroup := api.Group("", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleManager))
+	{
+		stockOpsGroup.Get("/stock-adjustments", container.StockOpsHandler.ListAdjustmentsHandler)
+		stockOpsGroup.Post("/stock-adjustments", container.StockOpsHandler.CreateAdjustmentHandler)
+		stockOpsGroup.Get("/stock-adjustments/:id", container.StockOpsHandler.GetAdjustmentHandler)
+		stockOpsGroup.Put("/stock-adjustments/:id", container.StockOpsHandler.UpdateAdjustmentHandler)
+		stockOpsGroup.Post("/stock-adjustments/:id/complete", container.StockOpsHandler.CompleteAdjustmentHandler)
+
+		stockOpsGroup.Get("/stock-transfers", container.StockOpsHandler.ListTransfersHandler)
+		stockOpsGroup.Post("/stock-transfers", container.StockOpsHandler.CreateTransferHandler)
+		stockOpsGroup.Get("/stock-transfers/:id", container.StockOpsHandler.GetTransferHandler)
+		stockOpsGroup.Put("/stock-transfers/:id", container.StockOpsHandler.UpdateTransferHandler)
+		stockOpsGroup.Post("/stock-transfers/:id/complete", container.StockOpsHandler.CompleteTransferHandler)
+
+		stockOpsGroup.Get("/stock-takes", container.StockOpsHandler.ListStockTakesHandler)
+		stockOpsGroup.Post("/stock-takes", container.StockOpsHandler.CreateStockTakeHandler)
+		stockOpsGroup.Get("/stock-takes/:id", container.StockOpsHandler.GetStockTakeHandler)
+		stockOpsGroup.Put("/stock-takes/:id", container.StockOpsHandler.UpdateStockTakeHandler)
+		stockOpsGroup.Post("/stock-takes/:id/post", container.StockOpsHandler.PostStockTakeHandler)
+
+		stockOpsGroup.Get("/stock-movements", container.StockOpsHandler.ListStockMovementsHandler)
+	}
+
 	SetupFrontend(app)
 }

@@ -123,7 +123,13 @@
         "customers": "Daftar pelanggan",
         "customers_menu": "Pelanggan",
         "customer_groups": "Grup pelanggan",
-        "inventory": "Inventaris",
+        "inventory_menu": "Gudang",
+        "inventory": "Stok",
+        "warehouses": "Daftar gudang",
+        "stock_transfers": "Transfer stok",
+        "stock_adjustments": "Penyesuaian",
+        "stock_takes": "Stok opname",
+        "stock_movements": "Buku mutasi",
         "suppliers": "Supplier",
         "stock_receipts": "Penerimaan stok",
         "supplier_debts": "Hutang supplier",
@@ -1498,8 +1504,68 @@
         "title": "Ringkasan inventaris",
         "description": "Stok, SKU, filter stok rendah.",
         "low_stock_only": "Hanya stok rendah",
+        "warehouse": "Gudang",
         "create_receipt": "Buat penerimaan",
         "link_from_receipts": "Lihat inventaris"
+    },
+    "warehouses": {
+        "title": "Gudang",
+        "add": "Tambah gudang",
+        "code": "Kode",
+        "name": "Nama",
+        "default": "Default",
+        "inactive": "Nonaktif",
+        "created": "Gudang dibuat",
+        "create_failed": "Gagal membuat gudang"
+    },
+    "stockMovements": {
+        "title": "Buku mutasi stok",
+        "warehouse": "Gudang",
+        "all_warehouses": "Semua gudang",
+        "date": "Tanggal",
+        "product": "Produk",
+        "type": "Tipe",
+        "delta": "Qty Δ"
+    },
+    "stockAdjustments": {
+        "title": "Penyesuaian stok",
+        "new": "Baru",
+        "doc_no": "No. dokumen",
+        "warehouse": "Gudang",
+        "reason": "Alasan",
+        "status": "Status",
+        "complete": "Selesaikan",
+        "completed": "Penyesuaian selesai",
+        "complete_failed": "Gagal menyelesaikan",
+        "form_title": "Penyesuaian cepat",
+        "pick_warehouse": "Pilih gudang",
+        "product_id": "ID produk",
+        "product_id_hint": "UUID dari daftar produk",
+        "delta": "Perubahan qty (+/-)",
+        "validation": "Gudang dan produk wajib",
+        "save_and_complete": "Simpan & selesaikan",
+        "create_failed": "Gagal membuat penyesuaian"
+    },
+    "stockTransfers": {
+        "title": "Transfer stok",
+        "hint": "Buat transfer via API; daftar draft/selesai.",
+        "doc_no": "No. dokumen",
+        "from": "Dari",
+        "to": "Ke",
+        "status": "Status",
+        "complete": "Selesaikan",
+        "completed": "Transfer selesai",
+        "complete_failed": "Gagal menyelesaikan"
+    },
+    "stockTakes": {
+        "title": "Stok opname",
+        "hint": "Buka sesi via API; post untuk selisih.",
+        "doc_no": "No. dokumen",
+        "warehouse": "Gudang",
+        "status": "Status",
+        "post": "Post opname",
+        "posted": "Opname diposting",
+        "post_failed": "Gagal posting"
     },
     "customers": {
         "title": "Pelanggan",
@@ -1597,9 +1663,30 @@
     },
     "price_lists": {
         "title": "Daftar harga",
-        "description": "Ekspor dan impor harga jual massal (Excel).",
+        "description": "Edit harga di grid atau ekspor/impor massal lewat Excel.",
         "card_title": "Harga jual produk",
-        "card_description": "Unduh template, edit Excel, impor; atau ekspor harga saat ini."
+        "card_description": "Unduh template, edit Excel, impor; atau ekspor harga saat ini.",
+        "excel_menu": "Excel",
+        "grid_title": "Edit harga langsung",
+        "grid_help_edit": "Ubah harga pokok atau jual di baris; disimpan saat keluar dari kolom (Enter atau klik luar).",
+        "grid_help_readonly": "Hanya lihat; hanya manajer yang bisa mengubah.",
+        "empty": "Tidak ada produk.",
+        "filters": {
+            "search_label": "Cari",
+            "search_placeholder": "Kode, barcode, SKU, atau nama…"
+        },
+        "columns": {
+            "sku": "Kode / SKU",
+            "name": "Produk",
+            "unit": "Satuan",
+            "cost_price": "Harga pokok",
+            "retail_price": "Eceran",
+            "wholesale_price": "Grosir",
+            "stock": "Stok"
+        },
+        "messages": {
+            "save_failed": "Gagal menyimpan harga"
+        }
     },
     "product_units_page": {
         "title": "Satuan ukuran",

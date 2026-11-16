@@ -522,5 +522,92 @@ export const RBAC_RULES: Record<string, string[]> = {
     "POST /customer-debts/{id}/void": [
         "admin",
         "manager"
+    ],
+    "GET /warehouses": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "POST /warehouses": [
+        "admin",
+        "manager"
+    ],
+    "GET /warehouses/{id}": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "PUT /warehouses/{id}": [
+        "admin",
+        "manager"
+    ],
+    "GET /warehouses/{id}/stock": [
+        "admin",
+        "manager",
+        "cashier"
+    ],
+    "GET /stock-adjustments": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-adjustments": [
+        "admin",
+        "manager"
+    ],
+    "GET /stock-adjustments/{id}": [
+        "admin",
+        "manager"
+    ],
+    "PUT /stock-adjustments/{id}": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-adjustments/{id}/complete": [
+        "admin",
+        "manager"
+    ],
+    "GET /stock-transfers": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-transfers": [
+        "admin",
+        "manager"
+    ],
+    "GET /stock-transfers/{id}": [
+        "admin",
+        "manager"
+    ],
+    "PUT /stock-transfers/{id}": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-transfers/{id}/complete": [
+        "admin",
+        "manager"
+    ],
+    "GET /stock-takes": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-takes": [
+        "admin",
+        "manager"
+    ],
+    "GET /stock-takes/{id}": [
+        "admin",
+        "manager"
+    ],
+    "PUT /stock-takes/{id}": [
+        "admin",
+        "manager"
+    ],
+    "POST /stock-takes/{id}/post": [
+        "admin",
+        "manager"
+    ],
+    "GET /stock-movements": [
+        "admin",
+        "manager"
     ]
 };

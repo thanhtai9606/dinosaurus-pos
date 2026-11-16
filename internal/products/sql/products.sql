@@ -59,6 +59,13 @@ SELECT
     p.cost_price,
     p.default_supplier_id,
     COALESCE(
+        (SELECT pu.wholesale_price
+         FROM product_units pu
+         WHERE pu.product_id = p.id AND pu.is_base = TRUE AND pu.deleted_at IS NULL
+         LIMIT 1),
+        0
+    )::bigint AS base_wholesale_price,
+    COALESCE(
         (SELECT json_agg(c.*) 
          FROM product_categories pc 
          JOIN categories c ON pc.category_id = c.id 
@@ -350,6 +357,12 @@ RETURNING *;
 UPDATE products
 SET stock = stock + sqlc.arg(quantity), updated_at = NOW()
 WHERE id = sqlc.arg(id) AND deleted_at IS NULL
+RETURNING *;
+
+-- name: SetProductStock :one
+UPDATE products
+SET stock = $2, updated_at = NOW()
+WHERE id = $1 AND deleted_at IS NULL
 RETURNING *;
 
 -- name: SetProductCostPrice :one

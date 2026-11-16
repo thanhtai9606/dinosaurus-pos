@@ -30,6 +30,7 @@ type UpdateProductRequest struct {
 	Name                *string    `json:"name" validate:"omitempty,min=3,max=100"`
 	CategoryIDs         *[]int32   `json:"category_ids" validate:"omitempty,dive,gt=0"`
 	Price               *float64   `json:"price" validate:"omitempty,gt=0"`
+	WholesalePrice      *float64   `json:"wholesale_price" validate:"omitempty,gte=0"`
 	CostPrice           *float64   `json:"cost_price" validate:"omitempty,gte=0"`
 	Stock               *int32     `json:"stock" validate:"omitempty,gte=0"`
 	Sku                 *string    `json:"sku" validate:"omitempty,max=50"`
@@ -128,6 +129,7 @@ type ProductListResponse struct {
 	Categories          []ProductCategoryResponse `json:"categories,omitempty"`
 	ImageURL            *string                   `json:"image_url,omitempty"`
 	Price               float64                   `json:"price"`
+	WholesalePrice      float64                   `json:"wholesale_price,omitempty"`
 	CostPrice           float64                   `json:"cost_price"`
 	Stock               int32                     `json:"stock"`
 	Code                string                    `json:"code,omitempty"`

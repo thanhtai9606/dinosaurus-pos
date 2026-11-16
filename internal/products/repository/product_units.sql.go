@@ -238,3 +238,35 @@ func (q *Queries) SoftDeleteProductUnitsByProduct(ctx context.Context, productID
 	_, err := q.db.Exec(ctx, softDeleteProductUnitsByProduct, productID)
 	return err
 }
+
+const setBaseProductUnitSellPrice = `-- name: SetBaseProductUnitSellPrice :exec
+UPDATE product_units
+SET sell_price = $2, updated_at = NOW()
+WHERE product_id = $1 AND is_base = TRUE AND deleted_at IS NULL
+`
+
+type SetBaseProductUnitSellPriceParams struct {
+	ProductID uuid.UUID `json:"product_id"`
+	SellPrice int64     `json:"sell_price"`
+}
+
+func (q *Queries) SetBaseProductUnitSellPrice(ctx context.Context, arg SetBaseProductUnitSellPriceParams) error {
+	_, err := q.db.Exec(ctx, setBaseProductUnitSellPrice, arg.ProductID, arg.SellPrice)
+	return err
+}
+
+const setBaseProductUnitWholesalePrice = `-- name: SetBaseProductUnitWholesalePrice :exec
+UPDATE product_units
+SET wholesale_price = $2, updated_at = NOW()
+WHERE product_id = $1 AND is_base = TRUE AND deleted_at IS NULL
+`
+
+type SetBaseProductUnitWholesalePriceParams struct {
+	ProductID       uuid.UUID `json:"product_id"`
+	WholesalePrice int64     `json:"wholesale_price"`
+}
+
+func (q *Queries) SetBaseProductUnitWholesalePrice(ctx context.Context, arg SetBaseProductUnitWholesalePriceParams) error {
+	_, err := q.db.Exec(ctx, setBaseProductUnitWholesalePrice, arg.ProductID, arg.WholesalePrice)
+	return err
+}

@@ -48,6 +48,42 @@ func (q *Queries) AddProductStock(ctx context.Context, arg AddProductStockParams
 	return i, err
 }
 
+const setProductStock = `-- name: SetProductStock :one
+UPDATE products
+SET stock = $2, updated_at = NOW()
+WHERE id = $1 AND deleted_at IS NULL
+RETURNING id, name, image_url, price, stock, created_at, updated_at, deleted_at, cost_price, sku, barcode, unit, min_stock, default_supplier_id, code, tenant_id
+`
+
+type SetProductStockParams struct {
+	ID    uuid.UUID `json:"id"`
+	Stock int32     `json:"stock"`
+}
+
+func (q *Queries) SetProductStock(ctx context.Context, arg SetProductStockParams) (Product, error) {
+	row := q.db.QueryRow(ctx, setProductStock, arg.ID, arg.Stock)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ImageUrl,
+		&i.Price,
+		&i.Stock,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CostPrice,
+		&i.Sku,
+		&i.Barcode,
+		&i.Unit,
+		&i.MinStock,
+		&i.DefaultSupplierID,
+		&i.Code,
+		&i.TenantID,
+	)
+	return i, err
+}
+
 const assignProductCategory = `-- name: AssignProductCategory :exec
 INSERT INTO product_categories (product_id, category_id) VALUES ($1, $2) ON CONFLICT DO NOTHING
 `
@@ -938,6 +974,13 @@ SELECT
     p.cost_price,
     p.default_supplier_id,
     COALESCE(
+        (SELECT pu.wholesale_price
+         FROM product_units pu
+         WHERE pu.product_id = p.id AND pu.is_base = TRUE AND pu.deleted_at IS NULL
+         LIMIT 1),
+        0
+    )::bigint AS base_wholesale_price,
+    COALESCE(
         (SELECT json_agg(c.*) 
          FROM product_categories pc 
          JOIN categories c ON pc.category_id = c.id 
@@ -990,9 +1033,10 @@ type ListProductsRow struct {
 	Barcode           *string        `json:"barcode"`
 	Unit              string         `json:"unit"`
 	MinStock          int32          `json:"min_stock"`
-	CostPrice         pgtype.Numeric `json:"cost_price"`
-	DefaultSupplierID pgtype.UUID    `json:"default_supplier_id"`
-	Categories        interface{}    `json:"categories"`
+	CostPrice            pgtype.Numeric `json:"cost_price"`
+	DefaultSupplierID    pgtype.UUID    `json:"default_supplier_id"`
+	BaseWholesalePrice   int64          `json:"base_wholesale_price"`
+	Categories           interface{}    `json:"categories"`
 }
 
 // Lists products with filtering and pagination.
@@ -1025,6 +1069,7 @@ func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]L
 			&i.MinStock,
 			&i.CostPrice,
 			&i.DefaultSupplierID,
+			&i.BaseWholesalePrice,
 			&i.Categories,
 		); err != nil {
 			return nil, err

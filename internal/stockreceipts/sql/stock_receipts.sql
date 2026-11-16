@@ -3,8 +3,8 @@ SELECT COUNT(*)::int FROM stock_receipts
 WHERE created_at::date = $1::date;
 
 -- name: CreateStockReceipt :one
-INSERT INTO stock_receipts (receipt_no, supplier_id, status, received_at, note, created_by)
-VALUES ($1, $2, 'draft', $3, $4, $5)
+INSERT INTO stock_receipts (receipt_no, supplier_id, status, received_at, note, created_by, warehouse_id)
+VALUES ($1, $2, 'draft', $3, $4, $5, $6)
 RETURNING *;
 
 -- name: GetStockReceiptByID :one

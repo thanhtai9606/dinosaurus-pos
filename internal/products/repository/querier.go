@@ -68,8 +68,11 @@ type Querier interface {
 	ListProductsForSearchIndex(ctx context.Context) ([]ListProductsForSearchIndexRow, error)
 	RestoreProduct(ctx context.Context, id uuid.UUID) error
 	RestoreProductsBulk(ctx context.Context, dollar_1 []uuid.UUID) error
+	SetBaseProductUnitSellPrice(ctx context.Context, arg SetBaseProductUnitSellPriceParams) error
+	SetBaseProductUnitWholesalePrice(ctx context.Context, arg SetBaseProductUnitWholesalePriceParams) error
 	SetProductCostPrice(ctx context.Context, arg SetProductCostPriceParams) (Product, error)
 	SetProductSellPrice(ctx context.Context, arg SetProductSellPriceParams) (Product, error)
+	SetProductStock(ctx context.Context, arg SetProductStockParams) (Product, error)
 	SoftDeleteProduct(ctx context.Context, id uuid.UUID) error
 	// Deletes a single product option.
 	SoftDeleteProductOption(ctx context.Context, id uuid.UUID) error

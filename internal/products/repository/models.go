@@ -544,11 +544,14 @@ func (ns NullSortOrder) Value() (driver.Value, error) {
 type StockChangeType string
 
 const (
-	StockChangeTypeSale       StockChangeType = "sale"
-	StockChangeTypeRestock    StockChangeType = "restock"
-	StockChangeTypeCorrection StockChangeType = "correction"
-	StockChangeTypeReturn     StockChangeType = "return"
-	StockChangeTypeDamage     StockChangeType = "damage"
+	StockChangeTypeSale         StockChangeType = "sale"
+	StockChangeTypeRestock      StockChangeType = "restock"
+	StockChangeTypeCorrection   StockChangeType = "correction"
+	StockChangeTypeReturn       StockChangeType = "return"
+	StockChangeTypeDamage       StockChangeType = "damage"
+	StockChangeTypeTransferOut  StockChangeType = "transfer_out"
+	StockChangeTypeTransferIn   StockChangeType = "transfer_in"
+	StockChangeTypeCount        StockChangeType = "count"
 )
 
 func (e *StockChangeType) Scan(src interface{}) error {
@@ -1073,6 +1076,7 @@ type Shift struct {
 type StockHistory struct {
 	ID            uuid.UUID          `json:"id"`
 	ProductID     uuid.UUID          `json:"product_id"`
+	WarehouseID   pgtype.UUID        `json:"warehouse_id"`
 	ChangeAmount  int32              `json:"change_amount"`
 	PreviousStock int32              `json:"previous_stock"`
 	CurrentStock  int32              `json:"current_stock"`

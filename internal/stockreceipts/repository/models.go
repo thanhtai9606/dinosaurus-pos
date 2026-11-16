@@ -1094,6 +1094,7 @@ type StockReceipt struct {
 	PaymentMode StockReceiptPaymentMode `json:"payment_mode"`
 	AmountPaid  pgtype.Numeric          `json:"amount_paid"`
 	TenantID    uuid.UUID               `json:"tenant_id"`
+	WarehouseID pgtype.UUID             `json:"warehouse_id"`
 }
 
 type StockReceiptItem struct {

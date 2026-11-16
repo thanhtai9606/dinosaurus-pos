@@ -68,6 +68,20 @@ type InvoiceSettingsResponse struct {
 	LegalText         string `json:"legal_text"`
 }
 
+type RegionalSettingsResponse struct {
+	Timezone     string `json:"timezone"`
+	DateStyle    string `json:"date_style"`
+	TimeStyle    string `json:"time_style"`
+	WeekStartsOn string `json:"week_starts_on"`
+}
+
+type UpdateRegionalSettingsRequest struct {
+	Timezone     string `json:"timezone" validate:"required"`
+	DateStyle    string `json:"date_style" validate:"required,oneof=DMY MDY YMD"`
+	TimeStyle    string `json:"time_style" validate:"required,oneof=24h 12h"`
+	WeekStartsOn string `json:"week_starts_on" validate:"required,oneof=monday sunday"`
+}
+
 type UpdateInvoiceSettingsRequest struct {
 	ReceiptHeader    string `json:"receipt_header" validate:"max=500"`
 	ReceiptFooter    string `json:"receipt_footer" validate:"max=500"`

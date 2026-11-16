@@ -815,6 +815,7 @@
             "reports_title": "Báo cáo email định kỳ",
             "reports_desc": "Báo cáo ngày/tháng/năm chỉ gửi qua kênh SMTP (không qua push).",
             "timezone": "Múi giờ (IANA)",
+            "timezone_moved": "Múi giờ cửa hàng cấu hình tại Cài đặt → Tùy chọn → Múi giờ & ngày giờ cửa hàng. Giờ gửi báo cáo email dùng múi giờ đó.",
             "report_emails": "Email nhận báo cáo (phân tách bằng dấu phẩy)",
             "report_period": {
                 "daily": "Hàng ngày",
@@ -830,10 +831,28 @@
         },
         "preferences": {
             "title": "Hiển thị & ngôn ngữ",
-            "description": "Ngôn ngữ giao diện và giao diện sáng/tối.",
+            "description": "Ngôn ngữ giao diện và định dạng ngày giờ theo cửa hàng.",
             "language": "Ngôn ngữ",
             "theme": "Giao diện",
-            "theme_help": "Chế độ sáng hoặc tối."
+            "theme_help": "Chế độ sáng hoặc tối.",
+            "regional_title": "Múi giờ & ngày giờ cửa hàng",
+            "regional_description": "Áp dụng cho mọi người trong cửa hàng (danh sách, báo cáo, email lịch).",
+            "timezone": "Múi giờ",
+            "date_style": "Định dạng ngày",
+            "date_style_dmy": "Ngày / tháng / năm",
+            "date_style_mdy": "Tháng / ngày / năm",
+            "date_style_ymd": "Năm-tháng-ngày",
+            "time_style": "Định dạng giờ",
+            "time_style_24h": "24 giờ",
+            "time_style_12h": "12 giờ (AM/PM)",
+            "week_starts_on": "Tuần bắt đầu",
+            "week_monday": "Thứ Hai",
+            "week_sunday": "Chủ nhật",
+            "regional_preview": "Xem thử: {{sample}}",
+            "regional_save": "Lưu cài đặt khu vực",
+            "regional_saved": "Đã lưu cài đặt khu vực",
+            "regional_save_failed": "Không lưu được cài đặt khu vực",
+            "regional_admin_only": "Chỉ admin mới đổi được múi giờ và định dạng ngày giờ cửa hàng."
         },
         "financial": {
             "title": "Thiết lập tài chính",

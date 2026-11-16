@@ -13,6 +13,7 @@ import (
 	"dinosaurus-pos/internal/notifications/channels"
 	notif_repo "dinosaurus-pos/internal/notifications/repository"
 	"dinosaurus-pos/internal/report"
+	"dinosaurus-pos/internal/settings"
 	settings_repo "dinosaurus-pos/internal/settings/repository"
 	"dinosaurus-pos/internal/tenant"
 	"dinosaurus-pos/pkg/logger"
@@ -299,8 +300,10 @@ func (s *Service) ListDeliveries(ctx context.Context, page, limit int) (*ListDel
 func (s *Service) GetTenantConfig(ctx context.Context) (TenantConfigResponse, error) {
 	cfg, err := s.loadTenantConfigStruct(ctx)
 	if err != nil {
-		def := DefaultTenantNotificationConfig()
-		return tenantConfigToResponse(def), nil
+		cfg = DefaultTenantNotificationConfig()
+	}
+	if reg, regErr := settings.LoadRegionalConfig(ctx, s.settingsRepo); regErr == nil && reg.Timezone != "" {
+		cfg.Timezone = reg.Timezone
 	}
 	return tenantConfigToResponse(cfg), nil
 }
@@ -312,9 +315,6 @@ func (s *Service) UpdateTenantConfig(ctx context.Context, req UpdateTenantConfig
 	}
 	if req.StockLowThreshold != nil {
 		existing.StockLowThreshold = *req.StockLowThreshold
-	}
-	if req.Timezone != "" {
-		existing.Timezone = req.Timezone
 	}
 	if req.ReportSchedules != nil {
 		existing.ReportSchedules = *req.ReportSchedules

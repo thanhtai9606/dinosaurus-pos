@@ -74,7 +74,6 @@ export function NotificationSettingsCard() {
     const [newType, setNewType] = useState<NotificationChannelType>('email')
     const [newConfig, setNewConfig] = useState<Record<string, unknown>>(defaultConfig('email'))
     const [threshold, setThreshold] = useState(5)
-    const [timezone, setTimezone] = useState('Asia/Ho_Chi_Minh')
     const [reportEmails, setReportEmails] = useState('')
     const [reportSchedules, setReportSchedules] = useState<NotificationTenantConfig['report_schedules']>({
         daily: { enabled: false, hour: 6, minute: 0 },
@@ -86,7 +85,6 @@ export function NotificationSettingsCard() {
     useEffect(() => {
         if (tenantConfig) {
             setThreshold(tenantConfig.stock_low_threshold)
-            setTimezone(tenantConfig.timezone || 'Asia/Ho_Chi_Minh')
             setReportEmails((tenantConfig.report_recipient_emails || []).join(', '))
             if (tenantConfig.report_schedules) setReportSchedules(tenantConfig.report_schedules)
         }
@@ -176,7 +174,6 @@ export function NotificationSettingsCard() {
             .filter(Boolean)
         configMut.mutate({
             stock_low_threshold: threshold,
-            timezone,
             report_schedules: reportSchedules,
             report_recipient_emails: emails,
         })
@@ -257,10 +254,9 @@ export function NotificationSettingsCard() {
                         <CardDescription>{t('settings.notifications.reports_desc')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div>
-                            <Label>{t('settings.notifications.timezone')}</Label>
-                            <Input value={timezone} onChange={(e) => setTimezone(e.target.value)} className="max-w-md" />
-                        </div>
+                        <p className="text-sm text-muted-foreground rounded-md border bg-muted/40 p-3">
+                            {t('settings.notifications.timezone_moved')}
+                        </p>
                         <div>
                             <Label>{t('settings.notifications.report_emails')}</Label>
                             <Input

@@ -7,6 +7,7 @@ import { useRBAC } from '@/lib/auth/rbac'
 export const brandingSettingsQueryKey = ['branding-settings']
 export const printerSettingsQueryKey = ['printer-settings']
 export const financialSettingsQueryKey = ['financial-settings']
+export const regionalSettingsQueryKey = ['regional-settings']
 export const invoiceSettingsQueryKey = ['invoice-settings']
 
 export type CurrencyOption = {
@@ -19,6 +20,13 @@ export type CurrencyOption = {
 export type PosQuickCashSettings = {
     retail: number[]
     stock_receipt: number[]
+}
+
+export type RegionalSettings = {
+    timezone: string
+    date_style: 'DMY' | 'MDY' | 'YMD'
+    time_style: '24h' | '12h'
+    week_starts_on: 'monday' | 'sunday'
 }
 
 export type FinancialSettings = {
@@ -162,6 +170,42 @@ export function useDiscoverPrintersQuery(enabled: boolean = false) {
         staleTime: 0,
     })
     return { ...query, isAllowed }
+}
+
+export const regionalSettingsQueryOptions = () =>
+    queryOptions({
+        queryKey: regionalSettingsQueryKey,
+        queryFn: async () => {
+            const res = await axiosInstance.get('/settings/regional')
+            return (res.data as { data: RegionalSettings }).data
+        },
+        staleTime: 60_000,
+    })
+
+export function useRegionalSettingsQuery() {
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('GET', '/settings/regional')
+    const query = useQuery({
+        ...regionalSettingsQueryOptions(),
+        enabled: isAllowed,
+    })
+    return { ...query, isAllowed }
+}
+
+export function useUpdateRegionalSettingsMutation() {
+    const queryClient = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const isAllowed = canAccessApi('PUT', '/settings/regional')
+    const mutation = useMutation({
+        mutationFn: async (data: RegionalSettings) => {
+            const res = await putSettingsWithFallback('regional', data)
+            return (res.data as { data: RegionalSettings }).data
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: regionalSettingsQueryKey })
+        },
+    })
+    return { ...mutation, isAllowed }
 }
 
 export const financialSettingsQueryOptions = () =>

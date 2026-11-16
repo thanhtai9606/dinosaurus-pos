@@ -5,8 +5,9 @@ import { CloseShiftModal } from "@/components/modals/CloseShiftModal"
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
 import { meQueryOptions } from '@/lib/api/query/auth'
-import { useBrandingSettingsQuery, financialSettingsQueryOptions } from '@/lib/api/query/settings'
+import { useBrandingSettingsQuery, financialSettingsQueryOptions, regionalSettingsQueryOptions } from '@/lib/api/query/settings'
 import { MoneyProvider } from '@/context/MoneyContext'
+import { RegionalProvider } from '@/context/RegionalContext'
 import { useNavigationMenu } from '@/hooks/useNavigationMenu'
 import { canAccessMenuPath, MENU_BY_PATH } from '@/lib/auth/menuCatalog'
 import { isSuperAdminPlatformPath, SUPER_ADMIN_HOME } from '@/lib/auth/superAdminPaths'
@@ -22,6 +23,7 @@ export const Route = createFileRoute('/_dashboard')({
     loader: async ({ context: { queryClient } }) => {
         try {
             await queryClient.ensureQueryData(financialSettingsQueryOptions())
+            await queryClient.ensureQueryData(regionalSettingsQueryOptions())
             return await queryClient.ensureQueryData(meQueryOptions())
         } catch (error: any) {
             const status = error?.response?.status ?? error?.status
@@ -114,9 +116,11 @@ function DashboardLayout() {
                         handleLogout={handleLogout}
                     />
                     <main className="flex flex-1 flex-col gap-4 p-4 sm:p-5 lg:gap-6 lg:p-6 overflow-y-auto overflow-x-hidden min-w-0">
-                        <MoneyProvider>
-                            <Outlet />
-                        </MoneyProvider>
+                        <RegionalProvider>
+                            <MoneyProvider>
+                                <Outlet />
+                            </MoneyProvider>
+                        </RegionalProvider>
                     </main>
                 </div>
                 {!isSuperAdmin && (

@@ -3,22 +3,18 @@ import { twMerge } from "tailwind-merge"
 import { Area } from "react-easy-crop"
 
 import { format } from "date-fns"
+import { formatActiveDate, formatActiveDateTime, formatActiveTime } from '@/lib/datetime/regional'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const formatDate = (date: Date | string | number) => {
-  return format(new Date(date), 'd MMM yyyy')
-}
+/** Uses tenant regional settings when RegionalProvider has loaded (see setFormattingContext). */
+export const formatDate = (date: Date | string | number) => formatActiveDate(date)
 
-export const formatDateTime = (date: Date | string | number) => {
-  return format(new Date(date), 'd MMM yyyy HH:mm')
-}
+export const formatDateTime = (date: Date | string | number) => formatActiveDateTime(date)
 
-export const formatTime = (date: Date | string | number) => {
-  return format(new Date(date), 'HH:mm')
-}
+export const formatTime = (date: Date | string | number) => formatActiveTime(date)
 
 export function readFile(file: File) {
   return new Promise((resolve) => {

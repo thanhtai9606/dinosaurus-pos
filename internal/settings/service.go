@@ -31,6 +31,8 @@ type ISettingsService interface {
 	UpdateInvoiceSettings(ctx context.Context, req UpdateInvoiceSettingsRequest) (*InvoiceSettingsResponse, error)
 	GetMenuRoleAccess(ctx context.Context) (*MenuRoleAccessResponse, error)
 	UpdateMenuRoleAccess(ctx context.Context, req UpdateMenuRoleAccessRequest) (*MenuRoleAccessResponse, error)
+	GetRegionalSettings(ctx context.Context) (*RegionalSettingsResponse, error)
+	UpdateRegionalSettings(ctx context.Context, req UpdateRegionalSettingsRequest) (*RegionalSettingsResponse, error)
 	ComputeOrderTaxAndService(ctx context.Context, grossTotal int64) (taxAmount int64, serviceChargeAmount int64, err error)
 	UpdateLogo(ctx context.Context, data []byte, filename string, contentType string) (string, error)
 }
@@ -507,6 +509,45 @@ func (s *SettingsService) UpdateInvoiceSettings(ctx context.Context, req UpdateI
 	})
 
 	return s.GetInvoiceSettings(ctx)
+}
+
+func (s *SettingsService) currentRegionalConfig(ctx context.Context) (RegionalConfig, error) {
+	return LoadRegionalConfig(ctx, s.repo)
+}
+
+func (s *SettingsService) GetRegionalSettings(ctx context.Context) (*RegionalSettingsResponse, error) {
+	cfg, err := s.currentRegionalConfig(ctx)
+	if err != nil {
+		s.log.Error("Failed to fetch regional settings", "error", err)
+		return nil, err
+	}
+	return regionalConfigToResponse(cfg), nil
+}
+
+func (s *SettingsService) UpdateRegionalSettings(ctx context.Context, req UpdateRegionalSettingsRequest) (*RegionalSettingsResponse, error) {
+	if err := validateRegionalUpdate(req); err != nil {
+		return nil, err
+	}
+	cfg := RegionalConfig{
+		Timezone:     strings.TrimSpace(req.Timezone),
+		DateStyle:    DateStyle(strings.ToUpper(strings.TrimSpace(req.DateStyle))),
+		TimeStyle:    TimeStyle(strings.TrimSpace(req.TimeStyle)),
+		WeekStartsOn: WeekStart(strings.ToLower(strings.TrimSpace(req.WeekStartsOn))),
+	}
+	cfg.Normalize()
+	txErr := s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		qtx := repository.New(tx)
+		return upsertRegionalConfig(ctx, qtx, cfg)
+	})
+	if txErr != nil {
+		s.log.Error("Failed to update regional settings", "error", txErr)
+		return nil, txErr
+	}
+	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
+	s.activitylog.Log(ctx, actorID, activity_log_repo.LogActionTypeUPDATE, activity_log_repo.LogEntityTypeSETTINGS, "settings", map[string]interface{}{
+		"regional": true, "timezone": cfg.Timezone,
+	})
+	return s.GetRegionalSettings(ctx)
 }
 
 func (s *SettingsService) ComputeOrderTaxAndService(ctx context.Context, grossTotal int64) (int64, int64, error) {

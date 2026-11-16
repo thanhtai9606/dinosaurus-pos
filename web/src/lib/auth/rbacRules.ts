@@ -362,6 +362,14 @@ export const RBAC_RULES: Record<string, string[]> = {
     "PUT /settings/printer": [
         "admin"
     ],
+    "GET /settings/regional": [
+        "admin",
+        "manager",
+        "cashier",
+    ],
+    "PUT /settings/regional": [
+        "admin",
+    ],
     "GET /settings/financial": [
         "admin",
         "manager",

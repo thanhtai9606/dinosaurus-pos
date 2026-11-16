@@ -783,6 +783,7 @@
             "reports_title": "Email laporan terjadwal",
             "reports_desc": "Ringkasan harian/bulanan/tahunan hanya dikirim lewat SMTP (bukan push).",
             "timezone": "Zona waktu (IANA)",
+            "timezone_moved": "Zona waktu toko diatur di Pengaturan → Preferensi → Zona waktu & tanggal toko. Jadwal email laporan memakai zona waktu itu.",
             "report_emails": "Penerima laporan (pisahkan dengan koma)",
             "report_period": {
                 "daily": "Harian",
@@ -798,10 +799,28 @@
         },
         "preferences": {
             "title": "Tampilan & bahasa",
-            "description": "Bahasa antarmuka dan tema.",
+            "description": "Bahasa antarmuka dan format tanggal/waktu toko.",
             "language": "Bahasa",
             "theme": "Tema",
-            "theme_help": "Mode terang atau gelap."
+            "theme_help": "Mode terang atau gelap.",
+            "regional_title": "Zona waktu & tanggal toko",
+            "regional_description": "Berlaku untuk semua pengguna di toko ini (daftar, laporan, email terjadwal).",
+            "timezone": "Zona waktu",
+            "date_style": "Format tanggal",
+            "date_style_dmy": "Hari / bulan / tahun",
+            "date_style_mdy": "Bulan / hari / tahun",
+            "date_style_ymd": "Tahun-bulan-hari",
+            "time_style": "Format jam",
+            "time_style_24h": "24 jam",
+            "time_style_12h": "12 jam (AM/PM)",
+            "week_starts_on": "Minggu dimulai",
+            "week_monday": "Senin",
+            "week_sunday": "Minggu",
+            "regional_preview": "Pratinjau: {{sample}}",
+            "regional_save": "Simpan pengaturan regional",
+            "regional_saved": "Pengaturan regional disimpan",
+            "regional_save_failed": "Gagal menyimpan pengaturan regional",
+            "regional_admin_only": "Hanya admin yang dapat mengubah zona waktu dan format tanggal toko."
         },
         "financial": {
             "title": "Pengaturan Keuangan",

@@ -7,8 +7,9 @@ import (
 	"time"
 
 	"dinosaurus-pos/internal/common/pagination"
-	"dinosaurus-pos/internal/report"
 	notif_repo "dinosaurus-pos/internal/notifications/repository"
+	"dinosaurus-pos/internal/report"
+	"dinosaurus-pos/internal/settings"
 	"dinosaurus-pos/internal/tenant"
 
 	"github.com/jackc/pgx/v5"
@@ -143,6 +144,21 @@ func (s *Service) trySendTenantReport(ctx context.Context, period notif_repo.Not
 	s.dispatcher.Publish(ctx, DispatchEvent{EventType: eventType, Subject: subject, Body: body})
 }
 
+func (s *Service) tenantLocation(ctx context.Context, fallbackTimezone string) *time.Location {
+	if reg, err := settings.LoadRegionalConfig(ctx, s.settingsRepo); err == nil && reg.Timezone != "" {
+		if loc, err := time.LoadLocation(reg.Timezone); err == nil {
+			return loc
+		}
+	}
+	tz := strings.TrimSpace(fallbackTimezone)
+	if tz != "" {
+		if loc, err := time.LoadLocation(tz); err == nil {
+			return loc
+		}
+	}
+	return time.FixedZone("VN", 7*3600)
+}
+
 func reportSlotMatches(now time.Time, period notif_repo.NotificationReportPeriod, slot ReportScheduleSlot) bool {
 	if now.Hour() != slot.Hour || now.Minute() < slot.Minute || now.Minute() >= slot.Minute+15 {
 		return false
@@ -186,10 +202,7 @@ func (s *Service) RunScheduledReports(ctx context.Context) {
 			cfg = DefaultTenantNotificationConfig()
 		}
 		cfg.Normalize()
-		loc, err := time.LoadLocation(cfg.Timezone)
-		if err != nil {
-			loc = time.FixedZone("VN", 7*3600)
-		}
+		loc := s.tenantLocation(tctx, cfg.Timezone)
 		s.trySendTenantReport(tctx, notif_repo.NotificationReportPeriodDaily, cfg.ReportSchedules.Daily, loc)
 		s.trySendTenantReport(tctx, notif_repo.NotificationReportPeriodMonthly, cfg.ReportSchedules.Monthly, loc)
 		s.trySendTenantReport(tctx, notif_repo.NotificationReportPeriodYearly, cfg.ReportSchedules.Yearly, loc)

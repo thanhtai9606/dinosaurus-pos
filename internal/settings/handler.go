@@ -448,4 +448,61 @@ func (h *SettingsHandler) UpdateMenuRoleAccessHandler(c fiber.Ctx) error {
 	})
 }
 
+// GetRegionalSettingsHandler returns tenant timezone and date/time display preferences.
+// @Summary      Get regional settings
+// @Description  Timezone and date/time display for the store (Roles: authenticated)
+// @Tags         Settings
+// @Produce      json
+// @Success      200 {object} common.SuccessResponse{data=RegionalSettingsResponse}
+// @x-roles      ["admin", "manager", "cashier"]
+// @Router       /settings/regional [get]
+func (h *SettingsHandler) GetRegionalSettingsHandler(c fiber.Ctx) error {
+	resp, err := h.service.GetRegionalSettings(c.RequestCtx())
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(common.ErrorResponse{
+			Message: "Failed to fetch regional settings", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Regional settings fetched successfully", Data: resp,
+	})
+}
+
+// UpdateRegionalSettingsHandler updates tenant timezone and display preferences.
+// @Summary      Update regional settings
+// @Tags         Settings
+// @Accept       json
+// @Produce      json
+// @Param        request body UpdateRegionalSettingsRequest true "Regional settings"
+// @Success      200 {object} common.SuccessResponse{data=RegionalSettingsResponse}
+// @x-roles      ["admin"]
+// @Router       /settings/regional [put]
+func (h *SettingsHandler) UpdateRegionalSettingsHandler(c fiber.Ctx) error {
+	ctx := c.RequestCtx()
+	var req UpdateRegionalSettingsRequest
+	if err := c.Bind().Body(&req); err != nil {
+		var ve *validator.ValidationErrors
+		if errors.As(err, &ve) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{
+				Message: "Validation failed", Error: ve.Error(),
+				Data: map[string]interface{}{"errors": ve.Errors},
+			})
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid request body", Error: err.Error()})
+	}
+	resp, err := h.service.UpdateRegionalSettings(ctx, req)
+	if err != nil {
+		status := http.StatusInternalServerError
+		if errors.Is(err, common.ErrBadRequest) {
+			status = http.StatusBadRequest
+		}
+		return c.Status(status).JSON(common.ErrorResponse{
+			Message: "Failed to update regional settings", Error: err.Error(),
+		})
+	}
+	return c.Status(http.StatusOK).JSON(common.SuccessResponse{
+		Message: "Regional settings updated successfully", Data: resp,
+	})
+}
+
 // fiber:context-methods migrated

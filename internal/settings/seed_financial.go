@@ -36,5 +36,8 @@ func (s *FinancialSeeder) SeedIfMissing(ctx context.Context, tenantID uuid.UUID,
 		s.log.Warnf("seed financial for tenant %s: %v", tenantID, err)
 		return err
 	}
+	if err := NewRegionalSeeder(s.repo, s.log).SeedIfMissing(ctx, tenantID, market); err != nil {
+		s.log.Warnf("seed regional for tenant %s: %v", tenantID, err)
+	}
 	return nil
 }

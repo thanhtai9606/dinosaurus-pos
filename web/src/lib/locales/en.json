@@ -777,6 +777,7 @@
             "reports_title": "Scheduled report emails",
             "reports_desc": "Daily, monthly, and yearly summaries are sent via your SMTP channel only (not push).",
             "timezone": "Timezone (IANA)",
+            "timezone_moved": "Store timezone is configured under Settings → Preferences → Store timezone & dates. Report send times use that timezone.",
             "report_emails": "Report recipients (comma-separated)",
             "report_period": {
                 "daily": "Daily",
@@ -792,10 +793,28 @@
         },
         "preferences": {
             "title": "Display & language",
-            "description": "Interface language and appearance.",
+            "description": "Interface language and store date/time format.",
             "language": "Language",
             "theme": "Theme",
-            "theme_help": "Light or dark mode."
+            "theme_help": "Light or dark mode.",
+            "regional_title": "Store timezone & dates",
+            "regional_description": "Applies to everyone in this store (lists, reports, scheduled emails).",
+            "timezone": "Timezone",
+            "date_style": "Date format",
+            "date_style_dmy": "Day / month / year",
+            "date_style_mdy": "Month / day / year",
+            "date_style_ymd": "Year-month-day",
+            "time_style": "Time format",
+            "time_style_24h": "24-hour",
+            "time_style_12h": "12-hour (AM/PM)",
+            "week_starts_on": "Week starts on",
+            "week_monday": "Monday",
+            "week_sunday": "Sunday",
+            "regional_preview": "Preview: {{sample}}",
+            "regional_save": "Save regional settings",
+            "regional_saved": "Regional settings saved",
+            "regional_save_failed": "Could not save regional settings",
+            "regional_admin_only": "Only admins can change store timezone and date format."
         },
         "financial": {
             "title": "Financial Settings",

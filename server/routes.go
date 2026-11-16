@@ -176,6 +176,10 @@ func SetupRoutes(app *App, container *AppContainer) {
 		settingsGroup.Get("/printer", container.SettingsHandler.GetPrinterSettingsHandler)
 		settingsGroup.Put("/printer", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdatePrinterSettingsHandler)
 
+		settingsGroup.Get("/regional", container.SettingsHandler.GetRegionalSettingsHandler)
+		settingsGroup.Put("/regional", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateRegionalSettingsHandler)
+		settingsGroup.Post("/regional", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateRegionalSettingsHandler)
+
 		settingsGroup.Get("/financial", container.SettingsHandler.GetFinancialSettingsHandler)
 		settingsGroup.Put("/financial/currencies", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateSupportedCurrenciesHandler)
 		settingsGroup.Post("/financial/currencies", middleware.RoleMiddleware(middleware.UserRoleAdmin), container.SettingsHandler.UpdateSupportedCurrenciesHandler)

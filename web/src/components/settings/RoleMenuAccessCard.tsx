@@ -13,6 +13,19 @@ import { useRBAC } from '@/lib/auth/rbac'
 
 const ROLES: TenantRole[] = ['admin', 'manager', 'cashier']
 
+const TENANT_ROLE_SET = new Set<string>(ROLES)
+
+export function isTenantRole(role: string | undefined | null): role is TenantRole {
+    return !!role && TENANT_ROLE_SET.has(role)
+}
+
+export type RoleMenuAccessCardProps = {
+    /** Omit outer spacing / second card when nested in another dialog. */
+    embedded?: boolean
+    showApiPreview?: boolean
+    highlightRole?: TenantRole | null
+}
+
 const API_PREVIEW_KEYS = [
     'GET /orders',
     'POST /orders',
@@ -28,7 +41,11 @@ const API_PREVIEW_KEYS = [
     'PUT /settings/menu-access',
 ] as const
 
-export function RoleMenuAccessCard() {
+export function RoleMenuAccessCard({
+    embedded = false,
+    showApiPreview = true,
+    highlightRole = null,
+}: RoleMenuAccessCardProps = {}) {
     const { t } = useTranslation()
     const { data, isLoading } = useMenuAccessQuery()
     const updateMutation = useUpdateMenuAccessMutation()
@@ -89,98 +106,123 @@ export function RoleMenuAccessCard() {
         )
     }
 
-    return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Shield className="h-5 w-5" />
-                        {t('settings.permissions.menu_title')}
-                    </CardTitle>
-                    <CardDescription>{t('settings.permissions.menu_description')}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="overflow-x-auto rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>{t('settings.permissions.menu_column')}</TableHead>
-                                    <TableHead className="w-24 text-center">{t('users.roles.admin')}</TableHead>
-                                    <TableHead className="w-24 text-center">{t('users.roles.manager')}</TableHead>
-                                    <TableHead className="w-24 text-center">{t('users.roles.cashier')}</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {data.catalog.map((row) => {
-                                    const roles = workingItems[row.key] ?? []
-                                    return (
-                                        <TableRow key={row.key}>
-                                            <TableCell>
-                                                <MenuPermissionLabel t={t} labelKey={row.label_key} sectionKey={row.section_key} />
-                                            </TableCell>
-                                            {ROLES.map((role) => (
-                                                <TableCell key={role} className="text-center">
-                                                    <Checkbox
-                                                        checked={roles.includes(role)}
-                                                        disabled={!canEdit || (row.admin_lock && role === 'admin')}
-                                                        onCheckedChange={(v) => toggle(row.key, role, v === true)}
-                                                        aria-label={`${row.key}-${role}`}
-                                                    />
-                                                </TableCell>
-                                            ))}
-                                        </TableRow>
-                                    )
-                                })}
-                            </TableBody>
-                        </Table>
-                    </div>
-                    {canEdit && (
-                        <div className="flex justify-end gap-2">
-                            <Button
-                                variant="outline"
-                                disabled={!draft || updateMutation.isPending}
-                                onClick={() => setDraft(null)}
+    const menuTable = (
+        <div className="overflow-x-auto rounded-md border">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('settings.permissions.menu_column')}</TableHead>
+                        {ROLES.map((role) => (
+                            <TableHead
+                                key={role}
+                                className={`w-24 text-center ${highlightRole === role ? 'bg-primary/10' : ''}`}
                             >
-                                {t('common.cancel')}
-                            </Button>
-                            <Button disabled={!draft || updateMutation.isPending} onClick={() => void handleSave()}>
-                                {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {t('common.save')}
-                            </Button>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                                {t(`users.roles.${role}`)}
+                            </TableHead>
+                        ))}
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {data.catalog.map((row) => {
+                        const roles = workingItems[row.key] ?? []
+                        return (
+                            <TableRow key={row.key}>
+                                <TableCell>
+                                    <MenuPermissionLabel t={t} labelKey={row.label_key} sectionKey={row.section_key} />
+                                </TableCell>
+                                {ROLES.map((role) => (
+                                    <TableCell
+                                        key={role}
+                                        className={`text-center ${highlightRole === role ? 'bg-primary/5' : ''}`}
+                                    >
+                                        <Checkbox
+                                            checked={roles.includes(role)}
+                                            disabled={!canEdit || (row.admin_lock && role === 'admin')}
+                                            onCheckedChange={(v) => toggle(row.key, role, v === true)}
+                                            aria-label={`${row.key}-${role}`}
+                                        />
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        )
+                    })}
+                </TableBody>
+            </Table>
+        </div>
+    )
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t('settings.permissions.api_title')}</CardTitle>
-                    <CardDescription>{t('settings.permissions.api_description')}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="overflow-x-auto rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>{t('settings.permissions.api_column')}</TableHead>
-                                    <TableHead>{t('settings.permissions.roles_column')}</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {API_PREVIEW_KEYS.map((key) => {
-                                    const roles = RBAC_RULES[key] ?? []
-                                    return (
-                                        <TableRow key={key}>
-                                            <TableCell className="font-mono text-xs">{key}</TableCell>
-                                            <TableCell>{roles.length ? roles.join(', ') : '—'}</TableCell>
-                                        </TableRow>
-                                    )
-                                })}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
-            </Card>
+    const saveBar =
+        canEdit ? (
+            <div className="flex justify-end gap-2">
+                <Button
+                    variant="outline"
+                    disabled={!draft || updateMutation.isPending}
+                    onClick={() => setDraft(null)}
+                >
+                    {t('common.cancel')}
+                </Button>
+                <Button disabled={!draft || updateMutation.isPending} onClick={() => void handleSave()}>
+                    {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t('common.save')}
+                </Button>
+            </div>
+        ) : null
+
+    const menuBlock = embedded ? (
+        <div className="space-y-4 max-h-[min(52vh,520px)] overflow-y-auto pr-1">
+            {menuTable}
+            {saveBar}
+        </div>
+    ) : (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    {t('settings.permissions.menu_title')}
+                </CardTitle>
+                <CardDescription>{t('settings.permissions.menu_description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {menuTable}
+                {saveBar}
+            </CardContent>
+        </Card>
+    )
+
+    return (
+        <div className={embedded ? undefined : 'space-y-6'}>
+            {menuBlock}
+            {showApiPreview ? (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('settings.permissions.api_title')}</CardTitle>
+                        <CardDescription>{t('settings.permissions.api_description')}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="overflow-x-auto rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>{t('settings.permissions.api_column')}</TableHead>
+                                        <TableHead>{t('settings.permissions.roles_column')}</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {API_PREVIEW_KEYS.map((key) => {
+                                        const roles = RBAC_RULES[key] ?? []
+                                        return (
+                                            <TableRow key={key}>
+                                                <TableCell className="font-mono text-xs">{key}</TableCell>
+                                                <TableCell>{roles.length ? roles.join(', ') : '—'}</TableCell>
+                                            </TableRow>
+                                        )
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardContent>
+                </Card>
+            ) : null}
         </div>
     )
 }

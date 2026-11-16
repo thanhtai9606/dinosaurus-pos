@@ -7,7 +7,7 @@ import {
 } from "@/lib/api/generated";
 import { useTranslation } from "react-i18next";
 import { useCreateUserMutation, useUpdateUserMutation } from "@/lib/api/query/user.ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from '@tanstack/react-form';
 import * as z from 'zod';
@@ -19,11 +19,15 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { Loader2 } from "lucide-react";
+import { Loader2, Shield, User } from "lucide-react";
+import { RoleMenuAccessCard, isTenantRole } from '@/components/settings/RoleMenuAccessCard'
+import { useRBAC } from '@/lib/auth/rbac'
+import type { DialogSize } from '@/components/ui/dialog'
 
 export function UserFormDialog({ open, onOpenChange, userToEdit }: {
     open: boolean,
@@ -33,6 +37,9 @@ export function UserFormDialog({ open, onOpenChange, userToEdit }: {
     const { t } = useTranslation()
     const createMutation = useCreateUserMutation()
     const updateMutation = useUpdateUserMutation()
+    const { canAccessApi } = useRBAC()
+    const canManageMenuAccess = canAccessApi('GET', '/settings/menu-access')
+    const [dialogTab, setDialogTab] = useState<'profile' | 'permissions'>('profile')
 
     const form = useForm({
         defaultValues: {
@@ -82,6 +89,7 @@ export function UserFormDialog({ open, onOpenChange, userToEdit }: {
 
     useEffect(() => {
         if (open) {
+            setDialogTab('profile')
             if (userToEdit) {
                 form.setFieldValue('username', userToEdit.username || '')
                 form.setFieldValue('email', userToEdit.email || '')
@@ -93,16 +101,11 @@ export function UserFormDialog({ open, onOpenChange, userToEdit }: {
         }
     }, [open, userToEdit])
 
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent size="md" dismissible>
-                <DialogHeader>
-                    <DialogTitle>{userToEdit ? t('users.form.title_edit') : t('users.form.title_create')}</DialogTitle>
-                    <DialogDescription>
-                        {userToEdit ? t('users.form.desc_edit') : t('users.form.desc_create')}
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={(e) => {
+    const showPermissionsTab = !!userToEdit && canManageMenuAccess
+    const dialogSize: DialogSize = showPermissionsTab ? 'xl' : 'md'
+
+    const profileForm = (
+        <form onSubmit={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     form.handleSubmit();
@@ -225,6 +228,56 @@ export function UserFormDialog({ open, onOpenChange, userToEdit }: {
                         />
                     </DialogFooter>
                 </form>
+    )
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent size={dialogSize} dismissible className={showPermissionsTab ? 'max-h-[90vh] overflow-y-auto' : undefined}>
+                <DialogHeader>
+                    <DialogTitle>{userToEdit ? t('users.form.title_edit') : t('users.form.title_create')}</DialogTitle>
+                    <DialogDescription>
+                        {userToEdit ? t('users.form.desc_edit') : t('users.form.desc_create')}
+                    </DialogDescription>
+                </DialogHeader>
+                {showPermissionsTab ? (
+                    <Tabs value={dialogTab} onValueChange={(v) => setDialogTab(v as 'profile' | 'permissions')}>
+                        <TabsList className="mb-2">
+                            <TabsTrigger value="profile" className="gap-2">
+                                <User className="h-4 w-4" />
+                                {t('users.tabs.profile')}
+                            </TabsTrigger>
+                            <TabsTrigger value="permissions" className="gap-2">
+                                <Shield className="h-4 w-4" />
+                                {t('users.tabs.permissions')}
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="profile">{profileForm}</TabsContent>
+                        <TabsContent value="permissions" className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                                <form.Subscribe
+                                    selector={(state) => state.values.role}
+                                    children={(role) =>
+                                        isTenantRole(role)
+                                            ? t('users.permissions.role_hint', { role: t(`users.roles.${role}`) })
+                                            : t('users.permissions.role_hint_generic')
+                                    }
+                                />
+                            </p>
+                            <form.Subscribe
+                                selector={(state) => state.values.role}
+                                children={(role) => (
+                                    <RoleMenuAccessCard
+                                        embedded
+                                        showApiPreview={false}
+                                        highlightRole={isTenantRole(role) ? role : null}
+                                    />
+                                )}
+                            />
+                        </TabsContent>
+                    </Tabs>
+                ) : (
+                    profileForm
+                )}
             </DialogContent>
         </Dialog>
     )

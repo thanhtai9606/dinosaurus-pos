@@ -14,6 +14,8 @@ import { UsersTable } from '@/components/users/UsersTable'
 import { UsersCardView } from '@/components/users/UsersCardView'
 import { UserActions } from '@/components/users/UserActions'
 import { UserFormDialog } from '@/components/users/UserFormDialog'
+import { UserRolePermissionsDialog } from '@/components/users/UserRolePermissionsDialog'
+import { useRBAC } from '@/lib/auth/rbac'
 import { UserGridSkeleton } from '@/components/ui/list-skeletons'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutGrid, LayoutList } from 'lucide-react'
@@ -57,7 +59,10 @@ function UsersPage() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedUser, setSelectedUser] = useState<InternalUserProfileResponse | null>(null)
+    const [rolePermissionsOpen, setRolePermissionsOpen] = useState(false)
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+    const { canAccessApi } = useRBAC()
+    const canManageMenuAccess = canAccessApi('GET', '/settings/menu-access')
 
     const activeFilter: 'all' | 'active' | 'inactive' =
         isActive === true ? 'active' : isActive === false ? 'inactive' : 'all'
@@ -95,7 +100,13 @@ function UsersPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <UsersHeader t={t} onCreateClick={openCreateModal} canCreate={canCreate} />
+            <UsersHeader
+                t={t}
+                onCreateClick={openCreateModal}
+                canCreate={canCreate}
+                canManageRolePermissions={canManageMenuAccess}
+                onRolePermissionsClick={() => setRolePermissionsOpen(true)}
+            />
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <UsersFilters
@@ -127,6 +138,7 @@ function UsersPage() {
                     users={users}
                     t={t}
                     renderActions={renderActions}
+                    onRowClick={canEdit ? openEditModal : undefined}
                     server={{
                         pagination,
                         onPageChange,
@@ -153,6 +165,7 @@ function UsersPage() {
             ) : null}
 
             <UserFormDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} userToEdit={selectedUser} />
+            <UserRolePermissionsDialog open={rolePermissionsOpen} onOpenChange={setRolePermissionsOpen} />
         </div>
     )
 }

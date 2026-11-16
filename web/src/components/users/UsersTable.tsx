@@ -9,10 +9,11 @@ interface UsersTableProps {
     users: InternalUserProfileResponse[]
     t: any
     renderActions: (user: InternalUserProfileResponse) => React.ReactNode
+    onRowClick?: (user: InternalUserProfileResponse) => void
     server?: Parameters<typeof DataGrid<InternalUserProfileResponse>>[0]['server']
 }
 
-export function UsersTable({ users, t, renderActions, server }: UsersTableProps) {
+export function UsersTable({ users, t, renderActions, onRowClick, server }: UsersTableProps) {
     const columns = useMemo<DataGridColumnDef<InternalUserProfileResponse>[]>(
         () => [
             {
@@ -92,6 +93,7 @@ export function UsersTable({ users, t, renderActions, server }: UsersTableProps)
             data={users}
             getRowId={(u) => u.id!}
             emptyMessage={t('users.table.empty')}
+            onRowClick={onRowClick}
             server={server}
             enableClientSort={!server?.onSortChange}
         />

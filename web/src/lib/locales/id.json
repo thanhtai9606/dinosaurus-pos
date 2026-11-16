@@ -968,6 +968,15 @@
         "title": "Pengguna",
         "description": "Kelola akses dan peran pengguna.",
         "add_button": "Tambah Pengguna",
+        "role_permissions_button": "Peran & menu",
+        "tabs": {
+            "profile": "Profil",
+            "permissions": "Peran & menu"
+        },
+        "permissions": {
+            "role_hint": "Akses menu berlaku untuk semua pengguna dengan peran {{role}}. Kolom yang disorot sesuai pengguna ini.",
+            "role_hint_generic": "Akses menu dikonfigurasi per peran dan berlaku untuk setiap pengguna dengan peran tersebut."
+        },
         "filters": {
             "search_label": "Cari"
         },

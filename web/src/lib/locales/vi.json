@@ -1006,6 +1006,15 @@
         "title": "Người dùng",
         "description": "Quản lý quyền truy cập và vai trò của người dùng.",
         "add_button": "Thêm Người dùng",
+        "role_permissions_button": "Vai trò & menu",
+        "tabs": {
+            "profile": "Hồ sơ",
+            "permissions": "Vai trò & menu"
+        },
+        "permissions": {
+            "role_hint": "Quyền menu áp dụng cho mọi người dùng có vai trò {{role}}. Cột được tô sáng khớp với người dùng này.",
+            "role_hint_generic": "Quyền menu được cấu hình theo vai trò và áp dụng cho mọi người dùng có vai trò đó."
+        },
         "search_placeholder": "Tìm Kiếm Người Dùng",
         "filters": {
             "search_label": "Tìm kiếm"

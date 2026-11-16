@@ -1,13 +1,21 @@
-import { Plus, Users } from 'lucide-react'
+import { Plus, Shield, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface UsersHeaderProps {
     t: any
     onCreateClick: () => void
     canCreate?: boolean
+    onRolePermissionsClick?: () => void
+    canManageRolePermissions?: boolean
 }
 
-export function UsersHeader({ t, onCreateClick, canCreate = true }: UsersHeaderProps) {
+export function UsersHeader({
+    t,
+    onCreateClick,
+    canCreate = true,
+    onRolePermissionsClick,
+    canManageRolePermissions = false,
+}: UsersHeaderProps) {
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -19,11 +27,19 @@ export function UsersHeader({ t, onCreateClick, canCreate = true }: UsersHeaderP
                     <p className="text-sm text-muted-foreground">{t('users.description')}</p>
                 </div>
             </div>
-            {canCreate && (
-                <Button onClick={onCreateClick} className="rounded-xl shadow-md shadow-primary/20">
-                    <Plus className="mr-2 h-4 w-4" /> {t('users.add_button')}
-                </Button>
-            )}
+            <div className="flex flex-wrap items-center gap-2">
+                {canManageRolePermissions && onRolePermissionsClick ? (
+                    <Button variant="outline" onClick={onRolePermissionsClick} className="rounded-xl">
+                        <Shield className="mr-2 h-4 w-4" />
+                        {t('users.role_permissions_button')}
+                    </Button>
+                ) : null}
+                {canCreate ? (
+                    <Button onClick={onCreateClick} className="rounded-xl shadow-md shadow-primary/20">
+                        <Plus className="mr-2 h-4 w-4" /> {t('users.add_button')}
+                    </Button>
+                ) : null}
+            </div>
         </div>
     )
 }

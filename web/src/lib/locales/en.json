@@ -968,6 +968,15 @@
         "title": "Users",
         "description": "Manage user access and roles.",
         "add_button": "Add User",
+        "role_permissions_button": "Roles & menu",
+        "tabs": {
+            "profile": "Profile",
+            "permissions": "Roles & menu"
+        },
+        "permissions": {
+            "role_hint": "Menu access is shared by all users with the {{role}} role. The highlighted column matches this user.",
+            "role_hint_generic": "Menu access is configured per role and applies to every user with that role."
+        },
         "search_placeholder": "Search user...",
         "filters": {
             "search_label": "Search"

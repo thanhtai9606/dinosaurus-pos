@@ -12,14 +12,21 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+type KitchenTicketItem struct {
+	ProductName  string  `json:"product_name"`
+	Quantity     int32   `json:"quantity"`
+	SaleUnitName *string `json:"sale_unit_name,omitempty"`
+}
+
 type KitchenTicketResponse struct {
-	ID            uuid.UUID  `json:"id"`
-	OrderNo       string     `json:"order_no"`
-	KitchenStatus string     `json:"kitchen_status"`
-	OrderStatus   string     `json:"order_status"`
-	CreatedAt     time.Time  `json:"created_at"`
-	DiningTableID *uuid.UUID `json:"dining_table_id,omitempty"`
-	TableName     *string    `json:"table_name,omitempty"`
+	ID            uuid.UUID           `json:"id"`
+	OrderNo       string              `json:"order_no"`
+	KitchenStatus string              `json:"kitchen_status"`
+	OrderStatus   string              `json:"order_status"`
+	CreatedAt     time.Time           `json:"created_at"`
+	DiningTableID *uuid.UUID          `json:"dining_table_id,omitempty"`
+	TableName     *string             `json:"table_name,omitempty"`
+	Items         []KitchenTicketItem `json:"items,omitempty"`
 }
 
 type UpdateKitchenStatusRequest struct {
@@ -38,7 +45,7 @@ func (s *OrderService) ListKitchenTickets(ctx context.Context) ([]KitchenTicketR
 			id := uuid.UUID(r.DiningTableID.Bytes)
 			tableID = &id
 		}
-		out = append(out, KitchenTicketResponse{
+		ticket := KitchenTicketResponse{
 			ID:            r.ID,
 			OrderNo:       r.OrderNo,
 			KitchenStatus: string(r.KitchenStatus),
@@ -46,7 +53,27 @@ func (s *OrderService) ListKitchenTickets(ctx context.Context) ([]KitchenTicketR
 			CreatedAt:     r.CreatedAt.Time,
 			DiningTableID: tableID,
 			TableName:     r.TableName,
-		})
+		}
+		items, err := s.ordersRepo.GetOrderItemsByOrderID(ctx, r.ID)
+		if err == nil {
+			for _, it := range items {
+				p, pErr := s.productsRepo.GetProductByID(ctx, it.ProductID)
+				name := "—"
+				if pErr == nil {
+					name = p.Name
+				}
+				var unitName *string
+				if it.SaleUnitName != nil && *it.SaleUnitName != "" {
+					unitName = it.SaleUnitName
+				}
+				ticket.Items = append(ticket.Items, KitchenTicketItem{
+					ProductName:  name,
+					Quantity:     it.Quantity,
+					SaleUnitName: unitName,
+				})
+			}
+		}
+		out = append(out, ticket)
 	}
 	return out, nil
 }

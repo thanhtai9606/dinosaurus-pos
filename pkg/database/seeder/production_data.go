@@ -71,6 +71,10 @@ func SeedProductionData(ctx context.Context, db *database.TenantDB, r2Client clo
 	}
 	log.Infof("Seeded %d customers", len(customerIDs))
 
+	if err := seedDiningLayout(ctx, db, log); err != nil {
+		return fmt.Errorf("failed to seed dining layout: %w", err)
+	}
+
 	// 3. Seed Promotions
 	err = seedPromotions(ctx, db, log)
 	if err != nil {

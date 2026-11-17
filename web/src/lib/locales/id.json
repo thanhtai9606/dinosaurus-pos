@@ -369,6 +369,78 @@
             "void": "Batalkan"
         }
     },
+    "kitchen": {
+        "title": "Layar dapur",
+        "subtitle": "Pesanan belum dibayar — perbarui status masak.",
+        "refresh": "Muat ulang",
+        "empty": "Tidak ada tiket dapur",
+        "empty_hint": "Buat pesanan dine-in dari POS Pesanan (pilih meja).",
+        "no_items": "Tidak ada item",
+        "order_status": "Status pesanan",
+        "order_status_open": "Terbuka",
+        "order_status_in_progress": "Diproses",
+        "order_status_served": "Disajikan",
+        "table": "Meja",
+        "status": {
+            "pending": "Menunggu",
+            "preparing": "Dimasak",
+            "ready": "Siap",
+            "served": "Disajikan"
+        },
+        "advance_to": {
+            "preparing": "Mulai masak",
+            "ready": "Siap",
+            "served": "Disajikan"
+        },
+        "errors": {
+            "update_failed": "Gagal memperbarui status dapur",
+            "load_failed": "Gagal memuat tiket dapur."
+        }
+    },
+    "dining": {
+        "title": "Denah meja",
+        "subtitle": "Status meja per area.",
+        "seats": "{{count}} kursi",
+        "select_table": "Pilih meja (dine-in)",
+        "filter_area": "Area",
+        "all_areas": "Semua area",
+        "empty_title": "Belum ada meja",
+        "empty_hint": "Tambah area dan meja, atau jalankan migrate/seed.",
+        "actions": {
+            "add_area": "Tambah area",
+            "add_table": "Tambah meja"
+        },
+        "fields": {
+            "area": "Area",
+            "area_name": "Nama area",
+            "table_name": "Nama meja",
+            "capacity": "Kapasitas"
+        },
+        "placeholders": {
+            "area_name": "cth. Lantai 1",
+            "select_area": "Pilih area"
+        },
+        "dialog": {
+            "new_area": "Area baru",
+            "new_table": "Meja baru"
+        },
+        "messages": {
+            "area_created": "Area ditambahkan",
+            "area_create_failed": "Gagal menambah area",
+            "table_created": "Meja ditambahkan",
+            "table_create_failed": "Gagal menambah meja",
+            "status_update_failed": "Gagal mengubah status meja"
+        },
+        "errors": {
+            "load_failed": "Gagal memuat meja. Periksa migrasi 000017–000019."
+        },
+        "status": {
+            "available": "Kosong",
+            "occupied": "Terisi",
+            "reserved": "Reservasi",
+            "dirty": "Perlu dibersihkan"
+        }
+    },
     "supplierDebts": {
         "title": "Hutang supplier",
         "fields": {
@@ -1357,6 +1429,7 @@
             "load_failed": "Gagal memuat info produk",
             "variant_check_skipped": "Ditambahkan ke keranjang; variasi tidak dapat dimuat, memakai produk dasar.",
             "insufficient_stock": "Stok tidak mencukupi",
+            "table_required": "Pilih meja untuk dine-in",
             "create_failed": "Gagal membuat pesanan",
             "cash_insufficient": "Uang tunai kurang!",
             "payment_failed": "Pembayaran gagal",

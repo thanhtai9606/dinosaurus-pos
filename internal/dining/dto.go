@@ -23,6 +23,11 @@ type DiningTableResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type CreateDiningAreaRequest struct {
+	Name      string `json:"name" validate:"required,min=1,max=120"`
+	SortOrder *int   `json:"sort_order,omitempty" validate:"omitempty,min=0,max=9999"`
+}
+
 type CreateDiningTableRequest struct {
 	AreaID   uuid.UUID `json:"area_id" validate:"required"`
 	Name     string    `json:"name" validate:"required,min=1,max=60"`

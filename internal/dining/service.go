@@ -14,6 +14,7 @@ import (
 
 type IService interface {
 	ListAreas(ctx context.Context) ([]DiningAreaResponse, error)
+	CreateArea(ctx context.Context, req CreateDiningAreaRequest) (*DiningAreaResponse, error)
 	ListTables(ctx context.Context) ([]DiningTableResponse, error)
 	CreateTable(ctx context.Context, req CreateDiningTableRequest) (*DiningTableResponse, error)
 	UpdateTableStatus(ctx context.Context, id uuid.UUID, req UpdateTableStatusRequest) (*DiningTableResponse, error)
@@ -26,6 +27,23 @@ type Service struct {
 
 func NewService(repo *dining_repo.Queries, log logger.ILogger) IService {
 	return &Service{repo: repo, log: log}
+}
+
+func (s *Service) CreateArea(ctx context.Context, req CreateDiningAreaRequest) (*DiningAreaResponse, error) {
+	sortOrder := int32(0)
+	if req.SortOrder != nil {
+		sortOrder = int32(*req.SortOrder)
+	}
+	row, err := s.repo.CreateDiningArea(ctx, dining_repo.CreateDiningAreaParams{
+		Name:      req.Name,
+		SortOrder: sortOrder,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &DiningAreaResponse{
+		ID: row.ID, Name: row.Name, SortOrder: int(row.SortOrder), CreatedAt: row.CreatedAt.Time,
+	}, nil
 }
 
 func (s *Service) ListAreas(ctx context.Context) ([]DiningAreaResponse, error) {

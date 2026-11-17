@@ -1,4 +1,5 @@
 import { OrderType } from '@/lib/api/domain'
+import type { DiningTable } from '@/lib/api/query/dining'
 import { ShoppingCart, Trash2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { QuantityEditor } from '@/components/common/QuantityEditor'
@@ -31,6 +32,9 @@ interface CartContentProps {
     setSelectedCustomerId: (id: string | null) => void
     selectedOrderType: OrderType
     setSelectedOrderType: (type: OrderType) => void
+    diningTables?: DiningTable[]
+    selectedDiningTableId: string | null
+    setSelectedDiningTableId: (id: string | null) => void
     updateQuantity: (lineKey: string, delta: number) => void
     setQuantity: (lineKey: string, quantity: number) => void
     changeSaleUnit: (lineKey: string, unit: ProductSaleUnit) => void
@@ -42,7 +46,9 @@ interface CartContentProps {
 
 export function CartContent({
     cart, t, customers, selectedCustomerId, setSelectedCustomerId,
-    selectedOrderType, setSelectedOrderType, updateQuantity, setQuantity, changeSaleUnit, removeFromCart,
+    selectedOrderType, setSelectedOrderType,
+    diningTables, selectedDiningTableId, setSelectedDiningTableId,
+    updateQuantity, setQuantity, changeSaleUnit, removeFromCart,
     calculateTotal, handleCheckout, canCheckout
 }: CartContentProps) {
     const formatMoney = useFormatMoney()
@@ -80,12 +86,41 @@ export function CartContent({
                     </SelectContent>
                 </Select>
 
-                <Tabs value={selectedOrderType} onValueChange={(v) => setSelectedOrderType(v as OrderType)} className="w-full">
+                <Tabs
+                    value={selectedOrderType}
+                    onValueChange={(v) => {
+                        const type = v as OrderType
+                        setSelectedOrderType(type)
+                        if (type !== OrderType.OrderTypeDineIn) setSelectedDiningTableId(null)
+                    }}
+                    className="w-full"
+                >
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value={OrderType.OrderTypeDineIn}>{t('order.order_type.dine_in')}</TabsTrigger>
                         <TabsTrigger value={OrderType.OrderTypeTakeaway}>{t('order.order_type.take_away')}</TabsTrigger>
                     </TabsList>
                 </Tabs>
+
+                {selectedOrderType === OrderType.OrderTypeDineIn && (
+                    <Select
+                        value={selectedDiningTableId || ''}
+                        onValueChange={(v) => setSelectedDiningTableId(v || null)}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder={t('dining.select_table')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {(diningTables ?? [])
+                                .filter((tbl) => tbl.status === 'available' || tbl.id === selectedDiningTableId)
+                                .map((tbl) => (
+                                    <SelectItem key={tbl.id} value={tbl.id}>
+                                        {tbl.area_name ? `${tbl.area_name} — ` : ''}
+                                        {tbl.name} ({t('dining.seats', { count: tbl.capacity })})
+                                    </SelectItem>
+                                ))}
+                        </SelectContent>
+                    </Select>
+                )}
             </div>
 
 

@@ -367,6 +367,78 @@
             "void": "Void entry"
         }
     },
+    "kitchen": {
+        "title": "Kitchen display",
+        "subtitle": "Unpaid orders — update prep status for the kitchen.",
+        "refresh": "Refresh",
+        "empty": "No open kitchen tickets",
+        "empty_hint": "Create a dine-in order from Order POS (pick a table). Tickets leave KDS after payment.",
+        "no_items": "No line items",
+        "order_status": "Order status",
+        "order_status_open": "Open",
+        "order_status_in_progress": "In progress",
+        "order_status_served": "Served",
+        "table": "Table",
+        "status": {
+            "pending": "Pending",
+            "preparing": "Preparing",
+            "ready": "Ready",
+            "served": "Served"
+        },
+        "advance_to": {
+            "preparing": "Start prep",
+            "ready": "Mark ready",
+            "served": "Served"
+        },
+        "errors": {
+            "update_failed": "Failed to update kitchen status",
+            "load_failed": "Could not load kitchen tickets."
+        }
+    },
+    "dining": {
+        "title": "Dining floor",
+        "subtitle": "Table status by area.",
+        "seats": "{{count}} seats",
+        "select_table": "Select table (dine-in)",
+        "filter_area": "Area",
+        "all_areas": "All areas",
+        "empty_title": "No tables yet",
+        "empty_hint": "Add areas and tables, or run migrate/seed demo.",
+        "actions": {
+            "add_area": "Add area",
+            "add_table": "Add table"
+        },
+        "fields": {
+            "area": "Area",
+            "area_name": "Area name",
+            "table_name": "Table name",
+            "capacity": "Seats"
+        },
+        "placeholders": {
+            "area_name": "e.g. Main floor",
+            "select_area": "Choose area"
+        },
+        "dialog": {
+            "new_area": "New area",
+            "new_table": "New table"
+        },
+        "messages": {
+            "area_created": "Area created",
+            "area_create_failed": "Could not create area",
+            "table_created": "Table created",
+            "table_create_failed": "Could not create table",
+            "status_update_failed": "Could not update table status"
+        },
+        "errors": {
+            "load_failed": "Could not load tables. Check migrations 000017–000019."
+        },
+        "status": {
+            "available": "Available",
+            "occupied": "Occupied",
+            "reserved": "Reserved",
+            "dirty": "Needs cleaning"
+        }
+    },
     "supplierDebts": {
         "title": "Supplier debts (AP)",
         "fields": {
@@ -1368,6 +1440,7 @@
             "load_failed": "Failed to load product info",
             "variant_check_skipped": "Added to cart; could not load variants, using base product.",
             "insufficient_stock": "Insufficient stock",
+            "table_required": "Select a table for dine-in",
             "create_failed": "Failed to create order",
             "cash_insufficient": "Cash insufficient!",
             "payment_failed": "Payment failed",

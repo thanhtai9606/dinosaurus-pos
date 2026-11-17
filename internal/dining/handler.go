@@ -13,6 +13,7 @@ import (
 
 type IHandler interface {
 	ListAreasHandler(c fiber.Ctx) error
+	CreateAreaHandler(c fiber.Ctx) error
 	ListTablesHandler(c fiber.Ctx) error
 	CreateTableHandler(c fiber.Ctx) error
 	UpdateTableStatusHandler(c fiber.Ctx) error
@@ -33,6 +34,22 @@ func (h *Handler) ListAreasHandler(c fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to list areas"})
 	}
 	return c.JSON(common.SuccessResponse{Message: "OK", Data: data})
+}
+
+func (h *Handler) CreateAreaHandler(c fiber.Ctx) error {
+	var req CreateDiningAreaRequest
+	if err := c.Bind().Body(&req); err != nil {
+		var ve *validator.ValidationErrors
+		if errors.As(err, &ve) {
+			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Validation failed", Error: ve.Error()})
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: "Invalid body"})
+	}
+	data, err := h.service.CreateArea(c.RequestCtx(), req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to create area"})
+	}
+	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{Message: "Created", Data: data})
 }
 
 func (h *Handler) ListTablesHandler(c fiber.Ctx) error {

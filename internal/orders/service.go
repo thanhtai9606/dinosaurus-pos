@@ -401,6 +401,10 @@ func (s *OrderService) UpdateOperationalStatus(ctx context.Context, orderID uuid
 		return nil, err
 	}
 
+	if newStatus == orders_repo.OrderStatusPaid && order.DiningTableID.Valid {
+		s.setDiningTableStatus(ctx, order.DiningTableID, dining_repo.DiningTableStatusDirty)
+	}
+
 	actorID, _ := ctx.Value(common.UserIDKey).(uuid.UUID)
 	logDetails := map[string]interface{}{
 		"order_id":    orderID.String(),
@@ -900,6 +904,14 @@ func (s *OrderService) CancelOrder(ctx context.Context, orderID uuid.UUID, req C
 			}
 			s.log.Error("Failed to execute cancel order query", "error", err)
 			return err
+		}
+
+		if orderWithDetails.DiningTableID.Valid {
+			diningQ := dining_repo.New(tx)
+			_ = diningQ.SetDiningTableStatusByID(ctx, dining_repo.SetDiningTableStatusByIDParams{
+				ID:     uuid.UUID(orderWithDetails.DiningTableID.Bytes),
+				Status: dining_repo.DiningTableStatusAvailable,
+			})
 		}
 
 		if orderWithDetails.Items != nil {
@@ -1807,4 +1819,16 @@ func (s *OrderService) HandleMidtransNotification(ctx context.Context, payload p
 	}
 
 	return nil
+}
+
+func (s *OrderService) setDiningTableStatus(ctx context.Context, tableID pgtype.UUID, status dining_repo.DiningTableStatus) {
+	if !tableID.Valid {
+		return
+	}
+	_ = s.store.ExecTx(ctx, func(tx pgx.Tx) error {
+		return dining_repo.New(tx).SetDiningTableStatusByID(ctx, dining_repo.SetDiningTableStatusByIDParams{
+			ID:     uuid.UUID(tableID.Bytes),
+			Status: status,
+		})
+	})
 }

@@ -10,6 +10,7 @@ export type OrderPosDraftSnapshot = {
     cart: CartItem[]
     selectedCustomerId: string | null
     selectedOrderType: OrderType
+    selectedDiningTableId?: string | null
 }
 
 function storageKey(scope = posStorageScope()) {

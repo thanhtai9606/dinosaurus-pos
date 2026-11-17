@@ -371,8 +371,15 @@
     },
     "kitchen": {
         "title": "Màn hình bếp",
+        "subtitle": "Đơn chưa thanh toán — cập nhật tiến độ chế biến cho bếp.",
         "refresh": "Làm mới",
         "empty": "Không có phiếu bếp đang chờ",
+        "empty_hint": "Tạo đơn tại chỗ từ POS Đơn hàng (chọn bàn). Sau thanh toán vé biến mất khỏi KDS.",
+        "no_items": "Không có dòng món",
+        "order_status": "Trạng thái đơn",
+        "order_status_open": "Mở",
+        "order_status_in_progress": "Đang phục vụ",
+        "order_status_served": "Đã phục vụ",
         "table": "Bàn",
         "status": {
             "pending": "Chờ bếp",
@@ -386,12 +393,47 @@
             "served": "Đã phục vụ"
         },
         "errors": {
-            "update_failed": "Cập nhật trạng thái bếp thất bại"
+            "update_failed": "Cập nhật trạng thái bếp thất bại",
+            "load_failed": "Không tải được vé bếp."
         }
     },
     "dining": {
         "title": "Sơ đồ bàn",
+        "subtitle": "Theo dõi trạng thái bàn và khu vực phục vụ.",
         "seats": "{{count}} chỗ",
+        "select_table": "Chọn bàn (tại chỗ)",
+        "filter_area": "Khu vực",
+        "all_areas": "Tất cả khu",
+        "empty_title": "Chưa có bàn nào",
+        "empty_hint": "Thêm khu vực và bàn để bắt đầu, hoặc chạy migrate/seed demo.",
+        "actions": {
+            "add_area": "Thêm khu",
+            "add_table": "Thêm bàn"
+        },
+        "fields": {
+            "area": "Khu vực",
+            "area_name": "Tên khu",
+            "table_name": "Tên bàn",
+            "capacity": "Số ghế"
+        },
+        "placeholders": {
+            "area_name": "VD: Tầng trệt",
+            "select_area": "Chọn khu"
+        },
+        "dialog": {
+            "new_area": "Khu vực mới",
+            "new_table": "Bàn mới"
+        },
+        "messages": {
+            "area_created": "Đã thêm khu vực",
+            "area_create_failed": "Không thêm được khu vực",
+            "table_created": "Đã thêm bàn",
+            "table_create_failed": "Không thêm được bàn",
+            "status_update_failed": "Không đổi được trạng thái bàn"
+        },
+        "errors": {
+            "load_failed": "Không tải được sơ đồ bàn. Kiểm tra migrate 000017–000019."
+        },
         "status": {
             "available": "Trống",
             "occupied": "Có khách",
@@ -1406,6 +1448,7 @@
             "load_failed": "Không thể tải thông tin sản phẩm",
             "variant_check_skipped": "Đã thêm vào giỏ; không tải được biến thể, dùng phiên bản gốc.",
             "insufficient_stock": "Kho không đủ",
+            "table_required": "Chọn bàn cho đơn tại chỗ",
             "create_failed": "Không thể tạo lệnh",
             "cash_insufficient": "Tiền mặt không đủ!",
             "payment_failed": "Thanh toán không thành công",

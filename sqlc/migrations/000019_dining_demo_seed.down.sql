@@ -1,0 +1,1 @@
+-- Intentionally empty: demo dining data may be edited in production.

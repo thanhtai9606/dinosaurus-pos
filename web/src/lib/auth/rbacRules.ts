@@ -594,6 +594,14 @@ export const RBAC_RULES: Record<string, string[]> = {
         "manager",
         "cashier"
     ],
+    "POST /dining/areas": [
+        "admin",
+        "manager"
+    ],
+    "POST /dining/tables": [
+        "admin",
+        "manager"
+    ],
     "PATCH /dining/tables/{id}/status": [
         "admin",
         "manager",

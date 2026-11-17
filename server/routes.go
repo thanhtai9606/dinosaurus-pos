@@ -286,6 +286,7 @@ func SetupRoutes(app *App, container *AppContainer) {
 	diningGroup := api.Group("/dining", authMiddleware, middleware.RoleMiddleware(middleware.UserRoleCashier))
 	{
 		diningGroup.Get("/areas", container.DiningHandler.ListAreasHandler)
+		diningGroup.Post("/areas", middleware.RoleMiddleware(middleware.UserRoleManager), container.DiningHandler.CreateAreaHandler)
 		diningGroup.Get("/tables", container.DiningHandler.ListTablesHandler)
 		diningGroup.Post("/tables", middleware.RoleMiddleware(middleware.UserRoleManager), container.DiningHandler.CreateTableHandler)
 		diningGroup.Patch("/tables/:id/status", container.DiningHandler.UpdateTableStatusHandler)

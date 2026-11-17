@@ -1,7 +1,6 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { cancellationReasonsListQueryOptions } from "@/lib/api/query/cancel-reason.ts";
+import { useCancellationReasonsListQuery } from "@/lib/api/query/cancel-reason.ts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { Ban } from "lucide-react";
+import { Ban, Loader2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { useTranslation } from 'react-i18next';
@@ -10,11 +9,21 @@ import type { InternalCancellationReasonsCancellationReasonResponse } from '@/li
 
 export function CancellationReasonsCard() {
     const { t } = useTranslation()
-    const { data: reasons } = useSuspenseQuery(cancellationReasonsListQueryOptions())
+    const { data: reasons, isLoading } = useCancellationReasonsListQuery()
     const reasonsList: InternalCancellationReasonsCancellationReasonResponse[] =
         Array.isArray(reasons)
             ? (reasons as InternalCancellationReasonsCancellationReasonResponse[])
             : ((reasons as { data?: InternalCancellationReasonsCancellationReasonResponse[] })?.data ?? [])
+
+    if (isLoading) {
+        return (
+            <Card>
+                <CardContent className="flex justify-center p-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card>

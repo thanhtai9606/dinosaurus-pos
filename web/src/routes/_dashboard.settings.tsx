@@ -11,8 +11,10 @@ import { InvoiceSettingsCard } from '@/components/settings/InvoiceSettingsCard'
 import { SettingsHeader } from "@/components/settings/SettingsHeader"
 import { PreferencesSettingsCard } from '@/components/settings/PreferencesSettingsCard'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRBAC } from '@/lib/auth/rbac'
+import { cancellationReasonsListQueryOptions } from '@/lib/api/query/cancel-reason.ts'
 
 export const Route = createFileRoute('/_dashboard/settings')({
     component: SettingsPage,
@@ -21,9 +23,16 @@ export const Route = createFileRoute('/_dashboard/settings')({
 function SettingsPage() {
     const { t } = useTranslation()
     const [tab, setTab] = useState('preferences')
-    
+    const queryClient = useQueryClient()
+
     const { canAccessApi } = useRBAC()
     const canViewCancellations = canAccessApi('GET', '/cancellation-reasons')
+
+    useEffect(() => {
+        if (canViewCancellations) {
+            void queryClient.prefetchQuery(cancellationReasonsListQueryOptions())
+        }
+    }, [canViewCancellations, queryClient])
     const canViewPaymentMethods = canAccessApi('GET', '/payment-methods')
     const canViewBranding = canAccessApi('GET', '/settings/branding')
     const canViewPrinter = canAccessApi('GET', '/settings/printer')

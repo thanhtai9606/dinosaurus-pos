@@ -277,6 +277,23 @@ function RetailPosPage() {
         )
     }
 
+    const setQuantity = (lineKey: string, quantity: number) => {
+        const qty = Math.max(1, Math.floor(quantity))
+        setCart((prev) =>
+            prev.map((item) => {
+                const key = cartLineKey(item.product.id!, item.variant?.id, item.saleUnit ?? defaultSaleUnit(item.product))
+                if (key !== lineKey) return item
+                const unit = item.saleUnit ?? defaultSaleUnit(item.product)
+                const baseUsed = cartBaseQtyForProduct(prev, item.product.id!, lineKey)
+                if (baseUsed + baseQtyForLine(qty, unit) > (item.product.stock || 0)) {
+                    toast.error(t('order.errors.insufficient_stock'))
+                    return item
+                }
+                return { ...item, quantity: qty }
+            }),
+        )
+    }
+
     const changeSaleUnit = (lineKey: string, unit: ProductSaleUnit) => {
         setCart((prev) => {
             const item = prev.find(
@@ -536,6 +553,7 @@ function RetailPosPage() {
                             priceTier={priceTier}
                             t={t}
                             onUpdateQuantity={updateQuantity}
+                            onSetQuantity={setQuantity}
                             onRemove={removeFromCart}
                             onEditPrice={setPriceEditItem}
                             onChangeSaleUnit={changeSaleUnit}

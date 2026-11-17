@@ -227,6 +227,22 @@ function OrderPage() {
         })
     }
 
+    const setQuantity = (productId: string, quantity: number, variantId?: string) => {
+        const qty = Math.max(1, Math.floor(quantity))
+        setCart((prev) =>
+            prev.map((item) => {
+                if (item.product.id === productId && item.variant?.id === variantId) {
+                    if (qty > (item.product.stock || 0)) {
+                        toast.error(t('order.errors.insufficient_stock'))
+                        return item
+                    }
+                    return { ...item, quantity: qty }
+                }
+                return item
+            }),
+        )
+    }
+
     const calculateTotal = () => {
         return cart.reduce((total, item) => {
             const price = (item.product.price || 0) + (item.variant?.additional_price || 0)
@@ -333,6 +349,7 @@ function OrderPage() {
                             selectedOrderType={selectedOrderType}
                             setSelectedOrderType={setSelectedOrderType}
                             updateQuantity={updateQuantity}
+                            setQuantity={setQuantity}
                             removeFromCart={removeFromCart}
                             calculateTotal={calculateTotal}
                             handleCheckout={handleCheckout}
@@ -353,6 +370,7 @@ function OrderPage() {
                     selectedOrderType={selectedOrderType}
                     setSelectedOrderType={setSelectedOrderType}
                     updateQuantity={updateQuantity}
+                    setQuantity={setQuantity}
                     removeFromCart={removeFromCart}
                     calculateTotal={calculateTotal}
                     handleCheckout={handleCheckout}

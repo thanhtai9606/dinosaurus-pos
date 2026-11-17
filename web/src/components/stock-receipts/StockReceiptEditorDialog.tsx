@@ -189,6 +189,7 @@ export function StockReceiptEditorDialog({
                             readOnly={readOnly}
                             t={t}
                             onUpdateQuantity={draft.updateQuantity}
+                            onSetQuantity={draft.setQuantity}
                             onSetUnitCost={draft.setUnitCost}
                             onSetUnitSell={draft.setUnitSell}
                             onRemove={draft.removeLine}

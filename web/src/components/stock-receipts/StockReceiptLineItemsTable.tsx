@@ -1,6 +1,7 @@
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { QuantityEditor } from '@/components/common/QuantityEditor'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useFormatMoney } from '@/context/MoneyContext'
@@ -12,6 +13,7 @@ type Props = {
     readOnly: boolean
     t: (key: string, fallback?: string) => string
     onUpdateQuantity: (productId: string, delta: number) => void
+    onSetQuantity: (productId: string, quantity: number) => void
     onSetUnitCost: (productId: string, value: number) => void
     onSetUnitSell: (productId: string, value: number | undefined) => void
     onRemove: (productId: string) => void
@@ -22,6 +24,7 @@ export function StockReceiptLineItemsTable({
     readOnly,
     t,
     onUpdateQuantity,
+    onSetQuantity,
     onSetUnitCost,
     onSetUnitSell,
     onRemove,
@@ -69,27 +72,11 @@ export function StockReceiptLineItemsTable({
                                         {readOnly ? (
                                             <span className="block text-center font-semibold">{line.quantity}</span>
                                         ) : (
-                                            <div className="flex items-center justify-center gap-1">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                    onClick={() => onUpdateQuantity(id, -1)}
-                                                >
-                                                    <Minus className="h-3 w-3" />
-                                                </Button>
-                                                <span className="w-8 text-center font-semibold">{line.quantity}</span>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                    onClick={() => onUpdateQuantity(id, 1)}
-                                                >
-                                                    <Plus className="h-3 w-3" />
-                                                </Button>
-                                            </div>
+                                            <QuantityEditor
+                                                value={line.quantity}
+                                                onDelta={(d) => onUpdateQuantity(id, d)}
+                                                onSetValue={(q) => onSetQuantity(id, q)}
+                                            />
                                         )}
                                     </TableCell>
                                     <TableCell>

@@ -1,6 +1,7 @@
 import { OrderType } from '@/lib/api/domain'
-import { ShoppingCart, Trash2, Minus, Plus, User } from 'lucide-react'
+import { ShoppingCart, Trash2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { QuantityEditor } from '@/components/common/QuantityEditor'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useFormatMoney } from '@/context/MoneyContext'
 import { useFinancialSettingsQuery } from '@/lib/api/query/settings'
@@ -29,6 +30,7 @@ interface CartContentProps {
     selectedOrderType: OrderType
     setSelectedOrderType: (type: OrderType) => void
     updateQuantity: (id: string, delta: number, variantId?: string) => void
+    setQuantity: (id: string, quantity: number, variantId?: string) => void
     removeFromCart: (id: string, variantId?: string) => void
     calculateTotal: () => number
     handleCheckout: () => void
@@ -37,7 +39,7 @@ interface CartContentProps {
 
 export function CartContent({
     cart, t, customers, selectedCustomerId, setSelectedCustomerId,
-    selectedOrderType, setSelectedOrderType, updateQuantity, removeFromCart,
+    selectedOrderType, setSelectedOrderType, updateQuantity, setQuantity, removeFromCart,
     calculateTotal, handleCheckout, canCheckout
 }: CartContentProps) {
     const formatMoney = useFormatMoney()
@@ -113,15 +115,14 @@ export function CartContent({
                                                 <div className="text-sm text-muted-foreground">
                                                     {formatMoney((item.product.price || 0) + (item.variant?.additional_price || 0))} x {item.quantity}
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={(e) => { e.stopPropagation(); updateQuantity(item.product.id!, -1, item.variant?.id) }}>
-                                                        <Minus className="h-3 w-3" />
-                                                    </Button>
-                                                    <span className="w-4 text-center text-sm font-medium">{item.quantity}</span>
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={(e) => { e.stopPropagation(); updateQuantity(item.product.id!, 1, item.variant?.id) }}>
-                                                        <Plus className="h-3 w-3" />
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); removeFromCart(item.product.id!, item.variant?.id) }}>
+                                                <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                                    <QuantityEditor
+                                                        size="compact"
+                                                        value={item.quantity}
+                                                        onDelta={(d) => updateQuantity(item.product.id!, d, item.variant?.id)}
+                                                        onSetValue={(q) => setQuantity(item.product.id!, q, item.variant?.id)}
+                                                    />
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.product.id!, item.variant?.id)}>
                                                         <Trash2 className="h-3 w-3" />
                                                     </Button>
                                                 </div>

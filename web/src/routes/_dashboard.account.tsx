@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { meQueryOptions } from '@/lib/api/query/auth'
-import { ShieldCheck, User } from 'lucide-react'
+import { useMeQuery } from '@/lib/api/query/auth'
+import { Loader2, ShieldCheck, User } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UpdateAvatarCard } from '@/components/account/UpdateAvatarCard.tsx'
 import { UpdatePasswordCard } from '@/components/account/UpdatePasswordCard.tsx'
@@ -17,8 +17,21 @@ function AccountPage() {
     const { t } = useTranslation()
     const [tab, setTab] = useState('account')
 
-    const { data: user } = useSuspenseQuery(meQueryOptions())
+    const { data: user, isLoading } = useMeQuery()
     const profile = (user as any)?.data ?? user
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col gap-6">
+                <AccountHeader t={t} />
+                <Card>
+                    <CardContent className="flex justify-center p-12">
+                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col gap-6">

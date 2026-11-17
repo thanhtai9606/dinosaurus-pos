@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import {
-    categoriesListQueryOptions,
+    useCategoriesListQuery,
     useCreateCategoryMutation,
     type Category
 } from '@/lib/api/query/categories'
@@ -10,14 +9,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table'
 
-import { Package, Plus, Tag } from 'lucide-react'
+import { Loader2, Package, Plus, Tag } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { CategoryFormDialog } from './CategoryFormDialog'
 import { CategoryActions } from './CategoryActions'
 
 export function CategoriesCard() {
     const { t } = useTranslation()
-    const { data: categories } = useSuspenseQuery(categoriesListQueryOptions())
+    const { data: categories, isLoading } = useCategoriesListQuery()
     const categoriesList = Array.isArray(categories) ? categories : (categories as any)?.data || []
 
     const createMutation = useCreateCategoryMutation()
@@ -34,6 +33,16 @@ export function CategoriesCard() {
     const openEditModal = (category: Category) => {
         setSelectedCategory(category)
         setIsDialogOpen(true)
+    }
+
+    if (isLoading) {
+        return (
+            <Card>
+                <CardContent className="flex justify-center p-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </CardContent>
+            </Card>
+        )
     }
 
     return (

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useSuspenseQuery, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
 import { useServerListState } from '@/hooks/use-server-list-state'
@@ -14,7 +14,7 @@ import {
     useUpdateProductMutation,
     useDeleteProductMutation,
 } from '@/lib/api/query/products'
-import { categoriesListQueryOptions } from '@/lib/api/query/categories'
+import { useCategoriesListQuery } from '@/lib/api/query/categories'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -78,7 +78,7 @@ function ProductsPage() {
 
     const createMutation = useCreateProductMutation()
     const productsQuery = useQuery(productsListQueryOptions(listParams))
-    const { data: categoriesData } = useSuspenseQuery(categoriesListQueryOptions())
+    const { data: categoriesData } = useCategoriesListQuery()
     const categories = Array.isArray(categoriesData) ? categoriesData : (categoriesData as any)?.data || []
 
     const products = productsQuery.data?.products || []

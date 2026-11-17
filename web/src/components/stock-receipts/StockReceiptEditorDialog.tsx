@@ -122,10 +122,12 @@ export function StockReceiptEditorDialog({
                     {readOnly ? (
                         <DialogDescription>{t('stockReceipts.form.readonly_hint')}</DialogDescription>
                     ) : (
-                        <DialogDescription className="space-y-1 text-left">
-                            <p>{t('stockReceipts.form.scan_hint')}</p>
-                            <p>{t('stockReceipts.form.cost_note')}</p>
-                            <p>{t('stockReceipts.form.sell_note')}</p>
+                        <DialogDescription asChild>
+                            <div className="space-y-1 text-left">
+                                <p>{t('stockReceipts.form.scan_hint')}</p>
+                                <p>{t('stockReceipts.form.cost_note')}</p>
+                                <p>{t('stockReceipts.form.sell_note')}</p>
+                            </div>
                         </DialogDescription>
                     )}
                 </DialogHeader>

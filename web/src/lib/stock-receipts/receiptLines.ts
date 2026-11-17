@@ -56,7 +56,7 @@ export function linesToApiItems(lines: StockReceiptLine[]): StockReceiptItem[] {
         .filter((l) => l.product.id && l.quantity > 0)
         .map((l) => ({
             product_id: l.product.id!,
-            quantity: l.quantity,
+            quantity: Math.max(1, Math.floor(Number(l.quantity) || 0)),
             unit_cost: l.unit_cost,
             unit_sell_price:
                 l.unit_sell_price !== undefined && l.unit_sell_price > 0 ? l.unit_sell_price : undefined,

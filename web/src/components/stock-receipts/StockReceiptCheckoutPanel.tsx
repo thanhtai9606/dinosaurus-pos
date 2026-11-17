@@ -1,4 +1,4 @@
-import { Truck } from 'lucide-react'
+import { Truck, Warehouse } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,9 +13,14 @@ import { formatQuickCashLabel } from '@/lib/money/quickCash'
 import { useQuickCashAmounts } from '@/hooks/useQuickCashAmounts'
 
 type Supplier = { id: string; name: string }
+type WarehouseOption = { id: string; name: string; code?: string }
 
 type Props = {
     t: (key: string, fallback?: string) => string
+    warehouses?: WarehouseOption[]
+    warehouseId?: string
+    onWarehouseChange?: (id: string) => void
+    warehouseRequired?: boolean
     suppliers: Supplier[]
     supplierId: string
     onSupplierChange: (id: string) => void
@@ -49,6 +54,10 @@ function Row({ label, value, bold }: { label: string; value: string; bold?: bool
 
 export function StockReceiptCheckoutPanel({
     t,
+    warehouses,
+    warehouseId,
+    onWarehouseChange,
+    warehouseRequired,
     suppliers,
     supplierId,
     onSupplierChange,
@@ -75,8 +84,31 @@ export function StockReceiptCheckoutPanel({
     const debt = Math.max(0, subtotal - amountPaid)
     const creditNeedsSupplier = paymentMode === 'credit' && !supplierId
 
+    const needsWarehouse = warehouseRequired && warehouses && warehouses.length > 0 && !warehouseId
+
     return (
-        <div className="flex h-full flex-col border-l bg-card">
+        <div className="flex h-full flex-col border-l bg-card lg:max-h-none max-h-[min(70vh,520px)]">
+            {warehouses && warehouses.length > 0 && onWarehouseChange && (
+                <div className="border-b p-4">
+                    <p className="mb-2 text-sm font-medium text-muted-foreground">{t('stockReceipts.fields.warehouse')}</p>
+                    <Select value={warehouseId || ''} onValueChange={onWarehouseChange}>
+                        <SelectTrigger className="w-full">
+                            <div className="flex items-center gap-2 truncate">
+                                <Warehouse className="h-4 w-4 shrink-0" />
+                                <SelectValue placeholder={t('stockTransfers.pick_warehouse', 'Select warehouse')} />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {warehouses.map((w) => (
+                                <SelectItem key={w.id} value={w.id}>
+                                    {w.name}
+                                    {w.code ? ` (${w.code})` : ''}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            )}
             <div className="border-b p-4">
                 <p className="mb-2 text-sm font-medium text-muted-foreground">{t('stockReceipts.fields.supplier')}</p>
                 <Select value={supplierId || ''} onValueChange={onSupplierChange}>
@@ -156,6 +188,8 @@ export function StockReceiptCheckoutPanel({
             <div className="space-y-2 border-t bg-muted/30 p-4">
                 {noPermission ? (
                     <p className="text-xs text-destructive">{t('stockReceipts.messages.create_denied')}</p>
+                ) : needsWarehouse ? (
+                    <p className="text-xs text-destructive">{t('stockReceipts.messages.pick_warehouse')}</p>
                 ) : needsLines ? (
                     <p className="text-xs text-muted-foreground">{t('stockReceipts.form.empty_lines')}</p>
                 ) : null}
@@ -166,7 +200,7 @@ export function StockReceiptCheckoutPanel({
                 <Button
                     className="h-11 w-full text-base"
                     size="lg"
-                    disabled={!canComplete || completing || creditNeedsSupplier}
+                    disabled={!canComplete || completing || creditNeedsSupplier || needsWarehouse}
                     onClick={onComplete}
                 >
                     {completing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -176,7 +210,7 @@ export function StockReceiptCheckoutPanel({
                     type="button"
                     variant="outline"
                     className="w-full"
-                    disabled={!canSave || saving}
+                    disabled={!canSave || saving || needsWarehouse}
                     onClick={onSaveDraft}
                 >
                     {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -15,6 +15,11 @@ import {
     useCreateStockReceiptMutation,
 } from '@/lib/api/query/stockReceipts'
 import { useSuppliersListQuery } from '@/lib/api/query/suppliers'
+import { useWarehousesListQuery } from '@/lib/api/query/warehouses'
+import { getApiErrorMessage } from '@/lib/api/errorMessage'
+import { httpStatus } from '@/lib/api/httpStatus'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+
 export const Route = createFileRoute('/_dashboard/stock-receipts/new')({
     component: StockReceiptNewPage,
 })
@@ -24,9 +29,11 @@ function StockReceiptNewPage() {
     const navigate = useNavigate()
     const createMutation = useCreateStockReceiptMutation()
     const completeMutation = useCompleteStockReceiptMutation()
-    const { data: suppliersData } = useSuppliersListQuery({ limit: 200 })
+    const { data: suppliersData } = useSuppliersListQuery({ limit: 100 })
+    const { data: warehousesData } = useWarehousesListQuery({ limit: 50, page: 1 })
 
     const [supplierId, setSupplierId] = useState('')
+    const [warehouseId, setWarehouseId] = useState('')
     const [note, setNote] = useState('')
     const [paymentMode, setPaymentMode] = useState<StockReceiptPaymentMode>('cash')
     const [amountPaid, setAmountPaid] = useState(0)
@@ -52,28 +59,42 @@ function StockReceiptNewPage() {
         }
     }, [paymentMode, subtotal, amountPaid])
 
+    const warehouses = (warehousesData?.warehouses ?? []).filter((w) => w.is_active)
+    useEffect(() => {
+        if (warehouseId || warehouses.length === 0) return
+        const def = warehouses.find((w) => w.is_default) ?? warehouses[0]
+        if (def) setWarehouseId(def.id)
+    }, [warehouses, warehouseId])
+
     const suppliers = (suppliersData?.suppliers || []).filter((s) => s.id) as { id: string; name: string }[]
     const items = linesToApiItems(draft.lines)
     const hasLines = items.length > 0
-    const canAct = hasLines && createMutation.isAllowed
+    const hasWarehouse = warehouses.length === 0 || Boolean(warehouseId)
+    const canAct = hasLines && createMutation.isAllowed && hasWarehouse
 
     const buildBody = () => ({
         supplier_id: supplierId || undefined,
+        warehouse_id: warehouseId || undefined,
         note: note || undefined,
         payment_mode: paymentMode,
         amount_paid: amountPaid,
         items,
     })
 
+    const formatCreateError = (err: unknown) => {
+        if (httpStatus(err) === 403) {
+            return t('stockReceipts.messages.create_forbidden')
+        }
+        return getApiErrorMessage(err, t('stockReceipts.messages.draft_failed'))
+    }
+
     const handleSaveDraft = async () => {
         setBusyAction('draft')
         try {
             await createMutation.mutateAsync(buildBody())
-            toast.success(t('stockReceipts.messages.create_success'))
             navigate({ to: '/stock-receipts' })
         } catch (err: unknown) {
-            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-            toast.error(msg || t('stockReceipts.messages.draft_failed', 'Không lưu được phiếu nháp'))
+            toast.error(formatCreateError(err))
         } finally {
             setBusyAction(null)
         }
@@ -90,11 +111,9 @@ function StockReceiptNewPage() {
             if (completeMutation.isAllowed && receipt.id) {
                 await completeMutation.mutateAsync(receipt.id)
             }
-            toast.success(t('stockReceipts.messages.complete_success'))
             navigate({ to: '/stock-receipts' })
         } catch (err: unknown) {
-            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-            toast.error(msg || t('stockReceipts.messages.complete_failed'))
+            toast.error(formatCreateError(err) || t('stockReceipts.messages.complete_failed'))
         } finally {
             setBusyAction(null)
         }
@@ -104,7 +123,24 @@ function StockReceiptNewPage() {
     const completing = busyAction === 'complete'
 
     return (
-        <div className="flex h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-xl border bg-background">
+        <div className="flex min-h-0 flex-col gap-3 lg:h-[calc(100vh-7rem)] lg:overflow-hidden rounded-xl border bg-background">
+            {!createMutation.isAllowed && (
+                <Alert variant="destructive" className="mx-4 mt-4">
+                    <AlertTitle>{t('stockReceipts.messages.create_denied')}</AlertTitle>
+                    <AlertDescription>{t('stockReceipts.messages.create_forbidden_hint')}</AlertDescription>
+                </Alert>
+            )}
+            {warehouses.length === 0 && (
+                <Alert className="mx-4 mt-4">
+                    <AlertTitle>{t('stockReceipts.messages.no_warehouse_title')}</AlertTitle>
+                    <AlertDescription>
+                        {t('stockReceipts.messages.no_warehouse_body')}{' '}
+                        <Link to="/warehouses" className="font-medium underline">
+                            {t('sidebar.warehouses')}
+                        </Link>
+                    </AlertDescription>
+                </Alert>
+            )}
             <header className="flex shrink-0 items-center gap-2 border-b bg-muted/30 px-4 py-3">
                 <Button variant="ghost" size="icon" asChild>
                     <Link to="/stock-receipts">
@@ -118,8 +154,8 @@ function StockReceiptNewPage() {
                 </div>
             </header>
 
-            <div className="flex min-h-0 flex-1">
-                <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+                <div className="flex min-h-[280px] min-w-0 flex-1 flex-col">
                     <div className="flex shrink-0 items-center gap-2 border-b bg-background px-3 py-2">
                         <ScanBarcode className="h-5 w-5 shrink-0 text-primary" />
                         <RetailProductSearchField
@@ -147,9 +183,13 @@ function StockReceiptNewPage() {
                     </div>
                 </div>
 
-                <div className="w-[min(100%,22rem)] shrink-0 xl:w-[min(24rem,100%)]">
+                <div className="w-full shrink-0 border-t lg:w-[min(100%,22rem)] lg:border-t-0 xl:w-[min(24rem,100%)]">
                     <StockReceiptCheckoutPanel
                         t={t}
+                        warehouses={warehouses.map((w) => ({ id: w.id, name: w.name, code: w.code }))}
+                        warehouseId={warehouseId}
+                        onWarehouseChange={setWarehouseId}
+                        warehouseRequired={warehouses.length > 0}
                         suppliers={suppliers}
                         supplierId={supplierId}
                         onSupplierChange={setSupplierId}

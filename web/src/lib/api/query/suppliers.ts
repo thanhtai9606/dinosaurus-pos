@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { AxiosError } from 'axios'
 import { useRBAC } from '@/lib/auth/rbac'
 import type { ApiErrorBody } from '../domain'
+import { clampListLimit } from '../listLimit'
 
 export type Supplier = {
     id: string
@@ -31,7 +32,13 @@ export const suppliersListQueryOptions = (params?: SuppliersListParams) =>
     queryOptions<PagedSuppliers, AxiosError<ApiErrorBody>>({
         queryKey: ['suppliers', 'list', params],
         queryFn: async () => {
-            const res = await axiosInstance.get('/suppliers', { params })
+            const res = await axiosInstance.get('/suppliers', {
+                params: {
+                    ...params,
+                    page: params?.page ?? 1,
+                    limit: clampListLimit(params?.limit),
+                },
+            })
             return (res.data as { data: PagedSuppliers }).data
         },
         placeholderData: keepPreviousData,

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useServerListState } from '@/hooks/use-server-list-state'
@@ -37,8 +37,18 @@ import {
 } from '@/components/ui/alert-dialog'
 
 export const Route = createFileRoute('/_dashboard/stock-receipts')({
-    component: StockReceiptsPage,
+    component: StockReceiptsRouteShell,
 })
+
+/** Renders child routes (e.g. /new); list only on exact /stock-receipts */
+function StockReceiptsRouteShell() {
+    const pathname = useRouterState({ select: (s) => s.location.pathname })
+    const normalized = pathname.replace(/\/$/, '') || '/'
+    if (normalized.endsWith('/stock-receipts/new')) {
+        return <Outlet />
+    }
+    return <StockReceiptsPage />
+}
 
 function StockReceiptsPage() {
     const { t } = useTranslation()

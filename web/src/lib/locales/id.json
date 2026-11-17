@@ -1525,6 +1525,7 @@
             "receipt_no": "No. penerimaan",
             "supplier": "Supplier",
             "supplier_placeholder": "Pilih supplier",
+            "warehouse": "Gudang penerimaan",
             "status": "Status",
             "total": "Total",
             "product": "Produk",
@@ -1572,7 +1573,12 @@
             "export_failed": "Ekspor gagal",
             "product_not_found": "Produk tidak ditemukan",
             "draft_failed": "Gagal simpan draf",
-            "create_denied": "Hanya admin/manajer yang dapat membuat penerimaan"
+            "create_denied": "Hanya admin/manajer yang dapat membuat penerimaan",
+            "create_forbidden": "API ditolak (403): akun tidak punya hak manager. Gunakan admin/manager atau periksa Pengaturan → akses menu.",
+            "create_forbidden_hint": "Masuk sebagai admin atau manajer. Kasir tidak dapat membuat penerimaan.",
+            "pick_warehouse": "Pilih gudang sebelum menyimpan",
+            "no_warehouse_title": "Belum ada gudang aktif",
+            "no_warehouse_body": "Buat minimal satu gudang (default) lalu coba lagi:"
         }
     },
     "importPrices": {

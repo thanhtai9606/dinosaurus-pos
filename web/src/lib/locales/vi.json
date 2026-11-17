@@ -1576,6 +1576,7 @@
             "receipt_no": "Số phiếu",
             "supplier": "Nhà cung cấp",
             "supplier_placeholder": "Chọn NCC",
+            "warehouse": "Kho nhập",
             "status": "Trạng thái",
             "total": "Tổng tiền",
             "product": "Hàng hóa",
@@ -1623,7 +1624,12 @@
             "export_failed": "Xuất file thất bại",
             "product_not_found": "Không tìm thấy hàng với mã/SKU/tên đó",
             "draft_failed": "Không lưu được phiếu nháp",
-            "create_denied": "Chỉ admin/quản lý được tạo phiếu nhập"
+            "create_denied": "Chỉ admin/quản lý được tạo phiếu nhập",
+            "create_forbidden": "API từ chối (403): tài khoản không đủ quyền manager. Dùng admin/manager hoặc kiểm tra Cài đặt → quyền menu.",
+            "create_forbidden_hint": "Đăng nhập bằng tài khoản admin hoặc quản lý. Thu ngân không tạo được phiếu nhập.",
+            "pick_warehouse": "Chọn kho nhập trước khi lưu",
+            "no_warehouse_title": "Chưa có kho hoạt động",
+            "no_warehouse_body": "Tạo ít nhất một kho (kho mặc định) rồi thử lại:"
         }
     },
     "importPrices": {

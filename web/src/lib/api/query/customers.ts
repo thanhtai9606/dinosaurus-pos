@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient, queryOptions, keepPreviousData } from '@tanstack/react-query'
 import type { ApiErrorBody } from '../domain'
+import { clampListLimit } from '../listLimit'
 import { useTranslation } from "react-i18next";
 import { axiosInstance, customersApi } from "../../api/client.ts"
 import {
@@ -32,7 +33,13 @@ export const customersListQueryOptions = (params?: CustomersListParams) =>
     >({
         queryKey: ['customers', 'list', params],
         queryFn: async () => {
-            const res = await axiosInstance.get('/customers', { params })
+            const res = await axiosInstance.get('/customers', {
+                params: {
+                    ...params,
+                    page: params?.page ?? 1,
+                    limit: clampListLimit(params?.limit),
+                },
+            })
             return (res.data as { data: InternalCustomersPagedCustomerResponse }).data
         },
         placeholderData: keepPreviousData,

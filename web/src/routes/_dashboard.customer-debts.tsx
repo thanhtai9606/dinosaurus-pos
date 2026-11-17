@@ -51,7 +51,7 @@ function CustomerDebtsPage() {
     )
 
     const { data } = useQuery(customerDebtsListQueryOptions(listParams))
-    const { data: customersData } = useCustomersListQuery({ limit: 200 })
+    const { data: customersData } = useCustomersListQuery({ limit: 100 })
     const createMutation = useCreateCustomerDebtMutation()
     const payMutation = usePayCustomerDebtMutation()
     const voidMutation = useVoidCustomerDebtMutation()

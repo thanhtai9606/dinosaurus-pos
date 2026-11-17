@@ -58,7 +58,7 @@ function SupplierDebtsPage() {
     )
 
     const { data } = useQuery(supplierDebtsListQueryOptions(listParams))
-    const { data: suppliersData } = useSuppliersListQuery({ limit: 200 })
+    const { data: suppliersData } = useSuppliersListQuery({ limit: 100 })
     const createMutation = useCreateSupplierDebtMutation()
     const payMutation = usePaySupplierDebtMutation()
     const voidMutation = useVoidSupplierDebtMutation()

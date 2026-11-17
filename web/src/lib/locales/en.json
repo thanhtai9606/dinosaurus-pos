@@ -1537,6 +1537,7 @@
             "receipt_no": "Receipt no.",
             "supplier": "Supplier",
             "supplier_placeholder": "Select supplier",
+            "warehouse": "Receiving warehouse",
             "status": "Status",
             "total": "Total",
             "product": "Product",
@@ -1584,7 +1585,12 @@
             "export_failed": "Export failed",
             "product_not_found": "No product found for that code/SKU/name",
             "draft_failed": "Could not save draft",
-            "create_denied": "Only admin or manager can create goods receipts"
+            "create_denied": "Only admin or manager can create goods receipts",
+            "create_forbidden": "API denied (403): this account cannot create receipts. Use admin/manager or check Settings → menu access.",
+            "create_forbidden_hint": "Sign in as admin or manager. Cashiers cannot create goods receipts.",
+            "pick_warehouse": "Select a warehouse before saving",
+            "no_warehouse_title": "No active warehouse",
+            "no_warehouse_body": "Create at least one warehouse (with a default) then try again:"
         }
     },
     "importPrices": {

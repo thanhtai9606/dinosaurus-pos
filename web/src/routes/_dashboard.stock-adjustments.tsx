@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useStockAdjustmentsQuery, useCompleteAdjustmentMutation } from '@/lib/api/query/stockOps'
 import { Card, CardContent } from '@/components/ui/card'
@@ -7,8 +7,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_dashboard/stock-adjustments')({
-    component: StockAdjustmentsPage,
+    component: StockAdjustmentsRouteShell,
 })
+
+function StockAdjustmentsRouteShell() {
+    const pathname = useRouterState({ select: (s) => s.location.pathname })
+    const normalized = pathname.replace(/\/$/, '') || '/'
+    if (normalized.endsWith('/stock-adjustments/new')) {
+        return <Outlet />
+    }
+    return <StockAdjustmentsPage />
+}
 
 function StockAdjustmentsPage() {
     const { t } = useTranslation()

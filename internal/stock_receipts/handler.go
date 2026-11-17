@@ -55,7 +55,11 @@ func (h *StockReceiptHandler) CreateHandler(c fiber.Ctx) error {
 		if errors.Is(err, common.ErrInvalidInput) {
 			return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(common.ErrorResponse{Message: "Failed to create stock receipt"})
+		if errors.Is(err, common.ErrUnauthorized) {
+			return c.Status(fiber.StatusUnauthorized).JSON(common.ErrorResponse{Message: err.Error()})
+		}
+		h.log.Errorf("CreateStockReceipt failed", "error", err)
+		return c.Status(fiber.StatusBadRequest).JSON(common.ErrorResponse{Message: err.Error()})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(common.SuccessResponse{

@@ -598,7 +598,23 @@ export const RBAC_RULES: Record<string, string[]> = {
         "admin",
         "manager"
     ],
+    "PUT /dining/areas/{id}": [
+        "admin",
+        "manager"
+    ],
+    "DELETE /dining/areas/{id}": [
+        "admin",
+        "manager"
+    ],
     "POST /dining/tables": [
+        "admin",
+        "manager"
+    ],
+    "PUT /dining/tables/{id}": [
+        "admin",
+        "manager"
+    ],
+    "DELETE /dining/tables/{id}": [
         "admin",
         "manager"
     ],

@@ -406,13 +406,12 @@
         "all_areas": "Tất cả khu",
         "empty_title": "Chưa có bàn nào",
         "empty_hint": "Thêm khu vực và bàn để bắt đầu, hoặc chạy migrate/seed demo.",
-        "actions": {
-            "add_area": "Thêm khu",
-            "add_table": "Thêm bàn"
-        },
+        "areas_section": "Khu vực (tầng)",
+        "table_count": "{{count}} bàn",
         "fields": {
             "area": "Khu vực",
             "area_name": "Tên khu",
+            "sort_order": "Thứ tự hiển thị",
             "table_name": "Tên bàn",
             "capacity": "Số ghế"
         },
@@ -422,13 +421,39 @@
         },
         "dialog": {
             "new_area": "Khu vực mới",
-            "new_table": "Bàn mới"
+            "edit_area": "Sửa khu vực",
+            "new_table": "Bàn mới",
+            "edit_table": "Sửa bàn"
+        },
+        "delete_area": {
+            "title": "Xóa khu vực?",
+            "description": "Tất cả bàn trong khu sẽ bị xóa. Không xóa được khi còn bàn có khách hoặc đặt trước."
+        },
+        "actions": {
+            "add_area": "Thêm khu",
+            "add_table": "Thêm bàn",
+            "edit_area": "Sửa",
+            "delete_area": "Xóa khu",
+            "edit_table": "Sửa bàn",
+            "delete_table": "Xóa bàn"
+        },
+        "delete_table": {
+            "title": "Xóa bàn?",
+            "description": "Không xóa được khi bàn đang có khách hoặc đặt trước."
         },
         "messages": {
             "area_created": "Đã thêm khu vực",
             "area_create_failed": "Không thêm được khu vực",
+            "area_updated": "Đã cập nhật khu vực",
+            "area_update_failed": "Không sửa được khu vực",
+            "area_deleted": "Đã xóa khu vực",
+            "area_delete_failed": "Không xóa được khu (kiểm tra bàn đang có khách)",
             "table_created": "Đã thêm bàn",
             "table_create_failed": "Không thêm được bàn",
+            "table_updated": "Đã cập nhật bàn",
+            "table_update_failed": "Không sửa được bàn",
+            "table_deleted": "Đã xóa bàn",
+            "table_delete_failed": "Không xóa được bàn (kiểm tra trạng thái)",
             "status_update_failed": "Không đổi được trạng thái bàn"
         },
         "errors": {

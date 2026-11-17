@@ -404,13 +404,12 @@
         "all_areas": "All areas",
         "empty_title": "No tables yet",
         "empty_hint": "Add areas and tables, or run migrate/seed demo.",
-        "actions": {
-            "add_area": "Add area",
-            "add_table": "Add table"
-        },
+        "areas_section": "Areas (floors)",
+        "table_count": "{{count}} tables",
         "fields": {
             "area": "Area",
             "area_name": "Area name",
+            "sort_order": "Display order",
             "table_name": "Table name",
             "capacity": "Seats"
         },
@@ -420,11 +419,32 @@
         },
         "dialog": {
             "new_area": "New area",
+            "edit_area": "Edit area",
             "new_table": "New table"
+        },
+        "delete_area": {
+            "title": "Delete area?",
+            "description": "All tables in this area will be removed. Blocked if any table is occupied or reserved."
+        },
+        "actions": {
+            "add_area": "Add area",
+            "add_table": "Add table",
+            "edit_area": "Edit",
+            "delete_area": "Delete area",
+            "edit_table": "Edit table",
+            "delete_table": "Delete table"
+        },
+        "delete_table": {
+            "title": "Delete table?",
+            "description": "Cannot delete while occupied or reserved."
         },
         "messages": {
             "area_created": "Area created",
             "area_create_failed": "Could not create area",
+            "area_updated": "Area updated",
+            "area_update_failed": "Could not update area",
+            "area_deleted": "Area deleted",
+            "area_delete_failed": "Could not delete area (check occupied tables)",
             "table_created": "Table created",
             "table_create_failed": "Could not create table",
             "status_update_failed": "Could not update table status"

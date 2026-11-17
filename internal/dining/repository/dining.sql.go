@@ -12,6 +12,58 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countActiveDiningTablesInArea = `-- name: CountActiveDiningTablesInArea :one
+SELECT COUNT(*)::int FROM dining_tables
+WHERE area_id = $1 AND status IN ('occupied', 'reserved')
+`
+
+func (q *Queries) CountActiveDiningTablesInArea(ctx context.Context, areaID uuid.UUID) (int32, error) {
+	row := q.db.QueryRow(ctx, countActiveDiningTablesInArea, areaID)
+	var count int32
+	err := row.Scan(&count)
+	return count, err
+}
+
+const deleteDiningArea = `-- name: DeleteDiningArea :exec
+DELETE FROM dining_areas WHERE id = $1
+`
+
+func (q *Queries) DeleteDiningArea(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteDiningArea, id)
+	return err
+}
+
+const getDiningAreaByID = `-- name: GetDiningAreaByID :one
+SELECT id, tenant_id, name, sort_order, created_at, updated_at FROM dining_areas WHERE id = $1
+`
+
+func (q *Queries) GetDiningAreaByID(ctx context.Context, id uuid.UUID) (DiningArea, error) {
+	row := q.db.QueryRow(ctx, getDiningAreaByID, id)
+	var i DiningArea
+	err := row.Scan(&i.ID, &i.TenantID, &i.Name, &i.SortOrder, &i.CreatedAt, &i.UpdatedAt)
+	return i, err
+}
+
+const updateDiningArea = `-- name: UpdateDiningArea :one
+UPDATE dining_areas
+SET name = $2, sort_order = $3, updated_at = NOW()
+WHERE id = $1
+RETURNING id, tenant_id, name, sort_order, created_at, updated_at
+`
+
+type UpdateDiningAreaParams struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	SortOrder int32     `json:"sort_order"`
+}
+
+func (q *Queries) UpdateDiningArea(ctx context.Context, arg UpdateDiningAreaParams) (DiningArea, error) {
+	row := q.db.QueryRow(ctx, updateDiningArea, arg.ID, arg.Name, arg.SortOrder)
+	var i DiningArea
+	err := row.Scan(&i.ID, &i.TenantID, &i.Name, &i.SortOrder, &i.CreatedAt, &i.UpdatedAt)
+	return i, err
+}
+
 const createDiningArea = `-- name: CreateDiningArea :one
 INSERT INTO dining_areas (name, sort_order)
 VALUES ($1, $2)
@@ -169,6 +221,45 @@ func (q *Queries) ListDiningTables(ctx context.Context) ([]ListDiningTablesRow, 
 		return nil, err
 	}
 	return items, nil
+}
+
+const deleteDiningTable = `-- name: DeleteDiningTable :exec
+DELETE FROM dining_tables WHERE id = $1
+`
+
+func (q *Queries) DeleteDiningTable(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteDiningTable, id)
+	return err
+}
+
+const updateDiningTable = `-- name: UpdateDiningTable :one
+UPDATE dining_tables
+SET area_id = $2, name = $3, capacity = $4, updated_at = NOW()
+WHERE id = $1
+RETURNING id, tenant_id, area_id, name, capacity, status, created_at, updated_at
+`
+
+type UpdateDiningTableParams struct {
+	ID       uuid.UUID `json:"id"`
+	AreaID   uuid.UUID `json:"area_id"`
+	Name     string    `json:"name"`
+	Capacity int32     `json:"capacity"`
+}
+
+func (q *Queries) UpdateDiningTable(ctx context.Context, arg UpdateDiningTableParams) (DiningTable, error) {
+	row := q.db.QueryRow(ctx, updateDiningTable, arg.ID, arg.AreaID, arg.Name, arg.Capacity)
+	var i DiningTable
+	err := row.Scan(
+		&i.ID,
+		&i.TenantID,
+		&i.AreaID,
+		&i.Name,
+		&i.Capacity,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const setDiningTableStatusByID = `-- name: SetDiningTableStatusByID :exec

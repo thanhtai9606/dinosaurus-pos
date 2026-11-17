@@ -28,7 +28,18 @@ type CreateDiningAreaRequest struct {
 	SortOrder *int   `json:"sort_order,omitempty" validate:"omitempty,min=0,max=9999"`
 }
 
+type UpdateDiningAreaRequest struct {
+	Name      string `json:"name" validate:"required,min=1,max=120"`
+	SortOrder *int   `json:"sort_order,omitempty" validate:"omitempty,min=0,max=9999"`
+}
+
 type CreateDiningTableRequest struct {
+	AreaID   uuid.UUID `json:"area_id" validate:"required"`
+	Name     string    `json:"name" validate:"required,min=1,max=60"`
+	Capacity int       `json:"capacity" validate:"required,min=1,max=99"`
+}
+
+type UpdateDiningTableRequest struct {
 	AreaID   uuid.UUID `json:"area_id" validate:"required"`
 	Name     string    `json:"name" validate:"required,min=1,max=60"`
 	Capacity int       `json:"capacity" validate:"required,min=1,max=99"`

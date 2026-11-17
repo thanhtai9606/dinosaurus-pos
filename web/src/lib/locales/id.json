@@ -406,13 +406,12 @@
         "all_areas": "Semua area",
         "empty_title": "Belum ada meja",
         "empty_hint": "Tambah area dan meja, atau jalankan migrate/seed.",
-        "actions": {
-            "add_area": "Tambah area",
-            "add_table": "Tambah meja"
-        },
+        "areas_section": "Area (lantai)",
+        "table_count": "{{count}} meja",
         "fields": {
             "area": "Area",
             "area_name": "Nama area",
+            "sort_order": "Urutan tampil",
             "table_name": "Nama meja",
             "capacity": "Kapasitas"
         },
@@ -422,11 +421,32 @@
         },
         "dialog": {
             "new_area": "Area baru",
+            "edit_area": "Ubah area",
             "new_table": "Meja baru"
+        },
+        "delete_area": {
+            "title": "Hapus area?",
+            "description": "Semua meja di area ini ikut terhapus. Tidak bisa jika masih ada meja terisi/dipesan."
+        },
+        "actions": {
+            "add_area": "Tambah area",
+            "add_table": "Tambah meja",
+            "edit_area": "Ubah",
+            "delete_area": "Hapus area",
+            "edit_table": "Ubah meja",
+            "delete_table": "Hapus meja"
+        },
+        "delete_table": {
+            "title": "Hapus meja?",
+            "description": "Tidak bisa jika meja terisi atau dipesan."
         },
         "messages": {
             "area_created": "Area ditambahkan",
             "area_create_failed": "Gagal menambah area",
+            "area_updated": "Area diperbarui",
+            "area_update_failed": "Gagal mengubah area",
+            "area_deleted": "Area dihapus",
+            "area_delete_failed": "Gagal menghapus (cek meja terisi)",
             "table_created": "Meja ditambahkan",
             "table_create_failed": "Gagal menambah meja",
             "status_update_failed": "Gagal mengubah status meja"

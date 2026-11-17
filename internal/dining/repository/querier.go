@@ -11,12 +11,18 @@ import (
 )
 
 type Querier interface {
+	CountActiveDiningTablesInArea(ctx context.Context, areaID uuid.UUID) (int32, error)
 	CreateDiningArea(ctx context.Context, arg CreateDiningAreaParams) (DiningArea, error)
 	CreateDiningTable(ctx context.Context, arg CreateDiningTableParams) (DiningTable, error)
+	DeleteDiningArea(ctx context.Context, id uuid.UUID) error
+	DeleteDiningTable(ctx context.Context, id uuid.UUID) error
+	GetDiningAreaByID(ctx context.Context, id uuid.UUID) (DiningArea, error)
 	GetDiningTableByID(ctx context.Context, id uuid.UUID) (DiningTable, error)
 	ListDiningAreas(ctx context.Context) ([]DiningArea, error)
 	ListDiningTables(ctx context.Context) ([]ListDiningTablesRow, error)
 	SetDiningTableStatusByID(ctx context.Context, arg SetDiningTableStatusByIDParams) error
+	UpdateDiningArea(ctx context.Context, arg UpdateDiningAreaParams) (DiningArea, error)
+	UpdateDiningTable(ctx context.Context, arg UpdateDiningTableParams) (DiningTable, error)
 	UpdateDiningTableStatus(ctx context.Context, arg UpdateDiningTableStatusParams) (DiningTable, error)
 }
 

@@ -52,6 +52,49 @@ export function useDiningTablesQuery() {
     }
 }
 
+export function useUpdateDiningAreaMutation() {
+    const { t } = useTranslation()
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const allowed = canAccessApi('PUT', '/dining/areas/{id}')
+    return {
+        ...useMutation({
+            mutationFn: async ({ id, ...body }: { id: string; name: string; sort_order?: number }) => {
+                const res = await axiosInstance.put(`/dining/areas/${id}`, body)
+                return (res.data as { data: DiningArea }).data
+            },
+            onSuccess: async () => {
+                await qc.invalidateQueries({ queryKey: ['dining', 'areas'] })
+                await qc.invalidateQueries({ queryKey: ['dining', 'tables'] })
+                toast.success(t('dining.messages.area_updated'))
+            },
+            onError: () => toast.error(t('dining.messages.area_update_failed')),
+        }),
+        isAllowed: allowed,
+    }
+}
+
+export function useDeleteDiningAreaMutation() {
+    const { t } = useTranslation()
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const allowed = canAccessApi('DELETE', '/dining/areas/{id}')
+    return {
+        ...useMutation({
+            mutationFn: async (id: string) => {
+                await axiosInstance.delete(`/dining/areas/${id}`)
+            },
+            onSuccess: async () => {
+                await qc.invalidateQueries({ queryKey: ['dining', 'areas'] })
+                await qc.invalidateQueries({ queryKey: ['dining', 'tables'] })
+                toast.success(t('dining.messages.area_deleted'))
+            },
+            onError: () => toast.error(t('dining.messages.area_delete_failed')),
+        }),
+        isAllowed: allowed,
+    }
+}
+
 export function useCreateDiningAreaMutation() {
     const { t } = useTranslation()
     const qc = useQueryClient()
@@ -68,6 +111,55 @@ export function useCreateDiningAreaMutation() {
                 toast.success(t('dining.messages.area_created'))
             },
             onError: () => toast.error(t('dining.messages.area_create_failed')),
+        }),
+        isAllowed: allowed,
+    }
+}
+
+export function useUpdateDiningTableMutation() {
+    const { t } = useTranslation()
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const allowed = canAccessApi('PUT', '/dining/tables/{id}')
+    return {
+        ...useMutation({
+            mutationFn: async ({
+                id,
+                ...body
+            }: {
+                id: string
+                area_id: string
+                name: string
+                capacity: number
+            }) => {
+                const res = await axiosInstance.put(`/dining/tables/${id}`, body)
+                return (res.data as { data: DiningTable }).data
+            },
+            onSuccess: async () => {
+                await qc.invalidateQueries({ queryKey: ['dining', 'tables'] })
+                toast.success(t('dining.messages.table_updated'))
+            },
+            onError: () => toast.error(t('dining.messages.table_update_failed')),
+        }),
+        isAllowed: allowed,
+    }
+}
+
+export function useDeleteDiningTableMutation() {
+    const { t } = useTranslation()
+    const qc = useQueryClient()
+    const { canAccessApi } = useRBAC()
+    const allowed = canAccessApi('DELETE', '/dining/tables/{id}')
+    return {
+        ...useMutation({
+            mutationFn: async (id: string) => {
+                await axiosInstance.delete(`/dining/tables/${id}`)
+            },
+            onSuccess: async () => {
+                await qc.invalidateQueries({ queryKey: ['dining', 'tables'] })
+                toast.success(t('dining.messages.table_deleted'))
+            },
+            onError: () => toast.error(t('dining.messages.table_delete_failed')),
         }),
         isAllowed: allowed,
     }

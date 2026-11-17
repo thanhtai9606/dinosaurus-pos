@@ -14,14 +14,27 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Plus } from 'lucide-react'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import {
     useCreateDiningAreaMutation,
     useCreateDiningTableMutation,
+    useDeleteDiningAreaMutation,
     useDiningAreasQuery,
     useDiningTablesQuery,
+    useUpdateDiningAreaMutation,
     useUpdateDiningTableStatusMutation,
+    type DiningArea,
     type DiningTable,
 } from '@/lib/api/query/dining'
 
@@ -43,16 +56,29 @@ function DiningTablesPage() {
     const { data: areas, isLoading: areasLoading, isError: areasError } = useDiningAreasQuery()
     const { data: tables, isLoading: tablesLoading, isError: tablesError } = useDiningTablesQuery()
     const createArea = useCreateDiningAreaMutation()
+    const updateArea = useUpdateDiningAreaMutation()
+    const deleteArea = useDeleteDiningAreaMutation()
     const createTable = useCreateDiningTableMutation()
     const updateStatus = useUpdateDiningTableStatusMutation()
 
     const [areaFilter, setAreaFilter] = useState<string>('all')
     const [areaDialog, setAreaDialog] = useState(false)
     const [tableDialog, setTableDialog] = useState(false)
+    const [editingArea, setEditingArea] = useState<DiningArea | null>(null)
+    const [deleteAreaTarget, setDeleteAreaTarget] = useState<DiningArea | null>(null)
     const [newAreaName, setNewAreaName] = useState('')
+    const [newAreaSortOrder, setNewAreaSortOrder] = useState(0)
     const [newTableAreaId, setNewTableAreaId] = useState('')
     const [newTableName, setNewTableName] = useState('')
     const [newTableCapacity, setNewTableCapacity] = useState(4)
+
+    const tableCountByArea = useMemo(() => {
+        const map = new Map<string, number>()
+        for (const tbl of tables ?? []) {
+            map.set(tbl.area_id, (map.get(tbl.area_id) ?? 0) + 1)
+        }
+        return map
+    }, [tables])
 
     const filtered = useMemo(() => {
         const list = tables ?? []
@@ -62,7 +88,21 @@ function DiningTablesPage() {
 
     const isLoading = areasLoading || tablesLoading
     const isError = areasError || tablesError
-    const canManage = createArea.isAllowed || createTable.isAllowed
+    const canManageAreas = createArea.isAllowed || updateArea.isAllowed || deleteArea.isAllowed
+
+    const openCreateArea = () => {
+        setEditingArea(null)
+        setNewAreaName('')
+        setNewAreaSortOrder((areas?.length ?? 0) * 10)
+        setAreaDialog(true)
+    }
+
+    const openEditArea = (area: DiningArea) => {
+        setEditingArea(area)
+        setNewAreaName(area.name)
+        setNewAreaSortOrder(area.sort_order)
+        setAreaDialog(true)
+    }
 
     const openTableDialog = () => {
         const first = areas?.[0]?.id ?? ''
@@ -72,6 +112,33 @@ function DiningTablesPage() {
         setTableDialog(true)
     }
 
+    const saveArea = () => {
+        const name = newAreaName.trim()
+        if (!name) return
+        const sort_order = newAreaSortOrder
+        if (editingArea) {
+            updateArea.mutate(
+                { id: editingArea.id, name, sort_order },
+                {
+                    onSuccess: () => {
+                        setAreaDialog(false)
+                        setEditingArea(null)
+                    },
+                },
+            )
+        } else {
+            createArea.mutate(
+                { name, sort_order },
+                {
+                    onSuccess: () => {
+                        setAreaDialog(false)
+                        setNewAreaName('')
+                    },
+                },
+            )
+        }
+    }
+
     return (
         <div className="space-y-4 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -79,9 +146,9 @@ function DiningTablesPage() {
                     <h1 className="text-xl font-semibold">{t('dining.title')}</h1>
                     <p className="text-sm text-muted-foreground">{t('dining.subtitle')}</p>
                 </div>
-                {canManage && (
+                {canManageAreas && (
                     <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" size="sm" onClick={() => setAreaDialog(true)} disabled={!createArea.isAllowed}>
+                        <Button variant="outline" size="sm" onClick={openCreateArea} disabled={!createArea.isAllowed}>
                             <Plus className="h-4 w-4 mr-1" />
                             {t('dining.actions.add_area')}
                         </Button>
@@ -98,6 +165,57 @@ function DiningTablesPage() {
                     <AlertDescription>{t('dining.errors.load_failed')}</AlertDescription>
                 </Alert>
             )}
+
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-base">{t('dining.areas_section')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    {(areas ?? []).length === 0 && !areasLoading && (
+                        <p className="text-sm text-muted-foreground">{t('dining.empty_hint')}</p>
+                    )}
+                    <ul className="divide-y rounded-md border">
+                        {(areas ?? []).map((area) => (
+                            <li key={area.id} className="flex flex-wrap items-center justify-between gap-2 p-3">
+                                <div>
+                                    <p className="font-medium">{area.name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {t('dining.table_count', { count: tableCountByArea.get(area.id) ?? 0 })}
+                                        {' · '}
+                                        {t('dining.fields.sort_order')}: {area.sort_order}
+                                    </p>
+                                </div>
+                                {canManageAreas && (
+                                    <div className="flex gap-1">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            disabled={!updateArea.isAllowed}
+                                            onClick={() => openEditArea(area)}
+                                            title={t('dining.actions.edit_area')}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-destructive"
+                                            disabled={!deleteArea.isAllowed}
+                                            onClick={() => setDeleteAreaTarget(area)}
+                                            title={t('dining.actions.delete_area')}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
 
             <Card>
                 <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-2">
@@ -165,32 +283,71 @@ function DiningTablesPage() {
             <Dialog open={areaDialog} onOpenChange={setAreaDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{t('dining.dialog.new_area')}</DialogTitle>
+                        <DialogTitle>
+                            {editingArea ? t('dining.dialog.edit_area') : t('dining.dialog.new_area')}
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3">
-                        <Label htmlFor="area-name">{t('dining.fields.area_name')}</Label>
-                        <Input
-                            id="area-name"
-                            value={newAreaName}
-                            onChange={(e) => setNewAreaName(e.target.value)}
-                            placeholder={t('dining.placeholders.area_name')}
-                        />
+                        <div>
+                            <Label htmlFor="area-name">{t('dining.fields.area_name')}</Label>
+                            <Input
+                                id="area-name"
+                                value={newAreaName}
+                                onChange={(e) => setNewAreaName(e.target.value)}
+                                placeholder={t('dining.placeholders.area_name')}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="area-sort">{t('dining.fields.sort_order')}</Label>
+                            <Input
+                                id="area-sort"
+                                type="number"
+                                min={0}
+                                value={newAreaSortOrder}
+                                onChange={(e) => setNewAreaSortOrder(Number(e.target.value) || 0)}
+                            />
+                        </div>
                     </div>
                     <DialogFooter>
                         <Button
-                            disabled={!newAreaName.trim() || createArea.isPending}
-                            onClick={() =>
-                                createArea.mutate(
-                                    { name: newAreaName.trim() },
-                                    { onSuccess: () => { setAreaDialog(false); setNewAreaName('') } },
-                                )
+                            disabled={
+                                !newAreaName.trim() ||
+                                (editingArea ? updateArea.isPending : createArea.isPending)
                             }
+                            onClick={saveArea}
                         >
                             {t('common.save')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <AlertDialog open={!!deleteAreaTarget} onOpenChange={(o) => !o && setDeleteAreaTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t('dining.delete_area.title')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('dining.delete_area.description')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            disabled={deleteArea.isPending}
+                            onClick={() => {
+                                if (!deleteAreaTarget) return
+                                deleteArea.mutate(deleteAreaTarget.id, {
+                                    onSuccess: () => {
+                                        setDeleteAreaTarget(null)
+                                        if (areaFilter === deleteAreaTarget.id) setAreaFilter('all')
+                                    },
+                                })
+                            }}
+                        >
+                            {t('dining.actions.delete_area')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             <Dialog open={tableDialog} onOpenChange={setTableDialog}>
                 <DialogContent>
@@ -235,11 +392,7 @@ function DiningTablesPage() {
                     </div>
                     <DialogFooter>
                         <Button
-                            disabled={
-                                !newTableAreaId ||
-                                !newTableName.trim() ||
-                                createTable.isPending
-                            }
+                            disabled={!newTableAreaId || !newTableName.trim() || createTable.isPending}
                             onClick={() =>
                                 createTable.mutate(
                                     {

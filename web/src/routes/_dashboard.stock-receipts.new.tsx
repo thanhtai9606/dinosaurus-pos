@@ -177,6 +177,7 @@ function StockReceiptNewPage() {
                             t={t}
                             onUpdateQuantity={draft.updateQuantity}
                             onSetQuantity={draft.setQuantity}
+                            onChangeSaleUnit={draft.changeSaleUnit}
                             onSetUnitCost={draft.setUnitCost}
                             onSetUnitSell={draft.setUnitSell}
                             onRemove={draft.removeLine}

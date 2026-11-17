@@ -56,8 +56,11 @@ WHERE id = $1 AND status IN ('draft', 'cancelled');
 DELETE FROM stock_receipt_items WHERE receipt_id = $1;
 
 -- name: InsertStockReceiptItem :one
-INSERT INTO stock_receipt_items (receipt_id, product_id, quantity, unit_cost, unit_sell_price)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO stock_receipt_items (
+    receipt_id, product_id, quantity, unit_cost, unit_sell_price,
+    product_unit_id, sale_unit_name, factor_to_base
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
 -- name: ListStockReceiptItems :many

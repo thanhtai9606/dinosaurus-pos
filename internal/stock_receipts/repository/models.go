@@ -1590,6 +1590,9 @@ type StockReceiptItem struct {
 	LineTotal     pgtype.Numeric     `json:"line_total"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 	UnitSellPrice pgtype.Numeric     `json:"unit_sell_price"`
+	ProductUnitID pgtype.UUID        `json:"product_unit_id"`
+	SaleUnitName  *string            `json:"sale_unit_name"`
+	FactorToBase  pgtype.Numeric     `json:"factor_to_base"`
 }
 
 type StockTake struct {

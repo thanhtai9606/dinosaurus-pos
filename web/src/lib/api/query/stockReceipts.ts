@@ -13,6 +13,9 @@ export type StockReceiptItem = {
     product_sku?: string | null
     product_barcode?: string | null
     quantity: number
+    product_unit_id?: string
+    sale_unit_name?: string
+    factor_to_base?: number
     unit_cost: number
     unit_sell_price?: number
     line_total?: number

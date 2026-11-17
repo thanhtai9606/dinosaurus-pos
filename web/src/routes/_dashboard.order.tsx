@@ -31,6 +31,14 @@ import { getCachedPosProducts } from '@/lib/pos/posCatalogStore'
 import { OfflinePosBanner } from '@/components/retail-pos/OfflinePosBanner'
 import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
 import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
+import {
+    baseQtyForLine,
+    cartBaseQtyForProduct,
+    cartLineKey,
+    defaultSaleUnit,
+    type ProductSaleUnit,
+} from '@/lib/retail-pos/productUnits'
+import { lineSubtotal } from '@/lib/retail-pos/pricing'
 
 export const Route = createFileRoute('/_dashboard/order')({
     component: OrderPage,
@@ -172,7 +180,7 @@ function OrderPage() {
                 setVariantSelectionOpen(true)
                 return
             }
-            addCartItem(detail)
+            addCartItem(detail, undefined, defaultSaleUnit(detail, detail.matched_sale_unit_id))
         } catch (error) {
             console.error(error)
             addCartItem(product)
@@ -182,82 +190,175 @@ function OrderPage() {
         }
     }
 
-    const addCartItem = (product: Product, variant?: InternalProductsProductOptionResponse) => {
-        setCart(prev => {
-            const existing = prev.find(item =>
-                item.product.id === product.id && item.variant?.id === variant?.id
+    const addCartItem = (
+        product: Product,
+        variant?: InternalProductsProductOptionResponse,
+        saleUnit?: ProductSaleUnit,
+    ) => {
+        const unit = saleUnit ?? defaultSaleUnit(product)
+        setCart((prev) => {
+            const lineKey = cartLineKey(product.id!, variant?.id, unit)
+            const existing = prev.find(
+                (item) =>
+                    cartLineKey(
+                        item.product.id!,
+                        item.variant?.id,
+                        item.saleUnit ?? defaultSaleUnit(item.product),
+                    ) === lineKey,
             )
 
-            const currentQty = existing ? existing.quantity : 0
-            if (currentQty + 1 > (product.stock || 0)) {
+            const baseUsed = cartBaseQtyForProduct(prev, product.id!, lineKey)
+            if (baseUsed + baseQtyForLine(1, unit) > (product.stock || 0)) {
                 toast.error(t('order.errors.insufficient_stock'))
                 return prev
             }
 
             if (existing) {
-                return prev.map(item =>
-                    item.product.id === product.id && item.variant?.id === variant?.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                )
+                return prev.map((item) => {
+                    const key = cartLineKey(
+                        item.product.id!,
+                        item.variant?.id,
+                        item.saleUnit ?? defaultSaleUnit(item.product),
+                    )
+                    return key === lineKey ? { ...item, quantity: item.quantity + 1, saleUnit: unit } : item
+                })
             }
-            return [...prev, { product, variant, quantity: 1 }]
+            return [...prev, { product, variant, quantity: 1, saleUnit: unit }]
         })
         setVariantSelectionOpen(false)
         setProductForVariantSelection(null)
     }
 
-    const removeFromCart = (productId: string, variantId?: string) => {
-        setCart(prev => prev.filter(item => !(item.product.id === productId && item.variant?.id === variantId)))
+    const removeFromCart = (lineKey: string) => {
+        setCart((prev) =>
+            prev.filter(
+                (item) =>
+                    cartLineKey(
+                        item.product.id!,
+                        item.variant?.id,
+                        item.saleUnit ?? defaultSaleUnit(item.product),
+                    ) !== lineKey,
+            ),
+        )
     }
 
-    const updateQuantity = (productId: string, delta: number, variantId?: string) => {
-        setCart(prev => {
-            return prev.map(item => {
-                if (item.product.id === productId && item.variant?.id === variantId) {
-                    if (delta > 0 && item.quantity + delta > (item.product.stock || 0)) {
-                        toast.error(t('order.errors.insufficient_stock'))
-                        return item
-                    }
-                    const newQty = item.quantity + delta
-                    return { ...item, quantity: Math.max(1, newQty) }
-                }
-                return item
+    const updateQuantity = (lineKey: string, delta: number) => {
+        setCart((prev) => {
+            const item = prev.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === lineKey,
+            )
+            if (!item) return prev
+            const unit = item.saleUnit ?? defaultSaleUnit(item.product)
+            const newQty = Math.max(1, item.quantity + delta)
+            const baseUsed = cartBaseQtyForProduct(prev, item.product.id!, lineKey)
+            if (baseUsed + baseQtyForLine(newQty, unit) - baseQtyForLine(item.quantity, unit) > (item.product.stock || 0)) {
+                toast.error(t('order.errors.insufficient_stock'))
+                return prev
+            }
+            return prev.map((row) => {
+                const key = cartLineKey(
+                    row.product.id!,
+                    row.variant?.id,
+                    row.saleUnit ?? defaultSaleUnit(row.product),
+                )
+                return key === lineKey ? { ...row, quantity: newQty } : row
             })
         })
     }
 
-    const setQuantity = (productId: string, quantity: number, variantId?: string) => {
+    const setQuantity = (lineKey: string, quantity: number) => {
         const qty = Math.max(1, Math.floor(quantity))
-        setCart((prev) =>
-            prev.map((item) => {
-                if (item.product.id === productId && item.variant?.id === variantId) {
-                    if (qty > (item.product.stock || 0)) {
-                        toast.error(t('order.errors.insufficient_stock'))
-                        return item
-                    }
-                    return { ...item, quantity: qty }
-                }
-                return item
-            }),
-        )
+        setCart((prev) => {
+            const item = prev.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === lineKey,
+            )
+            if (!item) return prev
+            const unit = item.saleUnit ?? defaultSaleUnit(item.product)
+            const baseUsed = cartBaseQtyForProduct(prev, item.product.id!, lineKey)
+            if (baseUsed + baseQtyForLine(qty, unit) - baseQtyForLine(item.quantity, unit) > (item.product.stock || 0)) {
+                toast.error(t('order.errors.insufficient_stock'))
+                return prev
+            }
+            return prev.map((row) => {
+                const key = cartLineKey(
+                    row.product.id!,
+                    row.variant?.id,
+                    row.saleUnit ?? defaultSaleUnit(row.product),
+                )
+                return key === lineKey ? { ...row, quantity: qty } : row
+            })
+        })
     }
 
-    const calculateTotal = () => {
-        return cart.reduce((total, item) => {
-            const price = (item.product.price || 0) + (item.variant?.additional_price || 0)
-            return total + (price * item.quantity)
-        }, 0)
+    const changeSaleUnit = (lineKey: string, unit: ProductSaleUnit) => {
+        setCart((prev) => {
+            const item = prev.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === lineKey,
+            )
+            if (!item) return prev
+            const newKey = cartLineKey(item.product.id!, item.variant?.id, unit)
+            const merged = prev.filter(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) !== lineKey,
+            )
+            const existing = merged.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === newKey,
+            )
+            const qty = existing ? existing.quantity + item.quantity : item.quantity
+            const baseUsed = cartBaseQtyForProduct(merged, item.product.id!, newKey)
+            if (baseUsed + baseQtyForLine(qty, unit) > (item.product.stock || 0)) {
+                toast.error(t('order.errors.insufficient_stock'))
+                return prev
+            }
+            if (existing) {
+                return merged.map((row) => {
+                    const key = cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    )
+                    return key === newKey ? { ...row, quantity: qty, saleUnit: unit } : row
+                })
+            }
+            return [...merged, { ...item, saleUnit: unit, quantity: qty }]
+        })
     }
+
+    const calculateTotal = () => cart.reduce((total, item) => total + lineSubtotal(item), 0)
 
     const handleCheckout = () => {
         if (cart.length === 0) return
 
         const orderData = {
-            items: cart.map(item => ({
+            items: cart.map((item) => ({
                 product_id: item.product.id!,
                 quantity: item.quantity,
-                options: item.variant && item.variant.id ? [{ product_option_id: item.variant.id }] : []
+                product_unit_id: (item.saleUnit ?? defaultSaleUnit(item.product)).id || undefined,
+                options: item.variant && item.variant.id ? [{ product_option_id: item.variant.id }] : [],
             })),
             type: selectedOrderType,
             customer_id: selectedCustomerId || undefined
@@ -350,6 +451,7 @@ function OrderPage() {
                             setSelectedOrderType={setSelectedOrderType}
                             updateQuantity={updateQuantity}
                             setQuantity={setQuantity}
+                            changeSaleUnit={changeSaleUnit}
                             removeFromCart={removeFromCart}
                             calculateTotal={calculateTotal}
                             handleCheckout={handleCheckout}
@@ -371,6 +473,7 @@ function OrderPage() {
                     setSelectedOrderType={setSelectedOrderType}
                     updateQuantity={updateQuantity}
                     setQuantity={setQuantity}
+                    changeSaleUnit={changeSaleUnit}
                     removeFromCart={removeFromCart}
                     calculateTotal={calculateTotal}
                     handleCheckout={handleCheckout}

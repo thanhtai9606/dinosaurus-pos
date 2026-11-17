@@ -11,6 +11,7 @@ import (
 	"dinosaurus-pos/internal/common/store"
 	"dinosaurus-pos/internal/inventory"
 	"dinosaurus-pos/internal/notifications"
+	"dinosaurus-pos/internal/products"
 	products_repo "dinosaurus-pos/internal/products/repository"
 	"dinosaurus-pos/internal/tenant"
 	wh_repo "dinosaurus-pos/internal/warehouse/repository"
@@ -106,7 +107,8 @@ func (s *StockReceiptService) Create(ctx context.Context, req CreateStockReceipt
 			return err
 		}
 
-		if err := insertReceiptItems(ctx, qtx, receipt.ID, req.Items); err != nil {
+		qPrd := products_repo.New(tx)
+		if err := insertReceiptItems(ctx, qtx, qPrd, receipt.ID, req.Items); err != nil {
 			return err
 		}
 		return applyReceiptPayment(ctx, qtx, receipt.ID, req.PaymentMode, req.AmountPaid)
@@ -239,7 +241,8 @@ func (s *StockReceiptService) UpdateDraft(ctx context.Context, id uuid.UUID, req
 		if err := qtx.DeleteStockReceiptItems(ctx, id); err != nil {
 			return err
 		}
-		if err := insertReceiptItems(ctx, qtx, id, req.Items); err != nil {
+		qPrd := products_repo.New(tx)
+		if err := insertReceiptItems(ctx, qtx, qPrd, id, req.Items); err != nil {
 			return err
 		}
 		return applyReceiptPayment(ctx, qtx, id, req.PaymentMode, req.AmountPaid)
@@ -331,7 +334,9 @@ func (s *StockReceiptService) Complete(ctx context.Context, id uuid.UUID) (*Stoc
 				return err
 			}
 
-			if err := inventory.ApplyWarehouseDelta(ctx, prd, wh, warehouseID, line.ProductID, line.Quantity, products_repo.StockChangeTypeRestock, refID, &note, createdBy); err != nil {
+			factor := products.FloatFromNumeric(line.FactorToBase)
+			baseQty := products.SaleQtyToBase(line.Quantity, factor)
+			if err := inventory.ApplyWarehouseDelta(ctx, prd, wh, warehouseID, line.ProductID, baseQty, products_repo.StockChangeTypeRestock, refID, &note, createdBy); err != nil {
 				return err
 			}
 
@@ -461,8 +466,60 @@ func nextReceiptNo(ctx context.Context, q *sr_repo.Queries) (string, error) {
 	return fmt.Sprintf("GR-%s-%03d", now.Format("20060102"), count+1), nil
 }
 
-func insertReceiptItems(ctx context.Context, q *sr_repo.Queries, receiptID uuid.UUID, items []ReceiptItemInput) error {
+func insertReceiptItems(ctx context.Context, q *sr_repo.Queries, qPrd *products_repo.Queries, receiptID uuid.UUID, items []ReceiptItemInput) error {
 	for _, it := range items {
+		productRow, err := qPrd.GetProductByID(ctx, it.ProductID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return fmt.Errorf("%w: product not found", common.ErrInvalidInput)
+			}
+			return err
+		}
+		product := products_repo.Product{
+			ID:      productRow.ID,
+			Name:    productRow.Name,
+			Price:   productRow.Price,
+			Unit:    productRow.Unit,
+			Barcode: productRow.Barcode,
+			Sku:     productRow.Sku,
+		}
+
+		var saleUnit products_repo.ProductUnit
+		usedExplicit := false
+		if it.ProductUnitID != nil {
+			saleUnit, err = qPrd.GetProductUnit(ctx, *it.ProductUnitID)
+			if err == nil {
+				usedExplicit = true
+			} else if !errors.Is(err, pgx.ErrNoRows) {
+				return err
+			}
+		}
+		if !usedExplicit {
+			if err := products.EnsureBaseProductUnit(ctx, qPrd, product); err != nil {
+				return fmt.Errorf("sale unit not configured for product: %w", err)
+			}
+			saleUnit, err = qPrd.GetBaseProductUnit(ctx, it.ProductID)
+			if err != nil {
+				if errors.Is(err, pgx.ErrNoRows) {
+					return fmt.Errorf("%w: sale unit not configured", common.ErrInvalidInput)
+				}
+				return err
+			}
+		}
+		if saleUnit.ProductID != it.ProductID {
+			return fmt.Errorf("%w: sale unit does not match product", common.ErrInvalidInput)
+		}
+
+		factor := products.FloatFromNumeric(saleUnit.FactorToBase)
+		var factorNum pgtype.Numeric
+		_ = factorNum.Scan(fmt.Sprintf("%v", factor))
+
+		var unitID pgtype.UUID
+		if saleUnit.ID != uuid.Nil {
+			unitID = pgtype.UUID{Bytes: saleUnit.ID, Valid: true}
+		}
+		unitName := saleUnit.Name
+
 		var cost pgtype.Numeric
 		if err := cost.Scan(fmt.Sprintf("%f", it.UnitCost)); err != nil {
 			return err
@@ -473,12 +530,15 @@ func insertReceiptItems(ctx context.Context, q *sr_repo.Queries, receiptID uuid.
 				return err
 			}
 		}
-		_, err := q.InsertStockReceiptItem(ctx, sr_repo.InsertStockReceiptItemParams{
+		_, err = q.InsertStockReceiptItem(ctx, sr_repo.InsertStockReceiptItemParams{
 			ReceiptID:     receiptID,
 			ProductID:     it.ProductID,
 			Quantity:      it.Quantity,
 			UnitCost:      cost,
 			UnitSellPrice: sellPrice,
+			ProductUnitID: unitID,
+			SaleUnitName:  &unitName,
+			FactorToBase:  factorNum,
 		})
 		if err != nil {
 			return err
@@ -514,19 +574,28 @@ func mapReceiptDetail(r sr_repo.StockReceipt, items []sr_repo.ListStockReceiptIt
 			v := numericToFloat(it.UnitSellPrice)
 			sellPtr = &v
 		}
-		resp.Items = append(resp.Items, StockReceiptItemResponse{
+		var unitID *uuid.UUID
+		if it.ProductUnitID.Valid {
+			uid := uuid.UUID(it.ProductUnitID.Bytes)
+			unitID = &uid
+		}
+		itemResp := StockReceiptItemResponse{
 			ID:               it.ID,
 			ProductID:        it.ProductID,
 			ProductName:      it.ProductName,
 			ProductSku:       it.ProductSku,
 			ProductBarcode:   it.ProductBarcode,
 			Quantity:         it.Quantity,
+			ProductUnitID:    unitID,
+			SaleUnitName:     it.SaleUnitName,
+			FactorToBase:     products.FloatFromNumeric(it.FactorToBase),
 			UnitCost:         numericToFloat(it.UnitCost),
 			UnitSellPrice:    sellPtr,
 			LineTotal:        numericToFloat(it.LineTotal),
 			ProductCostPrice: numericToFloat(it.ProductCostPrice),
 			ProductSellPrice: float64(it.ProductSellPrice),
-		})
+		}
+		resp.Items = append(resp.Items, itemResp)
 	}
 	return resp
 }

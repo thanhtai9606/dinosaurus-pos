@@ -8,10 +8,11 @@ import (
 )
 
 type ReceiptItemInput struct {
-	ProductID     uuid.UUID `json:"product_id" validate:"required"`
-	Quantity      int32     `json:"quantity" validate:"required,gt=0"`
-	UnitCost      float64   `json:"unit_cost" validate:"gte=0"`
-	UnitSellPrice *float64  `json:"unit_sell_price" validate:"omitempty,gte=0"`
+	ProductID     uuid.UUID  `json:"product_id" validate:"required"`
+	ProductUnitID *uuid.UUID `json:"product_unit_id,omitempty"`
+	Quantity      int32      `json:"quantity" validate:"required,gt=0"`
+	UnitCost      float64    `json:"unit_cost" validate:"gte=0"`
+	UnitSellPrice *float64   `json:"unit_sell_price" validate:"omitempty,gte=0"`
 }
 
 type CreateStockReceiptRequest struct {
@@ -48,6 +49,9 @@ type StockReceiptItemResponse struct {
 	ProductSku         *string   `json:"product_sku,omitempty"`
 	ProductBarcode     *string   `json:"product_barcode,omitempty"`
 	Quantity           int32     `json:"quantity"`
+	ProductUnitID      *uuid.UUID `json:"product_unit_id,omitempty"`
+	SaleUnitName       *string    `json:"sale_unit_name,omitempty"`
+	FactorToBase       float64    `json:"factor_to_base,omitempty"`
 	UnitCost           float64   `json:"unit_cost"`
 	UnitSellPrice      *float64  `json:"unit_sell_price,omitempty"`
 	LineTotal          float64   `json:"line_total"`

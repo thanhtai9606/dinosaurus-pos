@@ -9,6 +9,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Product } from '@/lib/api/query/products'
 import type { ProductSaleUnit } from '@/lib/retail-pos/productUnits'
+import { cartLineKey, defaultSaleUnit, saleUnitsOf } from '@/lib/retail-pos/productUnits'
+import { catalogUnitPrice, lineSubtotal } from '@/lib/retail-pos/pricing'
 import { InternalProductsProductOptionResponse } from '@/lib/api/generated'
 
 export interface CartItem {
@@ -29,9 +31,10 @@ interface CartContentProps {
     setSelectedCustomerId: (id: string | null) => void
     selectedOrderType: OrderType
     setSelectedOrderType: (type: OrderType) => void
-    updateQuantity: (id: string, delta: number, variantId?: string) => void
-    setQuantity: (id: string, quantity: number, variantId?: string) => void
-    removeFromCart: (id: string, variantId?: string) => void
+    updateQuantity: (lineKey: string, delta: number) => void
+    setQuantity: (lineKey: string, quantity: number) => void
+    changeSaleUnit: (lineKey: string, unit: ProductSaleUnit) => void
+    removeFromCart: (lineKey: string) => void
     calculateTotal: () => number
     handleCheckout: () => void
     canCheckout: boolean
@@ -39,7 +42,7 @@ interface CartContentProps {
 
 export function CartContent({
     cart, t, customers, selectedCustomerId, setSelectedCustomerId,
-    selectedOrderType, setSelectedOrderType, updateQuantity, setQuantity, removeFromCart,
+    selectedOrderType, setSelectedOrderType, updateQuantity, setQuantity, changeSaleUnit, removeFromCart,
     calculateTotal, handleCheckout, canCheckout
 }: CartContentProps) {
     const formatMoney = useFormatMoney()
@@ -96,8 +99,14 @@ export function CartContent({
                                     <span>{t('order.empty_cart')}</span>
                                 </div>
                             ) : (
-                                cart.map((item) => (
-                                    <div key={`${item.product.id}-${item.variant?.id || 'base'}`} className="flex gap-3 bg-background p-3 rounded-lg border group">
+                                cart.map((item) => {
+                                    const saleUnit = item.saleUnit ?? defaultSaleUnit(item.product)
+                                    const lineKey = cartLineKey(item.product.id!, item.variant?.id, saleUnit)
+                                    const units = saleUnitsOf(item.product)
+                                    const unitPrice = catalogUnitPrice(item)
+                                    const lineTotal = lineSubtotal(item)
+                                    return (
+                                    <div key={lineKey} className="flex gap-3 bg-background p-3 rounded-lg border group">
                                         <div className="h-12 w-12 rounded-md bg-muted overflow-hidden shrink-0">
                                             {item.product.image_url && <img src={item.product.image_url} className="h-full w-full object-cover" />}
                                         </div>
@@ -108,28 +117,49 @@ export function CartContent({
                                                     {item.variant && (
                                                         <span className="text-sm text-muted-foreground block truncate">{item.variant.name} (+{formatMoney(item.variant.additional_price || 0)})</span>
                                                     )}
+                                                    <span className="text-xs text-muted-foreground block">{saleUnit.name}</span>
                                                 </div>
-                                                <span className="text-sm font-bold ml-1">{formatMoney(((item.product.price || 0) + (item.variant?.additional_price || 0)) * item.quantity)}</span>
+                                                <span className="text-sm font-bold ml-1">{formatMoney(lineTotal)}</span>
                                             </div>
-                                            <div className="flex items-center justify-between mt-1">
-                                                <div className="text-sm text-muted-foreground">
-                                                    {formatMoney((item.product.price || 0) + (item.variant?.additional_price || 0))} x {item.quantity}
+                                            <div className="flex items-center justify-between mt-1 gap-2">
+                                                {units.length > 1 ? (
+                                                    <Select
+                                                        value={saleUnit.id ?? saleUnit.name}
+                                                        onValueChange={(v) => {
+                                                            const next = units.find((u) => (u.id ?? u.name) === v)
+                                                            if (next) changeSaleUnit(lineKey, next)
+                                                        }}
+                                                    >
+                                                        <SelectTrigger className="h-7 text-xs w-[5.5rem]">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {units.map((u) => (
+                                                                <SelectItem key={u.id ?? u.name} value={u.id ?? u.name}>
+                                                                    {u.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                ) : null}
+                                                <div className="text-sm text-muted-foreground flex-1 truncate">
+                                                    {formatMoney(unitPrice)} × {item.quantity}
                                                 </div>
                                                 <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                                                     <QuantityEditor
                                                         size="compact"
                                                         value={item.quantity}
-                                                        onDelta={(d) => updateQuantity(item.product.id!, d, item.variant?.id)}
-                                                        onSetValue={(q) => setQuantity(item.product.id!, q, item.variant?.id)}
+                                                        onDelta={(d) => updateQuantity(lineKey, d)}
+                                                        onSetValue={(q) => setQuantity(lineKey, q)}
                                                     />
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(item.product.id!, item.variant?.id)}>
+                                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => removeFromCart(lineKey)}>
                                                         <Trash2 className="h-3 w-3" />
                                                     </Button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                ))
+                                )})
                             )}
                         </div>
                     </div>

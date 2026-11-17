@@ -5,10 +5,12 @@ import type { StockReceipt } from '@/lib/api/query/stockReceipts'
 import { fetchProductByCode, fetchProductDetail } from '@/lib/products/lookupProduct'
 import {
     addProductToLines,
+    defaultCostSell,
     linesFromApiItems,
     StockReceiptLine,
     stockReceiptLineKey,
 } from '@/lib/stock-receipts/receiptLines'
+import type { ProductSaleUnit } from '@/lib/retail-pos/productUnits'
 
 type Options = {
     open: boolean
@@ -42,15 +44,15 @@ export function useStockReceiptDraft({ open, receiptId, detail, readOnly, t }: O
         }
     }, [open, readOnly, receiptId])
 
-    const addProduct = useCallback((product: Product) => {
+    const addProduct = useCallback((product: Product, preferredUnitId?: string | null) => {
         if (!product.id) return
-        setLines((prev) => addProductToLines(prev, product, 1))
+        setLines((prev) => addProductToLines(prev, product, 1, preferredUnitId))
         setSearch('')
         searchRef.current?.focus()
     }, [])
 
     const addProductFlow = useCallback(
-        async (product: Product) => {
+        async (product: Product, preferredUnitId?: string | null) => {
             let detailProduct = product
             if (product.id) {
                 try {
@@ -59,7 +61,8 @@ export function useStockReceiptDraft({ open, receiptId, detail, readOnly, t }: O
                     detailProduct = product
                 }
             }
-            addProduct(detailProduct)
+            const unitId = preferredUnitId ?? product.matched_sale_unit_id ?? detailProduct.matched_sale_unit_id
+            addProduct(detailProduct, unitId)
         },
         [addProduct],
     )
@@ -71,7 +74,7 @@ export function useStockReceiptDraft({ open, receiptId, detail, readOnly, t }: O
             setScanning(true)
             try {
                 const product = await fetchProductByCode(code)
-                await addProductFlow(product)
+                await addProductFlow(product, product.matched_sale_unit_id)
             } catch {
                 toast.error(t('stockReceipts.messages.product_not_found'))
             } finally {
@@ -81,12 +84,12 @@ export function useStockReceiptDraft({ open, receiptId, detail, readOnly, t }: O
         [addProductFlow, t],
     )
 
-    const updateQuantity = useCallback((productId: string, delta: number) => {
-        const key = stockReceiptLineKey(productId)
+    const updateQuantity = useCallback((lineKey: string, delta: number) => {
         setLines((prev) =>
             prev
                 .map((l) => {
-                    if (stockReceiptLineKey(l.product.id!) !== key) return l
+                    const key = stockReceiptLineKey(l.product.id!, l.saleUnit)
+                    if (key !== lineKey) return l
                     const next = l.quantity + delta
                     if (next < 1) return null
                     return { ...l, quantity: next }
@@ -95,26 +98,55 @@ export function useStockReceiptDraft({ open, receiptId, detail, readOnly, t }: O
         )
     }, [])
 
-    const setQuantity = useCallback((productId: string, quantity: number) => {
-        const key = stockReceiptLineKey(productId)
+    const setQuantity = useCallback((lineKey: string, quantity: number) => {
         setLines((prev) =>
-            prev.map((l) => (stockReceiptLineKey(l.product.id!) === key ? { ...l, quantity: Math.max(1, quantity) } : l)),
+            prev.map((l) => {
+                const key = stockReceiptLineKey(l.product.id!, l.saleUnit)
+                return key === lineKey ? { ...l, quantity: Math.max(1, quantity) } : l
+            }),
         )
     }, [])
 
-    const setUnitCost = useCallback((productId: string, unit_cost: number) => {
-        const key = stockReceiptLineKey(productId)
-        setLines((prev) => prev.map((l) => (stockReceiptLineKey(l.product.id!) === key ? { ...l, unit_cost } : l)))
+    const setUnitCost = useCallback((lineKey: string, unit_cost: number) => {
+        setLines((prev) =>
+            prev.map((l) => {
+                const key = stockReceiptLineKey(l.product.id!, l.saleUnit)
+                return key === lineKey ? { ...l, unit_cost } : l
+            }),
+        )
     }, [])
 
-    const setUnitSell = useCallback((productId: string, unit_sell_price: number | undefined) => {
-        const key = stockReceiptLineKey(productId)
-        setLines((prev) => prev.map((l) => (stockReceiptLineKey(l.product.id!) === key ? { ...l, unit_sell_price } : l)))
+    const setUnitSell = useCallback((lineKey: string, unit_sell_price: number | undefined) => {
+        setLines((prev) =>
+            prev.map((l) => {
+                const key = stockReceiptLineKey(l.product.id!, l.saleUnit)
+                return key === lineKey ? { ...l, unit_sell_price } : l
+            }),
+        )
     }, [])
 
-    const removeLine = useCallback((productId: string) => {
-        const key = stockReceiptLineKey(productId)
-        setLines((prev) => prev.filter((l) => stockReceiptLineKey(l.product.id!) !== key))
+    const changeSaleUnit = useCallback((lineKey: string, unit: ProductSaleUnit) => {
+        setLines((prev) => {
+            const item = prev.find((l) => stockReceiptLineKey(l.product.id!, l.saleUnit) === lineKey)
+            if (!item) return prev
+            const newKey = stockReceiptLineKey(item.product.id!, unit)
+            const merged = prev.filter((l) => stockReceiptLineKey(l.product.id!, l.saleUnit) !== lineKey)
+            const existing = merged.find((l) => stockReceiptLineKey(l.product.id!, l.saleUnit) === newKey)
+            const qty = existing ? existing.quantity + item.quantity : item.quantity
+            const { unit_cost, unit_sell_price } = defaultCostSell(item.product, unit)
+            if (existing) {
+                return merged.map((l) =>
+                    stockReceiptLineKey(l.product.id!, l.saleUnit) === newKey
+                        ? { ...l, quantity: qty, saleUnit: unit, unit_cost, unit_sell_price }
+                        : l,
+                )
+            }
+            return [...merged, { ...item, saleUnit: unit, quantity: qty, unit_cost, unit_sell_price }]
+        })
+    }, [])
+
+    const removeLine = useCallback((lineKey: string) => {
+        setLines((prev) => prev.filter((l) => stockReceiptLineKey(l.product.id!, l.saleUnit) !== lineKey))
     }, [])
 
     return {
@@ -130,6 +162,7 @@ export function useStockReceiptDraft({ open, receiptId, detail, readOnly, t }: O
         setQuantity,
         setUnitCost,
         setUnitSell,
+        changeSaleUnit,
         removeLine,
     }
 }

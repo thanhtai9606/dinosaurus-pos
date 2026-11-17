@@ -139,9 +139,12 @@ func (q *Queries) GetStockReceiptByID(ctx context.Context, id uuid.UUID) (StockR
 }
 
 const insertStockReceiptItem = `-- name: InsertStockReceiptItem :one
-INSERT INTO stock_receipt_items (receipt_id, product_id, quantity, unit_cost, unit_sell_price)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, receipt_id, product_id, quantity, unit_cost, line_total, created_at, unit_sell_price
+INSERT INTO stock_receipt_items (
+    receipt_id, product_id, quantity, unit_cost, unit_sell_price,
+    product_unit_id, sale_unit_name, factor_to_base
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id, receipt_id, product_id, quantity, unit_cost, line_total, created_at, unit_sell_price, product_unit_id, sale_unit_name, factor_to_base
 `
 
 type InsertStockReceiptItemParams struct {
@@ -150,6 +153,9 @@ type InsertStockReceiptItemParams struct {
 	Quantity      int32          `json:"quantity"`
 	UnitCost      pgtype.Numeric `json:"unit_cost"`
 	UnitSellPrice pgtype.Numeric `json:"unit_sell_price"`
+	ProductUnitID pgtype.UUID    `json:"product_unit_id"`
+	SaleUnitName  *string        `json:"sale_unit_name"`
+	FactorToBase  pgtype.Numeric `json:"factor_to_base"`
 }
 
 func (q *Queries) InsertStockReceiptItem(ctx context.Context, arg InsertStockReceiptItemParams) (StockReceiptItem, error) {
@@ -159,6 +165,9 @@ func (q *Queries) InsertStockReceiptItem(ctx context.Context, arg InsertStockRec
 		arg.Quantity,
 		arg.UnitCost,
 		arg.UnitSellPrice,
+		arg.ProductUnitID,
+		arg.SaleUnitName,
+		arg.FactorToBase,
 	)
 	var i StockReceiptItem
 	err := row.Scan(
@@ -170,6 +179,9 @@ func (q *Queries) InsertStockReceiptItem(ctx context.Context, arg InsertStockRec
 		&i.LineTotal,
 		&i.CreatedAt,
 		&i.UnitSellPrice,
+		&i.ProductUnitID,
+		&i.SaleUnitName,
+		&i.FactorToBase,
 	)
 	return i, err
 }
@@ -177,6 +189,7 @@ func (q *Queries) InsertStockReceiptItem(ctx context.Context, arg InsertStockRec
 const listStockReceiptItems = `-- name: ListStockReceiptItems :many
 SELECT
     i.id, i.receipt_id, i.product_id, i.quantity, i.unit_cost, i.line_total, i.created_at, i.unit_sell_price,
+    i.product_unit_id, i.sale_unit_name, i.factor_to_base,
     p.name AS product_name,
     p.sku AS product_sku,
     p.barcode AS product_barcode,
@@ -197,6 +210,9 @@ type ListStockReceiptItemsRow struct {
 	LineTotal        pgtype.Numeric     `json:"line_total"`
 	CreatedAt        pgtype.Timestamptz `json:"created_at"`
 	UnitSellPrice    pgtype.Numeric     `json:"unit_sell_price"`
+	ProductUnitID    pgtype.UUID        `json:"product_unit_id"`
+	SaleUnitName     *string            `json:"sale_unit_name"`
+	FactorToBase     pgtype.Numeric     `json:"factor_to_base"`
 	ProductName      string             `json:"product_name"`
 	ProductSku       *string            `json:"product_sku"`
 	ProductBarcode   *string            `json:"product_barcode"`
@@ -222,6 +238,9 @@ func (q *Queries) ListStockReceiptItems(ctx context.Context, receiptID uuid.UUID
 			&i.LineTotal,
 			&i.CreatedAt,
 			&i.UnitSellPrice,
+			&i.ProductUnitID,
+			&i.SaleUnitName,
+			&i.FactorToBase,
 			&i.ProductName,
 			&i.ProductSku,
 			&i.ProductBarcode,

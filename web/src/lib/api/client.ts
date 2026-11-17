@@ -60,10 +60,14 @@ axiosInstance.interceptors.response.use(
             }
         }
 
-        if (error.response?.status === 401 && !isLoginPath(window.location.pathname) && !originalRequest.url?.includes('/auth/login')) {
+        const sessionUrl = originalRequest.url ?? ''
+        const sessionGone =
+            error.response?.status === 401 ||
+            (error.response?.status === 404 && sessionUrl.includes('/auth/me'))
 
-            if (!originalRequest.url?.includes('/auth/refresh')) {
-                window.location.replace('/login');
+        if (sessionGone && !isLoginPath(window.location.pathname) && !sessionUrl.includes('/auth/login')) {
+            if (!sessionUrl.includes('/auth/refresh')) {
+                window.location.replace('/login')
             }
         }
 

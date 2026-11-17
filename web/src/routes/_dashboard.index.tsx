@@ -12,13 +12,22 @@ import { DashboardPaymentChart } from "@/components/dashboard/DashboardPaymentCh
 import { DashboardQuickActions } from "@/components/dashboard/DashboardQuickActions"
 import { formatDate } from '@/lib/utils'
 import { useFormatMoney } from '@/context/MoneyContext'
+import { isAuthSessionError } from '@/lib/api/httpStatus'
 
 
 export const Route = createFileRoute('/_dashboard/')({
     beforeLoad: async ({ context: { queryClient } }) => {
-        const me = await queryClient.ensureQueryData(meQueryOptions())
-        if ((me as { role?: string })?.role === 'super_admin') {
-            throw redirect({ to: '/platform/overview' })
+        try {
+            const me = await queryClient.ensureQueryData(meQueryOptions())
+            if ((me as { role?: string })?.role === 'super_admin') {
+                throw redirect({ to: '/platform/overview' })
+            }
+        } catch (error: unknown) {
+            if (isAuthSessionError(error)) {
+                queryClient.setQueryData(meQueryOptions().queryKey, null)
+                throw redirect({ to: '/login' })
+            }
+            throw error
         }
     },
     component: DashboardIndex,

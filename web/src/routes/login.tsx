@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTranslation } from 'react-i18next'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { LoginForm } from "@/components/auth/LoginForm"
+import { isAuthSessionError } from '@/lib/api/httpStatus'
 
 export const Route = createFileRoute('/login')({
     ssr: false,
@@ -19,9 +20,7 @@ export const Route = createFileRoute('/login')({
             }
         } catch (error: unknown) {
             if (isRedirect(error)) throw error
-            const err = error as { response?: { status?: number }; status?: number; cause?: { status?: number } }
-            const status = err?.response?.status ?? err?.status ?? err?.cause?.status
-            if (status === 401) {
+            if (isAuthSessionError(error)) {
                 queryClient.setQueryData(meQueryOptions().queryKey, null)
                 return
             }

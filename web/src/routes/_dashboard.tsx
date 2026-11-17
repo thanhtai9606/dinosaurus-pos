@@ -18,16 +18,19 @@ import { useQueryClient } from '@tanstack/react-query'
 import { PosStorageScopeEffect } from '@/components/dashboard/PosStorageScopeEffect'
 import { PosCatalogBootstrap } from '@/components/dashboard/PosCatalogBootstrap'
 import { FirebaseMessagingBootstrap } from '@/components/notifications/FirebaseMessagingBootstrap'
+import { isAuthSessionError } from '@/lib/api/httpStatus'
 
 export const Route = createFileRoute('/_dashboard')({
     loader: async ({ context: { queryClient } }) => {
         try {
-            await queryClient.ensureQueryData(financialSettingsQueryOptions())
-            await queryClient.ensureQueryData(regionalSettingsQueryOptions())
-            return await queryClient.ensureQueryData(meQueryOptions())
-        } catch (error: any) {
-            const status = error?.response?.status ?? error?.status
-            if (status === 401) {
+            const me = await queryClient.ensureQueryData(meQueryOptions())
+            await Promise.all([
+                queryClient.ensureQueryData(financialSettingsQueryOptions()),
+                queryClient.ensureQueryData(regionalSettingsQueryOptions()),
+            ])
+            return me
+        } catch (error: unknown) {
+            if (isAuthSessionError(error)) {
                 queryClient.setQueryData(meQueryOptions().queryKey, null)
                 throw redirect({ to: '/login' })
             }

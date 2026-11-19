@@ -1,9 +1,507 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useState, useMemo, useRef, useEffect } from 'react'
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts'
+import { useDebounce } from '@/hooks/use-debounce'
+import { useTranslation } from 'react-i18next'
+import { useProductsListQuery, Product } from '@/lib/api/query/products'
+import { productsApi } from '@/lib/api/client'
+import { ShoppingCart } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { PaymentDialog } from "@/components/payment/PaymentDialog"
+import { useCreateOrderMutation } from '@/lib/api/query/orders'
+import { getApiErrorMessage } from '@/lib/api/getApiErrorMessage'
+import { toast } from 'sonner'
+import { InternalProductsProductOptionResponse } from '@/lib/api/generated'
+import { OrderType } from '@/lib/api/domain'
+import { useCustomersListQuery } from '@/lib/api/query/customers'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { CartContent, CartItem } from '@/components/orders/CartContent'
+import { VariantSelectionDialog } from '@/components/orders/VariantSelectionDialog'
+import { ProductSearch } from '@/components/orders/ProductSearch'
+import { ProductGrid } from '@/components/orders/ProductGrid'
+import { CategorySidebar } from '@/components/orders/CategorySidebar'
+import { useCategoriesListQuery } from '@/lib/api/query/categories'
+import {
+    clearOrderPosDraft,
+    loadOrderPosDraft,
+    saveOrderPosDraft,
+} from '@/lib/orders/orderDraftStorage'
+import { notifyPosDraftChanged } from '@/lib/pos/sessionScope'
+import { getCachedPosProducts } from '@/lib/pos/posCatalogStore'
+import { OfflinePosBanner } from '@/components/retail-pos/OfflinePosBanner'
+import { usePosOfflineSync } from '@/hooks/usePosOfflineSync'
+import { enqueuePosOp, isNetworkError } from '@/lib/offline/posQueue'
+import {
+    baseQtyForLine,
+    cartBaseQtyForProduct,
+    cartLineKey,
+    defaultSaleUnit,
+    type ProductSaleUnit,
+} from '@/lib/retail-pos/productUnits'
+import { lineSubtotal } from '@/lib/retail-pos/pricing'
 
 export const Route = createFileRoute('/_dashboard/order')({
-  component: RouteComponent,
+    component: OrderPage,
 })
 
-function RouteComponent() {
-  return <div>Hello "/_dashboard/order"!</div>
+function OrderPage() {
+    const { t } = useTranslation()
+    const [selectedCategory, setSelectedCategory] = useState('all')
+
+    const searchInputRef = useRef<HTMLInputElement>(null)
+    const [searchTerm, setSearchTerm] = useState('')
+
+    useKeyboardShortcuts(
+        [
+            {
+                key: 'f',
+                ctrlKey: true,
+                action: () => searchInputRef.current?.focus(),
+            },
+        ],
+        true
+    )
+    const debouncedSearch = useDebounce(searchTerm, 500)
+    const isSearchPending = searchTerm !== debouncedSearch
+    const categoryFilter = selectedCategory === 'all' ? undefined : Number(selectedCategory)
+
+    const { data: productsData, isLoading: productsLoading, isFetching: productsFetching } =
+        useProductsListQuery({
+            limit: 100,
+            page: 1,
+            search: debouncedSearch || undefined,
+            category: Number.isFinite(categoryFilter) ? categoryFilter : undefined,
+        })
+    const [offlineProducts, setOfflineProducts] = useState<Product[] | null>(null)
+
+    const [netOnline, setNetOnline] = useState(
+        typeof navigator !== 'undefined' ? navigator.onLine : true,
+    )
+    useEffect(() => {
+        const on = () => setNetOnline(true)
+        const off = () => setNetOnline(false)
+        window.addEventListener('online', on)
+        window.addEventListener('offline', off)
+        return () => {
+            window.removeEventListener('online', on)
+            window.removeEventListener('offline', off)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (netOnline) {
+            setOfflineProducts(null)
+            return
+        }
+        void getCachedPosProducts().then((list) => setOfflineProducts(list.length ? list : null))
+    }, [netOnline])
+
+    const products =
+        !netOnline && offlineProducts?.length ? offlineProducts : productsData?.products || []
+    const { data: categoriesFromApi, isLoading: categoriesLoading } = useCategoriesListQuery({ limit: 100 })
+
+    const { data: customersData } = useCustomersListQuery({ limit: 100 })
+    const customers = customersData?.customers || []
+
+    const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
+    const [selectedOrderType, setSelectedOrderType] = useState<OrderType>(OrderType.OrderTypeDineIn)
+
+    const categories = useMemo(() => {
+        return (categoriesFromApi ?? [])
+            .filter((cat) => cat.id != null && cat.name)
+            .map((cat) => ({ id: String(cat.id), name: cat.name! }))
+            .sort((a, b) => a.name.localeCompare(b.name))
+    }, [categoriesFromApi])
+
+    const categoryTitle = useMemo(() => {
+        if (selectedCategory === 'all') return t('order.all_categories')
+        return categories.find((c) => c.id === selectedCategory)?.name ?? t('order.all_categories')
+    }, [selectedCategory, categories, t])
+
+    const inStockProducts = products.filter((p) => (p.stock || 0) > 0)
+    const outOfStockProducts = products.filter((p) => (p.stock || 0) <= 0)
+
+    const [cart, setCart] = useState<CartItem[]>([])
+    const orderDraftHydrated = useRef(false)
+
+    useEffect(() => {
+        if (orderDraftHydrated.current) return
+        orderDraftHydrated.current = true
+        const draft = loadOrderPosDraft()
+        if (!draft?.cart.length) return
+        setCart(draft.cart)
+        setSelectedCustomerId(draft.selectedCustomerId)
+        setSelectedOrderType(draft.selectedOrderType)
+        toast.info(t('order.draft.restored'))
+    }, [t])
+
+    useEffect(() => {
+        if (!orderDraftHydrated.current) return
+        if (cart.length === 0) {
+            clearOrderPosDraft()
+            notifyPosDraftChanged()
+            return
+        }
+        saveOrderPosDraft({
+            version: 1,
+            savedAt: Date.now(),
+            cart,
+            selectedCustomerId,
+            selectedOrderType,
+        })
+        notifyPosDraftChanged()
+    }, [cart, selectedCustomerId, selectedOrderType])
+    const [isPaymentOpen, setIsPaymentOpen] = useState(false)
+    const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
+    const [isLoadingDetailsId, setIsLoadingDetailsId] = useState<string | null>(null)
+
+    const [variantSelectionOpen, setVariantSelectionOpen] = useState(false)
+    const [productForVariantSelection, setProductForVariantSelection] = useState<Product | null>(null)
+
+    const createOrderMutation = useCreateOrderMutation()
+    const { online, pending, syncing, flush } = usePosOfflineSync()
+    const canCreateOrder = createOrderMutation.isAllowed
+
+    const addToCart = async (product: Product) => {
+        if ((product.stock || 0) <= 0) {
+            toast.error(t('order.errors.stock_empty'))
+            return
+        }
+        if (!product.id) {
+            toast.error(t('order.errors.load_failed'))
+            return
+        }
+        setIsLoadingDetailsId(product.id)
+        try {
+            const res = await productsApi.productsIdGet(product.id)
+            const detail = (res.data as { data?: Product }).data ?? product
+            if (detail.options && detail.options.length > 0) {
+                setProductForVariantSelection(detail)
+                setVariantSelectionOpen(true)
+                return
+            }
+            addCartItem(detail, undefined, defaultSaleUnit(detail, detail.matched_sale_unit_id))
+        } catch (error) {
+            console.error(error)
+            addCartItem(product)
+            toast.warning(t('order.errors.variant_check_skipped', 'Added to cart; could not load variants.'))
+        } finally {
+            setIsLoadingDetailsId(null)
+        }
+    }
+
+    const addCartItem = (
+        product: Product,
+        variant?: InternalProductsProductOptionResponse,
+        saleUnit?: ProductSaleUnit,
+    ) => {
+        const unit = saleUnit ?? defaultSaleUnit(product)
+        setCart((prev) => {
+            const lineKey = cartLineKey(product.id!, variant?.id, unit)
+            const existing = prev.find(
+                (item) =>
+                    cartLineKey(
+                        item.product.id!,
+                        item.variant?.id,
+                        item.saleUnit ?? defaultSaleUnit(item.product),
+                    ) === lineKey,
+            )
+
+            const baseUsed = cartBaseQtyForProduct(prev, product.id!, lineKey)
+            if (baseUsed + baseQtyForLine(1, unit) > (product.stock || 0)) {
+                toast.error(t('order.errors.insufficient_stock'))
+                return prev
+            }
+
+            if (existing) {
+                return prev.map((item) => {
+                    const key = cartLineKey(
+                        item.product.id!,
+                        item.variant?.id,
+                        item.saleUnit ?? defaultSaleUnit(item.product),
+                    )
+                    return key === lineKey ? { ...item, quantity: item.quantity + 1, saleUnit: unit } : item
+                })
+            }
+            return [...prev, { product, variant, quantity: 1, saleUnit: unit }]
+        })
+        setVariantSelectionOpen(false)
+        setProductForVariantSelection(null)
+    }
+
+    const removeFromCart = (lineKey: string) => {
+        setCart((prev) =>
+            prev.filter(
+                (item) =>
+                    cartLineKey(
+                        item.product.id!,
+                        item.variant?.id,
+                        item.saleUnit ?? defaultSaleUnit(item.product),
+                    ) !== lineKey,
+            ),
+        )
+    }
+
+    const updateQuantity = (lineKey: string, delta: number) => {
+        setCart((prev) => {
+            const item = prev.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === lineKey,
+            )
+            if (!item) return prev
+            const unit = item.saleUnit ?? defaultSaleUnit(item.product)
+            const newQty = Math.max(1, item.quantity + delta)
+            const baseUsed = cartBaseQtyForProduct(prev, item.product.id!, lineKey)
+            if (baseUsed + baseQtyForLine(newQty, unit) - baseQtyForLine(item.quantity, unit) > (item.product.stock || 0)) {
+                toast.error(t('order.errors.insufficient_stock'))
+                return prev
+            }
+            return prev.map((row) => {
+                const key = cartLineKey(
+                    row.product.id!,
+                    row.variant?.id,
+                    row.saleUnit ?? defaultSaleUnit(row.product),
+                )
+                return key === lineKey ? { ...row, quantity: newQty } : row
+            })
+        })
+    }
+
+    const setQuantity = (lineKey: string, quantity: number) => {
+        const qty = Math.max(1, Math.floor(quantity))
+        setCart((prev) => {
+            const item = prev.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === lineKey,
+            )
+            if (!item) return prev
+            const unit = item.saleUnit ?? defaultSaleUnit(item.product)
+            const baseUsed = cartBaseQtyForProduct(prev, item.product.id!, lineKey)
+            if (baseUsed + baseQtyForLine(qty, unit) - baseQtyForLine(item.quantity, unit) > (item.product.stock || 0)) {
+                toast.error(t('order.errors.insufficient_stock'))
+                return prev
+            }
+            return prev.map((row) => {
+                const key = cartLineKey(
+                    row.product.id!,
+                    row.variant?.id,
+                    row.saleUnit ?? defaultSaleUnit(row.product),
+                )
+                return key === lineKey ? { ...row, quantity: qty } : row
+            })
+        })
+    }
+
+    const changeSaleUnit = (lineKey: string, unit: ProductSaleUnit) => {
+        setCart((prev) => {
+            const item = prev.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === lineKey,
+            )
+            if (!item) return prev
+            const newKey = cartLineKey(item.product.id!, item.variant?.id, unit)
+            const merged = prev.filter(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) !== lineKey,
+            )
+            const existing = merged.find(
+                (row) =>
+                    cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    ) === newKey,
+            )
+            const qty = existing ? existing.quantity + item.quantity : item.quantity
+            const baseUsed = cartBaseQtyForProduct(merged, item.product.id!, newKey)
+            if (baseUsed + baseQtyForLine(qty, unit) > (item.product.stock || 0)) {
+                toast.error(t('order.errors.insufficient_stock'))
+                return prev
+            }
+            if (existing) {
+                return merged.map((row) => {
+                    const key = cartLineKey(
+                        row.product.id!,
+                        row.variant?.id,
+                        row.saleUnit ?? defaultSaleUnit(row.product),
+                    )
+                    return key === newKey ? { ...row, quantity: qty, saleUnit: unit } : row
+                })
+            }
+            return [...merged, { ...item, saleUnit: unit, quantity: qty }]
+        })
+    }
+
+    const calculateTotal = () => cart.reduce((total, item) => total + lineSubtotal(item), 0)
+
+    const handleCheckout = () => {
+        if (cart.length === 0) return
+
+        const orderData = {
+            items: cart.map((item) => ({
+                product_id: item.product.id!,
+                quantity: item.quantity,
+                product_unit_id: (item.saleUnit ?? defaultSaleUnit(item.product)).id || undefined,
+                options: item.variant && item.variant.id ? [{ product_option_id: item.variant.id }] : [],
+            })),
+            type: selectedOrderType,
+            customer_id: selectedCustomerId || undefined
+        }
+
+        createOrderMutation
+            .mutateAsync(orderData)
+            .then((data) => {
+                setCreatedOrderId(data.id || null)
+                setIsPaymentOpen(true)
+                toast.success(t('order.success.created'))
+            })
+            .catch((err) => {
+                if (isNetworkError(err)) {
+                    enqueuePosOp({
+                        idempotencyKey: crypto.randomUUID(),
+                        kind: selectedCustomerId ? 'pos_debt' : 'pos_cash',
+                        orderBody: orderData as Record<string, unknown>,
+                    })
+                    toast.info(t('retailPos.offline.queued'))
+                    setCart([])
+                    return
+                }
+                toast.error(getApiErrorMessage(err, t('order.errors.create_failed')))
+            })
+    }
+
+    return (
+        <div className="relative flex h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-xl border bg-muted/20">
+            <OfflinePosBanner online={online} pending={pending} syncing={syncing} onSync={() => void flush()} t={t} />
+            <div className="relative flex min-h-0 flex-1 overflow-hidden">
+            <aside className="hidden w-56 shrink-0 lg:block xl:w-64">
+                <CategorySidebar
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={setSelectedCategory}
+                    isLoading={categoriesLoading}
+                    allLabel={t('order.all_categories')}
+                    title={t('order.categories_title')}
+                />
+            </aside>
+
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
+                <ProductSearch
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    inputRef={searchInputRef}
+                    isSearching={isSearchPending || (productsFetching && !productsLoading)}
+                    t={t}
+                    categoryLabel={categoryTitle}
+                    itemsAvailable={inStockProducts.length}
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={setSelectedCategory}
+                    categories={categories}
+                />
+
+                <div className="min-h-0 flex-1">
+                    <ProductGrid
+                        inStockProducts={inStockProducts}
+                        outOfStockProducts={outOfStockProducts}
+                        isLoading={productsLoading}
+                        isLoadingDetailsId={isLoadingDetailsId}
+                        onAddToCart={addToCart}
+                        t={t}
+                    />
+                </div>
+            </div>
+
+            {/* Cart Mobile Toggle */}
+            <div className="md:hidden fixed bottom-6 right-6 z-50">
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button size="lg" className="rounded-full h-14 w-14 shadow-lg p-0 relative">
+                            <ShoppingCart className="h-6 w-6" />
+                            {cart.length > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs font-bold h-5 w-5 rounded-full flex items-center justify-center border-2 border-background">
+                                    {cart.length}
+                                </span>
+                            )}
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="p-0 w-full sm:max-w-md border-l">
+                        <CartContent 
+                            cart={cart} 
+                            t={t} 
+                            customers={customers} 
+                            selectedCustomerId={selectedCustomerId} 
+                            setSelectedCustomerId={setSelectedCustomerId}
+                            selectedOrderType={selectedOrderType}
+                            setSelectedOrderType={setSelectedOrderType}
+                            updateQuantity={updateQuantity}
+                            setQuantity={setQuantity}
+                            changeSaleUnit={changeSaleUnit}
+                            removeFromCart={removeFromCart}
+                            calculateTotal={calculateTotal}
+                            handleCheckout={handleCheckout}
+                            canCheckout={canCreateOrder}
+                        />
+                    </SheetContent>
+                </Sheet>
+            </div>
+
+            {/* Right: Cart Sidebar (Desktop) */}
+            <div className="hidden min-h-0 w-[min(100%,24rem)] shrink-0 flex-col overflow-hidden border-l bg-card md:flex xl:w-96">
+                <CartContent 
+                    cart={cart} 
+                    t={t} 
+                    customers={customers} 
+                    selectedCustomerId={selectedCustomerId} 
+                    setSelectedCustomerId={setSelectedCustomerId}
+                    selectedOrderType={selectedOrderType}
+                    setSelectedOrderType={setSelectedOrderType}
+                    updateQuantity={updateQuantity}
+                    setQuantity={setQuantity}
+                    changeSaleUnit={changeSaleUnit}
+                    removeFromCart={removeFromCart}
+                    calculateTotal={calculateTotal}
+                    handleCheckout={handleCheckout}
+                    canCheckout={canCreateOrder}
+                />
+            </div>
+
+            {/* Payment Dialog Component */}
+            <PaymentDialog
+                open={isPaymentOpen}
+                onOpenChange={setIsPaymentOpen}
+                orderId={createdOrderId}
+                onPaymentSuccess={() => {
+                    setCart([])
+                    setCreatedOrderId(null)
+                    setSelectedCustomerId(null)
+                }}
+            />
+
+            {/* Variant Selection Dialog */}
+            <VariantSelectionDialog 
+                open={variantSelectionOpen}
+                onOpenChange={setVariantSelectionOpen}
+                product={productForVariantSelection}
+                onSelect={addCartItem}
+                t={t}
+            />
+            </div>
+        </div>
+    )
 }
